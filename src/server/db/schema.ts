@@ -18,7 +18,7 @@ import { type AdapterAccount } from "next-auth/adapters";
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const mysqlTable = mysqlTableCreator((name) => `type-the-word_${name}`);
+export const mysqlTable = mysqlTableCreator((name) => `${name}`);
 
 export const example = mysqlTable(
   "example",
