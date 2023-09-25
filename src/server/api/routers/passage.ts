@@ -29,7 +29,7 @@ export const passageRouter = createTRPCRouter({
         .input(z.string())
         .query(async ({ input }): Promise<PassageSchema> => {
             const response = await fetch(
-                `https://api.esv.org/v3/passage/text/?q=John+11:35`,
+                `https://api.esv.org/v3/passage/text/?q=${input}`,
                 {
                     headers: {
                         Authorization: `Token ${env.CROSSWAY_SECRET}`,
