@@ -15,7 +15,7 @@ export default function Home() {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <nav className="container flex items-center justify-center gap-12 bg-black px-4 py-16 ">
-                <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
+                <h1 className="text-5xl font-mono font-extrabold tracking-tight text-white sm:text-[5rem]">
                     type the word
                 </h1>
                 <div className="flex flex-col items-center gap-2">
