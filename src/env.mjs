@@ -17,6 +17,7 @@ export const env = createEnv({
         NODE_ENV: z
             .enum(['development', 'test', 'production'])
             .default('development'),
+        CROSSWAY_SECRET: z.string(),
         // NEXTAUTH_SECRET:
         //   process.env.NODE_ENV === "production"
         //     ? z.string().min(1)
@@ -49,6 +50,7 @@ export const env = createEnv({
     runtimeEnv: {
         DATABASE_URL: process.env.DATABASE_URL,
         NODE_ENV: process.env.NODE_ENV,
+        CROSSWAY_SECRET: process.env.CROSSWAY_SECRET,
         // NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
         // NEXTAUTH_URL: process.env.NEXTAUTH_URL,
         // DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,

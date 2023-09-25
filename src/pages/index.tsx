@@ -1,9 +1,11 @@
 import { signIn, signOut, useSession } from 'next-auth/react'
 import Head from 'next/head'
+
 import { api } from '~/utils/api'
 
 export default function Home() {
     const hello = api.example.hello.useQuery({ text: 'from tRPC' })
+    const passage = api.passage.passage.useQuery('asdf')
 
     return (
         <div className=" flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
@@ -25,7 +27,11 @@ export default function Home() {
                     <AuthShowcase />
                 </div>
             </nav>
-            <main></main>
+
+            <main>
+                <p>{passage.data?.passages.at(0)}</p>
+                {JSON.stringify(passage.data)}
+            </main>
         </div>
     )
 }
