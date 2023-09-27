@@ -1,7 +1,7 @@
 import { clsx } from 'clsx'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import Head from 'next/head'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { api } from '~/utils/api'
 
@@ -122,6 +122,75 @@ export default function Home() {
 
     console.log({ currentVerse, chapter })
 
+    const [animatedCursorRect, setAnimatedCursorRect] = useState<{
+        top: string | number
+        left: string | number
+        width: string | number
+        height: string | number
+    }>({
+        top: 0,
+        left: 0,
+        width: 0,
+        height: 0,
+    })
+
+    useEffect(() => {
+        function move() {
+            console.log('move')
+
+            const arena = document.querySelector('.arena')
+            const arenaRect = arena?.getBoundingClientRect()
+            if (arenaRect == null) return
+
+            const activeLetterRect = document
+                .querySelector(
+                    '.active span:not(.correct):not(.incorrect):not(.extra)',
+                )
+                ?.getBoundingClientRect()
+
+            if (activeLetterRect) {
+                setAnimatedCursorRect(
+                    {
+                        ...activeLetterRect,
+                        top: activeLetterRect.top - arenaRect.top - 2,
+                        left: activeLetterRect.left - arenaRect.left - 2,
+                        width: activeLetterRect.width,
+                        height: activeLetterRect.height,
+                    },
+                    //{ soft: true }
+                )
+                return
+            }
+            const activeSpaceRect = document
+                .querySelector('.active ~ .space')
+                ?.getBoundingClientRect()
+
+            //console.log(activeSpaceRect);
+            if (activeSpaceRect) {
+                setAnimatedCursorRect(
+                    {
+                        ...activeSpaceRect,
+                        top: activeSpaceRect.top - arenaRect.top,
+                        left: activeSpaceRect.left - arenaRect.left,
+                        width: activeSpaceRect.width,
+                        height: '100%',
+                    },
+                    //{ soft: true }
+                )
+                return
+            }
+        }
+
+        let frame = requestAnimationFrame(function loop(t) {
+            frame = requestAnimationFrame(loop)
+            move()
+        })
+
+        return () => {
+            cancelAnimationFrame(frame)
+        }
+    }, [])
+
     return (
         <div className="container min-h-screen flex flex-col mx-auto">
             <Head>
@@ -136,7 +205,7 @@ export default function Home() {
                 <AuthShowcase />
             </nav>
 
-            <main className="prose mx-auto focus-within:border-red-400 border-2">
+            <main className="arena relative prose mx-auto focus-within:border-red-400 border-2">
                 <input
                     type="text"
                     className="h-0 peer opacity-0"
@@ -230,15 +299,15 @@ export default function Home() {
                                                                                                     'letter',
                                                                                                     letter ===
                                                                                                         correctLetter &&
-                                                                                                        'text-emerald-500',
+                                                                                                        'correct text-emerald-500',
                                                                                                     correctLetter &&
                                                                                                         letter !==
                                                                                                             correctLetter &&
-                                                                                                        'text-rose-700',
+                                                                                                        'incorrect text-rose-700',
                                                                                                     lIndex >
                                                                                                         word.length -
                                                                                                             1 &&
-                                                                                                        'text-rose-700',
+                                                                                                        'extra text-rose-700',
                                                                                                 )}
                                                                                             >
                                                                                                 {
@@ -267,11 +336,11 @@ export default function Home() {
                                                                                                     'letter',
                                                                                                     letter ===
                                                                                                         typedLetter &&
-                                                                                                        'text-emerald-500',
+                                                                                                        'correct text-emerald-500',
                                                                                                     typedLetter &&
                                                                                                         letter !==
                                                                                                             typedLetter &&
-                                                                                                        'text-rose-700',
+                                                                                                        'incorrect text-rose-700',
                                                                                                 )}
                                                                                             >
                                                                                                 {
@@ -315,6 +384,16 @@ export default function Home() {
                             break
                     }
                 })}
+                <div
+                    className="absolute rounded-sm bg-black/10 peer-focus:bg-black/20"
+                    style={{
+                        top: `${animatedCursorRect?.top}px`,
+                        left: `${animatedCursorRect?.left}px`,
+                        width: `${animatedCursorRect?.width}px`,
+                        height: `${animatedCursorRect?.height}px`,
+                        color: 'lime',
+                    }}
+                />
             </main>
         </div>
     )
