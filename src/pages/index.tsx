@@ -25,33 +25,22 @@ type Passage =
       }
     | { type: 'footnote'; verse: string; text: string }
 
-function normalizeText(text: string) {
-    const allQuotes = [
-        '“', // U+201c
-        '”', // U+201d
-        '«', // U+00AB
-        '»', // U+00BB
-        '„', // U+201E
-        '“', // U+201C
-        '‟', // U+201F
-        '”', // U+201D
-        '❝', // U+275D
-        '❞', // U+275E
-        '〝', // U+301D
-        '〞', // U+301E
-        '〟', // U+301F
-        '＂', // U+FF02
-    ]
-
-    const stdQuote = '"' // U+0022
-
-    const normalized = allQuotes.reduce((strNorm, quoteChar) => {
-        const re = new RegExp(quoteChar, 'g')
-        return strNorm.replace(re, stdQuote)
-    }, text)
-
-    return normalized
-}
+const validQuotes = [
+    '“', // U+201c
+    '”', // U+201d
+    '«', // U+00AB
+    '»', // U+00BB
+    '„', // U+201E
+    '“', // U+201C
+    '‟', // U+201F
+    '”', // U+201D
+    '❝', // U+275D
+    '❞', // U+275E
+    '〝', // U+301D
+    '〞', // U+301E
+    '〟', // U+301F
+    '＂', // U+FF02
+]
 
 function parseChapter(passage: string): Passage[] {
     return passage.split('\n').flatMap((line): Passage[] => {
@@ -60,12 +49,10 @@ function parseChapter(passage: string): Passage[] {
         } else if (verseRegex.test(line)) {
             const verseNodes = []
             for (const match of line.match(verseRegex) ?? []) {
-                const text = normalizeText(
-                    match
-                        .replace(verseNumberRegex, '')
-                        .replace(footnoteNumberRegex, '')
-                        .trimStart(),
-                )
+                const text = match
+                    .replace(verseNumberRegex, '')
+                    .replace(footnoteNumberRegex, '')
+                    .trimStart()
 
                 verseNodes.push({
                     type: 'verse' as const,
@@ -77,7 +64,7 @@ function parseChapter(passage: string): Passage[] {
                         .concat([]),
                 })
             }
-            console.log({ parseVerseNodes: verseNodes })
+            // console.log({ parseVerseNodes: verseNodes })
 
             return [{ type: 'paragraph' as const, nodes: verseNodes }]
         } else if (footnoteRegex.test(line)) {
@@ -128,16 +115,34 @@ function getPosition(
     )
 }
 
+function isLetterEqual(correct?: string, typed?: string) {
+    if (correct === undefined || typed === undefined) return correct === typed
+
+    if (typed === '"') {
+        console.log(
+            { a: correct, b: typed },
+            correct === typed,
+            validQuotes.includes(typed),
+        )
+
+        return correct === typed || validQuotes.includes(correct)
+    }
+
+    return correct === typed
+}
+
 function isMatrixEqual(a: string[][], b: string[][]) {
     return (
         a.length === b.length &&
         a.every((row, i) => row.length === b.at(i)?.length) &&
-        a.every((row, i) => row.every((letter, j) => letter === b.at(i)?.at(j)))
+        a.every((row, i) =>
+            row.every((letter, j) => isLetterEqual(letter, b.at(i)?.at(j))),
+        )
     )
 }
 
 function MyComponent({ passage }: { passage: any }) {
-    console.log({ passage })
+    // console.log({ passage })
 
     const chapter = parseChapter(passage.data?.passages.at(0) ?? '')
     const inputRef = useRef<HTMLInputElement>(null)
@@ -156,7 +161,7 @@ function MyComponent({ passage }: { passage: any }) {
             e.nativeEvent.inputType === 'insertText' ||
             e.nativeEvent.inputType === 'deleteContentBackward'
         ) {
-            console.log(e.nativeEvent.inputType, e.nativeEvent.data)
+            // console.log(e.nativeEvent.inputType, e.nativeEvent.data)
 
             setKeystrokes(prev => {
                 const next = prev.concat({
@@ -199,10 +204,12 @@ function MyComponent({ passage }: { passage: any }) {
     }
 
     function isEqual(a: string[], b: string[]) {
-        return a.length === b.length && a.every((A, i) => A === b.at(i))
+        return (
+            a.length === b.length && a.every((A, i) => isLetterEqual(A, b[i]))
+        )
     }
 
-    console.log({ currentVersePosition, position })
+    // console.log({ currentVersePosition, position })
 
     const [animatedCursorRect, setAnimatedCursorRect] = useState<{
         top: string | number
@@ -285,9 +292,7 @@ function MyComponent({ passage }: { passage: any }) {
                                 {node.nodes.map((verse, vIndex) => {
                                     const isCurrentVerse =
                                         currentVersePosition === verse.verse
-                                    const isNextVerse =
-                                        currentVersePosition ===
-                                        node.nodes.at(vIndex + 1)?.verse
+
                                     return (
                                         <span
                                             key={vIndex}
@@ -351,6 +356,12 @@ function MyComponent({ passage }: { passage: any }) {
                                                                                         word?.at(
                                                                                             lIndex,
                                                                                         )
+                                                                                    const isEqual =
+                                                                                        isLetterEqual(
+                                                                                            correctLetter,
+                                                                                            letter,
+                                                                                        )
+
                                                                                     return (
                                                                                         <span
                                                                                             data-letter
@@ -359,12 +370,10 @@ function MyComponent({ passage }: { passage: any }) {
                                                                                             }
                                                                                             className={clsx(
                                                                                                 'letter',
-                                                                                                letter ===
-                                                                                                    correctLetter &&
+                                                                                                isEqual &&
                                                                                                     'correct text-emerald-500',
                                                                                                 correctLetter &&
-                                                                                                    letter !==
-                                                                                                        correctLetter &&
+                                                                                                    !isEqual &&
                                                                                                     'incorrect text-rose-700',
                                                                                                 lIndex >
                                                                                                     word.length -
@@ -388,6 +397,11 @@ function MyComponent({ passage }: { passage: any }) {
                                                                                         typedWord?.at(
                                                                                             lIndex,
                                                                                         )
+                                                                                    const isEqual =
+                                                                                        isLetterEqual(
+                                                                                            letter,
+                                                                                            typedLetter,
+                                                                                        )
                                                                                     return (
                                                                                         <span
                                                                                             data-letter
@@ -396,12 +410,10 @@ function MyComponent({ passage }: { passage: any }) {
                                                                                             }
                                                                                             className={clsx(
                                                                                                 'letter',
-                                                                                                letter ===
-                                                                                                    typedLetter &&
+                                                                                                isEqual &&
                                                                                                     'correct text-emerald-500',
                                                                                                 typedLetter &&
-                                                                                                    letter !==
-                                                                                                        typedLetter &&
+                                                                                                    !isEqual &&
                                                                                                     'incorrect text-rose-700',
                                                                                             )}
                                                                                         >
