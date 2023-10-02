@@ -25,6 +25,34 @@ type Passage =
       }
     | { type: 'footnote'; verse: string; text: string }
 
+function normalizeText(text: string) {
+    const allQuotes = [
+        '“', // U+201c
+        '”', // U+201d
+        '«', // U+00AB
+        '»', // U+00BB
+        '„', // U+201E
+        '“', // U+201C
+        '‟', // U+201F
+        '”', // U+201D
+        '❝', // U+275D
+        '❞', // U+275E
+        '〝', // U+301D
+        '〞', // U+301E
+        '〟', // U+301F
+        '＂', // U+FF02
+    ]
+
+    const stdQuote = '"' // U+0022
+
+    const normalized = allQuotes.reduce((strNorm, quoteChar) => {
+        const re = new RegExp(quoteChar, 'g')
+        return strNorm.replace(re, stdQuote)
+    }, text)
+
+    return normalized
+}
+
 function parseChapter(passage: string): Passage[] {
     return passage.split('\n').flatMap((line): Passage[] => {
         if (line === '') {
@@ -32,17 +60,24 @@ function parseChapter(passage: string): Passage[] {
         } else if (verseRegex.test(line)) {
             const verseNodes = []
             for (const match of line.match(verseRegex) ?? []) {
-                const text = match
-                    .replace(verseNumberRegex, '')
-                    .replace(footnoteNumberRegex, '')
-                    .trim()
+                const text = normalizeText(
+                    match
+                        .replace(verseNumberRegex, '')
+                        .replace(footnoteNumberRegex, '')
+                        .trimStart(),
+                )
+
                 verseNodes.push({
                     type: 'verse' as const,
                     verse: match.match(numberRegex)?.[0] ?? '',
                     text,
-                    splitText: text.split(' ').map(word => word.split('')),
+                    splitText: text
+                        .split(' ')
+                        .map(word => word.split(''))
+                        .concat([]),
                 })
             }
+            console.log({ parseVerseNodes: verseNodes })
 
             return [{ type: 'paragraph' as const, nodes: verseNodes }]
         } else if (footnoteRegex.test(line)) {
@@ -65,35 +100,10 @@ function parseChapter(passage: string): Passage[] {
     })
 }
 
-export default function Home() {
-    const passage = api.passage.passage.useQuery('Genesis+6')
-    const chapter = parseChapter(passage.data?.passages.at(0) ?? '')
-    const inputRef = useRef<HTMLInputElement>(null)
-    const [keystrokes, setKeystrokes] = useState<
-        { inputType: string; data: string }[]
-    >([])
-    const [currentVerse, setCurrentVerse] = useState(
-        '1',
-        //chapter.find(node => node.type === 'paragraph')?.nodes?.at(0)?.verse as string,
-    )
-
-    function handleInput(e: React.FormEvent<HTMLInputElement>) {
-        if (
-            e.nativeEvent.inputType === 'insertText' ||
-            e.nativeEvent.inputType === 'deleteContentBackward'
-        ) {
-            console.log(e.nativeEvent.inputType, e.nativeEvent.data)
-
-            setKeystrokes(prev =>
-                prev.concat({
-                    inputType: e.nativeEvent.inputType,
-                    data: e.nativeEvent.data,
-                }),
-            )
-        }
-    }
-
-    const position = keystrokes.reduce(
+function getPosition(
+    keystrokes: { inputType: string; data: string }[] = [],
+): string[][] {
+    return keystrokes.reduce(
         (acc, keystroke) => {
             if (
                 keystroke.inputType === 'insertText' &&
@@ -116,11 +126,83 @@ export default function Home() {
         },
         [[]] as string[][],
     )
+}
+
+function isMatrixEqual(a: string[][], b: string[][]) {
+    return (
+        a.length === b.length &&
+        a.every((row, i) => row.length === b.at(i)?.length) &&
+        a.every((row, i) => row.every((letter, j) => letter === b.at(i)?.at(j)))
+    )
+}
+
+function MyComponent({ passage }: { passage: any }) {
+    console.log({ passage })
+
+    const chapter = parseChapter(passage.data?.passages.at(0) ?? '')
+    const inputRef = useRef<HTMLInputElement>(null)
+    const [keystrokes, setKeystrokes] = useState<
+        { inputType: string; data: string }[]
+    >([])
+    const [position, setPosition] = useState<string[][]>([] as string[][])
+
+    const [currentVersePosition, setCurrentVersePosition] = useState(
+        chapter.flatMap(node => ('nodes' in node ? node.nodes : [])).at(0)
+            ?.verse,
+    )
+
+    function handleInput(e: React.FormEvent<HTMLInputElement>) {
+        if (
+            e.nativeEvent.inputType === 'insertText' ||
+            e.nativeEvent.inputType === 'deleteContentBackward'
+        ) {
+            console.log(e.nativeEvent.inputType, e.nativeEvent.data)
+
+            setKeystrokes(prev => {
+                const next = prev.concat({
+                    inputType: e.nativeEvent.inputType,
+                    data: e.nativeEvent.data,
+                })
+
+                const position = getPosition(next)
+
+                const currentVerse = chapter
+                    .flatMap(node => ('nodes' in node ? node.nodes : []))
+                    .find(verse => verse.verse === currentVersePosition)
+                if (currentVerse == null) return next
+
+                const isVerseComplete = isMatrixEqual(
+                    currentVerse?.splitText,
+                    position,
+                )
+
+                if (isVerseComplete) {
+                    const verses = chapter.flatMap(node =>
+                        'nodes' in node ? node.nodes : [],
+                    )
+                    const currentVerseIndex = verses.findIndex(
+                        verse => verse.verse === currentVersePosition,
+                    )
+                    const next = verses.at(currentVerseIndex + 1)
+
+                    setCurrentVersePosition(next?.verse ?? '')
+                    setPosition([])
+                    return []
+                }
+
+                setPosition(position)
+                // console.log({ isVerseComplete, currentVerse, position })
+
+                return next
+            })
+        }
+    }
+
     function isEqual(a: string[], b: string[]) {
         return a.length === b.length && a.every((A, i) => A === b.at(i))
     }
 
-    console.log({ currentVerse, chapter })
+    console.log({ currentVersePosition, position })
 
     const [animatedCursorRect, setAnimatedCursorRect] = useState<{
         top: string | number
@@ -136,47 +218,38 @@ export default function Home() {
 
     useEffect(() => {
         function move() {
-            console.log('move')
-
             const arena = document.querySelector('.arena')
             const arenaRect = arena?.getBoundingClientRect()
             if (arenaRect == null) return
 
             const activeLetterRect = document
                 .querySelector(
-                    '.active span:not(.correct):not(.incorrect):not(.extra)',
+                    '.active-verse .active span:not(.correct):not(.incorrect):not(.extra)',
                 )
                 ?.getBoundingClientRect()
 
             if (activeLetterRect) {
-                setAnimatedCursorRect(
-                    {
-                        ...activeLetterRect,
-                        top: activeLetterRect.top - arenaRect.top - 2,
-                        left: activeLetterRect.left - arenaRect.left - 2,
-                        width: activeLetterRect.width,
-                        height: activeLetterRect.height,
-                    },
-                    //{ soft: true }
-                )
+                setAnimatedCursorRect({
+                    ...activeLetterRect,
+                    top: activeLetterRect.top - arenaRect.top - 2,
+                    left: activeLetterRect.left - arenaRect.left - 2,
+                    width: activeLetterRect.width,
+                    height: activeLetterRect.height,
+                })
                 return
             }
             const activeSpaceRect = document
-                .querySelector('.active ~ .space')
+                .querySelector('.active-verse .active ~ .space')
                 ?.getBoundingClientRect()
 
-            //console.log(activeSpaceRect);
             if (activeSpaceRect) {
-                setAnimatedCursorRect(
-                    {
-                        ...activeSpaceRect,
-                        top: activeSpaceRect.top - arenaRect.top,
-                        left: activeSpaceRect.left - arenaRect.left,
-                        width: activeSpaceRect.width,
-                        height: '100%',
-                    },
-                    //{ soft: true }
-                )
+                setAnimatedCursorRect({
+                    ...activeSpaceRect,
+                    top: activeSpaceRect.top - arenaRect.top,
+                    left: activeSpaceRect.left - arenaRect.left,
+                    width: activeSpaceRect.width,
+                    height: '100%',
+                })
                 return
             }
         }
@@ -190,6 +263,205 @@ export default function Home() {
             cancelAnimationFrame(frame)
         }
     }, [])
+
+    return (
+        <>
+            <input
+                type="text"
+                className="h-0 peer opacity-0"
+                tabIndex={0}
+                id="myInput"
+                onInput={e => {
+                    e.preventDefault()
+                    handleInput(e)
+                }}
+                ref={inputRef}
+            />
+            {chapter.map((node, pIndex) => {
+                switch (node.type) {
+                    case 'paragraph':
+                        return (
+                            <p className="font-[0px]" key={pIndex}>
+                                {node.nodes.map((verse, vIndex) => {
+                                    const isCurrentVerse =
+                                        currentVersePosition === verse.verse
+                                    const isNextVerse =
+                                        currentVersePosition ===
+                                        node.nodes.at(vIndex + 1)?.verse
+                                    return (
+                                        <span
+                                            key={vIndex}
+                                            className={clsx(
+                                                'verse inline break-spaces text-balance h-3',
+                                                isCurrentVerse &&
+                                                    'active-verse bg-gray-100',
+                                            )}
+                                            onClick={() => {
+                                                inputRef.current?.focus()
+                                            }}
+                                        >
+                                            <b className="">
+                                                {verse.verse}&nbsp;
+                                            </b>
+                                            {!isCurrentVerse
+                                                ? verse.text
+                                                : verse.splitText.map(
+                                                      (word, wIndex) => {
+                                                          const typedWord =
+                                                              position.at(
+                                                                  wIndex,
+                                                              )
+                                                          const extras =
+                                                              typedWord?.slice(
+                                                                  word.length,
+                                                              )
+                                                          const isPreviouslyTyped =
+                                                              position.at(
+                                                                  wIndex + 1,
+                                                              )
+                                                          return (
+                                                              <>
+                                                                  <span
+                                                                      key={
+                                                                          wIndex
+                                                                      }
+                                                                      className={clsx(
+                                                                          'word',
+                                                                          typedWord &&
+                                                                              isPreviouslyTyped ==
+                                                                                  null &&
+                                                                              'active',
+                                                                          typedWord &&
+                                                                              isPreviouslyTyped &&
+                                                                              !isEqual(
+                                                                                  word,
+                                                                                  typedWord,
+                                                                              ) &&
+                                                                              'underline decoration-rose-500',
+                                                                      )}
+                                                                  >
+                                                                      {extras?.length &&
+                                                                      typedWord
+                                                                          ? typedWord.map(
+                                                                                (
+                                                                                    letter,
+                                                                                    lIndex,
+                                                                                ) => {
+                                                                                    const correctLetter =
+                                                                                        word?.at(
+                                                                                            lIndex,
+                                                                                        )
+                                                                                    return (
+                                                                                        <span
+                                                                                            data-letter
+                                                                                            key={
+                                                                                                lIndex
+                                                                                            }
+                                                                                            className={clsx(
+                                                                                                'letter',
+                                                                                                letter ===
+                                                                                                    correctLetter &&
+                                                                                                    'correct text-emerald-500',
+                                                                                                correctLetter &&
+                                                                                                    letter !==
+                                                                                                        correctLetter &&
+                                                                                                    'incorrect text-rose-700',
+                                                                                                lIndex >
+                                                                                                    word.length -
+                                                                                                        1 &&
+                                                                                                    'extra text-rose-700',
+                                                                                            )}
+                                                                                        >
+                                                                                            {
+                                                                                                letter
+                                                                                            }
+                                                                                        </span>
+                                                                                    )
+                                                                                },
+                                                                            )
+                                                                          : word.map(
+                                                                                (
+                                                                                    letter,
+                                                                                    lIndex,
+                                                                                ) => {
+                                                                                    const typedLetter =
+                                                                                        typedWord?.at(
+                                                                                            lIndex,
+                                                                                        )
+                                                                                    return (
+                                                                                        <span
+                                                                                            data-letter
+                                                                                            key={
+                                                                                                lIndex
+                                                                                            }
+                                                                                            className={clsx(
+                                                                                                'letter',
+                                                                                                letter ===
+                                                                                                    typedLetter &&
+                                                                                                    'correct text-emerald-500',
+                                                                                                typedLetter &&
+                                                                                                    letter !==
+                                                                                                        typedLetter &&
+                                                                                                    'incorrect text-rose-700',
+                                                                                            )}
+                                                                                        >
+                                                                                            {
+                                                                                                letter
+                                                                                            }
+                                                                                        </span>
+                                                                                    )
+                                                                                },
+                                                                            )}
+                                                                  </span>
+                                                                  <span
+                                                                      data-space
+                                                                  >
+                                                                      {' '}
+                                                                  </span>
+                                                              </>
+                                                          )
+                                                      },
+                                                  )}
+                                        </span>
+                                    )
+                                })}
+                            </p>
+                        )
+                    case 'footnote':
+                        return (
+                            <p key={pIndex} className="my-2">
+                                <b>{node.verse}</b>
+                                {node.text}
+                            </p>
+                        )
+                    case 'newLine':
+                        return <br key={pIndex} className="mb-2" />
+                    case 'title':
+                        return (
+                            <h2 key={pIndex} className="tracking-tight">
+                                {node.text}
+                            </h2>
+                        )
+                    default:
+                        break
+                }
+            })}
+            <div
+                className="absolute rounded-sm bg-black/10 peer-focus:bg-black/20"
+                style={{
+                    top: `${animatedCursorRect?.top}px`,
+                    left: `${animatedCursorRect?.left}px`,
+                    width: `${animatedCursorRect?.width}px`,
+                    height: `${animatedCursorRect?.height}px`,
+                    color: 'lime',
+                }}
+            />
+        </>
+    )
+}
+
+export default function Home() {
+    const passage = api.passage.passage.useQuery('John 11:35-38')
 
     return (
         <div className="container min-h-screen flex flex-col mx-auto">
@@ -206,194 +478,7 @@ export default function Home() {
             </nav>
 
             <main className="arena relative prose mx-auto focus-within:border-red-400 border-2">
-                <input
-                    type="text"
-                    className="h-0 peer opacity-0"
-                    tabIndex={0}
-                    id="myInput"
-                    onInput={e => {
-                        e.preventDefault()
-                        handleInput(e)
-                    }}
-                    ref={inputRef}
-                />
-                {chapter.map((node, pIndex) => {
-                    switch (node.type) {
-                        case 'paragraph':
-                            return (
-                                <p className="font-[0px]" key={pIndex}>
-                                    {node.nodes.map((verse, vIndex) => {
-                                        const isCurrentVerse =
-                                            currentVerse === verse.verse
-                                        return (
-                                            <span
-                                                key={vIndex}
-                                                className={clsx(
-                                                    'verse inline break-spaces text-balance h-3',
-                                                    isCurrentVerse &&
-                                                        'bg-gray-100',
-                                                )}
-                                                onClick={() => {
-                                                    inputRef.current?.focus()
-                                                }}
-                                            >
-                                                <b className="">
-                                                    {verse.verse}&nbsp;
-                                                </b>
-                                                {!isCurrentVerse
-                                                    ? verse.text
-                                                    : verse.splitText.map(
-                                                          (word, wIndex) => {
-                                                              const typedWord =
-                                                                  position.at(
-                                                                      wIndex,
-                                                                  )
-                                                              const extras =
-                                                                  typedWord?.slice(
-                                                                      word.length,
-                                                                  )
-                                                              const isPreviouslyTyped =
-                                                                  position.at(
-                                                                      wIndex +
-                                                                          1,
-                                                                  )
-                                                              return (
-                                                                  <>
-                                                                      <span
-                                                                          key={
-                                                                              wIndex
-                                                                          }
-                                                                          className={clsx(
-                                                                              'word',
-                                                                              typedWord &&
-                                                                                  isPreviouslyTyped ==
-                                                                                      null &&
-                                                                                  'active',
-                                                                              typedWord &&
-                                                                                  isPreviouslyTyped &&
-                                                                                  !isEqual(
-                                                                                      word,
-                                                                                      typedWord,
-                                                                                  ) &&
-                                                                                  'underline decoration-rose-500',
-                                                                          )}
-                                                                      >
-                                                                          {extras?.length &&
-                                                                          typedWord
-                                                                              ? typedWord.map(
-                                                                                    (
-                                                                                        letter,
-                                                                                        lIndex,
-                                                                                    ) => {
-                                                                                        const correctLetter =
-                                                                                            word?.at(
-                                                                                                lIndex,
-                                                                                            )
-                                                                                        return (
-                                                                                            <span
-                                                                                                data-letter
-                                                                                                key={
-                                                                                                    lIndex
-                                                                                                }
-                                                                                                className={clsx(
-                                                                                                    'letter',
-                                                                                                    letter ===
-                                                                                                        correctLetter &&
-                                                                                                        'correct text-emerald-500',
-                                                                                                    correctLetter &&
-                                                                                                        letter !==
-                                                                                                            correctLetter &&
-                                                                                                        'incorrect text-rose-700',
-                                                                                                    lIndex >
-                                                                                                        word.length -
-                                                                                                            1 &&
-                                                                                                        'extra text-rose-700',
-                                                                                                )}
-                                                                                            >
-                                                                                                {
-                                                                                                    letter
-                                                                                                }
-                                                                                            </span>
-                                                                                        )
-                                                                                    },
-                                                                                )
-                                                                              : word.map(
-                                                                                    (
-                                                                                        letter,
-                                                                                        lIndex,
-                                                                                    ) => {
-                                                                                        const typedLetter =
-                                                                                            typedWord?.at(
-                                                                                                lIndex,
-                                                                                            )
-                                                                                        return (
-                                                                                            <span
-                                                                                                data-letter
-                                                                                                key={
-                                                                                                    lIndex
-                                                                                                }
-                                                                                                className={clsx(
-                                                                                                    'letter',
-                                                                                                    letter ===
-                                                                                                        typedLetter &&
-                                                                                                        'correct text-emerald-500',
-                                                                                                    typedLetter &&
-                                                                                                        letter !==
-                                                                                                            typedLetter &&
-                                                                                                        'incorrect text-rose-700',
-                                                                                                )}
-                                                                                            >
-                                                                                                {
-                                                                                                    letter
-                                                                                                }
-                                                                                            </span>
-                                                                                        )
-                                                                                    },
-                                                                                )}
-                                                                      </span>
-                                                                      <span
-                                                                          data-space
-                                                                      >
-                                                                          {' '}
-                                                                      </span>
-                                                                  </>
-                                                              )
-                                                          },
-                                                      )}
-                                            </span>
-                                        )
-                                    })}
-                                </p>
-                            )
-                        case 'footnote':
-                            return (
-                                <p key={pIndex} className="my-2">
-                                    <b>{node.verse}</b>
-                                    {node.text}
-                                </p>
-                            )
-                        case 'newLine':
-                            return <br key={pIndex} className="mb-2" />
-                        case 'title':
-                            return (
-                                <h2 key={pIndex} className="tracking-tight">
-                                    {node.text}
-                                </h2>
-                            )
-                        default:
-                            break
-                    }
-                })}
-                <div
-                    className="absolute rounded-sm bg-black/10 peer-focus:bg-black/20"
-                    style={{
-                        top: `${animatedCursorRect?.top}px`,
-                        left: `${animatedCursorRect?.left}px`,
-                        width: `${animatedCursorRect?.width}px`,
-                        height: `${animatedCursorRect?.height}px`,
-                        color: 'lime',
-                    }}
-                />
+                {passage.isLoading ? null : <MyComponent passage={passage} />}
             </main>
         </div>
     )
