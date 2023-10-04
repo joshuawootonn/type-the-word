@@ -149,7 +149,7 @@ function MyComponent({ passage }: { passage: any }) {
     const [keystrokes, setKeystrokes] = useState<
         { inputType: string; data: string }[]
     >([])
-    const [position, setPosition] = useState<string[][]>([] as string[][])
+    const [position, setPosition] = useState<string[][]>([[]] as string[][])
 
     const [currentVersePosition, setCurrentVersePosition] = useState(
         chapter.flatMap(node => ('nodes' in node ? node.nodes : [])).at(0)
