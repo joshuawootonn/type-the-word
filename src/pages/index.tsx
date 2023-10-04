@@ -490,6 +490,16 @@ export default function Home() {
             <main className="arena relative prose mx-auto focus-within:border-red-400 border-2">
                 {passage.isLoading ? null : <MyComponent passage={passage} />}
             </main>
+            <footer className="prose mx-auto flex w-full justify-start items-start py-2">
+                <a
+                    className="no-underline flex-grow text-xs"
+                    href="https://www.esv.org/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    (ESV)
+                </a>
+            </footer>
         </div>
     )
 }
