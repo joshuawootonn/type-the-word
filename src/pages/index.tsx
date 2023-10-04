@@ -43,48 +43,51 @@ const validQuotes = [
 ]
 
 function parseChapter(passage: string): Passage[] {
-    return passage.split('\n').flatMap((line): Passage[] => {
-        if (line === '') {
-            return []
-        } else if (verseRegex.test(line)) {
-            const verseNodes = []
-            for (const match of line.match(verseRegex) ?? []) {
-                const text = match
-                    .replace(verseNumberRegex, '')
-                    .replace(footnoteNumberRegex, '')
-                    .trimStart()
-
-                verseNodes.push({
-                    type: 'verse' as const,
-                    verse: match.match(numberRegex)?.[0] ?? '',
-                    text,
-                    splitText: text
-                        .split(' ')
-                        .map(word => word.split(''))
-                        .concat([]),
-                })
-            }
-            // console.log({ parseVerseNodes: verseNodes })
-
-            return [{ type: 'paragraph' as const, nodes: verseNodes }]
-        } else if (footnoteRegex.test(line)) {
-            const footnoteNodes = []
-            for (const match of line.match(footnoteRegex) ?? []) {
-                footnoteNodes.push({
-                    type: 'footnote' as const,
-                    verse: match.match(footnoteNumberRegex)?.[0] ?? '',
-                    text: match
+    return passage
+        .replace('(ESV)', '')
+        .split('\n')
+        .flatMap((line): Passage[] => {
+            if (line === '') {
+                return []
+            } else if (verseRegex.test(line)) {
+                const verseNodes = []
+                for (const match of line.match(verseRegex) ?? []) {
+                    const text = match
                         .replace(verseNumberRegex, '')
-                        .replace(footnoteNumberRegex, ''),
-                })
-            }
+                        .replace(footnoteNumberRegex, '')
+                        .trimStart()
 
-            return footnoteNodes
-        } else {
-            return [{ type: 'title' as const, text: line }]
-        }
-        return []
-    })
+                    verseNodes.push({
+                        type: 'verse' as const,
+                        verse: match.match(numberRegex)?.[0] ?? '',
+                        text,
+                        splitText: text
+                            .split(' ')
+                            .map(word => word.split(''))
+                            .concat([]),
+                    })
+                }
+                // console.log({ parseVerseNodes: verseNodes })
+
+                return [{ type: 'paragraph' as const, nodes: verseNodes }]
+            } else if (footnoteRegex.test(line)) {
+                const footnoteNodes = []
+                for (const match of line.match(footnoteRegex) ?? []) {
+                    footnoteNodes.push({
+                        type: 'footnote' as const,
+                        verse: match.match(footnoteNumberRegex)?.[0] ?? '',
+                        text: match
+                            .replace(verseNumberRegex, '')
+                            .replace(footnoteNumberRegex, ''),
+                    })
+                }
+
+                return footnoteNodes
+            } else {
+                return [{ type: 'title' as const, text: line }]
+            }
+            return []
+        })
 }
 
 function getPosition(
@@ -238,8 +241,8 @@ function MyComponent({ passage }: { passage: any }) {
             if (activeLetterRect) {
                 setAnimatedCursorRect({
                     ...activeLetterRect,
-                    top: activeLetterRect.top - arenaRect.top - 2,
-                    left: activeLetterRect.left - arenaRect.left - 2,
+                    top: activeLetterRect.top - arenaRect.top,
+                    left: activeLetterRect.left - arenaRect.left,
                     width: activeLetterRect.width,
                     height: activeLetterRect.height,
                 })
@@ -252,8 +255,8 @@ function MyComponent({ passage }: { passage: any }) {
             if (activeSpaceRect) {
                 setAnimatedCursorRect({
                     ...activeSpaceRect,
-                    top: activeSpaceRect.top - arenaRect.top - 2,
-                    left: activeSpaceRect.left - arenaRect.left - 2,
+                    top: activeSpaceRect.top - arenaRect.top,
+                    left: activeSpaceRect.left - arenaRect.left,
                     width: activeSpaceRect.width,
                     height: '100%',
                 })
@@ -275,7 +278,7 @@ function MyComponent({ passage }: { passage: any }) {
         <>
             <input
                 type="text"
-                className="h-0 peer opacity-0"
+                className="absolute h-0 max-h-0 peer opacity-0"
                 tabIndex={0}
                 id="myInput"
                 onInput={e => {
@@ -452,6 +455,7 @@ function MyComponent({ passage }: { passage: any }) {
                                 {node.text}
                             </h2>
                         )
+
                     default:
                         break
                 }
@@ -470,8 +474,26 @@ function MyComponent({ passage }: { passage: any }) {
     )
 }
 
+export function useDebounce<T>(value: T, delay: number): T {
+    const [debouncedValue, setDebouncedValue] = useState(value)
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value)
+        }, delay)
+
+        return () => {
+            clearTimeout(handler)
+        }
+    }, [value, delay])
+
+    return debouncedValue
+}
+
 export default function Home() {
-    const passage = api.passage.passage.useQuery('John 11:35-38')
+    const [value, setValue] = useState('John 11:35-38')
+    const debouncedValue = useDebounce(value, 2000)
+    const passage = api.passage.passage.useQuery(debouncedValue)
 
     return (
         <div className="container min-h-screen flex flex-col mx-auto">
@@ -480,14 +502,25 @@ export default function Home() {
                 <meta name="description" content="Generated by create-t3-app" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <nav className="prose mx-auto w-full flex justify-between items-center mb-8 pt-8">
+            <nav className="prose mx-auto w-full flex justify-between items-center mb-2 pt-8">
                 <h1 className="text-xl font-mono font-extrabold tracking-tight text-black m-0">
                     type the word
                 </h1>
                 <AuthShowcase />
             </nav>
+            <div className="prose mx-auto w-full flex justify-start space-x-3 items-center mb-8 pt-8">
+                <label htmlFor="passage" className="text-black">
+                    Passage:
+                </label>
+                <input
+                    type="text"
+                    className="border-black border-2 p-1 outline-none focus-visible:outline-black"
+                    value={value}
+                    onChange={e => setValue(e.target.value)}
+                />
+            </div>
 
-            <main className="arena relative prose mx-auto focus-within:border-red-400 border-2">
+            <main className="arena relative prose mx-auto flex-grow">
                 {passage.isLoading ? null : <MyComponent passage={passage} />}
             </main>
             <footer className="prose mx-auto flex w-full justify-start items-start py-2">
@@ -521,7 +554,7 @@ function AuthShowcase() {
                     {secretMessage && <span> - {secretMessage}</span>}
                 </p> */}
             <button
-                className="rounded-full px-10 py-3 font-semibold text-black"
+                className="border-2 border-black py-1 px-3 font-semibold text-black outline-none focus-visible:outline-black"
                 onClick={
                     sessionData ? () => void signOut() : () => void signIn()
                 }
