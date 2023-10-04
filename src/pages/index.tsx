@@ -191,7 +191,7 @@ function MyComponent({ passage }: { passage: any }) {
                     const next = verses.at(currentVerseIndex + 1)
 
                     setCurrentVersePosition(next?.verse ?? '')
-                    setPosition([])
+                    setPosition([[]])
                     return []
                 }
 
@@ -252,8 +252,8 @@ function MyComponent({ passage }: { passage: any }) {
             if (activeSpaceRect) {
                 setAnimatedCursorRect({
                     ...activeSpaceRect,
-                    top: activeSpaceRect.top - arenaRect.top,
-                    left: activeSpaceRect.left - arenaRect.left,
+                    top: activeSpaceRect.top - arenaRect.top - 2,
+                    left: activeSpaceRect.left - arenaRect.left - 2,
                     width: activeSpaceRect.width,
                     height: '100%',
                 })
@@ -320,7 +320,7 @@ function MyComponent({ passage }: { passage: any }) {
                                                               typedWord?.slice(
                                                                   word.length,
                                                               )
-                                                          const isPreviouslyTyped =
+                                                          const wordIsTyped =
                                                               position.at(
                                                                   wIndex + 1,
                                                               )
@@ -333,11 +333,11 @@ function MyComponent({ passage }: { passage: any }) {
                                                                       className={clsx(
                                                                           'word',
                                                                           typedWord &&
-                                                                              isPreviouslyTyped ==
+                                                                              wordIsTyped ==
                                                                                   null &&
                                                                               'active',
                                                                           typedWord &&
-                                                                              isPreviouslyTyped &&
+                                                                              wordIsTyped &&
                                                                               !isEqual(
                                                                                   word,
                                                                                   typedWord,
@@ -425,9 +425,7 @@ function MyComponent({ passage }: { passage: any }) {
                                                                                 },
                                                                             )}
                                                                   </span>
-                                                                  <span
-                                                                      data-space
-                                                                  >
+                                                                  <span className="space">
                                                                       {' '}
                                                                   </span>
                                                               </>
