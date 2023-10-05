@@ -540,26 +540,15 @@ export default function Home() {
 function AuthShowcase() {
     const { data: sessionData } = useSession()
 
-    const { data: secretMessage } = api.example.getSecretMessage.useQuery(
-        undefined, // no input
-        { enabled: sessionData?.user !== undefined },
-    )
-
     return (
         <div className="flex flex-col  gap-4">
-            {/* <p className="text-center text-2xl text-black">
-                    {sessionData && (
-                        <span>Logged in as {sessionData.user?.name}</span>
-                    )}
-                    {secretMessage && <span> - {secretMessage}</span>}
-                </p> */}
             <button
                 className="border-2 border-black py-1 px-3 font-semibold text-black outline-none focus-visible:outline-black"
                 onClick={
                     sessionData ? () => void signOut() : () => void signIn()
                 }
             >
-                {sessionData ? 'Sign out' : 'Sign in'}
+                {sessionData ? `Sign out ${sessionData.user?.name}` : 'Sign in'}
             </button>
         </div>
     )
