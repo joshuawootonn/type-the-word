@@ -43,6 +43,7 @@ export const env = createEnv({
      */
     client: {
         // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
+        NEXT_PUBLIC_FATHOM_ID: z.string(),
     },
 
     /**
@@ -59,6 +60,7 @@ export const env = createEnv({
         // NEXTAUTH_URL: process.env.NEXTAUTH_URL,
         // DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
         // DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
+        NEXT_PUBLIC_FATHOM_ID: process.env.NEXT_PUBLIC_FATHOM_ID,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
