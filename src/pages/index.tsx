@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { clsx } from 'clsx'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import Head from 'next/head'
@@ -144,9 +145,11 @@ function isMatrixEqual(a: string[][], b: string[][]) {
     )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function MyComponent({ passage }: { passage: any }) {
     // console.log({ passage })
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const chapter = parseChapter(passage.data?.passages.at(0) ?? '')
     const inputRef = useRef<HTMLInputElement>(null)
     const [keystrokes, setKeystrokes] = useState<
@@ -161,14 +164,21 @@ function MyComponent({ passage }: { passage: any }) {
 
     function handleInput(e: React.FormEvent<HTMLInputElement>) {
         if (
+            //@ts-ignore
             e.nativeEvent.inputType === 'insertText' ||
+            //@ts-ignore
             e.nativeEvent.inputType === 'deleteContentBackward'
         ) {
             // console.log(e.nativeEvent.inputType, e.nativeEvent.data)
 
             setKeystrokes(prev => {
+                //@ts-ignore
                 const next = prev.concat({
+                    //@ts-ignore
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     inputType: e.nativeEvent.inputType,
+                    //@ts-ignore
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     data: e.nativeEvent.data,
                 })
 
