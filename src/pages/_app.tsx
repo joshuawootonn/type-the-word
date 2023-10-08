@@ -19,12 +19,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     const router = useRouter()
 
     useEffect(() => {
-        Fathom.load(env.NEXT_PUBLIC_FATHOM_ID, {
-            includedDomains: [
-                'www.type-the-word.vercel.app/',
-                'type-the-word.vercel.app/',
-            ],
-        })
+        Fathom.load(env.NEXT_PUBLIC_FATHOM_ID)
 
         const handleRouteChange = () => {
             Fathom.trackPageview()
