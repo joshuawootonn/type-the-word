@@ -21,8 +21,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
     useEffect(() => {
         Fathom.load(env.NEXT_PUBLIC_FATHOM_ID, {
             includedDomains: [
-                'https://www.type-the-word.vercel.app/',
-                'https://type-the-word.vercel.app/',
+                'www.type-the-word.vercel.app/',
+                'type-the-word.vercel.app/',
             ],
         })
 
