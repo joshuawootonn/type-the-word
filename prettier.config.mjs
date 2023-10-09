@@ -21,7 +21,8 @@ const config = {
     importOrderCaseInsensitive: true,
     plugins: [
         'prettier-plugin-tailwindcss',
-        '@trivago/prettier-plugin-sort-imports',
+        // this is broken right now. find another solution or update when there is something available.
+        // '@trivago/prettier-plugin-sort-imports',
     ],
 }
 

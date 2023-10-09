@@ -7,7 +7,10 @@ const numberRegex = /[0-9]+/g
 const footnoteNumberRegex = /\([0-9]+\)/g
 
 export type Word = { type: 'word'; letters: string[] }
-export type Atom = { type: 'newLine' } | { type: 'space' } | Word
+export type Atom =
+    | { type: 'newLine'; typed: boolean }
+    | { type: 'space'; typed: boolean }
+    | Word
 
 export type Verse = {
     type: 'verse'
@@ -39,26 +42,57 @@ export function parseChapter(passage: string): Passage[] {
                         .replace(verseNumberRegex, '')
                         .replace(footnoteNumberRegex, '')
 
+                    const splitText = text.split(splitBySpaceOrNewLine)
+
                     const node: Verse = {
                         type: 'verse' as const,
                         verse: match.match(numberRegex)?.[0] ?? '',
                         text,
-                        nodes: text
-                            .split(splitBySpaceOrNewLine)
-                            .flatMap<Atom>(atomText => {
-                                if (atomText === '\n') {
-                                    return { type: 'newLine' as const }
+                        nodes: splitText.flatMap<Atom>((atomText, i) => {
+                            const prevCharIsASpace = splitText.at(i - 1) === ' '
+                            if (atomText === '\n') {
+                                return {
+                                    type: 'newLine' as const,
+                                    typed: prevCharIsASpace ? false : true,
                                 }
+                            }
 
-                                if (atomText === ' ') {
-                                    return { type: 'space' as const }
-                                }
+                            if (atomText === ' ') {
+                                const prevCharIsASpace =
+                                    splitText.at(i - 1) === ' '
+                                const ifTrimStart = splitText
+                                    .slice(0, i)
+                                    .every(atom => atom === ' ')
+
+                                const prevDifferentChar = splitText
+                                    .slice(0, i)
+                                    .reverse()
+                                    .find(atom => atom !== ' ')
+                                const nextDifferentChar = splitText
+                                    .slice(i)
+                                    .find(atom => atom !== ' ')
+
+                                const isSandwichedWithNewLines =
+                                    prevDifferentChar === '\n' &&
+                                    nextDifferentChar === '\n'
 
                                 return {
-                                    type: 'word' as const,
-                                    letters: atomText.split(''),
+                                    type: 'space' as const,
+                                    typed:
+                                        prevCharIsASpace ||
+                                        ifTrimStart ||
+                                        prevDifferentChar === '\n' ||
+                                        isSandwichedWithNewLines
+                                            ? false
+                                            : true,
                                 }
-                            }),
+                            }
+
+                            return {
+                                type: 'word' as const,
+                                letters: atomText.split(''),
+                            }
+                        }),
                     }
 
                     verseNodes.push(node)

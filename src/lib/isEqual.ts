@@ -20,7 +20,8 @@ const validQuotes = [
 export function isAtomTyped(atom: Atom): boolean {
     switch (atom.type) {
         case 'newLine':
-            return false
+        case 'space':
+            return atom.typed
 
         default:
             return true
