@@ -8,7 +8,9 @@
         "dev": "next dev",
         "lint": "next lint",
         "format": "prettier ./src/**/* --write",
-        "start": "next start"
+        "start": "next start",
+        "test": "vitest",
+        "test:watch": "vitest --watch --reporter=verbose"
     },
     "dependencies": {
         "@auth/drizzle-adapter": "^0.3.2",
@@ -48,7 +50,8 @@
         "prettier": "^3.0.0",
         "prettier-plugin-tailwindcss": "^0.5.1",
         "tailwindcss": "^3.3.3",
-        "typescript": "^5.1.6"
+        "typescript": "^5.1.6",
+        "vitest": "^0.34.6"
     },
     "ct3aMetadata": {
         "initVersion": "7.20.2"

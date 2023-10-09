@@ -22,12 +22,12 @@ const passageSchema = z.object({
     passages: z.array(z.string()),
 })
 
-export type PassageSchema = z.infer<typeof passageSchema>
+export type EsvPassageSchema = z.infer<typeof passageSchema>
 
 export const passageRouter = createTRPCRouter({
     passage: publicProcedure
         .input(z.string())
-        .query(async ({ input }): Promise<PassageSchema> => {
+        .query(async ({ input }): Promise<EsvPassageSchema> => {
             const response = await fetch(
                 `https://api.esv.org/v3/passage/text/?q=${input}`,
                 {
