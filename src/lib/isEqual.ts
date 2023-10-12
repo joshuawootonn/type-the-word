@@ -17,6 +17,8 @@ const validQuotes = [
     '＂', // U+FF02
 ]
 
+const validSingleQuotes = ['‘', '’', '‛', '❛', '❜', '']
+
 export function isAtomTyped(atom: Atom): boolean {
     switch (atom.type) {
         case 'newLine':
@@ -32,9 +34,11 @@ export function isLetterEqual(a?: string, b?: string): boolean {
     if (a === undefined || b === undefined) return a === b
 
     if (b === '"') {
-        console.log({ a: a, b: b }, a === b, validQuotes.includes(b))
-
         return a === b || validQuotes.includes(a)
+    }
+
+    if (b === "'") {
+        return a === b || validSingleQuotes.includes(a)
     }
 
     return a === b
