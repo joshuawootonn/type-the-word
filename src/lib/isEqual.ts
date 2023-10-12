@@ -50,6 +50,13 @@ export function isAtomEqual(a?: Atom, b?: Atom): boolean {
     if (a.type !== b.type) return false
 
     if (a.type === 'word' && b.type === 'word') {
+        if (b.letters.length !== a.letters.length) return false
+
+        if (b.letters.length > a.letters.length) {
+            return b.letters.every((letter, i) =>
+                isLetterEqual(letter, a.letters[i]),
+            )
+        }
         return a.letters.every((letter, i) =>
             isLetterEqual(letter, b.letters[i]),
         )
