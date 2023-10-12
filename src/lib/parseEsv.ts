@@ -1,10 +1,10 @@
 import { splitBySpaceOrNewLine } from './splitBySpaceOrNewLine'
 
 export const verseRegex = /\s*[[0-9]+\][\S\s]*?(?=[^\S\r\n]*(\[|$))/g
-const footnoteRegex = /\([0-9]+\).*?(?=\(|$)/g
-const verseNumberRegex = /\[[0-9]+\]/g
-const numberRegex = /[0-9]+/g
-const footnoteNumberRegex = /\([0-9]+\)/g
+export const footnoteRegex = /^\([0-9]+\)[\S\s]*?(?=\(|$)/
+const verseNumberRegex = /\[[0-9]+\]/
+const numberRegex = /[0-9]+/
+const footnoteNumberRegex = /\([0-9]+\)/
 
 export type Word = { type: 'word'; letters: string[] }
 export type Atom =
@@ -96,7 +96,6 @@ export function parseChapter(passage: string): Passage[] {
                     }
 
                     verseNodes.push(node)
-                    // console.log(JSON.stringify(node, null, 2))
                 }
 
                 return [{ type: 'paragraph' as const, nodes: verseNodes }]

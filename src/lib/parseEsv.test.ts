@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { parseChapter, verseRegex } from './parseEsv'
+import { footnoteRegex, parseChapter, verseRegex } from './parseEsv'
 
 export function sum(a: number, b: number): number {
     return a + b
@@ -37,4 +37,11 @@ test('verseRegex', () => {
         'Psalm 1\n\nBook One\n\nThe Way of the Righteous and the Wicked\n\n    [1] Blessed is the man(1)\n        who walks not in the counsel of the wicked,\n    nor stands in the way of sinners,\n        nor sits in the seat of scoffers;\n    [2] but his delight is in the law(2) of the LORD,\n        and on his law he meditates day and night.\n    \n    \n    [3] He is like a tree\n        planted by streams of water\n    that yields its fruit in its season,\n        and its leaf does not wither.\n    In all that he does, he prospers.\n    [4] The wicked are not so,\n        but are like chaff that the wind drives away.\n    \n    \n    [5] Therefore the wicked will not stand in the judgment,\n        nor sinners in the congregation of the righteous;\n    [6] for the LORD knows the way of the righteous,\n        but the way of the wicked will perish.\n    \n\nFootnotes\n\n(1) 1:1 The singular Hebrew word for *man* (*ish*) is used here to portray a representative example of a godly person; see Preface\n\n(2) 1:2 Or *instruction*\n (ESV)'
 
     expect(psalm1.match(verseRegex)?.length).toEqual(6)
+})
+
+test.only('footnoteRegex', () => {
+    const psalm1 = '(2) 1:2 Or *instruction*'
+
+    console.log(psalm1.match(footnoteRegex))
+    expect(psalm1.match(footnoteRegex)?.length).toEqual(1)
 })
