@@ -435,15 +435,18 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                             </p>
                         )
                     case 'footnote':
-                        return (
-                            <p key={pIndex} className="my-2">
-                                <b>{node.verse}</b>
-                                {node.text}
-                            </p>
-                        )
+                        return null
+                    // return (
+                    //     <p key={pIndex} className="my-2">
+                    //         <b>{node.verse}</b>
+                    //         {node.text}
+                    //     </p>
+                    // )
                     case 'newLine':
                         return <br key={pIndex} className="mb-2" />
                     case 'title':
+                        if (node.text === 'Footnotes') return null
+
                         return (
                             <h2 key={pIndex} className="tracking-tight">
                                 {node.text}
