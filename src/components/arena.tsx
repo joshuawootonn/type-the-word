@@ -3,7 +3,7 @@ import clsx from 'clsx'
 import equal from 'fast-deep-equal'
 import { useRef, useState, useEffect } from 'react'
 
-import { isAtomTyped, isVerseEqual } from '~/lib/isEqual'
+import { isAtomEqual, isAtomTyped, isVerseEqual } from '~/lib/isEqual'
 import { Atom, parseChapter } from '~/lib/parseEsv'
 import { EsvPassageSchema } from '~/server/api/routers/passage'
 
@@ -56,17 +56,64 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
         console.log(e.key)
         if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
             setKeystrokes(prev => {
+                const currentVerse = chapter
+                    .flatMap(node => ('nodes' in node ? node.nodes : []))
+                    .find(verse => verse.verse === currentVersePosition)
+                if (currentVerse == null) {
+                    throw new Error('Current Verse is invalid.')
+                }
+
+                const correctAtomNodes = currentVerse.nodes.filter(isAtomTyped)
+
+                const prevPosition = getPosition(prev)
+                const prevCurrentCorrect = correctAtomNodes.at(
+                    prevPosition.length - 1,
+                )
+                const prevNextCorrect = correctAtomNodes.at(prevPosition.length)
+                const isPrevCorrect = isAtomEqual(
+                    prevPosition.at(-2),
+                    correctAtomNodes.at(prevPosition.length - 2),
+                )
+
+                if (
+                    (e.key === 'Backspace' && prevPosition.length === 0) ||
+                    (e.key === 'Backspace' &&
+                        (prevCurrentCorrect?.type === 'space' ||
+                            prevCurrentCorrect?.type === 'newLine') &&
+                        prevNextCorrect?.type === 'word' &&
+                        isPrevCorrect)
+                )
+                    return prev
+
+                if (
+                    (e.key === ' ' || e.key === 'Enter') &&
+                    (prevCurrentCorrect?.type === 'space' ||
+                        prevCurrentCorrect?.type === 'newLine') &&
+                    prevNextCorrect?.type === 'word'
+                )
+                    return prev
+
                 const next = prev.concat({
                     type: e.key === 'Backspace' ? 'backspace' : 'insert',
                     key: e.key,
                 })
-
                 const position = getPosition(next)
 
-                const currentVerse = chapter
-                    .flatMap(node => ('nodes' in node ? node.nodes : []))
-                    .find(verse => verse.verse === currentVersePosition)
-                if (currentVerse == null) return next
+                const lastAtom = position.at(-1)
+
+                const currentCorrect = correctAtomNodes.at(position.length - 1)
+
+                /**
+                 * If you are supposed to type a space don't allow a new line etc.
+                 */
+                if (
+                    (currentCorrect?.type === 'space' &&
+                        lastAtom?.type === 'newLine') ||
+                    (currentCorrect?.type === 'newLine' &&
+                        lastAtom?.type === 'space')
+                ) {
+                    return prev
+                }
 
                 const isVerseComplete = isVerseEqual(
                     currentVerse?.nodes ?? [],
@@ -74,11 +121,6 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                 )
 
                 isVerseComplete && console.log('verse complete')
-                console.log({
-                    isVerseComplete,
-                    currentVerse: currentVerse?.nodes.filter(isAtomTyped) ?? [],
-                    position,
-                })
 
                 if (isVerseComplete) {
                     const verses = chapter.flatMap(node =>
@@ -95,12 +137,6 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                 }
 
                 setPosition(position)
-                // console.log({
-                //     isVerseComplete,
-                //     currentVerse,
-                //     position,
-                //     keystrokes,
-                // })
 
                 return next
             })
@@ -234,7 +270,9 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                                                 inputRef.current?.focus()
                                             }}
                                         >
-                                            <b>{verse.verse}</b>
+                                            <b className="absolute">
+                                                {verse.verse}
+                                            </b>
                                             {!isCurrentVerse
                                                 ? verse.nodes.map(
                                                       (atom, aIndexPrime) => {
@@ -254,7 +292,7 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                                                                           aIndexPrime
                                                                       }
                                                                       className={clsx(
-                                                                          'space inline-flex h-[19px] w-3',
+                                                                          'space inline-flex h-[19px] w-2',
                                                                       )}
                                                                   >
                                                                       {' '}
@@ -361,7 +399,7 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                                                                           aIndexPrime
                                                                       }
                                                                       className={clsx(
-                                                                          'space inline-flex h-[19px] w-3',
+                                                                          'space inline-flex h-[19px] w-2',
                                                                           lastAtom !=
                                                                               null &&
                                                                               typedAtom ==
