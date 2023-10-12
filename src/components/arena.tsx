@@ -268,6 +268,10 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                                             )}
                                             onClick={() => {
                                                 inputRef.current?.focus()
+                                                setCurrentVersePosition(
+                                                    verse.verse,
+                                                )
+                                                setPosition([])
                                             }}
                                         >
                                             <b className="absolute">
