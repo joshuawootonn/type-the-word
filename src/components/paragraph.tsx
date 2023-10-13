@@ -80,28 +80,38 @@ export function Paragraph({
                                           <>
                                               <span
                                                   className={clsx(
-                                                      'inline-flex h-[19px]  items-center justify-center px-2 opacity-0 transition-opacity',
                                                       lastAtom != null &&
                                                           typedAtom == null &&
-                                                          'active-space opacity-100',
+                                                          'opacity-100',
+                                                      'relative z-0 h-[19px] opacity-0 transition-opacity',
                                                   )}
                                               >
-                                                  <svg
-                                                      className="translate-y-0.5"
-                                                      width="16"
-                                                      height="16"
-                                                      viewBox="0 0 16 16"
-                                                      fill="none"
-                                                      xmlns="http://www.w3.org/2000/svg"
+                                                  <span
+                                                      className={clsx(
+                                                          'absolute left-0 top-0 inline-flex h-full -translate-y-[2px] items-center justify-center px-2',
+                                                          lastAtom != null &&
+                                                              typedAtom ==
+                                                                  null &&
+                                                              'active-space',
+                                                      )}
                                                   >
-                                                      <path
-                                                          d="M12.5611 4.33774C12.5611 4.33774 12.5611 4.84212 12.5611 5.82744C12.5611 7.72453 11.5283 8.55823 9.83026 8.55823C6.99146 8.55823 2.56105 8.55823 2.56105 8.55823M2.56105 8.55823C2.56105 8.39635 4.96506 5.82744 4.96506 5.82744M2.56105 8.55823C2.56105 8.72012 4.12224 10.3498 4.96506 11.2455"
-                                                          stroke="black"
+                                                      <svg
+                                                          className="translate-y-[2.5px]"
+                                                          width="16"
+                                                          height="16"
+                                                          viewBox="0 0 16 16"
+                                                          fill="none"
+                                                          xmlns="http://www.w3.org/2000/svg"
+                                                      >
+                                                          <path
+                                                              d="M12.5611 4.33774C12.5611 4.33774 12.5611 4.84212 12.5611 5.82744C12.5611 7.72453 11.5283 8.55823 9.83026 8.55823C6.99146 8.55823 2.56105 8.55823 2.56105 8.55823M2.56105 8.55823C2.56105 8.39635 4.96506 5.82744 4.96506 5.82744M2.56105 8.55823C2.56105 8.72012 4.12224 10.3498 4.96506 11.2455"
+                                                              stroke="black"
                                                               strokeWidth="2"
                                                               strokeLinecap="round"
                                                               strokeLinejoin="round"
-                                                      />
-                                                  </svg>
+                                                          />
+                                                      </svg>
+                                                  </span>
                                               </span>
                                               <br />
                                           </>
