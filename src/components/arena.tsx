@@ -294,7 +294,7 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                                                                           aIndexPrime
                                                                       }
                                                                       className={clsx(
-                                                                          'space inline-flex h-[19px] w-2',
+                                                                          'space inline-flex h-[19px] w-2.5',
                                                                       )}
                                                                   >
                                                                       {' '}
@@ -401,7 +401,7 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                                                                           aIndexPrime
                                                                       }
                                                                       className={clsx(
-                                                                          'space inline-flex h-[19px] w-2',
+                                                                          'space inline-flex h-[19px] w-2.5',
                                                                           lastAtom !=
                                                                               null &&
                                                                               typedAtom ==
