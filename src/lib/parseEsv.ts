@@ -10,6 +10,7 @@ export type Word = { type: 'word'; letters: string[] }
 export type Atom =
     | { type: 'newLine'; typed: boolean }
     | { type: 'space'; typed: boolean }
+    | { type: 'verseNumber'; number: string }
     | Word
 
 export type Verse = {
@@ -38,9 +39,7 @@ export function parseChapter(passage: string): Passage[] {
             } else if (verseRegex.test(line)) {
                 const verseNodes = []
                 for (const match of line.match(verseRegex) ?? []) {
-                    const text = match
-                        .replace(verseNumberRegex, '')
-                        .replace(footnoteNumberRegex, '')
+                    const text = match.replace(footnoteNumberRegex, '')
 
                     const splitText = text.split(splitBySpaceOrNewLine)
 
@@ -51,7 +50,8 @@ export function parseChapter(passage: string): Passage[] {
                         nodes: splitText.flatMap<Atom>((atomText, i) => {
                             const prevCharIsNewlineOrSpace =
                                 splitText.at(i - 1) === ' ' ||
-                                splitText.at(i - 1) === '\n'
+                                splitText.at(i - 1) === '\n' ||
+                                verseNumberRegex.test(splitText.at(i - 1) ?? '')
                             if (atomText === '\n') {
                                 return {
                                     type: 'newLine' as const,
@@ -87,6 +87,13 @@ export function parseChapter(passage: string): Passage[] {
                                         isSandwichedWithNewLines
                                             ? false
                                             : true,
+                                }
+                            }
+
+                            if (verseNumberRegex.test(atomText)) {
+                                return {
+                                    type: 'verseNumber' as const,
+                                    number: match.match(numberRegex)?.[0] ?? '',
                                 }
                             }
 

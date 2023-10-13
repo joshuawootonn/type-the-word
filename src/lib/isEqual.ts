@@ -21,6 +21,8 @@ const validSingleQuotes = ['‘', '’', '‛', '❛', '❜', '']
 
 export function isAtomTyped(atom: Atom): boolean {
     switch (atom.type) {
+        case 'verseNumber':
+            return false
         case 'newLine':
         case 'space':
             return atom.typed

@@ -274,7 +274,6 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                                                 setPosition([])
                                             }}
                                         >
-                                            <b>{verse.verse}</b>
                                             {!isCurrentVerse
                                                 ? verse.nodes.map(
                                                       (atom, aIndexPrime) => {
@@ -283,6 +282,23 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                                                               'newLine'
                                                           )
                                                               return <br />
+
+                                                          if (
+                                                              atom.type ===
+                                                              'verseNumber'
+                                                          ) {
+                                                              return (
+                                                                  <b
+                                                                      key={
+                                                                          aIndexPrime
+                                                                      }
+                                                                  >
+                                                                      {
+                                                                          atom.number
+                                                                      }
+                                                                  </b>
+                                                              )
+                                                          }
 
                                                           if (
                                                               atom.type ===
@@ -341,6 +357,12 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                                                                       isAtomTyped,
                                                                   ).length
 
+                                                          //   console.log({
+                                                          //       aIndexPrime,
+                                                          //       aIndex,
+                                                          //       atom,
+                                                          //   })
+
                                                           const lastAtom =
                                                               position.at(
                                                                   aIndex - 1,
@@ -393,6 +415,22 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
 
                                                           if (
                                                               atom.type ===
+                                                              'verseNumber'
+                                                          ) {
+                                                              return (
+                                                                  <b
+                                                                      key={
+                                                                          aIndexPrime
+                                                                      }
+                                                                  >
+                                                                      {
+                                                                          atom.number
+                                                                      }
+                                                                  </b>
+                                                              )
+                                                          }
+                                                          if (
+                                                              atom.type ===
                                                               'space'
                                                           ) {
                                                               return (
@@ -421,18 +459,41 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                                                                   typedAtom.type ===
                                                                       'word')
                                                           ) {
-                                                              // if (
-                                                              //     atom.letters.length ===
-                                                              //         7 &&
-                                                              //     atom.letters[0] === 'B'
-                                                              // )
-                                                              //     console.log(
-                                                              //         'word',
-                                                              //         atom,
-                                                              //         typedAtom,
-                                                              //         position,
-                                                              //         aIndex,
-                                                              //     )
+                                                              //   if (
+                                                              //       atom.letters
+                                                              //           .length ===
+                                                              //           3 &&
+                                                              //       atom
+                                                              //           .letters[0] ===
+                                                              //           'N'
+                                                              //   )
+                                                              //       console.log(
+                                                              //           'word',
+                                                              //           {
+                                                              //               atom,
+                                                              //               typedAtom,
+                                                              //               nextAtom,
+                                                              //               position,
+                                                              //               aIndex,
+                                                              //               aIndexPrime,
+                                                              //               active:
+                                                              //                   (aIndex ===
+                                                              //                       0 ||
+                                                              //                       lastAtom !=
+                                                              //                           null) &&
+                                                              //                   nextAtom ==
+                                                              //                       null,
+                                                              //               1:
+                                                              //                   aIndexPrime ===
+                                                              //                   0,
+                                                              //               2:
+                                                              //                   lastAtom !=
+                                                              //                   null,
+                                                              //               3:
+                                                              //                   nextAtom ==
+                                                              //                   null,
+                                                              //           },
+                                                              //       )
                                                               return (
                                                                   <Word
                                                                       key={
