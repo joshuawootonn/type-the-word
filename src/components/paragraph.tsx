@@ -31,7 +31,8 @@ export function Paragraph({
                     >
                         {!isCurrentVerse
                             ? verse.nodes.map((atom, aIndexPrime) => {
-                                  if (atom.type === 'newLine') return <br />
+                                  if (atom.type === 'newLine')
+                                      return <br key={aIndexPrime} />
 
                                   if (atom.type === 'verseNumber') {
                                       return (
@@ -96,9 +97,9 @@ export function Paragraph({
                                                       <path
                                                           d="M12.5611 4.33774C12.5611 4.33774 12.5611 4.84212 12.5611 5.82744C12.5611 7.72453 11.5283 8.55823 9.83026 8.55823C6.99146 8.55823 2.56105 8.55823 2.56105 8.55823M2.56105 8.55823C2.56105 8.39635 4.96506 5.82744 4.96506 5.82744M2.56105 8.55823C2.56105 8.72012 4.12224 10.3498 4.96506 11.2455"
                                                           stroke="black"
-                                                          stroke-width="2"
-                                                          stroke-linecap="round"
-                                                          stroke-linejoin="round"
+                                                              strokeWidth="2"
+                                                              strokeLinecap="round"
+                                                              strokeLinejoin="round"
                                                       />
                                                   </svg>
                                               </span>
