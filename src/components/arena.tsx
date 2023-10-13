@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import clsx from 'clsx'
 import equal from 'fast-deep-equal'
 import { useRef, useState, useEffect } from 'react'
 
@@ -7,7 +6,7 @@ import { isAtomEqual, isAtomTyped, isVerseEqual } from '~/lib/isEqual'
 import { Atom, parseChapter } from '~/lib/parseEsv'
 import { EsvPassageSchema } from '~/server/api/routers/passage'
 
-import { Word } from './atom'
+import { Paragraph } from './paragraph'
 
 type Keystroke = { type: 'backspace' | 'insert'; key: string }
 
@@ -44,10 +43,10 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
     const chapter = parseChapter(passage?.passages.at(0) ?? '')
 
     const inputRef = useRef<HTMLInputElement>(null)
-    const [keystrokes, setKeystrokes] = useState<Keystroke[]>([])
+    const [, setKeystrokes] = useState<Keystroke[]>([])
     const [position, setPosition] = useState<Atom[]>([] as Atom[])
 
-    const [currentVersePosition, setCurrentVersePosition] = useState(
+    const [currentVerse, setCurrentVerse] = useState(
         chapter.flatMap(node => ('nodes' in node ? node.nodes : [])).at(0)
             ?.verse,
     )
@@ -56,14 +55,14 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
         console.log(e.key)
         if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
             setKeystrokes(prev => {
-                const currentVerse = chapter
+                const currentVerseNode = chapter
                     .flatMap(node => ('nodes' in node ? node.nodes : []))
-                    .find(verse => verse.verse === currentVersePosition)
-                if (currentVerse == null) {
+                    .find(verse => verse.verse === currentVerse)
+                if (currentVerseNode == null) {
                     throw new Error('Current Verse is invalid.')
                 }
 
-                const correctAtomNodes = currentVerse.nodes.filter(isAtomTyped)
+                const correctAtomNodes = currentVerseNode.nodes.filter(isAtomTyped)
 
                 const prevPosition = getPosition(prev)
                 const prevCurrentCorrect = correctAtomNodes.at(
@@ -116,7 +115,7 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                 }
 
                 const isVerseComplete = isVerseEqual(
-                    currentVerse?.nodes ?? [],
+                    currentVerseNode?.nodes ?? [],
                     position,
                 )
 
@@ -127,11 +126,11 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                         'nodes' in node ? node.nodes : [],
                     )
                     const currentVerseIndex = verses.findIndex(
-                        verse => verse.verse === currentVersePosition,
+                        verse => verse.verse === currentVerse,
                     )
                     const next = verses.at(currentVerseIndex + 1)
 
-                    setCurrentVersePosition(next?.verse ?? '')
+                    setCurrentVerse(next?.verse ?? '')
                     setPosition([])
                     return []
                 }
@@ -234,8 +233,6 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
         }
     }, [])
 
-    console.log('render', { chapter })
-
     return (
         <div className="arena relative z-0  p-2  ">
             <input
@@ -253,296 +250,21 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                 switch (node.type) {
                     case 'paragraph':
                         return (
-                            <p className="font-[0px]" key={pIndex}>
-                                {node.nodes.map((verse, vIndex) => {
-                                    const isCurrentVerse =
-                                        currentVersePosition === verse.verse
-
-                                    return (
-                                        <span
-                                            key={vIndex}
-                                            className={clsx(
-                                                'verse break-spaces text-balance inline h-3',
-                                                isCurrentVerse &&
-                                                    'active-verse',
-                                            )}
-                                            onClick={() => {
-                                                inputRef.current?.focus()
-                                                setCurrentVersePosition(
-                                                    verse.verse,
-                                                )
-                                                setPosition([])
-                                            }}
-                                        >
-                                            {!isCurrentVerse
-                                                ? verse.nodes.map(
-                                                      (atom, aIndexPrime) => {
-                                                          if (
-                                                              atom.type ===
-                                                              'newLine'
-                                                          )
-                                                              return <br />
-
-                                                          if (
-                                                              atom.type ===
-                                                              'verseNumber'
-                                                          ) {
-                                                              return (
-                                                                  <b
-                                                                      key={
-                                                                          aIndexPrime
-                                                                      }
-                                                                  >
-                                                                      {
-                                                                          atom.number
-                                                                      }
-                                                                  </b>
-                                                              )
-                                                          }
-
-                                                          if (
-                                                              atom.type ===
-                                                              'space'
-                                                          ) {
-                                                              return (
-                                                                  <span
-                                                                      key={
-                                                                          aIndexPrime
-                                                                      }
-                                                                      className={clsx(
-                                                                          'space inline-flex h-[19px] w-2.5',
-                                                                      )}
-                                                                  >
-                                                                      {' '}
-                                                                  </span>
-                                                              )
-                                                          }
-                                                          if (
-                                                              atom.type ===
-                                                              'word'
-                                                          ) {
-                                                              return (
-                                                                  <Word
-                                                                      key={
-                                                                          aIndexPrime
-                                                                      }
-                                                                      atom={
-                                                                          atom
-                                                                      }
-                                                                      active={
-                                                                          false
-                                                                      }
-                                                                      isPrevTyped={
-                                                                          false
-                                                                      }
-                                                                      isAtomTyped={
-                                                                          false
-                                                                      }
-                                                                  />
-                                                              )
-                                                          }
-
-                                                          return null
-                                                      },
-                                                  )
-                                                : verse.nodes.map(
-                                                      (atom, aIndexPrime) => {
-                                                          const aIndex =
-                                                              verse.nodes
-                                                                  .slice(
-                                                                      0,
-                                                                      aIndexPrime,
-                                                                  )
-                                                                  .filter(
-                                                                      isAtomTyped,
-                                                                  ).length
-
-                                                          //   console.log({
-                                                          //       aIndexPrime,
-                                                          //       aIndex,
-                                                          //       atom,
-                                                          //   })
-
-                                                          const lastAtom =
-                                                              position.at(
-                                                                  aIndex - 1,
-                                                              )
-                                                          const typedAtom =
-                                                              position.at(
-                                                                  aIndex,
-                                                              )
-
-                                                          const nextAtom =
-                                                              position.at(
-                                                                  aIndex + 1,
-                                                              )
-                                                          if (
-                                                              atom.type ===
-                                                              'newLine'
-                                                          )
-                                                              return (
-                                                                  <>
-                                                                      <span
-                                                                          className={clsx(
-                                                                              'inline-flex h-[19px]  items-center justify-center px-2 opacity-0 transition-opacity',
-                                                                              lastAtom !=
-                                                                                  null &&
-                                                                                  typedAtom ==
-                                                                                      null &&
-                                                                                  'active-space opacity-100',
-                                                                          )}
-                                                                      >
-                                                                          <svg
-                                                                              className="translate-y-0.5"
-                                                                              width="16"
-                                                                              height="16"
-                                                                              viewBox="0 0 16 16"
-                                                                              fill="none"
-                                                                              xmlns="http://www.w3.org/2000/svg"
-                                                                          >
-                                                                              <path
-                                                                                  d="M12.5611 4.33774C12.5611 4.33774 12.5611 4.84212 12.5611 5.82744C12.5611 7.72453 11.5283 8.55823 9.83026 8.55823C6.99146 8.55823 2.56105 8.55823 2.56105 8.55823M2.56105 8.55823C2.56105 8.39635 4.96506 5.82744 4.96506 5.82744M2.56105 8.55823C2.56105 8.72012 4.12224 10.3498 4.96506 11.2455"
-                                                                                  stroke="black"
-                                                                                  stroke-width="2"
-                                                                                  stroke-linecap="round"
-                                                                                  stroke-linejoin="round"
-                                                                              />
-                                                                          </svg>
-                                                                      </span>
-                                                                      <br />
-                                                                  </>
-                                                              )
-
-                                                          if (
-                                                              atom.type ===
-                                                              'verseNumber'
-                                                          ) {
-                                                              return (
-                                                                  <b
-                                                                      key={
-                                                                          aIndexPrime
-                                                                      }
-                                                                  >
-                                                                      {
-                                                                          atom.number
-                                                                      }
-                                                                  </b>
-                                                              )
-                                                          }
-                                                          if (
-                                                              atom.type ===
-                                                              'space'
-                                                          ) {
-                                                              return (
-                                                                  <span
-                                                                      key={
-                                                                          aIndexPrime
-                                                                      }
-                                                                      className={clsx(
-                                                                          'space inline-flex h-[19px] w-2.5',
-                                                                          lastAtom !=
-                                                                              null &&
-                                                                              typedAtom ==
-                                                                                  null &&
-                                                                              'active-space',
-                                                                      )}
-                                                                  >
-                                                                      {' '}
-                                                                  </span>
-                                                              )
-                                                          }
-                                                          if (
-                                                              atom.type ===
-                                                                  'word' &&
-                                                              (typedAtom ==
-                                                                  null ||
-                                                                  typedAtom.type ===
-                                                                      'word')
-                                                          ) {
-                                                              //   if (
-                                                              //       atom.letters
-                                                              //           .length ===
-                                                              //           3 &&
-                                                              //       atom
-                                                              //           .letters[0] ===
-                                                              //           'N'
-                                                              //   )
-                                                              //       console.log(
-                                                              //           'word',
-                                                              //           {
-                                                              //               atom,
-                                                              //               typedAtom,
-                                                              //               nextAtom,
-                                                              //               position,
-                                                              //               aIndex,
-                                                              //               aIndexPrime,
-                                                              //               active:
-                                                              //                   (aIndex ===
-                                                              //                       0 ||
-                                                              //                       lastAtom !=
-                                                              //                           null) &&
-                                                              //                   nextAtom ==
-                                                              //                       null,
-                                                              //               1:
-                                                              //                   aIndexPrime ===
-                                                              //                   0,
-                                                              //               2:
-                                                              //                   lastAtom !=
-                                                              //                   null,
-                                                              //               3:
-                                                              //                   nextAtom ==
-                                                              //                   null,
-                                                              //           },
-                                                              //       )
-                                                              return (
-                                                                  <Word
-                                                                      key={
-                                                                          aIndexPrime
-                                                                      }
-                                                                      atom={
-                                                                          atom
-                                                                      }
-                                                                      active={
-                                                                          (aIndex ===
-                                                                              0 ||
-                                                                              lastAtom !=
-                                                                                  null) &&
-                                                                          nextAtom ==
-                                                                              null
-                                                                      }
-                                                                      typedAtom={
-                                                                          typedAtom
-                                                                      }
-                                                                      isPrevTyped={
-                                                                          (position.length ===
-                                                                              0 &&
-                                                                              aIndex ===
-                                                                                  0) ||
-                                                                          !!lastAtom
-                                                                      }
-                                                                      isAtomTyped={
-                                                                          !!nextAtom
-                                                                      }
-                                                                  />
-                                                              )
-                                                          }
-
-                                                          return null
-                                                      },
-                                                  )}
-                                        </span>
-                                    )
-                                })}
-                            </p>
+                            <Paragraph
+                                key={pIndex}
+                                node={node}
+                                currentVerse={currentVerse}
+                                setCurrentVerse={(verse: string) => {
+                                    inputRef.current?.focus()
+                                    setCurrentVerse(verse)
+                                    setPosition([])
+                                }}
+                                position={position}
+                            />
                         )
+
                     case 'footnote':
                         return null
-                    // return (
-                    //     <p key={pIndex} className="my-2">
-                    //         <b>{node.verse}</b>
-                    //         {node.text}
-                    //     </p>
-                    // )
                     case 'newLine':
                         return <br key={pIndex} className="mb-2" />
                     case 'title':

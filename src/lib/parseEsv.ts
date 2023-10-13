@@ -6,12 +6,15 @@ const verseNumberRegex = /\[[0-9]+\]/
 const numberRegex = /[0-9]+/
 const footnoteNumberRegex = /\([0-9]+\)/
 
+export type InlineNewLine = { type: 'newLine'; typed: boolean }
+
+export type Space = { type: 'space'; typed: boolean }
+
+export type VerseNumber = { type: 'verseNumber'; number: string }
+
 export type Word = { type: 'word'; letters: string[] }
-export type Atom =
-    | { type: 'newLine'; typed: boolean }
-    | { type: 'space'; typed: boolean }
-    | { type: 'verseNumber'; number: string }
-    | Word
+
+export type Atom = InlineNewLine | Space | VerseNumber | Word
 
 export type Verse = {
     type: 'verse'
@@ -20,14 +23,27 @@ export type Verse = {
     nodes: Atom[]
 }
 
-export type Passage =
-    | { type: 'newLine' }
-    | { type: 'title'; text: string }
-    | {
-          type: 'paragraph'
-          nodes: Verse[]
-      }
-    | { type: 'footnote'; verse: string; text: string }
+export type Title = {
+    type: 'title'
+    text: string
+}
+
+export type Newline = {
+    type: 'newLine'
+}
+
+export type Paragraph = {
+    type: 'paragraph'
+    nodes: Verse[]
+}
+
+export type FootNote = {
+    type: 'footnote'
+    verse: string
+    text: string
+}
+
+export type Passage = Newline | Title | Paragraph | FootNote
 
 export function parseChapter(passage: string): Passage[] {
     return passage
