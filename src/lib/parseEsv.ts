@@ -1,6 +1,6 @@
 import { splitBySpaceOrNewLine } from './splitBySpaceOrNewLine'
 
-export const verseRegex = /\s*[[0-9]+\][\S\s]*?(?=[^\S\r\n]*(\[|$))/g
+export const verseRegex = /\s*[[0-9]+\][\S\s]*?(?=(\[|$))/g
 export const footnoteRegex = /^\([0-9]+\)[\S\s]*?(?=\(|$)/
 const verseNumberRegex = /\[[0-9]+\]/
 const numberRegex = /[0-9]+/
@@ -49,17 +49,19 @@ export function parseChapter(passage: string): Passage[] {
                         verse: match.match(numberRegex)?.[0] ?? '',
                         text,
                         nodes: splitText.flatMap<Atom>((atomText, i) => {
-                            const prevCharIsASpace = splitText.at(i - 1) === ' '
+                            const prevCharIsNewlineOrSpace =
+                                splitText.at(i - 1) === ' ' ||
+                                splitText.at(i - 1) === '\n'
                             if (atomText === '\n') {
                                 return {
                                     type: 'newLine' as const,
-                                    typed: prevCharIsASpace ? false : true,
+                                    typed: prevCharIsNewlineOrSpace
+                                        ? false
+                                        : true,
                                 }
                             }
 
                             if (atomText === ' ') {
-                                const prevCharIsASpace =
-                                    splitText.at(i - 1) === ' '
                                 const ifTrimStart = splitText
                                     .slice(0, i)
                                     .every(atom => atom === ' ')
@@ -79,7 +81,7 @@ export function parseChapter(passage: string): Passage[] {
                                 return {
                                     type: 'space' as const,
                                     typed:
-                                        prevCharIsASpace ||
+                                        prevCharIsNewlineOrSpace ||
                                         ifTrimStart ||
                                         prevDifferentChar === '\n' ||
                                         isSandwichedWithNewLines
