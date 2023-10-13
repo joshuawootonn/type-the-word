@@ -274,9 +274,7 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                                                 setPosition([])
                                             }}
                                         >
-                                            <b className="absolute">
-                                                {verse.verse}
-                                            </b>
+                                            <b>{verse.verse}</b>
                                             {!isCurrentVerse
                                                 ? verse.nodes.map(
                                                       (atom, aIndexPrime) => {
