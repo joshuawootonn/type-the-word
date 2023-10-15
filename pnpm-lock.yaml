@@ -41,6 +41,9 @@ dependencies:
   fathom-client:
     specifier: ^3.5.0
     version: 3.5.0
+  motion:
+    specifier: ^10.16.4
+    version: 10.16.4
   next:
     specifier: ^13.4.19
     version: 13.5.2(react-dom@18.2.0)(react@18.2.0)
@@ -588,6 +591,67 @@ packages:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
+
+  /@motionone/animation@10.16.3:
+    resolution: {integrity: sha512-QUGWpLbMFLhyqKlngjZhjtxM8IqiJQjLK0DF+XOF6od9nhSvlaeEpOY/UMCRVcZn/9Tr2rZO22EkuCIjYdI74g==}
+    dependencies:
+      '@motionone/easing': 10.16.3
+      '@motionone/types': 10.16.3
+      '@motionone/utils': 10.16.3
+      tslib: 2.6.2
+    dev: false
+
+  /@motionone/dom@10.16.4:
+    resolution: {integrity: sha512-HPHlVo/030qpRj9R8fgY50KTN4Ko30moWRTA3L3imrsRBmob93cTYmodln49HYFbQm01lFF7X523OkKY0DX6UA==}
+    dependencies:
+      '@motionone/animation': 10.16.3
+      '@motionone/generators': 10.16.4
+      '@motionone/types': 10.16.3
+      '@motionone/utils': 10.16.3
+      hey-listen: 1.0.8
+      tslib: 2.6.2
+    dev: false
+
+  /@motionone/easing@10.16.3:
+    resolution: {integrity: sha512-HWTMZbTmZojzwEuKT/xCdvoMPXjYSyQvuVM6jmM0yoGU6BWzsmYMeB4bn38UFf618fJCNtP9XeC/zxtKWfbr0w==}
+    dependencies:
+      '@motionone/utils': 10.16.3
+      tslib: 2.6.2
+    dev: false
+
+  /@motionone/generators@10.16.4:
+    resolution: {integrity: sha512-geFZ3w0Rm0ZXXpctWsSf3REGywmLLujEjxPYpBR0j+ymYwof0xbV6S5kGqqsDKgyWKVWpUInqQYvQfL6fRbXeg==}
+    dependencies:
+      '@motionone/types': 10.16.3
+      '@motionone/utils': 10.16.3
+      tslib: 2.6.2
+    dev: false
+
+  /@motionone/svelte@10.16.4:
+    resolution: {integrity: sha512-zRVqk20lD1xqe+yEDZhMYgftsuHc25+9JSo+r0a0OWUJFocjSV9D/+UGhX4xgJsuwB9acPzXLr20w40VnY2PQA==}
+    dependencies:
+      '@motionone/dom': 10.16.4
+      tslib: 2.6.2
+    dev: false
+
+  /@motionone/types@10.16.3:
+    resolution: {integrity: sha512-W4jkEGFifDq73DlaZs3HUfamV2t1wM35zN/zX7Q79LfZ2sc6C0R1baUHZmqc/K5F3vSw3PavgQ6HyHLd/MXcWg==}
+    dev: false
+
+  /@motionone/utils@10.16.3:
+    resolution: {integrity: sha512-WNWDksJIxQkaI9p9Z9z0+K27xdqISGNFy1SsWVGaiedTHq0iaT6iZujby8fT/ZnZxj1EOaxJtSfUPCFNU5CRoA==}
+    dependencies:
+      '@motionone/types': 10.16.3
+      hey-listen: 1.0.8
+      tslib: 2.6.2
+    dev: false
+
+  /@motionone/vue@10.16.4:
+    resolution: {integrity: sha512-z10PF9JV6SbjFq+/rYabM+8CVlMokgl8RFGvieSGNTmrkQanfHn+15XBrhG3BgUfvmTeSeyShfOHpG0i9zEdcg==}
+    dependencies:
+      '@motionone/dom': 10.16.4
+      tslib: 2.6.2
+    dev: false
 
   /@next/env@13.5.2:
     resolution: {integrity: sha512-dUseBIQVax+XtdJPzhwww4GetTjlkRSsXeQnisIJWBaHsnxYcN2RGzsPHi58D6qnkATjnhuAtQTJmR1hKYQQPg==}
@@ -2505,6 +2569,10 @@ packages:
     resolution: {integrity: sha512-2bsegYkkHO+h/9MGbn6KWcE45cHZgPANo5LXF7EvWdT0yT2EguSVO1nDgU5c8+ZOPwp2vMNa7YFsJhVcDR9Sdg==}
     dev: true
 
+  /hey-listen@1.0.8:
+    resolution: {integrity: sha512-COpmrF2NOg4TBWUJ5UVyaCU2A88wEMkUPK4hNqyCkqHbxT92BbvfjoSozkAIIm6XhicGlJHhFdullInrdhwU8Q==}
+    dev: false
+
   /ignore@5.2.4:
     resolution: {integrity: sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==}
     engines: {node: '>= 4'}
@@ -2956,6 +3024,17 @@ packages:
       pkg-types: 1.0.3
       ufo: 1.3.1
     dev: true
+
+  /motion@10.16.4:
+    resolution: {integrity: sha512-wvBeT0sZNgU6Od1aimjywBikqzm5yE97+L9eM/AoLy01AXNPdcnSDVHB3CoR0dGdHMbp/S0A/PjsJfWg0+k8Mg==}
+    dependencies:
+      '@motionone/animation': 10.16.3
+      '@motionone/dom': 10.16.4
+      '@motionone/svelte': 10.16.4
+      '@motionone/types': 10.16.3
+      '@motionone/utils': 10.16.3
+      '@motionone/vue': 10.16.4
+    dev: false
 
   /ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}

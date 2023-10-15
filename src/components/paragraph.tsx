@@ -2,6 +2,7 @@ import clsx from 'clsx'
 import { isAtomTyped } from '~/lib/isEqual'
 import { Word } from './atom'
 import { Atom, Paragraph } from '~/lib/parseEsv'
+import { Fragment } from 'react'
 
 export function Paragraph({
     position,
@@ -45,7 +46,7 @@ export function Paragraph({
                                           <span
                                               key={aIndexPrime}
                                               className={clsx(
-                                                  'space inline-flex h-[19px] w-2.5',
+                                                  'space inline-flex h-[19px] w-2.5 translate-y-[3px]',
                                               )}
                                           >
                                               {' '}
@@ -77,7 +78,7 @@ export function Paragraph({
                                   const nextAtom = position.at(aIndex + 1)
                                   if (atom.type === 'newLine')
                                       return (
-                                          <>
+                                          <Fragment key={aIndexPrime}>
                                               <span
                                                   className={clsx(
                                                       lastAtom != null &&
@@ -88,7 +89,7 @@ export function Paragraph({
                                               >
                                                   <span
                                                       className={clsx(
-                                                          'absolute left-0 top-0 inline-flex h-full -translate-y-[2px] items-center justify-center px-2',
+                                                          'absolute left-0 top-0 inline-flex h-full items-center justify-center px-2',
                                                           lastAtom != null &&
                                                               typedAtom ==
                                                                   null &&
@@ -96,7 +97,7 @@ export function Paragraph({
                                                       )}
                                                   >
                                                       <svg
-                                                          className="translate-y-[2.5px]"
+                                                          className="translate-y-[.5px]"
                                                           width="16"
                                                           height="16"
                                                           viewBox="0 0 16 16"
@@ -114,7 +115,7 @@ export function Paragraph({
                                                   </span>
                                               </span>
                                               <br />
-                                          </>
+                                          </Fragment>
                                       )
 
                                   if (atom.type === 'verseNumber') {
@@ -127,7 +128,7 @@ export function Paragraph({
                                           <span
                                               key={aIndexPrime}
                                               className={clsx(
-                                                  'space inline-flex h-[19px] w-2.5',
+                                                  'space inline-flex h-[19px] w-2.5 translate-y-[3px]',
                                                   lastAtom != null &&
                                                       typedAtom == null &&
                                                       'active-space',

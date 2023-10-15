@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-import equal from 'fast-deep-equal'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState } from 'react'
 
 import { isAtomEqual, isAtomTyped, isVerseEqual } from '~/lib/isEqual'
 import { Atom, parseChapter } from '~/lib/parseEsv'
 import { EsvPassageSchema } from '~/server/api/routers/passage'
 
 import { Paragraph } from './paragraph'
+import { useCursor } from '~/lib/hooks'
 
 type Keystroke = { type: 'backspace' | 'insert'; key: string }
 
@@ -62,7 +61,8 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                     throw new Error('Current Verse is invalid.')
                 }
 
-                const correctAtomNodes = currentVerseNode.nodes.filter(isAtomTyped)
+                const correctAtomNodes =
+                    currentVerseNode.nodes.filter(isAtomTyped)
 
                 const prevPosition = getPosition(prev)
                 const prevCurrentCorrect = correctAtomNodes.at(
@@ -142,96 +142,7 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
         }
     }
 
-    const [animatedCursorRect, setAnimatedCursorRect] = useState<{
-        top: string | number
-        left: string | number
-        width: string | number
-        height: string | number
-    }>({
-        top: 0,
-        left: 0,
-        width: 0,
-        height: 0,
-    })
-
-    useEffect(() => {
-        function move() {
-            const arena = document.querySelector('.arena')
-            const arenaRect = arena?.getBoundingClientRect()
-            if (arenaRect == null) return
-
-            const activeLetterRect = document
-                .querySelector(
-                    '.active-verse .active-word span:not(.correct):not(.incorrect):not(.extra)',
-                )
-                ?.getBoundingClientRect()
-
-            if (activeLetterRect) {
-                setAnimatedCursorRect(prev => {
-                    const next = {
-                        ...activeLetterRect,
-                        top: `${activeLetterRect.top - arenaRect.top}px`,
-                        left: `${activeLetterRect.left - arenaRect.left}px`,
-                        width: `${activeLetterRect.width}px`,
-                        height: '19px',
-                    }
-
-                    return equal(prev, next) ? prev : next
-                })
-                return
-            }
-            const activeSpaceRect = document
-                .querySelector('.active-verse .active-space')
-                ?.getBoundingClientRect()
-
-            if (activeSpaceRect) {
-                setAnimatedCursorRect(prev => {
-                    const next = {
-                        ...activeSpaceRect,
-                        top: `${activeSpaceRect.top - arenaRect.top + 2}px`,
-                        left: `${activeSpaceRect.left - arenaRect.left}px`,
-                        width: `${activeSpaceRect.width}px`,
-                        height: '19px',
-                    }
-
-                    return equal(prev, next) ? prev : next
-                })
-                return
-            }
-        }
-
-        if (process.env.NODE_ENV === 'production') {
-            let frame = requestAnimationFrame(function loop() {
-                frame = requestAnimationFrame(loop)
-                move()
-            })
-
-            return () => {
-                cancelAnimationFrame(frame)
-            }
-        }
-
-        let now = Date.now()
-        let then = now
-        const fpsInterval = 1000 / 60
-
-        let frame = requestAnimationFrame(function loop() {
-            frame = requestAnimationFrame(loop)
-
-            now = Date.now()
-            const elapsed = now - then
-
-            if (elapsed > fpsInterval) {
-                then = now - (elapsed % fpsInterval)
-
-                move()
-            }
-        })
-
-        return () => {
-            cancelAnimationFrame(frame)
-        }
-    }, [])
+    useCursor()
 
     return (
         <div className="arena relative z-0  p-2  ">
@@ -258,6 +169,7 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                                     inputRef.current?.focus()
                                     setCurrentVerse(verse)
                                     setPosition([])
+                                    setKeystrokes([])
                                 }}
                                 position={position}
                             />
@@ -281,14 +193,8 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                 }
             })}
             <div
-                className="absolute rounded-sm bg-black/10 peer-focus:bg-black/20"
-                style={{
-                    top: animatedCursorRect.top,
-                    left: animatedCursorRect?.left,
-                    width: animatedCursorRect?.width,
-                    height: animatedCursorRect?.height,
-                    color: 'lime',
-                }}
+                id="cursor"
+                className="rounded-sm/10 absolute bg-black/20"
             />
         </div>
     )
