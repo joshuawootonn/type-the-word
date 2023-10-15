@@ -8,7 +8,7 @@ const footnoteNumberRegex = /\([0-9]+\)/
 
 export type InlineNewLine = { type: 'newLine'; typed: boolean }
 
-export type Space = { type: 'space'; typed: boolean }
+export type Space = { type: 'space'; typed: boolean; endOfLine: boolean }
 
 export type VerseNumber = { type: 'verseNumber'; number: string }
 

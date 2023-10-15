@@ -145,7 +145,7 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
     useCursor()
 
     return (
-        <div className="arena relative z-0  p-2  ">
+        <div className="arena prose relative z-0">
             <input
                 type="text"
                 className="peer absolute h-0 max-h-0 opacity-0"
@@ -192,10 +192,7 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                         break
                 }
             })}
-            <div
-                id="cursor"
-                className="rounded-sm/10 absolute bg-black/20"
-            />
+            <div id="cursor" className="rounded-sm/10 absolute bg-black/20" />
         </div>
     )
 }

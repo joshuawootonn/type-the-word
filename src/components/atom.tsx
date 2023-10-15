@@ -19,6 +19,7 @@ export function Word({
         <span
             className={clsx(
                 'word',
+                'peer mr-[1ch]',
                 active && 'active-word',
                 typedAtom &&
                     isAtomTyped &&

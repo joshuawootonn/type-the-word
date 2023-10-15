@@ -22,7 +22,7 @@ export function useDebounce<T>(value: T, delay: number): T {
 }
 
 export default function Home() {
-    const [value, setValue] = useState('Psalm 1')
+    const [value, setValue] = useState('Matthew 5:13-14' + '')
     const debouncedValue = useDebounce(value, 2000)
     const passage = api.passage.passage.useQuery(debouncedValue)
 
@@ -51,7 +51,7 @@ export default function Home() {
                 />
             </div>
 
-            <main className="prose relative mx-auto flex-grow">
+            <main className="relative mx-auto flex-grow">
                 {passage.isLoading ? null : <Arena passage={passage.data!} />}
             </main>
             <footer className="prose mx-auto flex w-full items-start justify-start py-2">

@@ -46,10 +46,10 @@ export function Paragraph({
                                           <span
                                               key={aIndexPrime}
                                               className={clsx(
-                                                  'space inline-flex h-[19px] w-2.5 translate-y-[3px]',
+                                                  'space inline-flex h-[19px] w-[1ch] translate-y-[3px]',
                                               )}
                                           >
-                                              {' '}
+                                              &nbsp;
                                           </span>
                                       )
                                   }
@@ -128,13 +128,13 @@ export function Paragraph({
                                           <span
                                               key={aIndexPrime}
                                               className={clsx(
-                                                  'space inline-flex h-[19px] w-2.5 translate-y-[3px]',
+                                                  'space inline-flex h-[19px] w-[1ch] translate-y-[3px]',
                                                   lastAtom != null &&
                                                       typedAtom == null &&
                                                       'active-space',
                                               )}
                                           >
-                                              {' '}
+                                              &nbsp;
                                           </span>
                                       )
                                   }
@@ -143,41 +143,6 @@ export function Paragraph({
                                       (typedAtom == null ||
                                           typedAtom.type === 'word')
                                   ) {
-                                      //   if (
-                                      //       atom.letters
-                                      //           .length ===
-                                      //           3 &&
-                                      //       atom
-                                      //           .letters[0] ===
-                                      //           'N'
-                                      //   )
-                                      //       console.log(
-                                      //           'word',
-                                      //           {
-                                      //               atom,
-                                      //               typedAtom,
-                                      //               nextAtom,
-                                      //               position,
-                                      //               aIndex,
-                                      //               aIndexPrime,
-                                      //               active:
-                                      //                   (aIndex ===
-                                      //                       0 ||
-                                      //                       lastAtom !=
-                                      //                           null) &&
-                                      //                   nextAtom ==
-                                      //                       null,
-                                      //               1:
-                                      //                   aIndexPrime ===
-                                      //                   0,
-                                      //               2:
-                                      //                   lastAtom !=
-                                      //                   null,
-                                      //               3:
-                                      //                   nextAtom ==
-                                      //                   null,
-                                      //           },
-                                      //       )
                                       return (
                                           <Word
                                               key={aIndexPrime}
