@@ -22,7 +22,7 @@ export function useDebounce<T>(value: T, delay: number): T {
 }
 
 export default function Home() {
-    const [value, setValue] = useState('Matthew 5:13-14' + '')
+    const [value, setValue] = useState('psalm 23')
     const debouncedValue = useDebounce(value, 2000)
     const passage = api.passage.passage.useQuery(debouncedValue)
 

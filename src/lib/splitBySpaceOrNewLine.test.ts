@@ -8,5 +8,5 @@ test('splitBySpaceOrNewLine', () => {
 
     const result = psalm1Verse1and2.split(splitBySpaceOrNewLine)
 
-    expect(result.length).toEqual(146)
+    expect(result.length).toEqual(100)
 })

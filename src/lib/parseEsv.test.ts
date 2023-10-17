@@ -39,7 +39,7 @@ test('verseRegex', () => {
     expect(psalm1.match(verseRegex)?.length).toEqual(6)
 })
 
-test.only('footnoteRegex', () => {
+test('footnoteRegex', () => {
     const psalm1 = '(2) 1:2 Or *instruction*'
 
     console.log(psalm1.match(footnoteRegex))

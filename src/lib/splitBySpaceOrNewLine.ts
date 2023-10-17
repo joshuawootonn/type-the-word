@@ -34,8 +34,8 @@ export const splitBySpaceOrNewLine = {
                     result.push(str.substring(pos))
                     pos = str.length
                 } else {
-                    result.push(str.substring(pos, endOfWord))
-                    pos = endOfWord
+                    result.push(str.substring(pos, endOfWord + 1))
+                    pos = endOfWord + 1
                 }
             }
         }

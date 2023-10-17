@@ -8,7 +8,7 @@ const footnoteNumberRegex = /\([0-9]+\)/
 
 export type InlineNewLine = { type: 'newLine'; typed: boolean }
 
-export type Space = { type: 'space'; typed: boolean; endOfLine: boolean }
+export type Space = { type: 'space'; typed: boolean }
 
 export type VerseNumber = { type: 'verseNumber'; number: string }
 
@@ -63,46 +63,18 @@ export function parseChapter(passage: string): Passage[] {
                         type: 'verse' as const,
                         verse: match.match(numberRegex)?.[0] ?? '',
                         text,
-                        nodes: splitText.flatMap<Atom>((atomText, i) => {
-                            const prevCharIsNewlineOrSpace =
-                                splitText.at(i - 1) === ' ' ||
-                                splitText.at(i - 1) === '\n' ||
-                                verseNumberRegex.test(splitText.at(i - 1) ?? '')
+                        nodes: splitText.flatMap<Atom>(atomText => {
                             if (atomText === '\n') {
                                 return {
                                     type: 'newLine' as const,
-                                    typed: prevCharIsNewlineOrSpace
-                                        ? false
-                                        : true,
+                                    typed: false,
                                 }
                             }
 
                             if (atomText === ' ') {
-                                const ifTrimStart = splitText
-                                    .slice(0, i)
-                                    .every(atom => atom === ' ')
-
-                                const prevDifferentChar = splitText
-                                    .slice(0, i)
-                                    .reverse()
-                                    .find(atom => atom !== ' ')
-                                const nextDifferentChar = splitText
-                                    .slice(i)
-                                    .find(atom => atom !== ' ')
-
-                                const isSandwichedWithNewLines =
-                                    prevDifferentChar === '\n' &&
-                                    nextDifferentChar === '\n'
-
                                 return {
                                     type: 'space' as const,
-                                    typed:
-                                        prevCharIsNewlineOrSpace ||
-                                        ifTrimStart ||
-                                        prevDifferentChar === '\n' ||
-                                        isSandwichedWithNewLines
-                                            ? false
-                                            : true,
+                                    typed: false,
                                 }
                             }
 

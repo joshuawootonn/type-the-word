@@ -1,6 +1,7 @@
 import { Atom } from './parseEsv'
+import { isAtomComplete } from '~/lib/keystroke'
 
-const validQuotes = [
+export const validQuotes = [
     '“', // U+201c
     '”', // U+201d
     '"',
@@ -18,7 +19,9 @@ const validQuotes = [
     // '＂', // U+FF02
 ]
 
-const validSingleQuotes = ["'", '‘', '’', '‛', '❛', '❜', '']
+export const validSingleQuotes = ["'", '‘', '’', '‛', '❛', '❜', '']
+
+export const validEnter = ['Enter', '\n']
 
 export function isAtomTyped(atom: Atom): boolean {
     switch (atom.type) {
@@ -67,11 +70,16 @@ export function isAtomEqual(a?: Atom, b?: Atom): boolean {
     return true
 }
 
-export function isVerseEqual(a: Atom[], b: Atom[]) {
+export function isVerseSameShape(a: Atom[], b: Atom[]) {
     const aTyped = a.filter(isAtomTyped)
     const bTyped = b.filter(isAtomTyped)
     if (aTyped.length !== bTyped.length) {
         return false
     }
-    return aTyped.every((atom, i) => isAtomEqual(atom, bTyped[i]))
+    return aTyped.every(
+        (atom, i) =>
+            isAtomComplete(atom) &&
+            isAtomComplete(bTyped[i]) &&
+            atom.type === bTyped[i]?.type,
+    )
 }

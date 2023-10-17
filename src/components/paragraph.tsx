@@ -2,7 +2,8 @@ import clsx from 'clsx'
 import { isAtomTyped } from '~/lib/isEqual'
 import { Word } from './atom'
 import { Atom, Paragraph } from '~/lib/parseEsv'
-import { Fragment } from 'react'
+import { isAtomComplete } from '~/lib/keystroke'
+import { NewLineIndicator } from '~/components/newLineIndicator'
 
 export function Paragraph({
     position,
@@ -76,47 +77,16 @@ export function Paragraph({
                                   const typedAtom = position.at(aIndex)
 
                                   const nextAtom = position.at(aIndex + 1)
-                                  if (atom.type === 'newLine')
+                                  if (atom.type === 'newLine') {
+                                      const isActive =
+                                          lastAtom != null && typedAtom == null
                                       return (
-                                          <Fragment key={aIndexPrime}>
-                                              <span
-                                                  className={clsx(
-                                                      lastAtom != null &&
-                                                          typedAtom == null &&
-                                                          'opacity-100',
-                                                      'relative z-0 h-[19px] opacity-0 transition-opacity',
-                                                  )}
-                                              >
-                                                  <span
-                                                      className={clsx(
-                                                          'absolute left-0 top-0 inline-flex h-full items-center justify-center px-2',
-                                                          lastAtom != null &&
-                                                              typedAtom ==
-                                                                  null &&
-                                                              'active-space',
-                                                      )}
-                                                  >
-                                                      <svg
-                                                          className="translate-y-[.5px]"
-                                                          width="16"
-                                                          height="16"
-                                                          viewBox="0 0 16 16"
-                                                          fill="none"
-                                                          xmlns="http://www.w3.org/2000/svg"
-                                                      >
-                                                          <path
-                                                              d="M12.5611 4.33774C12.5611 4.33774 12.5611 4.84212 12.5611 5.82744C12.5611 7.72453 11.5283 8.55823 9.83026 8.55823C6.99146 8.55823 2.56105 8.55823 2.56105 8.55823M2.56105 8.55823C2.56105 8.39635 4.96506 5.82744 4.96506 5.82744M2.56105 8.55823C2.56105 8.72012 4.12224 10.3498 4.96506 11.2455"
-                                                              stroke="black"
-                                                              strokeWidth="2"
-                                                              strokeLinecap="round"
-                                                              strokeLinejoin="round"
-                                                          />
-                                                      </svg>
-                                                  </span>
-                                              </span>
-                                              <br />
-                                          </Fragment>
+                                          <NewLineIndicator
+                                              key={aIndexPrime}
+                                              isActive={isActive}
+                                          />
                                       )
+                                  }
 
                                   if (atom.type === 'verseNumber') {
                                       return (
@@ -158,7 +128,9 @@ export function Paragraph({
                                                       aIndex === 0) ||
                                                   !!lastAtom
                                               }
-                                              isAtomTyped={!!nextAtom}
+                                              isAtomTyped={isAtomComplete(
+                                                  typedAtom,
+                                              )}
                                           />
                                       )
                                   }
