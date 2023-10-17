@@ -3,21 +3,22 @@ import { Atom } from './parseEsv'
 const validQuotes = [
     '“', // U+201c
     '”', // U+201d
-    '«', // U+00AB
-    '»', // U+00BB
-    '„', // U+201E
-    '“', // U+201C
-    '‟', // U+201F
-    '”', // U+201D
-    '❝', // U+275D
-    '❞', // U+275E
-    '〝', // U+301D
-    '〞', // U+301E
-    '〟', // U+301F
-    '＂', // U+FF02
+    '"',
+    // '«', // U+00AB
+    // '»', // U+00BB
+    // '„', // U+201E
+    // '“', // U+201C
+    // '‟', // U+201F
+    // '”', // U+201D
+    // '❝', // U+275D
+    // '❞', // U+275E
+    // '〝', // U+301D
+    // '〞', // U+301E
+    // '〟', // U+301F
+    // '＂', // U+FF02
 ]
 
-const validSingleQuotes = ['‘', '’', '‛', '❛', '❜', '']
+const validSingleQuotes = ["'", '‘', '’', '‛', '❛', '❜', '']
 
 export function isAtomTyped(atom: Atom): boolean {
     switch (atom.type) {
@@ -35,12 +36,12 @@ export function isAtomTyped(atom: Atom): boolean {
 export function isLetterEqual(a?: string, b?: string): boolean {
     if (a === undefined || b === undefined) return a === b
 
-    if (b === '"') {
-        return a === b || validQuotes.includes(a)
+    if (validQuotes.includes(b)) {
+        return validQuotes.includes(a)
     }
 
-    if (b === "'") {
-        return a === b || validSingleQuotes.includes(a)
+    if (validSingleQuotes.includes(b)) {
+        return validSingleQuotes.includes(a)
     }
 
     return a === b
