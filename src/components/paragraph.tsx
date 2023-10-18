@@ -117,11 +117,16 @@ export function Paragraph({
                                           <Word
                                               key={aIndexPrime}
                                               word={atom}
-                                              active={
+                                              active={Boolean(
                                                   (aIndex === 0 ||
-                                                      lastAtom != null) &&
-                                                  nextAtom == null
-                                              }
+                                                      isAtomComplete(
+                                                          lastAtom,
+                                                      )) &&
+                                                      !isAtomComplete(
+                                                          typedAtom,
+                                                      ) &&
+                                                      nextAtom == null,
+                                              )}
                                               typedWord={typedAtom}
                                               isPrevTyped={
                                                   (position.length === 0 &&
