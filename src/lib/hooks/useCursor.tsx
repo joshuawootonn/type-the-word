@@ -28,7 +28,6 @@ export function useCursor() {
                 if (activeRect.width === 0) {
                     const indicator = activeElement?.querySelector('.indicator')
 
-                    console.log({ indicator, activeElement })
                     if (indicator) {
                         activeElement = indicator
                         activeRect =
