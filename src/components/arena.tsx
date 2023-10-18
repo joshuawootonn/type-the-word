@@ -104,6 +104,7 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                                     setCurrentVerse(verse)
                                     setPosition([])
                                     setKeystrokes([])
+                                    setIsArenaActive(true)
                                     inputRef.current?.focus()
                                 }}
                                 position={position}
