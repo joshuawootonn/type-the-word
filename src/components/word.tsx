@@ -5,15 +5,15 @@ import { Word } from '~/lib/parseEsv'
 import { NewLineIndicator } from '~/components/newLineIndicator'
 
 export function Word({
-    atom,
-    typedAtom,
-    isAtomTyped,
+    word,
+    typedWord,
+    isWordTyped,
     active,
 }: {
-    typedAtom?: Word
-    atom: Word
+    typedWord?: Word
+    word: Word
     isPrevTyped: boolean
-    isAtomTyped: boolean
+    isWordTyped: boolean
     active: boolean
 }) {
     return (
@@ -22,15 +22,15 @@ export function Word({
                 className={clsx(
                     'word',
                     active && 'active-word',
-                    typedAtom &&
-                        isAtomTyped &&
-                        !isAtomEqual(atom, typedAtom) &&
+                    typedWord &&
+                        isWordTyped &&
+                        !isAtomEqual(word, typedWord) &&
                         'error underline decoration-rose-500',
                 )}
             >
-                {typedAtom?.letters.slice(atom.letters.length).length
-                    ? typedAtom.letters.map((letter, lIndex) => {
-                          const correctLetter = atom.letters?.at(lIndex)
+                {typedWord?.letters.slice(word.letters.length).length
+                    ? typedWord.letters.map((letter, lIndex) => {
+                          const correctLetter = word.letters?.at(lIndex)
                           const isEqual = isLetterEqual(correctLetter, letter)
 
                           return (
@@ -43,7 +43,7 @@ export function Word({
                                       correctLetter &&
                                           !isEqual &&
                                           'incorrect text-rose-700',
-                                      lIndex > atom.letters.length - 1 &&
+                                      lIndex > word.letters.length - 1 &&
                                           'extra text-rose-700',
                                   )}
                               >
@@ -57,8 +57,8 @@ export function Word({
                               </span>
                           )
                       })
-                    : atom.letters.map((letter, lIndex) => {
-                          const typedLetter = typedAtom?.letters.at(lIndex)
+                    : word.letters.map((letter, lIndex) => {
+                          const typedLetter = typedWord?.letters.at(lIndex)
                           const isEqual = isLetterEqual(letter, typedLetter)
                           return (
                               <span

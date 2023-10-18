@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { isAtomTyped } from '~/lib/isEqual'
-import { Word } from './atom'
+import { Word } from './word'
 import { Atom, Paragraph } from '~/lib/parseEsv'
 import { isAtomComplete } from '~/lib/keystroke'
 import { NewLineIndicator } from '~/components/newLineIndicator'
@@ -58,10 +58,10 @@ export function Paragraph({
                                       return (
                                           <Word
                                               key={aIndexPrime}
-                                              atom={atom}
+                                              word={atom}
                                               active={false}
                                               isPrevTyped={false}
-                                              isAtomTyped={false}
+                                              isWordTyped={false}
                                           />
                                       )
                                   }
@@ -116,19 +116,19 @@ export function Paragraph({
                                       return (
                                           <Word
                                               key={aIndexPrime}
-                                              atom={atom}
+                                              word={atom}
                                               active={
                                                   (aIndex === 0 ||
                                                       lastAtom != null) &&
                                                   nextAtom == null
                                               }
-                                              typedAtom={typedAtom}
+                                              typedWord={typedAtom}
                                               isPrevTyped={
                                                   (position.length === 0 &&
                                                       aIndex === 0) ||
                                                   !!lastAtom
                                               }
-                                              isAtomTyped={isAtomComplete(
+                                              isWordTyped={isAtomComplete(
                                                   typedAtom,
                                               )}
                                           />

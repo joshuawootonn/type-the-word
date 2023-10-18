@@ -66,7 +66,11 @@ function lastLetter(atom: Atom | undefined): string | undefined {
 }
 
 export function isAtomComplete(atom: Atom | undefined): boolean {
-    if (atom == null || atom.type !== 'word') {
+    if (atom == null) {
+        return false
+    }
+
+    if (atom.type !== 'word') {
         return true
     }
 
