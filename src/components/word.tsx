@@ -16,6 +16,13 @@ export function Word({
     isWordTyped: boolean
     active: boolean
 }) {
+    const wordWithoutEnder = word.letters.slice(0, -1)
+    const ender = word.letters.at(-1)
+
+    const extras = typedWord?.letters
+        .slice(wordWithoutEnder.length)
+        .filter(l => !isLetterEqual(l, ender))
+
     return (
         <>
             <span
@@ -28,60 +35,48 @@ export function Word({
                         'error underline decoration-rose-500',
                 )}
             >
-                {typedWord?.letters.slice(word.letters.length).length
-                    ? typedWord.letters.map((letter, lIndex) => {
-                          const correctLetter = word.letters?.at(lIndex)
-                          const isEqual = isLetterEqual(correctLetter, letter)
+                {wordWithoutEnder.map((letter, lIndex) => {
+                    const typedLetter = typedWord?.letters.at(lIndex)
+                    const isEqual = isLetterEqual(letter, typedLetter)
+                    return (
+                        <span
+                            data-letter
+                            key={lIndex}
+                            className={clsx(
+                                'letter relative z-0',
+                                isEqual && 'correct text-emerald-500',
+                                typedLetter &&
+                                    !isEqual &&
+                                    'incorrect text-rose-700',
+                            )}
+                        >
+                            {letter}
+                        </span>
+                    )
+                })}
+                {extras?.map((letter, lIndex) => {
+                    return (
+                        <span
+                            data-letter
+                            key={lIndex}
+                            className={clsx(
+                                'letter extra relative z-0 text-rose-700',
+                            )}
+                        >
+                            {letter}
+                        </span>
+                    )
+                })}
 
-                          return (
-                              <span
-                                  data-letter
-                                  key={lIndex}
-                                  className={clsx(
-                                      'letter relative z-0',
-                                      isEqual && 'correct text-emerald-500',
-                                      correctLetter &&
-                                          !isEqual &&
-                                          'incorrect text-rose-700',
-                                      lIndex > word.letters.length - 1 &&
-                                          'extra text-rose-700',
-                                  )}
-                              >
-                                  {letter === '\n' ? (
-                                      <NewLineIndicator isActive={active} />
-                                  ) : letter === ' ' ? (
-                                      <>&nbsp;</>
-                                  ) : (
-                                      letter
-                                  )}
-                              </span>
-                          )
-                      })
-                    : word.letters.map((letter, lIndex) => {
-                          const typedLetter = typedWord?.letters.at(lIndex)
-                          const isEqual = isLetterEqual(letter, typedLetter)
-                          return (
-                              <span
-                                  data-letter
-                                  key={lIndex}
-                                  className={clsx(
-                                      'letter relative z-0',
-                                      isEqual && 'correct text-emerald-500',
-                                      typedLetter &&
-                                          !isEqual &&
-                                          'incorrect text-rose-700',
-                                  )}
-                              >
-                                  {letter === '\n' ? (
-                                      <NewLineIndicator isActive={active} />
-                                  ) : letter === ' ' ? (
-                                      <>&nbsp;</>
-                                  ) : (
-                                      letter
-                                  )}
-                              </span>
-                          )
-                      })}
+                <span data-letter className={clsx('letter relative z-0')}>
+                    {ender === '\n' ? (
+                        <NewLineIndicator isActive={active} />
+                    ) : ender === ' ' ? (
+                        <>&nbsp;</>
+                    ) : (
+                        ender
+                    )}
+                </span>
             </span>
             <span className="text-[0px]"> </span>
         </>
