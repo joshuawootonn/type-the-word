@@ -54,7 +54,9 @@ export function parseChapter(passage: string): Passage[] {
                 return []
             } else if (verseRegex.test(line)) {
                 const verseNodes = []
-                for (const match of line.match(verseRegex) ?? []) {
+                const lineWithNewLineEnding = line + '\n'
+                for (const match of lineWithNewLineEnding.match(verseRegex) ??
+                    []) {
                     const text = match.replace(footnoteNumberRegex, '')
 
                     const splitText = text.split(splitBySpaceOrNewLine)
