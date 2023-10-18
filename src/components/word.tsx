@@ -23,18 +23,11 @@ export function Word({
         .slice(wordWithoutEnder.length)
         .filter(l => !isLetterEqual(l, ender))
 
+    const isErrored = typedWord && isWordTyped && !isAtomEqual(word, typedWord)
+
     return (
         <>
-            <span
-                className={clsx(
-                    'word',
-                    active && 'active-word',
-                    typedWord &&
-                        isWordTyped &&
-                        !isAtomEqual(word, typedWord) &&
-                        'error underline decoration-rose-500',
-                )}
-            >
+            <span className={clsx('word', active && 'active-word')}>
                 {wordWithoutEnder.map((letter, lIndex) => {
                     const typedLetter = typedWord?.letters.at(lIndex)
                     const isEqual = isLetterEqual(letter, typedLetter)
@@ -48,6 +41,8 @@ export function Word({
                                 typedLetter &&
                                     !isEqual &&
                                     'incorrect text-rose-700',
+                                isErrored &&
+                                    'error underline decoration-rose-500 decoration-2',
                             )}
                         >
                             {letter}
@@ -60,7 +55,9 @@ export function Word({
                             data-letter
                             key={lIndex}
                             className={clsx(
-                                'letter extra relative z-0 text-rose-700',
+                                'letter extra relative z-0 text-rose-900',
+                                isErrored &&
+                                    'error underline decoration-rose-500 decoration-2',
                             )}
                         >
                             {letter}
