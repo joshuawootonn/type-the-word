@@ -78,14 +78,7 @@ export function Paragraph({
 
                                   const nextAtom = position.at(aIndex + 1)
                                   if (atom.type === 'newLine') {
-                                      const isActive =
-                                          lastAtom != null && typedAtom == null
-                                      return (
-                                          <NewLineIndicator
-                                              key={aIndexPrime}
-                                              isActive={isActive}
-                                          />
-                                      )
+                                      return <br key={aIndexPrime} />
                                   }
 
                                   if (atom.type === 'verseNumber') {
