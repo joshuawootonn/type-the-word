@@ -1,14 +1,15 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useId, useRef, useState } from 'react'
 
 import { isAtomTyped, isVerseSameShape } from '~/lib/isEqual'
 import { Atom, parseChapter } from '~/lib/parseEsv'
 import { EsvPassageSchema } from '~/server/api/routers/passage'
 
 import { Paragraph } from './paragraph'
-import { useCursor } from '~/lib/hooks'
 import { getPosition, isValidKeystroke, Keystroke } from '~/lib/keystroke'
+import { Cursor } from '~/components/cursor'
 
 export function Arena({ passage }: { passage: EsvPassageSchema }) {
+    const arenaId = useId()
     const chapter = parseChapter(passage?.passages.at(0) ?? '')
 
     console.log({ chapter })
@@ -21,8 +22,20 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
             ?.verse,
     )
 
+    const [isArenaActive, setIsArenaActive] = useState(false)
+    const [isArenaFocused, setIsArenaFocused] = useState(false)
+
+    useEffect(() => {
+        const t = setTimeout(() => {
+            setIsArenaActive(false)
+        }, 3000)
+
+        return () => {
+            clearTimeout(t)
+        }
+    }, [isArenaActive])
+
     function handleInput(e: React.KeyboardEvent<HTMLInputElement>) {
-        console.log(e.key)
         if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
             setKeystrokes(prev => {
                 const currentVerseNode = chapter
@@ -58,25 +71,25 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                 }
 
                 setPosition(position)
+                setIsArenaActive(true)
 
                 return next
             })
         }
     }
 
-    useCursor()
-
     return (
-        <div className="arena prose relative z-0">
+        <div id={arenaId} className="arena prose relative z-0">
             <input
                 type="text"
                 className="peer fixed h-0 max-h-0 opacity-0"
                 tabIndex={0}
-                id="myInput"
                 onKeyDown={e => {
                     e.preventDefault()
                     handleInput(e)
                 }}
+                onFocus={() => setIsArenaFocused(true)}
+                onBlur={() => setIsArenaFocused(false)}
                 ref={inputRef}
             />
             {chapter.map((node, pIndex) => {
@@ -114,7 +127,11 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
                         break
                 }
             })}
-            <div id="cursor" className="rounded-sm/10 absolute bg-black/20" />
+            <Cursor
+                arenaId={arenaId}
+                isArenaFocused={isArenaFocused}
+                isArenaActive={isArenaActive}
+            />
         </div>
     )
 }

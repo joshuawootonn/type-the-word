@@ -1,7 +1,7 @@
 import { animate } from 'motion'
 import { useEffect, useRef } from 'react'
 
-export function useCursor() {
+export function useCursor(arenaId: string): void {
     const prev = useRef<{
         top: string | number
         left: string | number
@@ -19,7 +19,9 @@ export function useCursor() {
             if (arenaRect == null) return
 
             let activeElement = document.querySelector(
-                '.active-verse .active-word:not(.error) .letter:not(.correct):not(.incorrect):not(.extra)',
+                `#${CSS.escape(
+                    arenaId,
+                )} .active-verse .active-word:not(.error) .letter:not(.correct):not(.incorrect):not(.extra)`,
             )
 
             let activeRect = activeElement?.getBoundingClientRect()
@@ -50,7 +52,7 @@ export function useCursor() {
 
                 // Don't try to use Glide. It uses some bunk default values that throw.
                 animate(
-                    '#cursor',
+                    `#${CSS.escape(arenaId)}-cursor`,
                     {
                         top: 0,
                         left: 0,
@@ -61,36 +63,14 @@ export function useCursor() {
                     },
                     { easing: 'ease', duration: 0.05 },
                 )
+
                 return
             }
         }
 
-        if (process.env.NODE_ENV === 'production') {
-            let frame = requestAnimationFrame(function loop() {
-                frame = requestAnimationFrame(loop)
-                move()
-            })
-
-            return () => {
-                cancelAnimationFrame(frame)
-            }
-        }
-
-        let now = Date.now()
-        let then = now
-        const fpsInterval = 1000 / 60
-
         let frame = requestAnimationFrame(function loop() {
             frame = requestAnimationFrame(loop)
-
-            now = Date.now()
-            const elapsed = now - then
-
-            if (elapsed > fpsInterval) {
-                then = now - (elapsed % fpsInterval)
-
-                move()
-            }
+            move()
         })
 
         return () => {
