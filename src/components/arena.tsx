@@ -70,7 +70,7 @@ export function Arena({ passage }: { passage: EsvPassageSchema }) {
         <div className="arena prose relative z-0">
             <input
                 type="text"
-                className="peer absolute h-0 max-h-0 opacity-0"
+                className="peer fixed h-0 max-h-0 opacity-0"
                 tabIndex={0}
                 id="myInput"
                 onKeyDown={e => {
