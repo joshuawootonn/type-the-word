@@ -11,7 +11,6 @@ export function Cursor({
     isArenaActive: boolean
     isArenaFocused: boolean
 }) {
-    console.log({ arenaId, isArenaActive, isArenaFocused })
     useCursor(arenaId)
     return (
         <>

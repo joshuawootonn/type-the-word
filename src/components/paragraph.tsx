@@ -1,9 +1,8 @@
 import clsx from 'clsx'
 import { isAtomTyped } from '~/lib/isEqual'
 import { Word } from './word'
-import { Atom, Paragraph } from '~/lib/parseEsv'
+import { Inline, Paragraph } from '~/lib/parseEsv'
 import { isAtomComplete } from '~/lib/keystroke'
-import { NewLineIndicator } from '~/components/newLineIndicator'
 
 export function Paragraph({
     position,
@@ -11,7 +10,7 @@ export function Paragraph({
     currentVerse,
     setCurrentVerse,
 }: {
-    position: Atom[]
+    position: Inline[]
     node: Paragraph
     currentVerse?: string
     setCurrentVerse: (verse: string) => void
@@ -19,7 +18,7 @@ export function Paragraph({
     return (
         <p className="font-[0px]">
             {node.nodes.map((verse, vIndex) => {
-                const isCurrentVerse = verse.verse === currentVerse
+                const isCurrentVerse = verse.verse.value === currentVerse
                 return (
                     <span
                         key={vIndex}
@@ -28,7 +27,7 @@ export function Paragraph({
                             isCurrentVerse && 'active-verse',
                         )}
                         onClick={() => {
-                            setCurrentVerse(verse.verse)
+                            setCurrentVerse(verse.verse.value)
                         }}
                     >
                         {!isCurrentVerse
@@ -38,7 +37,7 @@ export function Paragraph({
 
                                   if (atom.type === 'verseNumber') {
                                       return (
-                                          <b key={aIndexPrime}>{atom.number}</b>
+                                          <b key={aIndexPrime}>{atom.text}</b>
                                       )
                                   }
 
@@ -54,6 +53,7 @@ export function Paragraph({
                                           </span>
                                       )
                                   }
+
                                   if (atom.type === 'word') {
                                       return (
                                           <Word
@@ -75,15 +75,15 @@ export function Paragraph({
 
                                   const lastAtom = position.at(aIndex - 1)
                                   const typedAtom = position.at(aIndex)
-
                                   const nextAtom = position.at(aIndex + 1)
+
                                   if (atom.type === 'newLine') {
                                       return <br key={aIndexPrime} />
                                   }
 
                                   if (atom.type === 'verseNumber') {
                                       return (
-                                          <b key={aIndexPrime}>{atom.number}</b>
+                                          <b key={aIndexPrime}>{atom.text}</b>
                                       )
                                   }
                                   if (atom.type === 'space') {

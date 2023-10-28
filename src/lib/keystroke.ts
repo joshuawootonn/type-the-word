@@ -1,4 +1,4 @@
-import { Atom, Verse } from '~/lib/parseEsv'
+import { Inline, Verse } from '~/lib/parseEsv'
 import React from 'react'
 import {
     isAtomEqual,
@@ -25,7 +25,7 @@ export function cleanInputKey(key: string): string {
 
     return key
 }
-export function getPosition(keystrokes: Keystroke[] = []): Atom[] {
+export function getPosition(keystrokes: Keystroke[] = []): Inline[] {
     return keystrokes.reduce((acc, keystroke) => {
         const last = acc.at(-1)
         if (keystroke.type === 'insert' && keystroke.key) {
@@ -54,10 +54,10 @@ export function getPosition(keystrokes: Keystroke[] = []): Atom[] {
             return acc.slice(0, -1)
         }
         return [...acc]
-    }, [] as Atom[])
+    }, [] as Inline[])
 }
 
-function lastLetter(atom: Atom | undefined): string | undefined {
+function lastLetter(atom: Inline | undefined): string | undefined {
     if (atom == null || atom.type !== 'word') {
         return
     }
@@ -65,7 +65,7 @@ function lastLetter(atom: Atom | undefined): string | undefined {
     return atom.letters.at(-1)
 }
 
-export function isAtomComplete(atom: Atom | undefined): boolean {
+export function isAtomComplete(atom: Inline | undefined): boolean {
     if (atom == null) {
         return false
     }
@@ -76,15 +76,19 @@ export function isAtomComplete(atom: Atom | undefined): boolean {
 
     const lastLetter = atom.letters.at(-1)
 
-    return lastLetter === ' ' || lastLetter === '\n' || lastLetter === 'Enter'
+    return (
+        (lastLetter && /\s/.test(lastLetter)) ||
+        lastLetter === '\n' ||
+        lastLetter === 'Enter'
+    )
 }
 
 export function isValidKeystroke(
     key: React.KeyboardEvent<HTMLInputElement>['key'],
-    currentVerse: Verse,
+    currentVerse: Inline[],
     prev: Keystroke[],
 ) {
-    const correctAtomNodes = currentVerse.nodes.filter(isAtomTyped)
+    const correctAtomNodes = currentVerse.filter(isAtomTyped)
     const prevPosition = getPosition(prev)
     const prevCurrentCorrect = correctAtomNodes.at(prevPosition.length - 1)
     const prevCurrentTyped = prevPosition.at(-1)

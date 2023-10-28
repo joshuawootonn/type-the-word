@@ -1,4 +1,4 @@
-import { Atom } from './parseEsv'
+import { Inline, Paragraph } from './parseEsv'
 import { isAtomComplete } from '~/lib/keystroke'
 
 export const validQuotes = [
@@ -23,13 +23,13 @@ export const validSingleQuotes = ["'", '‘', '’', '‛', '❛', '❜', '']
 
 export const validEnter = ['Enter', '\n']
 
-export function isAtomTyped(atom: Atom): boolean {
+export function isAtomTyped(atom: Inline | Paragraph): boolean {
     switch (atom.type) {
         case 'verseNumber':
-            return false
-        case 'newLine':
+        case 'paragraph':
         case 'space':
-            return atom.typed
+        case 'newLine':
+            return false
 
         default:
             return true
@@ -50,7 +50,7 @@ export function isLetterEqual(a?: string, b?: string): boolean {
     return a === b
 }
 
-export function isAtomEqual(a?: Atom, b?: Atom): boolean {
+export function isAtomEqual(a?: Inline, b?: Inline): boolean {
     if (a === undefined || b === undefined) return a === b
 
     if (a.type !== b.type) return false
@@ -70,7 +70,7 @@ export function isAtomEqual(a?: Atom, b?: Atom): boolean {
     return true
 }
 
-export function isVerseSameShape(a: Atom[], b: Atom[]) {
+export function isVerseSameShape(a: Inline[], b: Inline[]) {
     const aTyped = a.filter(isAtomTyped)
     const bTyped = b.filter(isAtomTyped)
     if (aTyped.length !== bTyped.length) {

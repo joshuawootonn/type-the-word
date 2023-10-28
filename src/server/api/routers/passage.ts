@@ -1,14 +1,13 @@
 import { z } from 'zod'
-
 import { env } from '~/env.mjs'
-
 import { createTRPCRouter, publicProcedure } from '../trpc'
+import { parseChapter, ParsedPassage } from '~/lib/parseEsv'
 
 const passageSchema = z.object({
     query: z.string(),
     canonical: z.string(),
     parsed: z.array(z.array(z.number())),
-    passageMeta: z.array(
+    passage_meta: z.array(
         z.object({
             canonical: z.string(),
             ['chapter_start']: z.tuple([z.number(), z.number()]),
@@ -22,14 +21,12 @@ const passageSchema = z.object({
     passages: z.array(z.string()),
 })
 
-export type EsvPassageSchema = z.infer<typeof passageSchema>
-
 export const passageRouter = createTRPCRouter({
     passage: publicProcedure
         .input(z.string())
-        .query(async ({ input }): Promise<EsvPassageSchema> => {
+        .query(async ({ input }): Promise<ParsedPassage> => {
             const response = await fetch(
-                `https://api.esv.org/v3/passage/text/?q=${input}`,
+                `https://api.esv.org/v3/passage/html/?q=${input}`,
                 {
                     headers: {
                         Authorization: `Token ${env.CROSSWAY_SECRET}`,
@@ -43,6 +40,9 @@ export const passageRouter = createTRPCRouter({
                 )
             }
 
-            return response.json()
+            const data: unknown = await response.json()
+            const parsedData = passageSchema.parse(data)
+
+            return parseChapter(parsedData.passages.at(0) ?? '')
         }),
 })
