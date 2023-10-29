@@ -47,7 +47,6 @@ export type Paragraph = {
     type: 'paragraph'
     text: string
     nodes: Verse[]
-    paragraphMetadata: ParagraphMetadata
 }
 
 export type Block = H1 | H2 | H3 | H4 | Verse | Paragraph
@@ -133,14 +132,11 @@ type VerseMetadata = {
     length: number
 }
 
-type ParagraphMetadata = {
-    lastVerse: Verse
-    firstVerse: Verse
-}
-
 function parseBlock(
     node: ChildNode,
-    paragraphMetadata?: ParagraphMetadata,
+    context?: {
+        lastVerse: Verse
+    },
 ): Block | null {
     if (node.nodeName === 'h2') {
         return {
@@ -213,21 +209,21 @@ function parseBlock(
             const continuingVerse =
                 i === 0 && (verseIndex === -1 || verseIndex > firstWordIndex)
 
-            if (continuingVerse && paragraphMetadata?.lastVerse == undefined) {
+            if (continuingVerse && context?.lastVerse == undefined) {
                 throw new Error(
                     'continuing prev verse but verseMetadata is undefined',
                 )
-            } else if (continuingVerse && paragraphMetadata?.lastVerse) {
+            } else if (continuingVerse && context?.lastVerse) {
                 verses.push({
                     type: 'verse',
                     nodes: verseSection,
-                    verse: paragraphMetadata.lastVerse.verse,
+                    verse: context.lastVerse.verse,
                     text: inlineToString(verseSection),
                     verseMetadata: {
                         hangingVerse: true,
                         offset:
-                            paragraphMetadata.lastVerse.verseMetadata.offset +
-                            paragraphMetadata.lastVerse.verseMetadata.length,
+                            context.lastVerse.verseMetadata.offset +
+                            context.lastVerse.verseMetadata.length,
                         length: verseSection.length,
                     },
                 })
@@ -246,22 +242,8 @@ function parseBlock(
             }
         }
 
-        const firstVerse = verses.at(0)
-        const lastVerse = verses.at(-1)
-
-        if (firstVerse == undefined) {
-            throw new Error('firstNode is undefined')
-        }
-        if (lastVerse == undefined) {
-            throw new Error('lastNode is undefined')
-        }
-
         return {
             type: 'paragraph',
-            paragraphMetadata: {
-                firstVerse: firstVerse,
-                lastVerse: lastVerse,
-            },
             text: inlineToString(nodes),
             nodes: verses,
         }
@@ -284,18 +266,24 @@ export function parseChapter(passage: string): ParsedPassage {
     const html = parseFragment(cleanPassage)
 
     let firstVerse: VerseNumber | undefined = undefined
-    let previousVerseMetadata: ParagraphMetadata | undefined = undefined
+    let context: { lastVerse: Verse } | undefined = undefined
     const nodes: Block[] = []
     for (const node of html.childNodes) {
-        const parsed = parseBlock(node, previousVerseMetadata)
+        const parsed = parseBlock(node, context)
 
         if (parsed == null) continue
 
         nodes.push(parsed)
         if (parsed.type === 'paragraph') {
-            previousVerseMetadata = parsed.paragraphMetadata
-            if (firstVerse == undefined && parsed.paragraphMetadata.firstVerse)
-                firstVerse = parsed.paragraphMetadata.firstVerse.verse
+            const lastVerse = parsed.nodes.at(-1)
+            if (lastVerse == undefined) {
+                throw new Error('lastVerse is undefined')
+            }
+            context = { lastVerse }
+
+            if (firstVerse == undefined) {
+                firstVerse = lastVerse.verse
+            }
         }
     }
 
