@@ -76,5 +76,5 @@ export function useCursor(arenaId: string): void {
         return () => {
             cancelAnimationFrame(frame)
         }
-    }, [])
+    }, [arenaId])
 }

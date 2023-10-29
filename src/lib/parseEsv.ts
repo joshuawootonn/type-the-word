@@ -1,5 +1,5 @@
 import { parseFragment } from 'parse5'
-import { ChildNode, DocumentFragment } from 'parse5/dist/tree-adapters/default'
+import { ChildNode } from 'parse5/dist/tree-adapters/default'
 import { isAtomTyped } from '~/lib/isEqual'
 import { splitBySpaceOrNewLine } from '~/lib/splitBySpaceOrNewLine'
 import { isAtomComplete } from '~/lib/keystroke'
@@ -202,7 +202,6 @@ function parseBlock(
             }
         }
 
-        let isVerseHanging = false
         const verses: Verse[] = []
         for (const [i, verseSection] of verseSections.entries()) {
             const firstWordIndex = verseSection.findIndex(
@@ -219,7 +218,6 @@ function parseBlock(
                     'continuing prev verse but verseMetadata is undefined',
                 )
             } else if (continuingVerse && paragraphMetadata?.lastVerse) {
-                isVerseHanging = true
                 verses.push({
                     type: 'verse',
                     nodes: verseSection,

@@ -1,4 +1,4 @@
-import { Inline, Verse } from '~/lib/parseEsv'
+import { Inline } from '~/lib/parseEsv'
 import React from 'react'
 import {
     isAtomEqual,
@@ -76,11 +76,9 @@ export function isAtomComplete(atom: Inline | undefined): boolean {
 
     const lastLetter = atom.letters.at(-1)
 
-    return (
-        (lastLetter && /\s/.test(lastLetter)) ||
-        lastLetter === '\n' ||
-        lastLetter === 'Enter'
-    )
+    return lastLetter
+        ? /\s/.test(lastLetter) || lastLetter === '\n' || lastLetter === 'Enter'
+        : false
 }
 
 export function isValidKeystroke(
