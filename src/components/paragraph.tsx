@@ -16,7 +16,12 @@ export function Paragraph({
     setCurrentVerse: (verse: string) => void
 }) {
     return (
-        <p className="font-[0px]">
+        <p
+            className={clsx(
+                'relative font-[0px]',
+                node.metadata.blockIndent && 'ml-3',
+            )}
+        >
             {node.nodes.map((verse, vIndex) => {
                 const isCurrentVerse = verse.verse.value === currentVerse
                 const versePosition = verse.verseMetadata.hangingVerse
@@ -44,7 +49,15 @@ export function Paragraph({
 
                                   if (atom.type === 'verseNumber') {
                                       return (
-                                          <b key={aIndexPrime}>{atom.text}</b>
+                                          <b
+                                              className={clsx(
+                                                  node.metadata.blockIndent &&
+                                                      'absolute -left-3',
+                                              )}
+                                              key={aIndexPrime}
+                                          >
+                                              {atom.text.split(':').at(-1)}
+                                          </b>
                                       )
                                   }
 
@@ -90,7 +103,15 @@ export function Paragraph({
 
                                   if (atom.type === 'verseNumber') {
                                       return (
-                                          <b key={aIndexPrime}>{atom.text}</b>
+                                          <b
+                                              className={clsx(
+                                                  node.metadata.blockIndent &&
+                                                      'absolute -left-3',
+                                              )}
+                                              key={aIndexPrime}
+                                          >
+                                              {atom.text.split(':').at(-1)}
+                                          </b>
                                       )
                                   }
                                   if (atom.type === 'space') {

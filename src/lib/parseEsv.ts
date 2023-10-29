@@ -43,10 +43,15 @@ export type H4 = {
     text: string
 }
 
+export type ParagraphMetadata = {
+    blockIndent: boolean
+}
+
 export type Paragraph = {
     type: 'paragraph'
     text: string
     nodes: Verse[]
+    metadata: ParagraphMetadata
 }
 
 export type Block = H1 | H2 | H3 | H4 | Verse | Paragraph
@@ -246,6 +251,12 @@ function parseBlock(
             type: 'paragraph',
             text: inlineToString(nodes),
             nodes: verses,
+            metadata: {
+                blockIndent:
+                    node.attrs.find(attr =>
+                        attr.value.includes('block-indent'),
+                    ) != undefined,
+            },
         }
     }
 
