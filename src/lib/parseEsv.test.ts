@@ -5,24 +5,20 @@ import { Paragraph, parseChapter, Verse } from './parseEsv'
 export function sum(a: number, b: number): number {
     return a + b
 }
-test.skip('parse James 1:1', () => {
-    const verseHtml = `<h2 class="extra_text">James 1:1 <small class="audio extra_text">(<a class="mp3link"
-                                                                      href="https://audio.esv.org/david-cochran-heath/mq/59001001-59001001.mp3"
-                                                                      title="James 1:1"
-                                                                      type="audio/mpeg">Listen</a>)</small></h2>
+test('parse James 1:1', () => {
+    const verseHtml = `<h2 class="extra_text">James 1:1–4 <small class="audio extra_text">(<a class="mp3link" href="https://audio.esv.org/david-cochran-heath/mq/59001001-59001004.mp3" title="James 1:1–4" type="audio/mpeg">Listen</a>)</small></h2>
 <h3 id="p59001001_01-1">Greeting</h3>
-<p id="p59001001_02-1" class="starts-chapter"><b class="chapter-num" id="v59001001-1">1:1&nbsp;</b>James, a servant<sup
-        class="footnote"><a class="fn" href="#f1-1" id="fb1-1"
-                            title="&lt;note class=&quot;translation&quot; sub-class=&quot;bondservant&quot;&gt;For the contextual rendering of the Greek word &lt;i language=&quot;Greek&quot;&gt;doulos&lt;/i&gt;, see &lt;a href=&quot;https://www.esv.org/preface/&quot;&gt;Preface&lt;/a&gt;&lt;/note&gt;">1</a></sup>
-    of God and of the Lord Jesus Christ,</p>
+<p id="p59001001_02-1" class="starts-chapter"><b class="chapter-num" id="v59001001-1">1:1&nbsp;</b>James, a servant<sup class="footnote"><a class="fn" href="#f1-1" id="fb1-1" title="&lt;note class=&quot;translation&quot; sub-class=&quot;bondservant&quot;&gt;For the contextual rendering of the Greek word &lt;i language=&quot;Greek&quot;&gt;doulos&lt;/i&gt;, see &lt;a href=&quot;https://www.esv.org/preface/&quot;&gt;Preface&lt;/a&gt;&lt;/note&gt;">1</a></sup> of God and of the Lord Jesus Christ,</p>
 <p id="p59001001_02-1">To the twelve tribes in the Dispersion:</p>
 <p id="p59001001_02-1">Greetings.</p>
+<h3 id="p59001001_02-1">Testing of Your Faith</h3>
+<p id="p59001001_06-1"><b class="verse-num" id="v59001002-1">2&nbsp;</b>Count it all joy, my brothers,<sup class="footnote"><a class="fn" href="#f2-1" id="fb2-1" title="&lt;note class=&quot;translation&quot; sub-class=&quot;gender-neutral&quot;&gt;Or &lt;i&gt;&lt;span class=&quot;catch-word&quot;&gt;brothers&lt;/span&gt; and sisters&lt;/i&gt;. In New Testament usage, depending on the context, the plural Greek word &lt;i language=&quot;Greek&quot;&gt;adelphoi&lt;/i&gt; (translated “brothers”) may refer either to &lt;i&gt;brothers&lt;/i&gt; or to &lt;i&gt;brothers and sisters&lt;/i&gt;; also verses 16, 19&lt;/note&gt;">2</a></sup> when you meet trials of various kinds, <b class="verse-num" id="v59001003-1">3&nbsp;</b>for you know that the testing of your faith produces steadfastness. <b class="verse-num" id="v59001004-1">4&nbsp;</b>And let steadfastness have its full effect, that you may be perfect and complete, lacking in nothing.</p>
 <div class="footnotes extra_text">
-    <h3>Footnotes</h3>
-    <p><span class="footnote"><a href="#fb1-1" id="f1-1">[1]</a></span> <span class="footnote-ref">1:1</span>
-        <note class="translation" sub-class="bondservant">For the contextual rendering of the Greek word <i
-                language="Greek">doulos</i>, see <a href="https://www.esv.org/preface/">Preface</a></note>
-    </p>
+<h3>Footnotes</h3>
+<p><span class="footnote"><a href="#fb1-1" id="f1-1">[1]</a></span> <span class="footnote-ref">1:1</span> <note class="translation" sub-class="bondservant">For the contextual rendering of the Greek word <i language="Greek">doulos</i>, see <a href="https://www.esv.org/preface/">Preface</a></note>
+<br />
+<span class="footnote"><a href="#fb2-1" id="f2-1">[2]</a></span> <span class="footnote-ref">1:2</span> <note class="translation" sub-class="gender-neutral">Or <i><span class="catch-word">brothers</span> and sisters</i>. In New Testament usage, depending on the context, the plural Greek word <i language="Greek">adelphoi</i> (translated “brothers”) may refer either to <i>brothers</i> or to <i>brothers and sisters</i>; also verses 16, 19</note>
+</p>
 </div>
 <p>(<a href="http://www.esv.org" class="copyright">ESV</a>)</p>`
 
@@ -39,7 +35,7 @@ test.skip('parse James 1:1', () => {
     expect(secondParagraph.verseMetadata?.offset).toBe(10)
 })
 
-test.only('parse psalm 23:1', () => {
+test('parse psalm 23:1', () => {
     const verseHtml = `"<h2 class="extra_text">Psalm 23 <small class="audio extra_text">(<a class="mp3link" href="https://audio.esv.org/david-cochran-heath/mq/19023001-19023006.mp3" title="Psalm 23" type="audio/mpeg">Listen</a>)</small></h2>
 <h3 id="p19023001_01-1">The <span class="divine-name">Lord</span> Is My Shepherd</h3>
 <h4 id="p19023001_06-1" class="psalm-title">A Psalm of David.</h4>

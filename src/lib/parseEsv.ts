@@ -183,13 +183,9 @@ function parseBlock(
             }
         }
 
-        console.log(verseNumberNodes)
         const verses: Verse[] = []
         for (const [i, index] of verseNumberNodes.entries()) {
-            const verseNodes = nodes.slice(
-                index,
-                verseNumberNodes.at(i + 1) ?? -1,
-            )
+            const verseNodes = nodes.slice(index, verseNumberNodes.at(i + 1))
 
             const continuingVerse =
                 i === 0 && index > nodes.findIndex(a => a.type === 'word')
@@ -214,7 +210,6 @@ function parseBlock(
                 })
             }
         }
-        console.log('verses', verses.length)
 
         if (verses.length === 0) {
             if (verseMetadata == undefined) {

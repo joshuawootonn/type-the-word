@@ -132,11 +132,6 @@ export function Arena({ passage }: { passage: ParsedPassage }) {
             {passage.nodes.map((node, pIndex) => {
                 switch (node.type) {
                     case 'paragraph':
-                        console.log(
-                            'paragraph',
-                            node.nodes.length,
-                            node.verseMetadata,
-                        )
                         return (
                             <Paragraph
                                 key={pIndex}
