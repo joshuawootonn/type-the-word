@@ -57,7 +57,13 @@ function getNextVerse(currentVerse: string, blocks: Block[]): Verse | null {
     )
 }
 
-export function Arena({ passage }: { passage: ParsedPassage }) {
+export function Arena({
+    passage,
+    autofocus,
+}: {
+    passage: ParsedPassage
+    autofocus: boolean
+}) {
     const arenaId = useId()
     const inputRef = useRef<HTMLInputElement>(null)
     const [, setKeystrokes] = useState<Keystroke[]>([])

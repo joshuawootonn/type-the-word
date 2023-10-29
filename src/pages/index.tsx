@@ -52,7 +52,9 @@ export default function Home() {
             </div>
 
             <main className="relative mx-auto flex-grow">
-                {passage.isLoading ? null : <Arena passage={passage.data!} />}
+                {passage.isLoading ? null : (
+                    <Arena autofocus={true} passage={passage.data!} />
+                )}
             </main>
             <footer className="prose mx-auto flex w-full items-start justify-start py-2">
                 <a
