@@ -265,7 +265,7 @@ export function parseChapter(passage: string): ParsedPassage {
     const cleanPassage = dom.serialize()
     const html = parseFragment(cleanPassage)
 
-    let firstVerse: VerseNumber | undefined = undefined
+    let firstVerseOfPassage: VerseNumber | undefined = undefined
     let context: { lastVerse: Verse } | undefined = undefined
     const nodes: Block[] = []
     for (const node of html.childNodes) {
@@ -275,21 +275,25 @@ export function parseChapter(passage: string): ParsedPassage {
 
         nodes.push(parsed)
         if (parsed.type === 'paragraph') {
+            const firstVerse = parsed.nodes.at(0)
             const lastVerse = parsed.nodes.at(-1)
+            if (firstVerse == undefined) {
+                throw new Error('firstVerse is undefined')
+            }
             if (lastVerse == undefined) {
                 throw new Error('lastVerse is undefined')
             }
             context = { lastVerse }
 
-            if (firstVerse == undefined) {
-                firstVerse = lastVerse.verse
+            if (firstVerseOfPassage == undefined) {
+                firstVerseOfPassage = firstVerse.verse
             }
         }
     }
 
-    if (firstVerse == undefined) {
+    if (firstVerseOfPassage == undefined) {
         throw new Error('firstVerse is undefined')
     }
 
-    return { nodes, firstVerse }
+    return { nodes, firstVerse: firstVerseOfPassage }
 }
