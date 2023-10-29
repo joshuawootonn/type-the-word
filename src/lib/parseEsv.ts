@@ -242,7 +242,7 @@ function parseBlock(
                     verseMetadata: {
                         hangingVerse: false,
                         offset: 0,
-                        length: verseSection.length,
+                        length: verseSection.filter(isAtomTyped).length,
                     },
                 })
             }
