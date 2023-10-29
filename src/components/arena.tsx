@@ -146,15 +146,7 @@ export function Arena({ passage }: { passage: ParsedPassage }) {
                                     }
                                     inputRef.current?.focus()
                                 }}
-                                position={
-                                    node.verseMetadata.hangingVerse
-                                        ? position.slice(
-                                              node.verseMetadata.offset,
-                                              node.verseMetadata.offset +
-                                                  node.verseMetadata.length,
-                                          )
-                                        : position
-                                }
+                                position={position}
                             />
                         )
 

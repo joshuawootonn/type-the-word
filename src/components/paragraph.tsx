@@ -19,6 +19,13 @@ export function Paragraph({
         <p className="font-[0px]">
             {node.nodes.map((verse, vIndex) => {
                 const isCurrentVerse = verse.verse.value === currentVerse
+                const versePosition = verse.verseMetadata.hangingVerse
+                    ? position.slice(
+                          verse.verseMetadata.offset,
+                          verse.verseMetadata.offset +
+                              verse.verseMetadata.length,
+                      )
+                    : position
                 return (
                     <span
                         key={vIndex}
@@ -73,9 +80,9 @@ export function Paragraph({
                                       .slice(0, aIndexPrime)
                                       .filter(isAtomTyped).length
 
-                                  const lastAtom = position.at(aIndex - 1)
-                                  const typedAtom = position.at(aIndex)
-                                  const nextAtom = position.at(aIndex + 1)
+                                  const lastAtom = versePosition.at(aIndex - 1)
+                                  const typedAtom = versePosition.at(aIndex)
+                                  const nextAtom = versePosition.at(aIndex + 1)
 
                                   if (atom.type === 'newLine') {
                                       return <br key={aIndexPrime} />
@@ -122,7 +129,7 @@ export function Paragraph({
                                               )}
                                               typedWord={typedAtom}
                                               isPrevTyped={
-                                                  (position.length === 0 &&
+                                                  (versePosition.length === 0 &&
                                                       aIndex === 0) ||
                                                   !!lastAtom
                                               }

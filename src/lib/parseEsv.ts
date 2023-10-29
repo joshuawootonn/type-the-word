@@ -20,6 +20,7 @@ export type Verse = {
     verse: VerseNumber
     text: string
     nodes: (Paragraph | Inline)[]
+    verseMetadata: VerseMetadata
 }
 
 export type H1 = {
@@ -46,7 +47,7 @@ export type Paragraph = {
     type: 'paragraph'
     text: string
     nodes: Verse[]
-    verseMetadata: VerseMetadata
+    paragraphMetadata: ParagraphMetadata
 }
 
 export type Block = H1 | H2 | H3 | H4 | Verse | Paragraph
@@ -126,18 +127,20 @@ function inlineToString(inlines: Inline[]): string {
         .map(node => node.letters.join(''))
         .join('')
 }
-
 type VerseMetadata = {
     hangingVerse?: boolean
     offset: number
     length: number
-    lastVerse: VerseNumber
-    firstVerse: VerseNumber
+}
+
+type ParagraphMetadata = {
+    lastVerse: Verse
+    firstVerse: Verse
 }
 
 function parseBlock(
     node: ChildNode,
-    verseMetadata?: VerseMetadata,
+    paragraphMetadata?: ParagraphMetadata,
 ): Block | null {
     if (node.nodeName === 'h2') {
         return {
@@ -183,56 +186,65 @@ function parseBlock(
             }
         }
 
+        const verseSections: Inline[][] = []
+
+        if (verseNumberNodes.length === 0) {
+            verseSections.push(nodes)
+        } else {
+            const firstSection = nodes.slice(0, verseNumberNodes.at(0))
+            if (firstSection.length > 0) {
+                verseSections.push(firstSection)
+            }
+            for (const [i, index] of verseNumberNodes.entries()) {
+                verseSections.push(
+                    nodes.slice(index, verseNumberNodes.at(i + 1)),
+                )
+            }
+        }
+
+        let isVerseHanging = false
         const verses: Verse[] = []
-        for (const [i, index] of verseNumberNodes.entries()) {
-            const verseNodes = nodes.slice(index, verseNumberNodes.at(i + 1))
-
+        for (const [i, verseSection] of verseSections.entries()) {
+            const firstWordIndex = verseSection.findIndex(
+                a => a.type === 'word',
+            )
+            const verseIndex = verseSection.findIndex(
+                a => a.type === 'verseNumber',
+            )
             const continuingVerse =
-                i === 0 && index > nodes.findIndex(a => a.type === 'word')
+                i === 0 && (verseIndex === -1 || verseIndex > firstWordIndex)
 
-            if (continuingVerse && verseMetadata?.lastVerse == undefined) {
+            if (continuingVerse && paragraphMetadata?.lastVerse == undefined) {
                 throw new Error(
                     'continuing prev verse but verseMetadata is undefined',
                 )
-            } else if (continuingVerse && verseMetadata?.lastVerse) {
+            } else if (continuingVerse && paragraphMetadata?.lastVerse) {
+                isVerseHanging = true
                 verses.push({
                     type: 'verse',
-                    nodes: verseNodes,
-                    verse: verseMetadata.lastVerse,
-                    text: inlineToString(verseNodes),
+                    nodes: verseSection,
+                    verse: paragraphMetadata.lastVerse.verse,
+                    text: inlineToString(verseSection),
+                    verseMetadata: {
+                        hangingVerse: true,
+                        offset:
+                            paragraphMetadata.lastVerse.verseMetadata.offset +
+                            paragraphMetadata.lastVerse.verseMetadata.length,
+                        length: verseSection.length,
+                    },
                 })
             } else {
                 verses.push({
                     type: 'verse',
-                    nodes: verseNodes,
-                    verse: verseNodes.at(0) as VerseNumber,
-                    text: inlineToString(verseNodes),
-                })
-            }
-        }
-
-        if (verses.length === 0) {
-            if (verseMetadata == undefined) {
-                throw new Error('prevVerse is undefined')
-            }
-            return {
-                type: 'paragraph',
-                text: inlineToString(nodes),
-                verseMetadata: {
-                    hangingVerse: true,
-                    offset: verseMetadata.offset + verseMetadata.length,
-                    length: nodes.length,
-                    firstVerse: verseMetadata.firstVerse,
-                    lastVerse: verseMetadata.lastVerse,
-                },
-                nodes: [
-                    {
-                        type: 'verse',
-                        nodes,
-                        verse: verseMetadata.lastVerse,
-                        text: inlineToString(nodes),
+                    nodes: verseSection,
+                    verse: verseSection.at(verseIndex) as VerseNumber,
+                    text: inlineToString(verseSection),
+                    verseMetadata: {
+                        hangingVerse: false,
+                        offset: 0,
+                        length: verseSection.length,
                     },
-                ],
+                })
             }
         }
 
@@ -246,16 +258,11 @@ function parseBlock(
             throw new Error('lastNode is undefined')
         }
 
-        const numberOfWords = lastVerse.nodes.filter(isAtomTyped).length
-
         return {
             type: 'paragraph',
-            verseMetadata: {
-                hangingVerse: false,
-                offset: 0,
-                length: numberOfWords,
-                firstVerse: firstVerse.verse,
-                lastVerse: lastVerse.verse,
+            paragraphMetadata: {
+                firstVerse: firstVerse,
+                lastVerse: lastVerse,
             },
             text: inlineToString(nodes),
             nodes: verses,
@@ -279,7 +286,7 @@ export function parseChapter(passage: string): ParsedPassage {
     const html = parseFragment(cleanPassage)
 
     let firstVerse: VerseNumber | undefined = undefined
-    let previousVerseMetadata: VerseMetadata | undefined = undefined
+    let previousVerseMetadata: ParagraphMetadata | undefined = undefined
     const nodes: Block[] = []
     for (const node of html.childNodes) {
         const parsed = parseBlock(node, previousVerseMetadata)
@@ -288,9 +295,9 @@ export function parseChapter(passage: string): ParsedPassage {
 
         nodes.push(parsed)
         if (parsed.type === 'paragraph') {
-            previousVerseMetadata = parsed.verseMetadata
-            if (firstVerse == undefined && parsed.verseMetadata.firstVerse)
-                firstVerse = parsed.verseMetadata.firstVerse
+            previousVerseMetadata = parsed.paragraphMetadata
+            if (firstVerse == undefined && parsed.paragraphMetadata.firstVerse)
+                firstVerse = parsed.paragraphMetadata.firstVerse.verse
         }
     }
 
