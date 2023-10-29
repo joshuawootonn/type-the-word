@@ -91,6 +91,7 @@ export function Arena({ passage }: { passage: ParsedPassage }) {
 
                 if (next == null) return prev
                 const position = getPosition(next)
+                // console.log(position)
 
                 const isVerseComplete = isVerseSameShape(
                     currentVerseNodes?.filter(isAtomTyped) ?? [],
@@ -131,6 +132,11 @@ export function Arena({ passage }: { passage: ParsedPassage }) {
             {passage.nodes.map((node, pIndex) => {
                 switch (node.type) {
                     case 'paragraph':
+                        console.log(
+                            'paragraph',
+                            node.nodes.length,
+                            node.verseMetadata,
+                        )
                         return (
                             <Paragraph
                                 key={pIndex}
@@ -146,8 +152,7 @@ export function Arena({ passage }: { passage: ParsedPassage }) {
                                     inputRef.current?.focus()
                                 }}
                                 position={
-                                    node.verseMetadata?.offset != null &&
-                                    node.verseMetadata?.length != null
+                                    node.verseMetadata.hangingVerse
                                         ? position.slice(
                                               node.verseMetadata.offset,
                                               node.verseMetadata.offset +

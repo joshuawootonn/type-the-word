@@ -45,8 +45,8 @@ export type H4 = {
 export type Paragraph = {
     type: 'paragraph'
     text: string
-    verseMetadata?: VerseMetadata
     nodes: Verse[]
+    verseMetadata: VerseMetadata
 }
 
 export type Block = H1 | H2 | H3 | H4 | Verse | Paragraph
@@ -128,65 +128,52 @@ function inlineToString(inlines: Inline[]): string {
 }
 
 type VerseMetadata = {
+    hangingVerse?: boolean
     offset: number
     length: number
-    prevVerse: VerseNumber
+    lastVerse: VerseNumber
+    firstVerse: VerseNumber
 }
 
 function parseBlock(
     node: ChildNode,
     verseMetadata?: VerseMetadata,
-): { nodes: Block[]; verseMetadata?: VerseMetadata } {
+): Block | null {
     if (node.nodeName === 'h2') {
         return {
-            verseMetadata,
-            nodes: [
-                {
-                    type: 'h2',
-                    text: node.childNodes
-                        .flatMap(parseInline)
-                        .filter((node): node is Word => node.type === 'word')
-                        .map(node => node.letters.join(''))
-                        .join(''),
-                },
-            ],
+            type: 'h2',
+            text: node.childNodes
+                .flatMap(parseInline)
+                .filter((node): node is Word => node.type === 'word')
+                .map(node => node.letters.join(''))
+                .join(''),
         }
     }
     if (node.nodeName === 'h3') {
         return {
-            verseMetadata,
-            nodes: [
-                {
-                    type: 'h3',
-                    text: node.childNodes
-                        .flatMap(parseInline)
-                        .filter((node): node is Word => node.type === 'word')
-                        .map(node => node.letters.join(''))
-                        .join(''),
-                },
-            ],
+            type: 'h3',
+            text: node.childNodes
+                .flatMap(parseInline)
+                .filter((node): node is Word => node.type === 'word')
+                .map(node => node.letters.join(''))
+                .join(''),
         }
     }
     if (node.nodeName === 'h4') {
         return {
-            verseMetadata,
-            nodes: [
-                {
-                    type: 'h4',
-                    text: node.childNodes
-                        .flatMap(parseInline)
-                        .filter((node): node is Word => node.type === 'word')
-                        .map(node => node.letters.join(''))
-                        .join(''),
-                },
-            ],
+            type: 'h4',
+            text: node.childNodes
+                .flatMap(parseInline)
+                .filter((node): node is Word => node.type === 'word')
+                .map(node => node.letters.join(''))
+                .join(''),
         }
     }
     if (node.nodeName === 'p') {
         const nodes: Inline[] = node.childNodes.flatMap(parseInline)
 
         if (inlineToString(nodes) === '( ) ') {
-            return { verseMetadata, nodes: [] }
+            return null
         }
 
         const verseNumberNodes: number[] = []
@@ -196,6 +183,7 @@ function parseBlock(
             }
         }
 
+        console.log(verseNumberNodes)
         const verses: Verse[] = []
         for (const [i, index] of verseNumberNodes.entries()) {
             const verseNodes = nodes.slice(
@@ -206,15 +194,15 @@ function parseBlock(
             const continuingVerse =
                 i === 0 && index > nodes.findIndex(a => a.type === 'word')
 
-            if (continuingVerse && verseMetadata?.prevVerse == undefined) {
+            if (continuingVerse && verseMetadata?.lastVerse == undefined) {
                 throw new Error(
                     'continuing prev verse but verseMetadata is undefined',
                 )
-            } else if (continuingVerse && verseMetadata?.prevVerse) {
+            } else if (continuingVerse && verseMetadata?.lastVerse) {
                 verses.push({
                     type: 'verse',
                     nodes: verseNodes,
-                    verse: verseMetadata.prevVerse,
+                    verse: verseMetadata.lastVerse,
                     text: inlineToString(verseNodes),
                 })
             } else {
@@ -226,69 +214,60 @@ function parseBlock(
                 })
             }
         }
+        console.log('verses', verses.length)
 
         if (verses.length === 0) {
             if (verseMetadata == undefined) {
                 throw new Error('prevVerse is undefined')
             }
             return {
+                type: 'paragraph',
+                text: inlineToString(nodes),
                 verseMetadata: {
+                    hangingVerse: true,
                     offset: verseMetadata.offset + verseMetadata.length,
                     length: nodes.length,
-                    prevVerse: verseMetadata.prevVerse,
+                    firstVerse: verseMetadata.firstVerse,
+                    lastVerse: verseMetadata.lastVerse,
                 },
                 nodes: [
                     {
-                        type: 'paragraph',
+                        type: 'verse',
+                        nodes,
+                        verse: verseMetadata.lastVerse,
                         text: inlineToString(nodes),
-                        verseMetadata: {
-                            offset: verseMetadata.offset + verseMetadata.length,
-                            length: nodes.length,
-                            prevVerse: verseMetadata.prevVerse,
-                        },
-                        nodes: [
-                            {
-                                type: 'verse',
-                                nodes,
-                                verse: verseMetadata.prevVerse,
-                                text: inlineToString(nodes),
-                            },
-                        ],
                     },
                 ],
             }
         }
 
-        const lastNode = verses.at(-1)
+        const firstVerse = verses.at(0)
+        const lastVerse = verses.at(-1)
 
-        if (lastNode == undefined) {
+        if (firstVerse == undefined) {
+            throw new Error('firstNode is undefined')
+        }
+        if (lastVerse == undefined) {
             throw new Error('lastNode is undefined')
         }
 
-        const numberOfWords = lastNode.nodes.filter(isAtomTyped).length
+        const numberOfWords = lastVerse.nodes.filter(isAtomTyped).length
 
         return {
+            type: 'paragraph',
             verseMetadata: {
+                hangingVerse: false,
                 offset: 0,
                 length: numberOfWords,
-                prevVerse: lastNode.verse,
+                firstVerse: firstVerse.verse,
+                lastVerse: lastVerse.verse,
             },
-            nodes: [
-                {
-                    type: 'paragraph',
-                    text: inlineToString(nodes),
-                    verseMetadata: {
-                        offset: 0,
-                        length: numberOfWords,
-                        prevVerse: lastNode.verse,
-                    },
-                    nodes: verses,
-                },
-            ],
+            text: inlineToString(nodes),
+            nodes: verses,
         }
     }
 
-    return { verseMetadata, nodes: [] }
+    return null
 }
 
 export type ParsedPassage = {
@@ -303,7 +282,6 @@ export function parseChapter(passage: string): ParsedPassage {
     })
     const cleanPassage = dom.serialize()
     const html = parseFragment(cleanPassage)
-    // const html = parseFragment(passage)
 
     let firstVerse: VerseNumber | undefined = undefined
     let previousVerseMetadata: VerseMetadata | undefined = undefined
@@ -311,15 +289,14 @@ export function parseChapter(passage: string): ParsedPassage {
     for (const node of html.childNodes) {
         const parsed = parseBlock(node, previousVerseMetadata)
 
-        if (
-            parsed.verseMetadata?.prevVerse != undefined &&
-            previousVerseMetadata == undefined
-        ) {
-            firstVerse = parsed.verseMetadata.prevVerse
-        }
+        if (parsed == null) continue
 
-        previousVerseMetadata = parsed.verseMetadata
-        nodes.push(...parsed.nodes)
+        nodes.push(parsed)
+        if (parsed.type === 'paragraph') {
+            previousVerseMetadata = parsed.verseMetadata
+            if (firstVerse == undefined && parsed.verseMetadata.firstVerse)
+                firstVerse = parsed.verseMetadata.firstVerse
+        }
     }
 
     if (firstVerse == undefined) {
