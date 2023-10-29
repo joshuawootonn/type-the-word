@@ -1,11 +1,11 @@
 import { expect, test } from 'vitest'
 
-import { Paragraph, parseChapter, Verse } from './parseEsv'
+import { Paragraph, parseChapter } from './parseEsv'
 
 export function sum(a: number, b: number): number {
     return a + b
 }
-test('parse James 1:1', () => {
+test('parse james 1:1', () => {
     const verseHtml = `<h2 class="extra_text">James 1:1–4 <small class="audio extra_text">(<a class="mp3link" href="https://audio.esv.org/david-cochran-heath/mq/59001001-59001004.mp3" title="James 1:1–4" type="audio/mpeg">Listen</a>)</small></h2>
 <h3 id="p59001001_01-1">Greeting</h3>
 <p id="p59001001_02-1" class="starts-chapter"><b class="chapter-num" id="v59001001-1">1:1&nbsp;</b>James, a servant<sup class="footnote"><a class="fn" href="#f1-1" id="fb1-1" title="&lt;note class=&quot;translation&quot; sub-class=&quot;bondservant&quot;&gt;For the contextual rendering of the Greek word &lt;i language=&quot;Greek&quot;&gt;doulos&lt;/i&gt;, see &lt;a href=&quot;https://www.esv.org/preface/&quot;&gt;Preface&lt;/a&gt;&lt;/note&gt;">1</a></sup> of God and of the Lord Jesus Christ,</p>
@@ -24,17 +24,22 @@ test('parse James 1:1', () => {
 
     const result = parseChapter(verseHtml)
     const firstParagraph = result.nodes.at(2) as Paragraph
-    const firstVerse = firstParagraph.nodes.at(0)!
+    const firstVerseA = firstParagraph.nodes.at(0)!
     const secondParagraph = result.nodes.at(3) as Paragraph
-    const secondVerse = secondParagraph.nodes.at(0)!
+    const firstVerseB = secondParagraph.nodes.at(0)!
     const thirdParagraph = result.nodes.at(4) as Paragraph
+    const firstVerseC = thirdParagraph.nodes.at(0)!
 
-    console.log(firstVerse.nodes)
-    expect(firstVerse.nodes.length).toBe(12)
-    expect(secondVerse.nodes.length).toBe(7)
+    expect(firstVerseA.nodes.length).toBe(12)
+    expect(firstVerseA.verseMetadata.hangingVerse).toBeFalsy()
+    expect(firstVerseB.nodes.length).toBe(7)
+    expect(firstVerseB.verseMetadata.hangingVerse).toBeTruthy()
+    expect(firstVerseC.nodes.length).toBe(1)
+    expect(firstVerseC.verseMetadata.offset).toBe(12 + 7 - 1)
+    expect(firstVerseC.verseMetadata.hangingVerse).toBeTruthy()
 })
 
-test('parse psalm 23:1', () => {
+test('parse psalm 23', () => {
     const verseHtml = `"<h2 class="extra_text">Psalm 23 <small class="audio extra_text">(<a class="mp3link" href="https://audio.esv.org/david-cochran-heath/mq/19023001-19023006.mp3" title="Psalm 23" type="audio/mpeg">Listen</a>)</small></h2>
 <h3 id="p19023001_01-1">The <span class="divine-name">Lord</span> Is My Shepherd</h3>
 <h4 id="p19023001_06-1" class="psalm-title">A Psalm of David.</h4>
@@ -68,8 +73,8 @@ test('parse psalm 23:1', () => {
     const firstVerse = firstParagraph.nodes.at(0)!
     const secondVerse = firstParagraph.nodes.at(1)!
 
-    // console.log(firstParagraph.paragraphMetadata)
-    // console.log(secondVerse)
+    expect(firstVerse.nodes.length).toBe(13)
+    expect(secondVerse.nodes.length).toBe(23)
 })
 
 test('parse 1 peter 1', () => {
@@ -99,6 +104,20 @@ test('parse 1 peter 1', () => {
     const result = parseChapter(verseHtml)
     const firstParagraph = result.nodes.at(2) as Paragraph
     const secondParagraph = result.nodes.at(3) as Paragraph
-    // console.log(firstParagraph)
-    // console.log(secondParagraph)
+    const thirdParagraph = result.nodes.at(4) as Paragraph
+    const firstVerseA = firstParagraph.nodes.at(0)!
+    const firstVerseB = secondParagraph.nodes.at(0)!
+    const secondVerseA = secondParagraph.nodes.at(1)!
+    const secondVerseB = thirdParagraph.nodes.at(0)!
+    expect(firstVerseA.nodes.length).toBe(7)
+    expect(firstVerseA.verseMetadata.hangingVerse).toBeFalsy()
+    expect(firstVerseB.nodes.length).toBe(16)
+    expect(firstVerseB.verseMetadata.hangingVerse).toBeTruthy()
+    expect(firstVerseB.verseMetadata.offset).toBe(6)
+
+    expect(secondVerseA.nodes.length).toBe(26)
+    expect(secondVerseA.verseMetadata.hangingVerse).toBeFalsy()
+    expect(secondVerseB.nodes.length).toBe(8)
+    expect(secondVerseB.verseMetadata.hangingVerse).toBeTruthy()
+    expect(secondVerseB.verseMetadata.offset).toBe(25)
 })
