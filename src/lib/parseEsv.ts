@@ -15,12 +15,18 @@ export type Inline =
     | { type: 'space' }
     | { type: 'newLine' }
 
+type VerseMetadata = {
+    hangingVerse?: boolean
+    offset: number
+    length: number
+}
+
 export type Verse = {
     type: 'verse'
     verse: VerseNumber
     text: string
     nodes: (Paragraph | Inline)[]
-    verseMetadata: VerseMetadata
+    metadata: VerseMetadata
 }
 
 export type H1 = {
@@ -131,11 +137,6 @@ function inlineToString(inlines: Inline[]): string {
         .map(node => node.letters.join(''))
         .join('')
 }
-type VerseMetadata = {
-    hangingVerse?: boolean
-    offset: number
-    length: number
-}
 
 function parseBlock(
     node: ChildNode,
@@ -224,11 +225,11 @@ function parseBlock(
                     nodes: verseSection,
                     verse: context.lastVerse.verse,
                     text: inlineToString(verseSection),
-                    verseMetadata: {
+                    metadata: {
                         hangingVerse: true,
                         offset:
-                            context.lastVerse.verseMetadata.offset +
-                            context.lastVerse.verseMetadata.length,
+                            context.lastVerse.metadata.offset +
+                            context.lastVerse.metadata.length,
                         length: verseSection.length,
                     },
                 })
@@ -238,7 +239,7 @@ function parseBlock(
                     nodes: verseSection,
                     verse: verseSection.at(verseIndex) as VerseNumber,
                     text: inlineToString(verseSection),
-                    verseMetadata: {
+                    metadata: {
                         hangingVerse: false,
                         offset: 0,
                         length: verseSection.filter(isAtomTyped).length,

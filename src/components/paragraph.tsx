@@ -24,11 +24,11 @@ export function Paragraph({
         >
             {node.nodes.map((verse, vIndex) => {
                 const isCurrentVerse = verse.verse.value === currentVerse
-                const versePosition = verse.verseMetadata.hangingVerse
+                const versePosition = verse.metadata.hangingVerse
                     ? position.slice(
-                          verse.verseMetadata.offset,
-                          verse.verseMetadata.offset +
-                              verse.verseMetadata.length,
+                          verse.metadata.offset,
+                          verse.metadata.offset +
+                              verse.metadata.length,
                       )
                     : position
                 return (

@@ -31,12 +31,12 @@ test('parse james 1:1', () => {
     const firstVerseC = thirdParagraph.nodes.at(0)!
 
     expect(firstVerseA.nodes.length).toBe(12)
-    expect(firstVerseA.verseMetadata.hangingVerse).toBeFalsy()
+    expect(firstVerseA.metadata.hangingVerse).toBeFalsy()
     expect(firstVerseB.nodes.length).toBe(7)
-    expect(firstVerseB.verseMetadata.hangingVerse).toBeTruthy()
+    expect(firstVerseB.metadata.hangingVerse).toBeTruthy()
     expect(firstVerseC.nodes.length).toBe(1)
-    expect(firstVerseC.verseMetadata.offset).toBe(12 + 7 - 1)
-    expect(firstVerseC.verseMetadata.hangingVerse).toBeTruthy()
+    expect(firstVerseC.metadata.offset).toBe(12 + 7 - 1)
+    expect(firstVerseC.metadata.hangingVerse).toBeTruthy()
 })
 
 test('parse psalm 23', () => {
@@ -110,14 +110,14 @@ test('parse 1 peter 1', () => {
     const secondVerseA = secondParagraph.nodes.at(1)!
     const secondVerseB = thirdParagraph.nodes.at(0)!
     expect(firstVerseA.nodes.length).toBe(7)
-    expect(firstVerseA.verseMetadata.hangingVerse).toBeFalsy()
+    expect(firstVerseA.metadata.hangingVerse).toBeFalsy()
     expect(firstVerseB.nodes.length).toBe(16)
-    expect(firstVerseB.verseMetadata.hangingVerse).toBeTruthy()
-    expect(firstVerseB.verseMetadata.offset).toBe(6)
+    expect(firstVerseB.metadata.hangingVerse).toBeTruthy()
+    expect(firstVerseB.metadata.offset).toBe(6)
 
     expect(secondVerseA.nodes.length).toBe(26)
-    expect(secondVerseA.verseMetadata.hangingVerse).toBeFalsy()
+    expect(secondVerseA.metadata.hangingVerse).toBeFalsy()
     expect(secondVerseB.nodes.length).toBe(8)
-    expect(secondVerseB.verseMetadata.hangingVerse).toBeTruthy()
-    expect(secondVerseB.verseMetadata.offset).toBe(25)
+    expect(secondVerseB.metadata.hangingVerse).toBeTruthy()
+    expect(secondVerseB.metadata.offset).toBe(25)
 })
