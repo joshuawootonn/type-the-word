@@ -134,6 +134,7 @@ export function Arena({
                 onFocus={() => setIsArenaFocused(true)}
                 onBlur={() => setIsArenaFocused(false)}
                 ref={inputRef}
+                autoFocus={autofocus}
             />
             {passage.nodes.map((node, pIndex) => {
                 switch (node.type) {

@@ -4,6 +4,11 @@ import { useEffect, useState } from 'react'
 
 import { Arena } from '~/components/arena'
 import { api } from '~/utils/api'
+import { createServerSideHelpers } from '@trpc/react-query/server'
+import { AppRouter, appRouter } from '~/server/api/root'
+import superjson from 'superjson'
+import { db } from '~/server/db'
+import { useRouter } from 'next/router'
 
 export function useDebounce<T>(value: T, delay: number): T {
     const [debouncedValue, setDebouncedValue] = useState(value)
@@ -21,7 +26,20 @@ export function useDebounce<T>(value: T, delay: number): T {
     return debouncedValue
 }
 
+export async function getStaticProps() {
+    const helpers = createServerSideHelpers<AppRouter>({
+        router: appRouter,
+        ctx: { session: null, db },
+        transformer: superjson,
+    })
+
+    await helpers.passage.passage.prefetch('psalm 23')
+
+    return { props: { trpcState: helpers.dehydrate() } }
+}
+
 export default function Home() {
+    const { push } = useRouter()
     const [value, setValue] = useState('psalm 23')
     const debouncedValue = useDebounce(value, 2000)
     const passage = api.passage.passage.useQuery(debouncedValue)
@@ -47,13 +65,25 @@ export default function Home() {
                     type="text"
                     className="border-2 border-black p-1 outline-none focus-visible:outline-black"
                     value={value}
-                    onChange={e => setValue(e.target.value)}
+                    onChange={e => {
+                        console.log('hit')
+                        setValue(e.target.value)
+                        const passage = e.target.value
+                            .trim()
+                            .split(' ')
+                            .join('_')
+                        push(`/passage/${passage}`)
+                    }}
                 />
             </div>
 
             <main className="relative mx-auto flex-grow">
-                {passage.isLoading ? null : (
-                    <Arena autofocus={true} passage={passage.data!} />
+                {passage.isLoading ? (
+                    <>Loading... </>
+                ) : passage.error ? (
+                    <>We hit a whoopsie! :(</>
+                ) : (
+                    <Arena autofocus={true} passage={passage.data} />
                 )}
             </main>
             <footer className="prose mx-auto flex w-full items-start justify-start py-2">
