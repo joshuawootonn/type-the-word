@@ -44,6 +44,14 @@ export default function Home() {
     const debouncedValue = useDebounce(value, 2000)
     const passage = api.passage.passage.useQuery(debouncedValue)
 
+    useEffect(() => {
+        async function changeRoute() {
+            const passage = debouncedValue.trim().split(' ').join('_')
+            await push(`/passage/${passage}`)
+        }
+        void changeRoute()
+    }, [debouncedValue, push])
+
     return (
         <div className="container mx-auto flex min-h-screen flex-col">
             <Head>
@@ -65,15 +73,7 @@ export default function Home() {
                     type="text"
                     className="border-2 border-black p-1 outline-none focus-visible:outline-black"
                     value={value}
-                    onChange={e => {
-                        console.log('hit')
-                        setValue(e.target.value)
-                        const passage = e.target.value
-                            .trim()
-                            .split(' ')
-                            .join('_')
-                        push(`/passage/${passage}`)
-                    }}
+                    onChange={e => setValue(e.target.value)}
                 />
             </div>
 
