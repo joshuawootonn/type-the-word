@@ -128,7 +128,7 @@ export function Arena({
                 className="peer fixed h-0 max-h-0 opacity-0"
                 tabIndex={0}
                 onKeyDown={e => {
-                    e.preventDefault()
+                    // e.preventDefault()
                     handleInput(e)
                 }}
                 onFocus={() => setIsArenaFocused(true)}

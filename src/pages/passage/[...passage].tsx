@@ -2,7 +2,7 @@ import { createServerSideHelpers } from '@trpc/react-query/server'
 import { AppRouter, appRouter } from '~/server/api/root'
 import superjson from 'superjson'
 import { db } from '~/server/db'
-import Page from '../index'
+import Page, {DEFAULT_PASSAGE_REFERENCE} from '../index'
 import { GetServerSidePropsContext } from 'next'
 
 export async function getServerSideProps({
@@ -15,7 +15,7 @@ export async function getServerSideProps({
     })
 
     if (params?.passage == null) {
-        await helpers.passage.passage.prefetch('psalm 23')
+        await helpers.passage.passage.prefetch(DEFAULT_PASSAGE_REFERENCE)
 
         return { props: { trpcState: helpers.dehydrate() } }
     }
@@ -27,7 +27,7 @@ export async function getServerSideProps({
 
     await helpers.passage.passage.prefetch(passage)
 
-    return { props: { trpcState: helpers.dehydrate() } }
+    return { props: { trpcState: helpers.dehydrate(), passage } }
 }
 
 export default Page

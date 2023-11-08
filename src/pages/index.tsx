@@ -1,6 +1,6 @@
 import { signIn, signOut, useSession } from 'next-auth/react'
 import Head from 'next/head'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { Arena } from '~/components/arena'
 import { api } from '~/utils/api'
@@ -9,22 +9,9 @@ import { AppRouter, appRouter } from '~/server/api/root'
 import superjson from 'superjson'
 import { db } from '~/server/db'
 import { useRouter } from 'next/router'
+import { useDebouncedValue } from '~/lib/hooks'
 
-export function useDebounce<T>(value: T, delay: number): T {
-    const [debouncedValue, setDebouncedValue] = useState(value)
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedValue(value)
-        }, delay)
-
-        return () => {
-            clearTimeout(handler)
-        }
-    }, [value, delay])
-
-    return debouncedValue
-}
+export const DEFAULT_PASSAGE_REFERENCE = 'Psalm 23'
 
 export async function getStaticProps() {
     const helpers = createServerSideHelpers<AppRouter>({
@@ -33,24 +20,18 @@ export async function getStaticProps() {
         transformer: superjson,
     })
 
-    await helpers.passage.passage.prefetch('psalm 23')
+    await helpers.passage.passage.prefetch(DEFAULT_PASSAGE_REFERENCE)
 
     return { props: { trpcState: helpers.dehydrate() } }
 }
 
-export default function Home() {
+export default function Home(props: { passage?: string }) {
     const { push } = useRouter()
-    const [value, setValue] = useState('psalm 23')
-    const debouncedValue = useDebounce(value, 2000)
+    const [value, setValue] = useState(
+        props.passage ?? DEFAULT_PASSAGE_REFERENCE,
+    )
+    const debouncedValue = useDebouncedValue(value, 1000)
     const passage = api.passage.passage.useQuery(debouncedValue)
-
-    useEffect(() => {
-        async function changeRoute() {
-            const passage = debouncedValue.trim().split(' ').join('_')
-            await push(`/passage/${passage}`)
-        }
-        void changeRoute()
-    }, [debouncedValue, push])
 
     return (
         <div className="container mx-auto flex min-h-screen flex-col">
@@ -73,7 +54,14 @@ export default function Home() {
                     type="text"
                     className="border-2 border-black p-1 outline-none focus-visible:outline-black"
                     value={value}
-                    onChange={e => setValue(e.target.value)}
+                    onChange={e => {
+                        const passage = e.target.value
+                            .trim()
+                            .split(' ')
+                            .join('_')
+                        void push(`/passage/${passage}`)
+                        setValue(e.target.value)
+                    }}
                 />
             </div>
 
