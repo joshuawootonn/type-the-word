@@ -11,7 +11,7 @@ import { db } from '~/server/db'
 import { useRouter } from 'next/router'
 import { useDebouncedValue } from '~/lib/hooks'
 
-export const DEFAULT_PASSAGE_REFERENCE = 'Psalm 23'
+export const DEFAULT_PASSAGE_REFERENCE = 'psalm 23'
 
 export async function getStaticProps() {
     const helpers = createServerSideHelpers<AppRouter>({
