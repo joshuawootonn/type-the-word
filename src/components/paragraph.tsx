@@ -18,7 +18,7 @@ export function Paragraph({
     return (
         <p
             className={clsx(
-                'relative font-[0px]',
+                'relative text-lg',
                 node.metadata.blockIndent && 'ml-3',
             )}
         >
@@ -27,8 +27,7 @@ export function Paragraph({
                 const versePosition = verse.metadata.hangingVerse
                     ? position.slice(
                           verse.metadata.offset,
-                          verse.metadata.offset +
-                              verse.metadata.length,
+                          verse.metadata.offset + verse.metadata.length,
                       )
                     : position
                 return (
