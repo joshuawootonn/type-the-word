@@ -61,7 +61,7 @@ export function useCursor(arenaId: string): void {
                         width: `${activeRect.width}px`,
                         height: '19px',
                     },
-                    { easing: 'ease', duration: 0.05 },
+                    { easing: [0.25, 0.46, 0.45, 0.94], duration: 0.085 },
                 )
 
                 return
