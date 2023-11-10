@@ -57,6 +57,10 @@ function getNextVerse(currentVerse: string, blocks: Block[]): Verse | null {
     )
 }
 
+export const ArenaContext = React.createContext<{ rect: DOMRect | null }>({
+    rect: null,
+})
+
 export function Arena({
     passage,
     autofocus,
@@ -73,6 +77,7 @@ export function Arena({
         passage.firstVerse.value,
     )
 
+    const [arenaRect, setArenaRect] = useState<DOMRect | null>(null)
     const [isArenaActive, setIsArenaActive] = useState(false)
     const [isArenaFocused, setIsArenaFocused] = useState(false)
 
@@ -122,7 +127,14 @@ export function Arena({
     }
 
     return (
-        <div id={arenaId} className="arena prose relative z-0">
+        <div
+            ref={el => {
+                if (el && arenaRect == null)
+                    setArenaRect(el.getBoundingClientRect() ?? null)
+            }}
+            id={arenaId}
+            className="arena prose relative z-0"
+        >
             <input
                 type="text"
                 className="peer fixed h-0 max-h-0 opacity-0"
@@ -136,50 +148,56 @@ export function Arena({
                 ref={inputRef}
                 autoFocus={autofocus}
             />
-            {passage.nodes.map((node, pIndex) => {
-                switch (node.type) {
-                    case 'paragraph':
-                        return (
-                            <Paragraph
-                                key={pIndex}
-                                node={node}
-                                currentVerse={currentVerse}
-                                setCurrentVerse={(verse: string) => {
-                                    if (verse !== currentVerse) {
-                                        setCurrentVerse(verse)
-                                        setPosition([])
-                                        setKeystrokes([])
-                                        setIsArenaActive(true)
-                                    }
-                                    inputRef.current?.focus()
-                                }}
-                                position={position}
-                            />
-                        )
+            <ArenaContext.Provider
+                value={{
+                    rect: arenaRect,
+                }}
+            >
+                {passage.nodes.map((node, pIndex) => {
+                    switch (node.type) {
+                        case 'paragraph':
+                            return (
+                                <Paragraph
+                                    key={pIndex}
+                                    node={node}
+                                    currentVerse={currentVerse}
+                                    setCurrentVerse={(verse: string) => {
+                                        if (verse !== currentVerse) {
+                                            setCurrentVerse(verse)
+                                            setPosition([])
+                                            setKeystrokes([])
+                                            setIsArenaActive(true)
+                                        }
+                                        inputRef.current?.focus()
+                                    }}
+                                    position={position}
+                                />
+                            )
 
-                    case 'h2':
-                        return (
-                            <h2 key={pIndex} className="tracking-tight">
-                                {node.text}
-                            </h2>
-                        )
-                    case 'h3':
-                        return (
-                            <h3 key={pIndex} className="tracking-tight">
-                                {node.text}
-                            </h3>
-                        )
-                    case 'h4':
-                        return (
-                            <h4 key={pIndex} className="tracking-tight">
-                                {node.text}
-                            </h4>
-                        )
+                        case 'h2':
+                            return (
+                                <h2 key={pIndex} className="tracking-tight">
+                                    {node.text}
+                                </h2>
+                            )
+                        case 'h3':
+                            return (
+                                <h3 key={pIndex} className="tracking-tight">
+                                    {node.text}
+                                </h3>
+                            )
+                        case 'h4':
+                            return (
+                                <h4 key={pIndex} className="tracking-tight">
+                                    {node.text}
+                                </h4>
+                            )
 
-                    default:
-                        break
-                }
-            })}
+                        default:
+                            break
+                    }
+                })}
+            </ArenaContext.Provider>
             <Cursor
                 arenaId={arenaId}
                 isArenaFocused={isArenaFocused}
