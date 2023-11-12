@@ -133,76 +133,76 @@ export function Arena({
                     setArenaRect(el.getBoundingClientRect() ?? null)
             }}
             id={arenaId}
-            className="arena prose relative z-0"
+            className="arena prose"
         >
-            <input
-                type="text"
-                className="peer fixed h-0 max-h-0 opacity-0"
-                tabIndex={0}
-                onKeyDown={e => {
-                    // e.preventDefault()
-                    handleInput(e)
-                }}
-                onFocus={() => setIsArenaFocused(true)}
-                onBlur={() => setIsArenaFocused(false)}
-                ref={inputRef}
-                autoFocus={autofocus}
-            />
-            <ArenaContext.Provider
-                value={{
-                    rect: arenaRect,
-                }}
-            >
-                {passage.nodes.map((node, pIndex) => {
-                    switch (node.type) {
-                        case 'paragraph':
-                            return (
-                                <Paragraph
-                                    key={pIndex}
-                                    node={node}
-                                    currentVerse={currentVerse}
-                                    setCurrentVerse={(verse: string) => {
-                                        if (verse !== currentVerse) {
-                                            setCurrentVerse(verse)
-                                            setPosition([])
-                                            setKeystrokes([])
-                                            setIsArenaActive(true)
-                                        }
-                                        inputRef.current?.focus()
-                                    }}
-                                    position={position}
-                                />
-                            )
+            {/*<input*/}
+            {/*    type="text"*/}
+            {/*    className="peer fixed h-0 max-h-0 opacity-0"*/}
+            {/*    tabIndex={0}*/}
+            {/*    onKeyDown={e => {*/}
+            {/*        // e.preventDefault()*/}
+            {/*        handleInput(e)*/}
+            {/*    }}*/}
+            {/*    onFocus={() => setIsArenaFocused(true)}*/}
+            {/*    onBlur={() => setIsArenaFocused(false)}*/}
+            {/*    ref={inputRef}*/}
+            {/*    autoFocus={autofocus}*/}
+            {/*/>*/}
+            {/*<ArenaContext.Provider*/}
+            {/*    value={{*/}
+            {/*        rect: arenaRect,*/}
+            {/*    }}*/}
+            {/*>*/}
+            {passage.nodes.map((node, pIndex) => {
+                switch (node.type) {
+                    case 'paragraph':
+                        return (
+                            <Paragraph
+                                key={pIndex}
+                                node={node}
+                                currentVerse={currentVerse}
+                                setCurrentVerse={(verse: string) => {
+                                    if (verse !== currentVerse) {
+                                        setCurrentVerse(verse)
+                                        setPosition([])
+                                        setKeystrokes([])
+                                        setIsArenaActive(true)
+                                    }
+                                    inputRef.current?.focus()
+                                }}
+                                position={position}
+                            />
+                        )
 
-                        case 'h2':
-                            return (
-                                <h2 key={pIndex} className="tracking-tight">
-                                    {node.text}
-                                </h2>
-                            )
-                        case 'h3':
-                            return (
-                                <h3 key={pIndex} className="tracking-tight">
-                                    {node.text}
-                                </h3>
-                            )
-                        case 'h4':
-                            return (
-                                <h4 key={pIndex} className="tracking-tight">
-                                    {node.text}
-                                </h4>
-                            )
+                    // case 'h2':
+                    //     return (
+                    //         <h2 key={pIndex} className="tracking-tight">
+                    //             {node.text}
+                    //         </h2>
+                    //     )
+                    // case 'h3':
+                    //     return (
+                    //         <h3 key={pIndex} className="tracking-tight">
+                    //             {node.text}
+                    //         </h3>
+                    //     )
+                    // case 'h4':
+                    //     return (
+                    //         <h4 key={pIndex} className="tracking-tight">
+                    //             {node.text}
+                    //         </h4>
+                    //     )
 
-                        default:
-                            break
-                    }
-                })}
-            </ArenaContext.Provider>
-            <Cursor
-                arenaId={arenaId}
-                isArenaFocused={isArenaFocused}
-                isArenaActive={isArenaActive}
-            />
+                    default:
+                        break
+                }
+            })}
+            {/*</ArenaContext.Provider>*/}
+            {/*<Cursor*/}
+            {/*    arenaId={arenaId}*/}
+            {/*    isArenaFocused={isArenaFocused}*/}
+            {/*    isArenaActive={isArenaActive}*/}
+            {/*/>*/}
         </div>
     )
 }

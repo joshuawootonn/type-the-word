@@ -58,6 +58,7 @@ export default function Home(props: { passage?: string }) {
                         type="text"
                         className="border-2 border-black p-1"
                         value={value}
+                        onFocus={event => event.target.select()}
                         onChange={e => {
                             const passage = e.target.value
                                 .trim()
@@ -70,15 +71,37 @@ export default function Home(props: { passage?: string }) {
                 </div>
             </div>
 
-            <main className="relative mx-auto w-full flex-grow">
-                {passage.isLoading ? (
-                    <>Loading... </>
-                ) : passage.error ? (
-                    <>We hit a whoopsie! :(</>
-                ) : (
-                    <Arena autofocus={true} passage={passage.data} />
-                )}
-            </main>
+            <p className="prose">
+                <style jsx>{`
+                    button {
+                        display: inline !important;
+                        width: fit-content;
+                    }
+
+                    span {
+                        display: inline-block;
+                    }
+                `}</style>
+                <span>A nice and long word to space this thing outs</span>
+                <span>A nice and long word to space this thing outs</span>
+                <button>A nice and long word to space this thing out</button>
+                <button>A nice and long word to space this thing out</button>
+                <button>A nice and long word to space this thing out</button>
+                <button>Joshua 1</button>
+                <button>Joshua 1</button>
+                <button>Joshua 1</button>
+                <button>Joshua 1</button>
+            </p>
+
+            {/*<main>*/}
+            {/*    {passage.isLoading ? (*/}
+            {/*        <>Loading... </>*/}
+            {/*    ) : passage.error ? (*/}
+            {/*        <>We hit a whoopsie! :(</>*/}
+            {/*    ) : (*/}
+            {/*        <Arena autofocus={true} passage={passage.data} />*/}
+            {/*    )}*/}
+            {/*</main>*/}
             <footer className="prose mx-auto flex w-full items-start justify-start py-2">
                 <a
                     className="svg-outline relative flex-grow text-xs no-underline"
