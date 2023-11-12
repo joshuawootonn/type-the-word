@@ -190,7 +190,7 @@ export function Verse({
             {rect && arenaRect && (
                 <button
                     className={clsx(
-                        'absolute z-10 border-2 border-black bg-white/80 opacity-0 outline-none outline-offset-4 backdrop-blur-sm transition-opacity duration-100 focus-visible:outline-black',
+                        'svg-outline absolute z-10 border-2 border-black bg-white/80 opacity-0 backdrop-blur-sm transition-opacity duration-100',
                         rect &&
                             arenaRect &&
                             !isCurrentVerse &&

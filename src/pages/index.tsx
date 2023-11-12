@@ -53,19 +53,21 @@ export default function Home(props: { passage?: string }) {
                 <label htmlFor="passage" className="text-black">
                     Passage:
                 </label>
-                <input
-                    type="text"
-                    className="border-2 border-black p-1 outline-none focus-visible:outline-black"
-                    value={value}
-                    onChange={e => {
-                        const passage = e.target.value
-                            .trim()
-                            .split(' ')
-                            .join('_')
-                        void push(`/passage/${passage}`)
-                        setValue(e.target.value)
-                    }}
-                />
+                <div className={'svg-outline relative '}>
+                    <input
+                        type="text"
+                        className="border-2 border-black p-1"
+                        value={value}
+                        onChange={e => {
+                            const passage = e.target.value
+                                .trim()
+                                .split(' ')
+                                .join('_')
+                            void push(`/passage/${passage}`)
+                            setValue(e.target.value)
+                        }}
+                    />
+                </div>
             </div>
 
             <main className="relative mx-auto w-full flex-grow">
@@ -79,7 +81,7 @@ export default function Home(props: { passage?: string }) {
             </main>
             <footer className="prose mx-auto flex w-full items-start justify-start py-2">
                 <a
-                    className="flex-grow text-xs no-underline"
+                    className="svg-outline relative flex-grow text-xs no-underline"
                     href="https://www.esv.org/"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -97,7 +99,7 @@ function AuthShowcase() {
     return (
         <div className="flex flex-col  gap-4">
             <button
-                className="border-2 border-black px-3 py-1 font-semibold text-black outline-none focus-visible:outline-black"
+                className="svg-outline relative border-2 border-black px-3 py-1 font-semibold text-black"
                 onClick={
                     sessionData ? () => void signOut() : () => void signIn()
                 }
