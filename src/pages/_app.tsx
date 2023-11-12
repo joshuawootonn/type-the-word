@@ -20,7 +20,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
 
     useEffect(() => {
         Fathom.load(env.NEXT_PUBLIC_FATHOM_ID, {
-            includedDomains: ['*/typetheword.site'],
+            includedDomains: ['typetheword.site', 'www.typetheword.site'],
         })
 
         const handleRouteChange = () => {
