@@ -3,7 +3,7 @@ import { isAtomTyped } from '~/lib/isEqual'
 import { Word } from './word'
 import { Inline, Paragraph, Verse } from '~/lib/parseEsv'
 import { isAtomComplete } from '~/lib/keystroke'
-import { useContext, useRef, useState } from 'react'
+import { ReactNode, useContext, useState } from 'react'
 import { ArenaContext } from '~/components/arena'
 
 export function Paragraph({
@@ -11,11 +11,13 @@ export function Paragraph({
     node,
     currentVerse,
     setCurrentVerse,
+    currentVerseInput,
 }: {
     position: Inline[]
     node: Paragraph
     currentVerse?: string
     setCurrentVerse: (verse: string) => void
+    currentVerseInput?: ReactNode
 }) {
     return (
         <p className={clsx('text-lg', node.metadata.blockIndent && 'ml-3')}>
@@ -36,6 +38,7 @@ export function Paragraph({
                         isCurrentVerse={isCurrentVerse}
                         setCurrentVerse={setCurrentVerse}
                         isIndented={node.metadata.blockIndent}
+                        currentVerseInput={currentVerseInput}
                     />
                 )
             })}
@@ -49,16 +52,17 @@ export function Verse({
     setCurrentVerse,
     versePosition,
     isIndented,
+    currentVerseInput,
 }: {
     versePosition: Inline[]
     setCurrentVerse: (verse: string) => void
     isCurrentVerse: boolean
     isIndented: boolean
     verse: Verse
+    currentVerseInput?: ReactNode
 }) {
     const { rect: arenaRect } = useContext(ArenaContext)
     const [rect, setRect] = useState<DOMRect | null>(null)
-    console.log(rect, arenaRect)
     return (
         <span
             className={clsx(
@@ -66,145 +70,158 @@ export function Verse({
                 isCurrentVerse && 'active-verse',
             )}
             ref={el => {
-                if (el && rect == null)
-                    setRect(el.getBoundingClientRect() ?? null)
+                if (el) {
+                    const nextRect = el.getBoundingClientRect() ?? null
+                    if (
+                        nextRect.top !== rect?.top ||
+                        nextRect.height !== rect?.height ||
+                        nextRect.width !== rect?.width ||
+                        nextRect.left !== rect?.left
+                    ) {
+                        setRect(nextRect)
+                    }
+                }
             }}
             onClick={() => {
                 setCurrentVerse(verse.verse.value)
             }}
         >
-            <span>
-                {!isCurrentVerse
-                    ? verse.nodes.map((atom, aIndexPrime) => {
-                          if (atom.type === 'newLine')
-                              return <br key={aIndexPrime} />
+            {isCurrentVerse ? (
+                <>
+                    {verse.nodes.map((atom, aIndexPrime) => {
+                        const aIndex = verse.nodes
+                            .slice(0, aIndexPrime)
+                            .filter(isAtomTyped).length
 
-                          if (atom.type === 'verseNumber') {
-                              return (
-                                  <b
-                                      className={clsx(
-                                          isIndented && 'absolute -left-0',
-                                      )}
-                                      key={aIndexPrime}
-                                  >
-                                      {atom.text.split(':').at(-1)}
-                                  </b>
-                              )
-                          }
+                        const lastAtom = versePosition.at(aIndex - 1)
+                        const typedAtom = versePosition.at(aIndex)
+                        const nextAtom = versePosition.at(aIndex + 1)
 
-                          if (atom.type === 'space') {
-                              return (
-                                  <span
-                                      key={aIndexPrime}
-                                      className={clsx(
-                                          'space inline-flex h-[19px] w-[1ch] translate-y-[3px]',
-                                      )}
-                                  >
-                                      &nbsp;
-                                  </span>
-                              )
-                          }
+                        if (atom.type === 'newLine') {
+                            return <br key={aIndexPrime} />
+                        }
 
-                          if (atom.type === 'word') {
-                              return (
-                                  <Word
-                                      key={aIndexPrime}
-                                      word={atom}
-                                      active={false}
-                                      isPrevTyped={false}
-                                      isWordTyped={false}
-                                  />
-                              )
-                          }
+                        if (atom.type === 'verseNumber') {
+                            return (
+                                <b
+                                    className={clsx(
+                                        isIndented && 'absolute -left-0',
+                                    )}
+                                    key={aIndexPrime}
+                                >
+                                    {atom.text.split(':').at(-1)}
+                                </b>
+                            )
+                        }
+                        if (atom.type === 'space') {
+                            return (
+                                <span
+                                    key={aIndexPrime}
+                                    className={clsx(
+                                        'space inline-flex h-[19px] w-[1ch] translate-y-[3px]',
+                                        lastAtom != null &&
+                                            typedAtom == null &&
+                                            'active-space',
+                                    )}
+                                >
+                                    &nbsp;
+                                </span>
+                            )
+                        }
+                        if (
+                            atom.type === 'word' &&
+                            (typedAtom == null || typedAtom.type === 'word')
+                        ) {
+                            return (
+                                <Word
+                                    key={aIndexPrime}
+                                    word={atom}
+                                    active={Boolean(
+                                        (aIndex === 0 ||
+                                            isAtomComplete(lastAtom)) &&
+                                            !isAtomComplete(typedAtom) &&
+                                            nextAtom == null,
+                                    )}
+                                    typedWord={typedAtom}
+                                    isPrevTyped={
+                                        (versePosition.length === 0 &&
+                                            aIndex === 0) ||
+                                        !!lastAtom
+                                    }
+                                    isWordTyped={isAtomComplete(typedAtom)}
+                                />
+                            )
+                        }
 
-                          return null
-                      })
-                    : verse.nodes.map((atom, aIndexPrime) => {
-                          const aIndex = verse.nodes
-                              .slice(0, aIndexPrime)
-                              .filter(isAtomTyped).length
+                        return null
+                    })}
 
-                          const lastAtom = versePosition.at(aIndex - 1)
-                          const typedAtom = versePosition.at(aIndex)
-                          const nextAtom = versePosition.at(aIndex + 1)
+                    {currentVerseInput}
+                </>
+            ) : (
+                <>
+                    {verse.nodes.map((atom, aIndexPrime) => {
+                        if (atom.type === 'newLine')
+                            return <br key={aIndexPrime} />
 
-                          if (atom.type === 'newLine') {
-                              return <br key={aIndexPrime} />
-                          }
+                        if (atom.type === 'verseNumber') {
+                            return (
+                                <b
+                                    className={clsx(
+                                        isIndented && 'absolute -left-0',
+                                    )}
+                                    key={aIndexPrime}
+                                >
+                                    {atom.text.split(':').at(-1)}
+                                </b>
+                            )
+                        }
 
-                          if (atom.type === 'verseNumber') {
-                              return (
-                                  <b
-                                      className={clsx(
-                                          isIndented && 'absolute -left-0',
-                                      )}
-                                      key={aIndexPrime}
-                                  >
-                                      {atom.text.split(':').at(-1)}
-                                  </b>
-                              )
-                          }
-                          if (atom.type === 'space') {
-                              return (
-                                  <span
-                                      key={aIndexPrime}
-                                      className={clsx(
-                                          'space inline-flex h-[19px] w-[1ch] translate-y-[3px]',
-                                          lastAtom != null &&
-                                              typedAtom == null &&
-                                              'active-space',
-                                      )}
-                                  >
-                                      &nbsp;
-                                  </span>
-                              )
-                          }
-                          if (
-                              atom.type === 'word' &&
-                              (typedAtom == null || typedAtom.type === 'word')
-                          ) {
-                              return (
-                                  <Word
-                                      key={aIndexPrime}
-                                      word={atom}
-                                      active={Boolean(
-                                          (aIndex === 0 ||
-                                              isAtomComplete(lastAtom)) &&
-                                              !isAtomComplete(typedAtom) &&
-                                              nextAtom == null,
-                                      )}
-                                      typedWord={typedAtom}
-                                      isPrevTyped={
-                                          (versePosition.length === 0 &&
-                                              aIndex === 0) ||
-                                          !!lastAtom
-                                      }
-                                      isWordTyped={isAtomComplete(typedAtom)}
-                                  />
-                              )
-                          }
+                        if (atom.type === 'space') {
+                            return (
+                                <span
+                                    key={aIndexPrime}
+                                    className={clsx(
+                                        'space inline-flex h-[19px] w-[1ch] translate-y-[3px]',
+                                    )}
+                                >
+                                    &nbsp;
+                                </span>
+                            )
+                        }
 
-                          return null
-                      })}
-            </span>
-            {rect && arenaRect && (
-                <button
-                    className={clsx(
-                        'svg-outline absolute z-10 border-2 border-black bg-white/80 opacity-0 backdrop-blur-sm transition-opacity duration-100',
-                        rect &&
-                            arenaRect &&
-                            !isCurrentVerse &&
-                            'hover:opacity-100 focus:opacity-100',
-                    )}
-                    style={{
-                        width: arenaRect.width + 16,
-                        height: rect.height + 16,
-                        left: -8,
-                        top: rect.top - arenaRect.top - 8,
-                    }}
-                >
-                    <span>Switch to verse {verse.verse.value}</span>
-                </button>
+                        if (atom.type === 'word') {
+                            return (
+                                <Word
+                                    key={aIndexPrime}
+                                    word={atom}
+                                    active={false}
+                                    isPrevTyped={false}
+                                    isWordTyped={false}
+                                />
+                            )
+                        }
+
+                        return null
+                    })}
+
+                    {rect && arenaRect ? (
+                        <button
+                            className={clsx(
+                                'svg-outline absolute z-10 border-2 border-black bg-white/80 opacity-0 backdrop-blur-sm transition-opacity duration-100',
+                                'hover:opacity-100 focus:opacity-100',
+                            )}
+                            style={{
+                                width: arenaRect.width + 16,
+                                height: rect.height + 16,
+                                left: -8,
+                                top: rect.top - arenaRect.top - 8,
+                            }}
+                        >
+                            <span>Switch to verse {verse.verse.value}</span>
+                        </button>
+                    ) : null}
+                </>
             )}
         </span>
     )

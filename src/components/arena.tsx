@@ -129,25 +129,21 @@ export function Arena({
     return (
         <div
             ref={el => {
-                if (el && arenaRect == null)
-                    setArenaRect(el.getBoundingClientRect() ?? null)
+                if (el) {
+                    const nextRect = el.getBoundingClientRect() ?? null
+                    if (
+                        nextRect.top !== arenaRect?.top ||
+                        nextRect.height !== arenaRect?.height ||
+                        nextRect.width !== arenaRect?.width ||
+                        nextRect.left !== arenaRect?.left
+                    ) {
+                        setArenaRect(nextRect)
+                    }
+                }
             }}
             id={arenaId}
             className="arena prose relative z-0"
         >
-            <input
-                type="text"
-                className="peer fixed h-0 max-h-0 opacity-0"
-                tabIndex={0}
-                onKeyDown={e => {
-                    // e.preventDefault()
-                    handleInput(e)
-                }}
-                onFocus={() => setIsArenaFocused(true)}
-                onBlur={() => setIsArenaFocused(false)}
-                ref={inputRef}
-                autoFocus={autofocus}
-            />
             <ArenaContext.Provider
                 value={{
                     rect: arenaRect,
@@ -168,9 +164,26 @@ export function Arena({
                                             setKeystrokes([])
                                             setIsArenaActive(true)
                                         }
-                                        inputRef.current?.focus()
                                     }}
                                     position={position}
+                                    currentVerseInput={
+                                        <input
+                                            type="text"
+                                            className="peer fixed h-0 max-h-0 opacity-0"
+                                            tabIndex={0}
+                                            onKeyDown={e => {
+                                                handleInput(e)
+                                            }}
+                                            onFocus={e => {
+                                                setIsArenaFocused(true)
+                                            }}
+                                            onBlur={() =>
+                                                setIsArenaFocused(false)
+                                            }
+                                            ref={inputRef}
+                                            autoFocus={autofocus}
+                                        />
+                                    }
                                 />
                             )
 
