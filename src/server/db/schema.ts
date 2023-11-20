@@ -1,13 +1,12 @@
 import { relations, sql } from 'drizzle-orm'
 import {
-    bigint,
     index,
     int,
+    mysqlEnum,
     mysqlTableCreator,
     primaryKey,
     text,
     timestamp,
-    uniqueIndex,
     varchar,
 } from 'drizzle-orm/mysql-core'
 import { type AdapterAccount } from 'next-auth/adapters'
@@ -19,21 +18,6 @@ import { type AdapterAccount } from 'next-auth/adapters'
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
 export const mysqlTable = mysqlTableCreator(name => `${name}`)
-
-export const example = mysqlTable(
-    'example',
-    {
-        id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
-        name: varchar('name', { length: 256 }),
-        createdAt: timestamp('created_at')
-            .default(sql`CURRENT_TIMESTAMP`)
-            .notNull(),
-        updatedAt: timestamp('updatedAt').onUpdateNow(),
-    },
-    example => ({
-        nameIndex: uniqueIndex('name_idx').on(example.name),
-    }),
-)
 
 export const users = mysqlTable('user', {
     id: varchar('id', { length: 255 }).notNull().primaryKey(),
@@ -108,3 +92,118 @@ export const verificationTokens = mysqlTable(
         compoundKey: primaryKey(vt.identifier, vt.token),
     }),
 )
+
+export const typingSessions = mysqlTable(
+    'typingSession',
+    {
+        id: varchar('id', { length: 255 }).notNull().primaryKey(),
+        userId: varchar('userId', { length: 255 }).notNull(),
+        createdAt: timestamp('createdAt', { mode: 'date' }).notNull(),
+        updatedAt: timestamp('updatedAt', { mode: 'date' }),
+    },
+    typingSession => ({
+        userIdIdx: index('userId_idx').on(typingSession.userId),
+    }),
+)
+
+export const typingSessionRelations = relations(typingSessions, ({ one }) => ({
+    user: one(users, {
+        fields: [typingSessions.userId],
+        references: [users.id],
+    }),
+}))
+
+export const typedVerses = mysqlTable(
+    'typedVerse',
+    {
+        id: varchar('id', { length: 255 }).notNull().primaryKey(),
+        userId: varchar('userId', { length: 255 }).notNull(),
+        typingSessionId: varchar('typingSessionId', { length: 255 }).notNull(),
+        translation: mysqlEnum('translation', ['ESV']).notNull(),
+        book: mysqlEnum('translation', [
+            'genesis',
+            'exodus',
+            'leviticus',
+            'numbers',
+            'deuteronomy',
+            'joshua',
+            'judges',
+            'ruth',
+            '1_samuel',
+            '2_samuel',
+            '1_kings',
+            '2_kings',
+            '1_chronicles',
+            '2_chronicles',
+            'ezra',
+            'nehemiah',
+            'esther',
+            'job',
+            'psalms',
+            'proverbs',
+            'ecclesiastes',
+            'song_of_solomon',
+            'isaiah',
+            'jeremiah',
+            'lamentations',
+            'ezekiel',
+            'daniel',
+            'hosea',
+            'joel',
+            'amos',
+            'obadiah',
+            'jonah',
+            'micah',
+            'nahum',
+            'habakkuk',
+            'zephaniah',
+            'haggai',
+            'zechariah',
+            'malachi',
+            'matthew',
+            'mark',
+            'luke',
+            'john',
+            'acts',
+            'romans',
+            '1_corinthians',
+            '2_corinthians',
+            'galatians',
+            'ephesians',
+            'philippians',
+            'colossians',
+            '1_thessalonians',
+            '2_thessalonians',
+            '1_timothy',
+            '2_timothy',
+            'titus',
+            'philemon',
+            'hebrews',
+            'james',
+            '1_peter',
+            '2_peter',
+            '1_john',
+            '2_john',
+            '3_john',
+            'jude',
+            'revelation',
+        ]).notNull(),
+        chapter: int('chapter').notNull(),
+        verse: int('verse').notNull(),
+        createdAt: timestamp('createdAt', { mode: 'date' }).notNull(),
+    },
+    typedVerse => ({
+        userIdIdx: index('userId_idx').on(typedVerse.userId),
+    }),
+)
+
+export const typedVerseRelations = relations(typedVerses, ({ one }) => ({
+    user: one(users, {
+        fields: [typedVerses.userId],
+        references: [users.id],
+    }),
+    typingSession: one(typingSessions, {
+        fields: [typedVerses.typingSessionId],
+        references: [typingSessions.id],
+    }),
+}))

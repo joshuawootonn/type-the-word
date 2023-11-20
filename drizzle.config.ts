@@ -8,5 +8,4 @@ export default {
     dbCredentials: {
         connectionString: env.DATABASE_URL,
     },
-    tablesFilter: ['type-the-word_*'],
 } satisfies Config
