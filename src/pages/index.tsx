@@ -34,7 +34,7 @@ export default function Home(props: { passage?: string }) {
     const passage = api.passage.passage.useQuery(debouncedValue)
 
     return (
-        <div className="container mx-auto flex min-h-screen max-w-page flex-col">
+        <div className="container mx-auto flex min-h-screen max-w-page flex-col px-4 lg:px-0">
             <Head>
                 <title>Type the Word</title>
                 <meta
@@ -43,17 +43,17 @@ export default function Home(props: { passage?: string }) {
                 />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <nav className="prose mx-auto mb-2 flex w-full items-center justify-between pt-8">
+            <nav className="prose mx-auto mb-2 flex w-full items-center justify-between pt-4 lg:pt-8">
                 <h1 className="m-0 font-mono text-xl font-extrabold tracking-tight text-black">
                     Type the Word
                 </h1>
                 <AuthShowcase />
             </nav>
-            <div className="prose mx-auto mb-8 flex w-full items-center justify-start space-x-3 pt-8">
+            <div className="prose mx-auto mb-8 flex w-full items-center justify-start space-x-3 pt-4 lg:pt-8">
                 <label htmlFor="passage" className="text-black">
                     Passage:
                 </label>
-                <div className={'svg-outline relative '}>
+                <div className={'svg-outline relative'}>
                     <input
                         type="text"
                         className="border-2 border-black p-1"
@@ -76,7 +76,11 @@ export default function Home(props: { passage?: string }) {
                 ) : passage.error ? (
                     <>We hit a whoopsie! :(</>
                 ) : (
-                    <Arena autofocus={true} passage={passage.data} />
+                    <Arena
+                        autofocus={true}
+                        passage={passage.data}
+                        key={JSON.stringify(passage.data)}
+                    />
                 )}
             </main>
             <footer className="prose mx-auto flex w-full items-start justify-start py-2">

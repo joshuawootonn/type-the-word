@@ -91,8 +91,16 @@ export function Arena({
     const [isArenaActive, setIsArenaActive] = useState(false)
     const [isArenaFocused, setIsArenaFocused] = useState(false)
 
+    // This is necessary to autofocus on SSR
+    useEffect(() => {
+        if (autofocus) {
+            inputRef.current?.focus()
+        }
+    }, [])
+
     useEffect(() => {
         window.addEventListener('resize', updateRect)
+        updateRect()
 
         return () => window.removeEventListener('resize', updateRect)
 
@@ -197,11 +205,10 @@ export function Arena({
                                         <input
                                             type="text"
                                             className="peer fixed h-0 max-h-0 opacity-0"
-                                            tabIndex={0}
                                             onKeyDown={e => {
                                                 handleInput(e)
                                             }}
-                                            onFocus={e => {
+                                            onFocus={() => {
                                                 setIsArenaFocused(true)
                                             }}
                                             onBlur={() =>
