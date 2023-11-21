@@ -6,6 +6,7 @@ import { Block, Inline, ParsedPassage, Verse } from '~/lib/parseEsv'
 import { Paragraph } from './paragraph'
 import { getPosition, isValidKeystroke, Keystroke } from '~/lib/keystroke'
 import { Cursor } from '~/components/cursor'
+import { api } from '~/utils/api'
 
 function getWords(verse: string, blocks: Block[]): Inline[] {
     return blocks.flatMap(block => {
@@ -70,8 +71,12 @@ export function Arena({
 }) {
     const arenaId = useId()
     const inputRef = useRef<HTMLInputElement>(null)
-    const [, setKeystrokes] = useState<Keystroke[]>([])
+    const [keystrokes, setKeystrokes] = useState<Keystroke[]>([])
     const [position, setPosition] = useState<Inline[]>([] as Inline[])
+
+    const typingSession = api.passage.getTypingSession.useQuery()
+    const addTypedVerseToSession =
+        api.passage.addTypedVerseToSession.useMutation()
 
     const [currentVerse, setCurrentVerse] = useState<string>(
         passage.firstVerse.value,
@@ -113,36 +118,43 @@ export function Arena({
 
     function handleInput(e: React.KeyboardEvent<HTMLInputElement>) {
         if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
-            setKeystrokes(prev => {
-                const currentVerseNodes = getWords(currentVerse, passage.nodes)
-                if (currentVerseNodes == null) {
-                    throw new Error('Current Verse is invalid.')
+            let isVerseComplete = false
+
+            setIsArenaActive(true)
+            const currentVerseNodes = getWords(currentVerse, passage.nodes)
+            if (currentVerseNodes == null) {
+                throw new Error('Current Verse is invalid.')
+            }
+            const next = isValidKeystroke(e.key, currentVerseNodes, keystrokes)
+
+            if (next == null) return keystrokes
+            const position = getPosition(next)
+
+            isVerseComplete = isVerseSameShape(
+                currentVerseNodes?.filter(isAtomTyped) ?? [],
+                position,
+            )
+
+            if (isVerseComplete) {
+                const nextVerse = getNextVerse(currentVerse, passage.nodes)
+                setCurrentVerse(nextVerse?.verse.value ?? '')
+                setPosition([])
+                setKeystrokes([])
+                if (typingSession?.data?.id != null) {
+                    addTypedVerseToSession.mutate({
+                        book: 'psalms',
+                        chapter: 23,
+                        verse: parseInt(currentVerse.split(':').at(-1) ?? ''),
+                        translation: 'ESV',
+                        typingSessionId: typingSession.data.id,
+                    })
+
+                    void typingSession.refetch()
                 }
-                const next = isValidKeystroke(e.key, currentVerseNodes, prev)
-
-                if (next == null) return prev
-                const position = getPosition(next)
-                // console.log(position)
-
-                const isVerseComplete = isVerseSameShape(
-                    currentVerseNodes?.filter(isAtomTyped) ?? [],
-                    position,
-                )
-
-                isVerseComplete && console.log('verse complete')
-
-                if (isVerseComplete) {
-                    const nextVerse = getNextVerse(currentVerse, passage.nodes)
-                    setCurrentVerse(nextVerse?.verse.value ?? '')
-                    setPosition([])
-                    return []
-                }
-
+            } else {
                 setPosition(position)
-                setIsArenaActive(true)
-
-                return next
-            })
+                setKeystrokes(next)
+            }
         }
     }
 

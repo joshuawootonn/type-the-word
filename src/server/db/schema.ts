@@ -32,6 +32,7 @@ export const users = mysqlTable('user', {
 
 export const usersRelations = relations(users, ({ many }) => ({
     accounts: many(accounts),
+    typingSessions: many(typingSessions),
 }))
 
 export const accounts = mysqlTable(
@@ -96,31 +97,45 @@ export const verificationTokens = mysqlTable(
 export const typingSessions = mysqlTable(
     'typingSession',
     {
-        id: varchar('id', { length: 255 }).notNull().primaryKey(),
+        id: varchar('id', { length: 255 })
+            .notNull()
+            .$default(() => crypto.randomUUID())
+            .primaryKey(),
         userId: varchar('userId', { length: 255 }).notNull(),
-        createdAt: timestamp('createdAt', { mode: 'date' }).notNull(),
-        updatedAt: timestamp('updatedAt', { mode: 'date' }),
+        createdAt: timestamp('createdAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+        updatedAt: timestamp('updatedAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
     },
     typingSession => ({
         userIdIdx: index('userId_idx').on(typingSession.userId),
     }),
 )
 
-export const typingSessionRelations = relations(typingSessions, ({ one }) => ({
-    user: one(users, {
-        fields: [typingSessions.userId],
-        references: [users.id],
+export const typingSessionRelations = relations(
+    typingSessions,
+    ({ one, many }) => ({
+        user: one(users, {
+            fields: [typingSessions.userId],
+            references: [users.id],
+        }),
+        typedVerses: many(typedVerses),
     }),
-}))
+)
 
 export const typedVerses = mysqlTable(
     'typedVerse',
     {
-        id: varchar('id', { length: 255 }).notNull().primaryKey(),
+        id: varchar('id', { length: 255 })
+            .notNull()
+            .$default(() => crypto.randomUUID())
+            .primaryKey(),
         userId: varchar('userId', { length: 255 }).notNull(),
         typingSessionId: varchar('typingSessionId', { length: 255 }).notNull(),
         translation: mysqlEnum('translation', ['ESV']).notNull(),
-        book: mysqlEnum('translation', [
+        book: mysqlEnum('book', [
             'genesis',
             'exodus',
             'leviticus',
@@ -190,7 +205,9 @@ export const typedVerses = mysqlTable(
         ]).notNull(),
         chapter: int('chapter').notNull(),
         verse: int('verse').notNull(),
-        createdAt: timestamp('createdAt', { mode: 'date' }).notNull(),
+        createdAt: timestamp('createdAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
     },
     typedVerse => ({
         userIdIdx: index('userId_idx').on(typedVerse.userId),
