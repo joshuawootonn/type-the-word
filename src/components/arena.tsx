@@ -77,9 +77,29 @@ export function Arena({
         passage.firstVerse.value,
     )
 
+    const arenaRef = useRef<HTMLDivElement>(null)
     const [arenaRect, setArenaRect] = useState<DOMRect | null>(null)
     const [isArenaActive, setIsArenaActive] = useState(false)
     const [isArenaFocused, setIsArenaFocused] = useState(false)
+
+    useEffect(() => {
+        window.addEventListener('resize', updateRect)
+
+        return () => window.removeEventListener('resize', updateRect)
+
+        function updateRect() {
+            const nextRect = arenaRef.current?.getBoundingClientRect() ?? null
+            if (
+                nextRect &&
+                (nextRect.top !== arenaRect?.top ||
+                    nextRect.height !== arenaRect?.height ||
+                    nextRect.width !== arenaRect?.width ||
+                    nextRect.left !== arenaRect?.left)
+            ) {
+                setArenaRect(nextRect)
+            }
+        }
+    }, [])
 
     useEffect(() => {
         const t = setTimeout(() => {
@@ -128,21 +148,9 @@ export function Arena({
 
     return (
         <div
-            ref={el => {
-                if (el) {
-                    const nextRect = el.getBoundingClientRect() ?? null
-                    if (
-                        nextRect.top !== arenaRect?.top ||
-                        nextRect.height !== arenaRect?.height ||
-                        nextRect.width !== arenaRect?.width ||
-                        nextRect.left !== arenaRect?.left
-                    ) {
-                        setArenaRect(nextRect)
-                    }
-                }
-            }}
+            ref={arenaRef}
             id={arenaId}
-            className="arena prose relative z-0"
+            className="arena prose relative z-0 w-full"
         >
             <ArenaContext.Provider
                 value={{
