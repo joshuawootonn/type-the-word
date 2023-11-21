@@ -7,6 +7,7 @@ import { Paragraph } from './paragraph'
 import { getPosition, isValidKeystroke, Keystroke } from '~/lib/keystroke'
 import { Cursor } from '~/components/cursor'
 import { api } from '~/utils/api'
+import { useSession } from 'next-auth/react'
 
 function getWords(verse: string, blocks: Block[]): Inline[] {
     return blocks.flatMap(block => {
@@ -73,8 +74,11 @@ export function Arena({
     const inputRef = useRef<HTMLInputElement>(null)
     const [keystrokes, setKeystrokes] = useState<Keystroke[]>([])
     const [position, setPosition] = useState<Inline[]>([] as Inline[])
+    const { data: sessionData } = useSession()
 
-    const typingSession = api.passage.getTypingSession.useQuery()
+    const typingSession = api.passage.getTypingSession.useQuery(undefined, {
+        enabled: sessionData?.user?.id != null,
+    })
     const addTypedVerseToSession =
         api.passage.addTypedVerseToSession.useMutation()
 
@@ -140,7 +144,10 @@ export function Arena({
                 setCurrentVerse(nextVerse?.verse.value ?? '')
                 setPosition([])
                 setKeystrokes([])
-                if (typingSession?.data?.id != null) {
+                if (
+                    typingSession?.data?.id != null &&
+                    sessionData?.user?.id != null
+                ) {
                     addTypedVerseToSession.mutate({
                         book: 'psalms',
                         chapter: 23,
