@@ -8,6 +8,8 @@ import { getPosition, isValidKeystroke, Keystroke } from '~/lib/keystroke'
 import { Cursor } from '~/components/cursor'
 import { api } from '~/utils/api'
 import { useSession } from 'next-auth/react'
+import { typingSessions } from '~/server/db/schema'
+import { TypingSession } from '~/server/api/routers/passage'
 
 function getWords(verse: string, blocks: Block[]): Inline[] {
     return blocks.flatMap(block => {
@@ -46,21 +48,44 @@ function getListOfVerses(blocks: Block[]): Verse[] {
     })
 }
 
-function getNextVerse(currentVerse: string, blocks: Block[]): Verse | null {
+function getVerse(currentVerse: string, blocks: Block[]): Verse {
     const listOfVerses = getListOfVerses(blocks)
     const indexOfCurrent = listOfVerses.findIndex(
         verse => verse.verse.value === currentVerse,
     )
 
-    return (
-        listOfVerses
-            .slice(indexOfCurrent)
-            .find(verse => verse.verse.value !== currentVerse) ?? null
-    )
+    const verse = listOfVerses.at(indexOfCurrent)
+
+    if (verse == null) {
+        throw new Error('Verse not found')
+    }
+
+    return verse
 }
 
-export const ArenaContext = React.createContext<{ rect: DOMRect | null }>({
+function getNextVerse(currentVerse: string, blocks: Block[]): Verse {
+    const listOfVerses = getListOfVerses(blocks)
+    const indexOfCurrent = listOfVerses.findIndex(
+        verse => verse.verse.value === currentVerse,
+    )
+
+    const verse = listOfVerses
+        .slice(indexOfCurrent)
+        .find(verse => verse.verse.value !== currentVerse)
+
+    if (verse == null) {
+        throw new Error('Verse not found')
+    }
+
+    return verse
+}
+
+export const ArenaContext = React.createContext<{
+    rect: DOMRect | null
+    typingSession: TypingSession | null
+}>({
     rect: null,
+    typingSession: null,
 })
 
 export function Arena({
@@ -148,23 +173,25 @@ export function Arena({
             )
 
             if (isVerseComplete) {
+                const verse = getVerse(currentVerse, passage.nodes)
                 const nextVerse = getNextVerse(currentVerse, passage.nodes)
-                setCurrentVerse(nextVerse?.verse.value ?? '')
+
+                setCurrentVerse(nextVerse.verse.value)
                 setPosition([])
                 setKeystrokes([])
                 if (
                     typingSession?.data?.id != null &&
                     sessionData?.user?.id != null
                 ) {
-                    addTypedVerseToSession.mutate({
-                        book: 'psalms',
-                        chapter: 23,
-                        verse: parseInt(currentVerse.split(':').at(-1) ?? ''),
-                        translation: 'ESV',
-                        typingSessionId: typingSession.data.id,
-                    })
-
-                    void typingSession.refetch()
+                    void addTypedVerseToSession
+                        .mutateAsync({
+                            book: verse.verse.book,
+                            chapter: verse.verse.chapter,
+                            verse: verse.verse.verse,
+                            translation: verse.verse.translation,
+                            typingSessionId: typingSession.data.id,
+                        })
+                        .then(() => typingSession.refetch())
                 }
             } else {
                 setPosition(position)
@@ -182,6 +209,7 @@ export function Arena({
             <ArenaContext.Provider
                 value={{
                     rect: arenaRect,
+                    typingSession: typingSession.data ?? null,
                 }}
             >
                 {passage.nodes.map((node, pIndex) => {

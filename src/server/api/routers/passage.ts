@@ -24,8 +24,10 @@ const passageSchema = z.object({
     passages: z.array(z.string()),
 })
 
-const typingSessionSchema = createSelectSchema(typingSessions)
-type TypingSession = z.infer<typeof typingSessionSchema>
+const typingSessionSchema = createSelectSchema(typingSessions).and(
+    z.object({ typedVerses: z.array(createSelectSchema(typedVerses)) }),
+)
+export type TypingSession = z.infer<typeof typingSessionSchema>
 
 const addTypedVerseInputSchema = createInsertSchema(typedVerses).omit({
     userId: true,
@@ -52,6 +54,7 @@ export const passageRouter = createTRPCRouter({
             }
 
             const data: unknown = await response.json()
+
             const parsedData = passageSchema.parse(data)
 
             return parseChapter(parsedData.passages.at(0) ?? '')
@@ -71,6 +74,9 @@ export const passageRouter = createTRPCRouter({
 
             await db.insert(typingSessions).values({ userId: session.user.id })
             const newTypingSession = await db.query.typingSessions.findFirst({
+                with: {
+                    typedVerses: true,
+                },
                 where: eq(typingSessions.id, sql`LAST_INSERT_ID()`),
             })
 
@@ -87,6 +93,9 @@ export const passageRouter = createTRPCRouter({
         .mutation(
             async ({ ctx: { db, session }, input }): Promise<TypingSession> => {
                 let typingSession = await db.query.typingSessions.findFirst({
+                    with: {
+                        typedVerses: true,
+                    },
                     where: eq(typingSessions.id, input.typingSessionId),
                 })
 

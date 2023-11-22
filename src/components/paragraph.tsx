@@ -61,13 +61,23 @@ export function Verse({
     verse: Verse
     currentVerseInput?: ReactNode
 }) {
-    const { rect: arenaRect } = useContext(ArenaContext)
+    const { rect: arenaRect, typingSession } = useContext(ArenaContext)
     const [rect, setRect] = useState<DOMRect | null>(null)
+
+    const isTypedInSession = typingSession?.typedVerses.find(
+        a =>
+            a.verse === verse.verse.verse &&
+            a.chapter === verse.verse.chapter &&
+            a.book === verse.verse.book &&
+            a.translation === verse.verse.translation,
+    )
+
     return (
         <span
             className={clsx(
                 'verse break-spaces text-balance group inline h-3 hover:cursor-pointer',
                 isCurrentVerse && 'active-verse',
+                isTypedInSession && 'text-gray-400',
             )}
             ref={el => {
                 if (el) {
