@@ -134,7 +134,7 @@ export const typedVerses = mysqlTable(
             .primaryKey(),
         userId: varchar('userId', { length: 255 }).notNull(),
         typingSessionId: varchar('typingSessionId', { length: 255 }).notNull(),
-        translation: mysqlEnum('translation', ['ESV']).notNull(),
+        translation: mysqlEnum('translation', ['esv']).notNull(),
         book: mysqlEnum('book', [
             'genesis',
             'exodus',
@@ -154,7 +154,7 @@ export const typedVerses = mysqlTable(
             'nehemiah',
             'esther',
             'job',
-            'psalms',
+            'psalm',
             'proverbs',
             'ecclesiastes',
             'song_of_solomon',
