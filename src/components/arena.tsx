@@ -227,6 +227,7 @@ export function Arena({
                                             setKeystrokes([])
                                             setIsArenaActive(true)
                                         }
+                                        inputRef.current?.focus()
                                     }}
                                     position={position}
                                     currentVerseInput={
