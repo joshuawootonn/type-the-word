@@ -82,9 +82,11 @@ function getNextVerse(currentVerse: string, blocks: Block[]): Verse {
 export const ArenaContext = React.createContext<{
     rect: DOMRect | null
     typingSession: TypingSession | null
+    isArenaActive: boolean
 }>({
     rect: null,
     typingSession: null,
+    isArenaActive: false,
 })
 
 export function Arena({
@@ -153,7 +155,7 @@ export function Arena({
         return () => {
             clearTimeout(t)
         }
-    }, [isArenaActive])
+    }, [keystrokes.length])
 
     function handleInput(e: React.KeyboardEvent<HTMLInputElement>) {
         if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
@@ -212,6 +214,7 @@ export function Arena({
                 value={{
                     rect: arenaRect,
                     typingSession: typingSession.data ?? null,
+                    isArenaActive,
                 }}
             >
                 {passage.nodes.map((node, pIndex) => {

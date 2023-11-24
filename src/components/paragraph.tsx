@@ -61,7 +61,11 @@ export function Verse({
     verse: Verse
     currentVerseInput?: ReactNode
 }) {
-    const { rect: arenaRect, typingSession } = useContext(ArenaContext)
+    const {
+        rect: arenaRect,
+        typingSession,
+        isArenaActive,
+    } = useContext(ArenaContext)
     const [rect, setRect] = useState<DOMRect | null>(null)
 
     const isTypedInSession = typingSession?.typedVerses.find(
@@ -219,7 +223,8 @@ export function Verse({
                         <button
                             className={clsx(
                                 'svg-outline absolute z-10 border-2 border-black bg-white/80 opacity-0 backdrop-blur-sm transition-opacity duration-100',
-                                'hover:opacity-100 focus:opacity-100',
+                                !isArenaActive && 'hover:opacity-100',
+                                'focus:opacity-100',
                             )}
                             style={{
                                 width: arenaRect.width + 16,
