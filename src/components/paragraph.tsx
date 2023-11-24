@@ -3,8 +3,9 @@ import { isAtomTyped } from '~/lib/isEqual'
 import { Word } from './word'
 import { Inline, Paragraph, Verse } from '~/lib/parseEsv'
 import { isAtomComplete } from '~/lib/keystroke'
-import { ReactNode, useContext, useState } from 'react'
+import { ReactNode, useContext, useRef, useState } from 'react'
 import { ArenaContext } from '~/components/arena'
+import { useRect } from '~/lib/hooks/useRect'
 
 export function Paragraph({
     position,
@@ -66,7 +67,9 @@ export function Verse({
         typingSession,
         isArenaActive,
     } = useContext(ArenaContext)
-    const [rect, setRect] = useState<DOMRect | null>(null)
+
+    const ref = useRef<HTMLSpanElement>(null)
+    const rect = useRect(ref)
 
     const isTypedInSession = typingSession?.typedVerses.find(
         a =>
@@ -83,19 +86,7 @@ export function Verse({
                 isCurrentVerse && 'active-verse',
                 isTypedInSession && 'text-gray-400',
             )}
-            ref={el => {
-                if (el) {
-                    const nextRect = el.getBoundingClientRect() ?? null
-                    if (
-                        nextRect.top !== rect?.top ||
-                        nextRect.height !== rect?.height ||
-                        nextRect.width !== rect?.width ||
-                        nextRect.left !== rect?.left
-                    ) {
-                        setRect(nextRect)
-                    }
-                }
-            }}
+            ref={ref}
             onClick={() => {
                 setCurrentVerse(verse.verse.value)
             }}

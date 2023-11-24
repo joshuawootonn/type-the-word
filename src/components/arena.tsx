@@ -9,6 +9,7 @@ import { Cursor } from '~/components/cursor'
 import { api } from '~/utils/api'
 import { useSession } from 'next-auth/react'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
+import { useRect } from '~/lib/hooks/useRect'
 
 function getWords(verse: string, blocks: Block[]): Inline[] {
     return blocks.flatMap(block => {
@@ -116,9 +117,10 @@ export function Arena({
     )
 
     const arenaRef = useRef<HTMLDivElement>(null)
-    const [arenaRect, setArenaRect] = useState<DOMRect | null>(null)
     const [isArenaActive, setIsArenaActive] = useState(false)
     const [isArenaFocused, setIsArenaFocused] = useState(false)
+
+    const arenaRect = useRect(arenaRef)
 
     // This is necessary to autofocus on SSR
     useEffect(() => {
@@ -127,35 +129,7 @@ export function Arena({
         }
     }, [])
 
-    useEffect(() => {
-        window.addEventListener('resize', updateRect)
-        updateRect()
-
-        return () => window.removeEventListener('resize', updateRect)
-
-        function updateRect() {
-            const nextRect = arenaRef.current?.getBoundingClientRect() ?? null
-            if (
-                nextRect &&
-                (nextRect.top !== arenaRect?.top ||
-                    nextRect.height !== arenaRect?.height ||
-                    nextRect.width !== arenaRect?.width ||
-                    nextRect.left !== arenaRect?.left)
-            ) {
-                setArenaRect(nextRect)
-            }
-        }
-    }, [])
-
-    useEffect(() => {
-        const t = setTimeout(() => {
-            setIsArenaActive(false)
-        }, 3000)
-
-        return () => {
-            clearTimeout(t)
-        }
-    }, [keystrokes.length])
+    const isActiveTimer = useRef<NodeJS.Timer>()
 
     function handleInput(e: React.KeyboardEvent<HTMLInputElement>) {
         if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
@@ -201,6 +175,11 @@ export function Arena({
                 setPosition(position)
                 setKeystrokes(next)
             }
+
+            clearTimeout(isActiveTimer.current)
+            isActiveTimer.current = setTimeout(() => {
+                setIsArenaActive(false)
+            }, 3000)
         }
     }
 
@@ -230,7 +209,6 @@ export function Arena({
                                             setCurrentVerse(verse)
                                             setPosition([])
                                             setKeystrokes([])
-                                            setIsArenaActive(true)
                                         }
                                         inputRef.current?.focus()
                                     }}
