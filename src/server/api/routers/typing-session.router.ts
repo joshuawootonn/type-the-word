@@ -3,12 +3,40 @@ import { typedVerses, typingSessions } from '~/server/db/schema'
 import { eq, sql } from 'drizzle-orm'
 import { createInsertSchema } from 'drizzle-zod'
 import { differenceInMinutes, subMinutes } from 'date-fns'
-import { TypingSession } from '~/server/repositories/typingSession.repository'
+import {
+    TypingSession,
+    typingSessionSchema,
+} from '~/server/repositories/typingSession.repository'
+import { z } from 'zod'
 
 const addTypedVerseInputSchema = createInsertSchema(typedVerses).omit({
     userId: true,
     id: true,
 })
+
+function typingSessionToString(typingSession: TypingSession) {
+    const books = Array.from(
+        new Set(typingSession.typedVerses.map(verse => verse.book)),
+    )
+    // const dd
+    // typingSession.typedVerses.reduce((acc, verse) => {
+    //     if (acc[verse.book] == null) {
+    //         acc[verse.book] = {}
+    //     }
+    // }, {})
+    return `${books.join(' ')} `
+}
+
+const typingSessionSummarySchema = typingSessionSchema.transform(
+    typingSession => ({
+        numberOfVersesTyped: typingSession.typedVerses.length,
+        updatedAt: typingSession.updatedAt,
+        createdAt: typingSession.createdAt,
+        location: typingSessionToString(typingSession),
+    }),
+)
+
+export type TypingSessionSummary = z.infer<typeof typingSessionSummarySchema>
 
 export const typingSessionRouter = createTRPCRouter({
     getOrCreateTypingSession: protectedProcedure.query(
@@ -68,4 +96,16 @@ export const typingSessionRouter = createTRPCRouter({
                 return typingSession
             },
         ),
+
+    getLog: protectedProcedure.query(
+        async ({
+            ctx: { db, session, repositories },
+        }): Promise<TypingSessionSummary[]> => {
+            const typingSessions = await repositories.typingSession.getMany({
+                userId: session.user.id,
+            })
+
+            return typingSessions.map(a => typingSessionSummarySchema.parse(a))
+        },
+    ),
 })

@@ -5,7 +5,7 @@ import { typedVerses, typingSessions } from '~/server/db/schema'
 import { createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
-const typingSessionSchema = createSelectSchema(typingSessions).and(
+export const typingSessionSchema = createSelectSchema(typingSessions).and(
     z.object({ typedVerses: z.array(createSelectSchema(typedVerses)) }),
 )
 
@@ -55,5 +55,21 @@ export class TypingSessionRepository {
             throw new Error('Typing session not found')
         }
         return session
+    }
+
+    async getMany({
+        userId,
+    }: {
+        userId: string | SQL
+    }): Promise<TypingSession[]> {
+        const where = eq(typingSessions.userId, userId)
+
+        return await this.db.query.typingSessions.findMany({
+            with: {
+                typedVerses: true,
+            },
+            where,
+            orderBy: [desc(typingSessions.createdAt)],
+        })
     }
 }
