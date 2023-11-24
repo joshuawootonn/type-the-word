@@ -1,6 +1,6 @@
 import { createTRPCRouter } from '~/server/api/trpc'
-import { passageRouter } from './routers/passage'
-import { typingSessionRouter } from '~/server/api/routers/typing-session'
+import { passageRouter } from './routers/passage.router'
+import { typingSessionRouter } from '~/server/api/routers/typing-session.router'
 
 /**
  * This is the primary router for your server.
