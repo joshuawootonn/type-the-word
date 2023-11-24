@@ -1,8 +1,6 @@
 import Head from 'next/head'
 
-import { useRouter } from 'next/router'
 import { Navigation } from '~/components/navigation'
-import { GetServerSidePropsContext } from 'next'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import { appRouter, AppRouter } from '~/server/api/root'
 import { db } from '~/server/db'
@@ -11,9 +9,7 @@ import superjson from 'superjson'
 import { api } from '~/utils/api'
 import { format, formatDuration, intervalToDuration } from 'date-fns'
 
-export async function getServerSideProps({
-    params,
-}: GetServerSidePropsContext<{ passage?: string | string[] }>) {
+export async function getServerSideProps() {
     const helpers = createServerSideHelpers<AppRouter>({
         router: appRouter,
         ctx: {
@@ -32,10 +28,6 @@ export async function getServerSideProps({
 }
 
 export default function Home() {
-    const { asPath } = useRouter()
-    const finalSlashIndex = asPath.lastIndexOf('/')
-    const previousPath = asPath.slice(0, finalSlashIndex)
-
     const log = api.typingSession.getLog.useQuery()
 
     return (
@@ -62,16 +54,20 @@ export default function Home() {
                 ) : log.error ? (
                     <>We hit a whoopsie! :(</>
                 ) : (
-                    log.data.map(a => {
+                    log.data.map(entry => {
                         return (
-                            <p>
-                                Typed {a.numberOfVersesTyped} verses in{' '}
-                                {a.location} on{' '}
-                                {format(a.createdAt, 'h:mm aaaa MM/dd/yyyy')} in{' '}
+                            <p key={entry.createdAt.toString()}>
+                                Typed {entry.numberOfVersesTyped} verses in{' '}
+                                {entry.location} on{' '}
+                                {format(
+                                    entry.createdAt,
+                                    'h:mm aaaa MM/dd/yyyy',
+                                )}{' '}
+                                in{' '}
                                 {formatDuration(
                                     intervalToDuration({
-                                        start: a.createdAt,
-                                        end: a.updatedAt,
+                                        start: entry.createdAt,
+                                        end: entry.updatedAt,
                                     }),
                                 )}
                             </p>
