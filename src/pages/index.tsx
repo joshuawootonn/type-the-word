@@ -61,6 +61,7 @@ export default function Home(props: { passage?: string }) {
                         type="text"
                         className="border-2 border-black p-1"
                         value={value}
+                        onFocus={e => e.target.select()}
                         onChange={e => {
                             const passage = e.target.value
                                 .trim()
