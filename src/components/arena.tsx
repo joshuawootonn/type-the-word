@@ -101,9 +101,12 @@ export function Arena({
     const [position, setPosition] = useState<Inline[]>([] as Inline[])
     const { data: sessionData } = useSession()
 
-    const typingSession = api.passage.getTypingSession.useQuery(undefined, {
-        enabled: sessionData?.user?.id != null,
-    })
+    const typingSession = api.passage.getOrCreateTypingSession.useQuery(
+        undefined,
+        {
+            enabled: sessionData?.user?.id != null,
+        },
+    )
     const addTypedVerseToSession =
         api.passage.addTypedVerseToSession.useMutation()
 

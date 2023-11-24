@@ -5,6 +5,7 @@ import { parseChapter, ParsedPassage } from '~/lib/parseEsv'
 import { typedVerses, typingSessions } from '~/server/db/schema'
 import { eq, sql } from 'drizzle-orm'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
+import { differenceInMinutes, subMinutes } from 'date-fns'
 
 const passageSchema = z.object({
     query: z.string(),
@@ -59,8 +60,7 @@ export const passageRouter = createTRPCRouter({
 
             return parseChapter(parsedData.passages.at(0) ?? '')
         }),
-
-    getTypingSession: protectedProcedure.query(
+    getOrCreateTypingSession: protectedProcedure.query(
         async ({ ctx: { db, session } }): Promise<TypingSession> => {
             const lastTypingSession = await db.query.typingSessions.findFirst({
                 with: {
@@ -68,7 +68,14 @@ export const passageRouter = createTRPCRouter({
                 },
                 where: eq(typingSessions.userId, session.user.id),
             })
-            if (lastTypingSession != null) {
+
+            if (
+                lastTypingSession?.updatedAt &&
+                differenceInMinutes(
+                    subMinutes(new Date(), 15),
+                    lastTypingSession?.createdAt,
+                ) < 15
+            ) {
                 return lastTypingSession
             }
 
@@ -87,7 +94,6 @@ export const passageRouter = createTRPCRouter({
             return newTypingSession
         },
     ),
-
     addTypedVerseToSession: protectedProcedure
         .input(addTypedVerseInputSchema)
         .mutation(
@@ -103,7 +109,12 @@ export const passageRouter = createTRPCRouter({
                     throw new Error('Typing session not found')
                 }
 
-                console.log(input)
+                await db
+                    .update(typingSessions)
+                    .set({
+                        updatedAt: sql`CURRENT_TIMESTAMP(3)`,
+                    })
+                    .where(eq(typingSessions.id, input.typingSessionId))
                 await db.insert(typedVerses).values({
                     userId: session.user.id,
                     ...input,
