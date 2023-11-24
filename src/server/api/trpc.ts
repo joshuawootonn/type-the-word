@@ -13,6 +13,7 @@ import superjson from 'superjson'
 import { ZodError } from 'zod'
 import { getServerAuthSession } from '~/server/auth'
 import { db } from '~/server/db'
+import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
 
 /**
  * 1. CONTEXT
@@ -40,6 +41,9 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
     return {
         session: opts.session,
         db,
+        repositories: {
+            typingSession: new TypingSessionRepository(db),
+        },
     }
 }
 

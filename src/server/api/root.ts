@@ -1,5 +1,6 @@
 import { createTRPCRouter } from '~/server/api/trpc'
 import { passageRouter } from './routers/passage'
+import { typingSessionRouter } from '~/server/api/routers/typing-session'
 
 /**
  * This is the primary router for your server.
@@ -8,6 +9,7 @@ import { passageRouter } from './routers/passage'
  */
 export const appRouter = createTRPCRouter({
     passage: passageRouter,
+    typingSession: typingSessionRouter,
 })
 
 // export type definition of API

@@ -1,11 +1,7 @@
 import { z } from 'zod'
 import { env } from '~/env.mjs'
-import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc'
+import { createTRPCRouter, publicProcedure } from '../trpc'
 import { parseChapter, ParsedPassage } from '~/lib/parseEsv'
-import { typedVerses, typingSessions } from '~/server/db/schema'
-import { eq, sql } from 'drizzle-orm'
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
-import { differenceInMinutes, subMinutes } from 'date-fns'
 
 const passageSchema = z.object({
     query: z.string(),
@@ -23,16 +19,6 @@ const passageSchema = z.object({
         }),
     ),
     passages: z.array(z.string()),
-})
-
-const typingSessionSchema = createSelectSchema(typingSessions).and(
-    z.object({ typedVerses: z.array(createSelectSchema(typedVerses)) }),
-)
-export type TypingSession = z.infer<typeof typingSessionSchema>
-
-const addTypedVerseInputSchema = createInsertSchema(typedVerses).omit({
-    userId: true,
-    id: true,
 })
 
 export const passageRouter = createTRPCRouter({
@@ -60,77 +46,4 @@ export const passageRouter = createTRPCRouter({
 
             return parseChapter(parsedData.passages.at(0) ?? '')
         }),
-    getOrCreateTypingSession: protectedProcedure.query(
-        async ({ ctx: { db, session } }): Promise<TypingSession> => {
-            const lastTypingSession = await db.query.typingSessions.findFirst({
-                with: {
-                    typedVerses: true,
-                },
-                where: eq(typingSessions.userId, session.user.id),
-            })
-
-            if (
-                lastTypingSession?.updatedAt &&
-                differenceInMinutes(
-                    subMinutes(new Date(), 15),
-                    lastTypingSession?.createdAt,
-                ) < 15
-            ) {
-                return lastTypingSession
-            }
-
-            await db.insert(typingSessions).values({ userId: session.user.id })
-            const newTypingSession = await db.query.typingSessions.findFirst({
-                with: {
-                    typedVerses: true,
-                },
-                where: eq(typingSessions.id, sql`LAST_INSERT_ID()`),
-            })
-
-            if (newTypingSession == null) {
-                throw new Error('Typing session not found')
-            }
-
-            return newTypingSession
-        },
-    ),
-    addTypedVerseToSession: protectedProcedure
-        .input(addTypedVerseInputSchema)
-        .mutation(
-            async ({ ctx: { db, session }, input }): Promise<TypingSession> => {
-                let typingSession = await db.query.typingSessions.findFirst({
-                    with: {
-                        typedVerses: true,
-                    },
-                    where: eq(typingSessions.id, input.typingSessionId),
-                })
-
-                if (typingSession == null) {
-                    throw new Error('Typing session not found')
-                }
-
-                await db
-                    .update(typingSessions)
-                    .set({
-                        updatedAt: sql`CURRENT_TIMESTAMP(3)`,
-                    })
-                    .where(eq(typingSessions.id, input.typingSessionId))
-                await db.insert(typedVerses).values({
-                    userId: session.user.id,
-                    ...input,
-                })
-
-                typingSession = await db.query.typingSessions.findFirst({
-                    with: {
-                        typedVerses: true,
-                    },
-                    where: eq(typingSessions.userId, session.user.id),
-                })
-                if (typingSession == null) {
-                    throw new Error('Typing session not found')
-                }
-
-                return typingSession
-            },
-        ),
 })

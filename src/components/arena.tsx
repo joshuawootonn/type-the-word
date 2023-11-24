@@ -8,8 +8,7 @@ import { getPosition, isValidKeystroke, Keystroke } from '~/lib/keystroke'
 import { Cursor } from '~/components/cursor'
 import { api } from '~/utils/api'
 import { useSession } from 'next-auth/react'
-import { typingSessions } from '~/server/db/schema'
-import { TypingSession } from '~/server/api/routers/passage'
+import { TypingSession } from '~/server/repositories/typingSession.repository'
 
 function getWords(verse: string, blocks: Block[]): Inline[] {
     return blocks.flatMap(block => {
@@ -101,14 +100,14 @@ export function Arena({
     const [position, setPosition] = useState<Inline[]>([] as Inline[])
     const { data: sessionData } = useSession()
 
-    const typingSession = api.passage.getOrCreateTypingSession.useQuery(
+    const typingSession = api.typingSession.getOrCreateTypingSession.useQuery(
         undefined,
         {
             enabled: sessionData?.user?.id != null,
         },
     )
     const addTypedVerseToSession =
-        api.passage.addTypedVerseToSession.useMutation()
+        api.typingSession.addTypedVerseToSession.useMutation()
 
     const [currentVerse, setCurrentVerse] = useState<string>(
         passage.firstVerse.value,

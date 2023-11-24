@@ -2,15 +2,22 @@ import { createServerSideHelpers } from '@trpc/react-query/server'
 import { AppRouter, appRouter } from '~/server/api/root'
 import superjson from 'superjson'
 import { db } from '~/server/db'
-import Page, {DEFAULT_PASSAGE_REFERENCE} from '../index'
+import Page, { DEFAULT_PASSAGE_REFERENCE } from '../index'
 import { GetServerSidePropsContext } from 'next'
+import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
 
 export async function getServerSideProps({
     params,
 }: GetServerSidePropsContext<{ passage?: string | string[] }>) {
     const helpers = createServerSideHelpers<AppRouter>({
         router: appRouter,
-        ctx: { session: null, db },
+        ctx: {
+            session: null,
+            db,
+            repositories: {
+                typingSession: new TypingSessionRepository(db),
+            },
+        },
         transformer: superjson,
     })
 
