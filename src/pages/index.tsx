@@ -1,4 +1,3 @@
-import { signIn, signOut, useSession } from 'next-auth/react'
 import Head from 'next/head'
 import { useState } from 'react'
 
@@ -10,6 +9,7 @@ import superjson from 'superjson'
 import { db } from '~/server/db'
 import { useRouter } from 'next/router'
 import { useDebouncedValue } from '~/lib/hooks'
+import { Navigation } from '~/components/navigation'
 
 export const DEFAULT_PASSAGE_REFERENCE = 'psalm 23'
 
@@ -43,12 +43,8 @@ export default function Home(props: { passage?: string }) {
                 />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <nav className="prose mx-auto mb-2 flex w-full items-center justify-between pt-4 lg:pt-8">
-                <h1 className="m-0 font-mono text-xl font-extrabold tracking-tight text-black">
-                    Type the Word
-                </h1>
-                <AuthShowcase />
-            </nav>
+
+            <Navigation />
             <div className="prose mx-auto mb-8 flex w-full items-center justify-start space-x-3 pt-4 lg:pt-8">
                 <label htmlFor="passage" className="text-black">
                     Passage:
@@ -93,23 +89,6 @@ export default function Home(props: { passage?: string }) {
                     (ESV)
                 </a>
             </footer>
-        </div>
-    )
-}
-
-function AuthShowcase() {
-    const { data: sessionData } = useSession()
-
-    return (
-        <div className="flex flex-col  gap-4">
-            <button
-                className="svg-outline relative border-2 border-black px-3 py-1 font-semibold text-black"
-                onClick={
-                    sessionData ? () => void signOut() : () => void signIn()
-                }
-            >
-                {sessionData ? `Sign out ${sessionData.user?.name}` : 'Sign in'}
-            </button>
         </div>
     )
 }
