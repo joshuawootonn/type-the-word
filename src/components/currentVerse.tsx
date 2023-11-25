@@ -203,7 +203,7 @@ export function CurrentVerse({
             )}
             ref={ref}
             onClick={() => {
-                setCurrentVerse(verse.verse.value)
+                inputRef.current?.focus()
             }}
         >
             {verse.nodes.map((atom, aIndexPrime) => {

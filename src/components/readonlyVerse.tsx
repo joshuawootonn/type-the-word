@@ -9,7 +9,6 @@ import {
 import { useRect } from '~/lib/hooks/useRect'
 import { useAtom, useSetAtom } from 'jotai'
 import clsx from 'clsx'
-import { Word } from '~/components/word'
 import { Verse } from '~/lib/parseEsv'
 import { api } from '~/utils/api'
 import { useSession } from 'next-auth/react'
