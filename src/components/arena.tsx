@@ -30,6 +30,7 @@ function HydrateAtoms({
     initialValues,
     children,
 }: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     initialValues: InitialValues<any>[]
     children: React.ReactNode
 }) {
