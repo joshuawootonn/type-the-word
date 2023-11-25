@@ -92,13 +92,10 @@ export function ReadonlyVerse({
 
                 if (atom.type === 'word') {
                     return (
-                        <Word
-                            key={aIndexPrime}
-                            word={atom}
-                            active={false}
-                            isPrevTyped={false}
-                            isWordTyped={false}
-                        />
+                        <span key={aIndexPrime} className="word">
+                            {atom.letters.join('').replace(' ', '\u00a0')}
+                            <span className="text-[0px]"> </span>
+                        </span>
                     )
                 }
 
