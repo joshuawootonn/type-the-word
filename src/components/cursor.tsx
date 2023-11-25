@@ -1,16 +1,12 @@
 import React from 'react'
 import { useCursor } from '~/lib/hooks'
 import clsx from 'clsx'
+import { useAtom } from 'jotai'
+import { isArenaActiveAtom, isArenaFocusedAtom } from '~/components/arena'
 
-export function Cursor({
-    arenaId,
-    isArenaActive,
-    isArenaFocused,
-}: {
-    arenaId: string
-    isArenaActive: boolean
-    isArenaFocused: boolean
-}) {
+export function Cursor({ arenaId }: { arenaId: string }) {
+    const [isArenaActive] = useAtom(isArenaActiveAtom)
+    const [isArenaFocused] = useAtom(isArenaFocusedAtom)
     useCursor(arenaId)
     return (
         <>
