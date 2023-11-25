@@ -11,6 +11,7 @@ import { useRouter } from 'next/router'
 import { useDebouncedValue } from '~/lib/hooks'
 import { Navigation } from '~/components/navigation'
 import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
+import Link from 'next/link'
 
 export const DEFAULT_PASSAGE_REFERENCE = 'psalm 23'
 
@@ -87,15 +88,21 @@ export default function Home(props: { passage?: string }) {
                     />
                 )}
             </main>
-            <footer className="prose mx-auto flex w-full items-start justify-start py-2">
+            <footer className="prose mx-auto flex w-full items-start justify-start space-x-3 py-2">
                 <a
-                    className="svg-outline relative flex-grow text-xs no-underline"
+                    className="svg-outline relative text-xs no-underline"
                     href="https://www.esv.org/"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
                     (ESV)
                 </a>
+                <Link
+                    className="svg-outline relative  text-xs no-underline"
+                    href={'/copywrite'}
+                >
+                    copywrite
+                </Link>
             </footer>
         </div>
     )
