@@ -4,6 +4,7 @@ import { eq, sql } from 'drizzle-orm'
 import { createInsertSchema } from 'drizzle-zod'
 import { differenceInMinutes, subMinutes } from 'date-fns'
 import {
+    TypedVerse,
     TypingSession,
     typingSessionSchema,
 } from '~/server/repositories/typingSession.repository'
@@ -123,6 +124,62 @@ function typingSessionToString(typingSession: TypingSession) {
     return `${books.join(', ')} `
 }
 
+export type BookSummary = {
+    book: string
+    totalVerses: number
+    typedVerses: number
+}
+
+function getBookSummary(typingSessions: TypingSession[]): BookSummary[] {
+    const bibleMetadata = getBibleMetadata()
+
+    const books = Array.from(
+        new Set(
+            typingSessions.reduce<TypedVerse['book'][]>(
+                (acc, curr) => [
+                    ...acc,
+                    ...curr.typedVerses.map(verse => verse.book),
+                ],
+                [],
+            ),
+        ),
+    )
+        .sort(function (a, b) {
+            const biblicalOrder = Object.keys(bibleMetadata)
+
+            const aIndex = biblicalOrder.findIndex(book => book === a)
+            const bIndex = biblicalOrder.findIndex(book => book === b)
+
+            if (aIndex === -1 || bIndex === -1) {
+                throw new Error('Book not found in typing session to string')
+            }
+
+            return aIndex - bIndex
+        })
+        .map(book => {
+            const typedVersesInThisBook = typingSessions.reduce<TypedVerse[]>(
+                (acc, curr) => [
+                    ...acc,
+                    ...curr.typedVerses.filter(verse => verse.book === book),
+                ],
+                [],
+            )
+            const versesInCurrentBook =
+                bibleMetadata[book]?.chapters.reduce(
+                    (acc, curr) => acc + curr.length,
+                    0,
+                ) ?? 0
+
+            return {
+                book: toProperCase(book),
+                totalVerses: versesInCurrentBook,
+                typedVerses: typedVersesInThisBook.length,
+            }
+        })
+
+    return books
+}
+
 const typingSessionSummarySchema = typingSessionSchema.transform(
     typingSession => ({
         numberOfVersesTyped: typingSession.typedVerses.length,
@@ -193,6 +250,17 @@ export const typingSessionRouter = createTRPCRouter({
             },
         ),
 
+    getHistorySummary: protectedProcedure.query(
+        async ({
+            ctx: { db, session, repositories },
+        }): Promise<BookSummary[]> => {
+            const typingSessions = await repositories.typingSession.getMany({
+                userId: session.user.id,
+            })
+
+            return getBookSummary(typingSessions)
+        },
+    ),
     getLog: protectedProcedure.query(
         async ({
             ctx: { db, session, repositories },

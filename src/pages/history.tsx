@@ -29,6 +29,7 @@ export async function getServerSideProps() {
 
 export default function Home() {
     const log = api.typingSession.getLog.useQuery()
+    const summary = api.typingSession.getHistorySummary.useQuery()
 
     return (
         <div className="container mx-auto flex min-h-screen max-w-page flex-col px-4 lg:px-0">
@@ -46,7 +47,34 @@ export default function Home() {
                 <h1 className="">History</h1>
                 <hr className="mx-0 w-full border-t-2 border-black" />
                 <h2>Summary</h2>
-                <p>coming soon....</p>
+                {summary.isLoading ? (
+                    <>Loading... </>
+                ) : summary.error ? (
+                    <>We hit a whoopsie! :(</>
+                ) : (
+                    <div className="flex flex-row gap-3">
+                        {summary.data.map(entry => {
+                            return (
+                                <div
+                                    className="relative z-0 h-40 w-40 border-2 border-black"
+                                    key={entry.book}
+                                >
+                                    <div className="max-w-[fit-content] bg-black px-2 text-white">
+                                        {entry.book}
+                                    </div>
+                                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                                        {Math.floor(
+                                            (entry.typedVerses /
+                                                entry.totalVerses) *
+                                                10000,
+                                        ) / 100}
+                                        %
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                )}
                 <hr className="mx-0 w-full border-t-2 border-black" />
                 <h2>Log</h2>
                 {log.isLoading ? (

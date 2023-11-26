@@ -10,6 +10,7 @@ export const typingSessionSchema = createSelectSchema(typingSessions).and(
 )
 
 export type TypingSession = z.infer<typeof typingSessionSchema>
+export type TypedVerse = TypingSession['typedVerses'][number]
 
 export class TypingSessionRepository {
     db: PlanetScaleDatabase<typeof schema>
