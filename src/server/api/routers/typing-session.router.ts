@@ -79,7 +79,7 @@ function typingSessionToString(typingSession: TypingSession) {
                     )
 
                     if (
-                        bibleMetadata[book]?.chapters?.at(parseInt(chapter))
+                        bibleMetadata[book]?.chapters?.at(parseInt(chapter) - 1)
                             ?.length === uniqueVerses.length
                     ) {
                         return chapter
