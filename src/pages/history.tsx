@@ -57,8 +57,7 @@ export default function Home() {
                     log.data.map(entry => {
                         return (
                             <p key={entry.createdAt.toString()}>
-                                Typed {entry.numberOfVersesTyped} verses in{' '}
-                                {entry.location} on{' '}
+                                Typed {entry.location} on{' '}
                                 {format(
                                     entry.createdAt,
                                     'h:mm aaaa MM/dd/yyyy',
