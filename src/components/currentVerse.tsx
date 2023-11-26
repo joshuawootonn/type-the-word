@@ -68,7 +68,7 @@ function getVerse(currentVerse: string, blocks: Block[]): Verse {
     return verse
 }
 
-function getNextVerse(currentVerse: string, blocks: Block[]): Verse {
+function getNextVerse(currentVerse: string, blocks: Block[]): Verse | null {
     const listOfVerses = getListOfVerses(blocks)
     const indexOfCurrent = listOfVerses.findIndex(
         verse => verse.verse.value === currentVerse,
@@ -78,11 +78,7 @@ function getNextVerse(currentVerse: string, blocks: Block[]): Verse {
         .slice(indexOfCurrent)
         .find(verse => verse.verse.value !== currentVerse)
 
-    if (verse == null) {
-        throw new Error('ReadonlyVerse not found')
-    }
-
-    return verse
+    return verse ?? null
 }
 
 export function CurrentVerse({
@@ -148,7 +144,7 @@ export function CurrentVerse({
                 const verse = getVerse(currentVerse, passage.nodes)
                 const nextVerse = getNextVerse(currentVerse, passage.nodes)
 
-                setCurrentVerse(nextVerse.verse.value)
+                setCurrentVerse(nextVerse?.verse.value ?? '')
                 setPosition([])
                 setKeystrokes([])
                 if (
@@ -194,6 +190,7 @@ export function CurrentVerse({
             a.translation === verse.verse.translation,
     )
 
+    console.log('isTypedInSession', isTypedInSession, typingSession.data)
     return (
         <span
             className={clsx(
