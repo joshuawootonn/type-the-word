@@ -84,20 +84,35 @@ export default function Home() {
                 ) : (
                     log.data.map(entry => {
                         return (
-                            <p key={entry.createdAt.toString()}>
-                                Typed {entry.location} on{' '}
-                                {format(
-                                    entry.createdAt,
-                                    'h:mm aaaa MM/dd/yyyy',
-                                )}{' '}
-                                in{' '}
-                                {formatDuration(
-                                    intervalToDuration({
-                                        start: entry.createdAt,
-                                        end: entry.updatedAt,
-                                    }),
-                                )}
-                            </p>
+                            <div
+                                className="flex w-full grow flex-row items-center justify-between"
+                                key={entry.createdAt.toString()}
+                            >
+                                <span className="shrink-0">
+                                    {entry.location}
+                                </span>
+                                <svg
+                                    height={2}
+                                    className={'mx-4 grow'}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <line
+                                        stroke="black"
+                                        stroke-width="4"
+                                        fill="transparent"
+                                        stroke-dasharray="6 5"
+                                        x="0"
+                                        y="0"
+                                        x2="100%"
+                                        y2="0"
+                                    />
+                                </svg>
+
+                                <span className="shrink-0">
+                                    {format(entry.createdAt, 'haaa')} {'- '}
+                                    {format(entry.createdAt, 'dd/MM')}
+                                </span>
+                            </div>
                         )
                     })
                 )}
