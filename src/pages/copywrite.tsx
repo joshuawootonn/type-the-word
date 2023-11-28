@@ -1,29 +1,6 @@
 import Head from 'next/head'
 
 import { Navigation } from '~/components/navigation'
-import { createServerSideHelpers } from '@trpc/react-query/server'
-import { appRouter, AppRouter } from '~/server/api/root'
-import { db } from '~/server/db'
-import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
-import superjson from 'superjson'
-
-export async function getServerSideProps() {
-    const helpers = createServerSideHelpers<AppRouter>({
-        router: appRouter,
-        ctx: {
-            session: null,
-            db,
-            repositories: {
-                typingSession: new TypingSessionRepository(db),
-            },
-        },
-        transformer: superjson,
-    })
-
-    await helpers.typingSession.getLog.prefetch()
-
-    return { props: { trpcState: helpers.dehydrate() } }
-}
 
 export default function Home() {
     return (
