@@ -4,6 +4,7 @@ import { Navigation } from '~/components/navigation'
 import { api } from '~/utils/api'
 import { format } from 'date-fns'
 import { useEffect, useRef } from 'react'
+import Link from 'next/link'
 
 function Loading(
     { initialDots }: { initialDots?: number } = { initialDots: 1 },
@@ -32,13 +33,12 @@ function Loading(
 
     return <div ref={ref}>{initialText.current}</div>
 }
-
 export default function Home() {
     const log = api.typingSession.getLog.useQuery()
     const summary = api.typingSession.getHistorySummary.useQuery()
 
     return (
-        <div className="container mx-auto flex max-w-page flex-col px-4 lg:px-0">
+        <div className="container mx-auto flex min-h-screen max-w-page flex-col px-4 lg:px-0">
             <Head>
                 <title>Type the Word - History</title>
                 <meta
@@ -49,7 +49,7 @@ export default function Home() {
             </Head>
 
             <Navigation />
-            <main className="prose mx-auto mb-8 w-full pt-4 lg:pt-8">
+            <main className="prose mx-auto mb-8 w-full flex-grow pt-4 lg:pt-8">
                 <h1 className="">History</h1>
                 <hr className="mx-0 w-full border-t-2 border-black" />
                 <h2>Summary</h2>
@@ -123,6 +123,22 @@ export default function Home() {
                     })
                 )}
             </main>
+            <footer className="prose mx-auto flex w-full items-start justify-start space-x-3 py-2">
+                <a
+                    className="svg-outline relative text-xs no-underline"
+                    href="https://www.esv.org/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    (ESV)
+                </a>
+                <Link
+                    className="svg-outline relative  text-xs no-underline"
+                    href={'/copywrite'}
+                >
+                    copywrite
+                </Link>
+            </footer>
         </div>
     )
 }

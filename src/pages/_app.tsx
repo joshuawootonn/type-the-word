@@ -34,7 +34,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
     }, [router.events])
 
     return (
-        <div className={clsx('overflow-y-hidden', martian.className)}>
+        <div
+            className={clsx('min-h-screen overflow-hidden', martian.className)}
+        >
             <SessionProvider session={session}>
                 <Component {...pageProps} />
             </SessionProvider>

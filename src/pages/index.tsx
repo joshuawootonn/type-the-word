@@ -42,7 +42,7 @@ export default function Home(props: { passage?: string }) {
     const passage = api.passage.passage.useQuery(debouncedValue)
 
     return (
-        <div className="container mx-auto flex max-w-page flex-col px-4 lg:px-0">
+        <div className="container mx-auto flex min-h-screen max-w-page flex-col px-4 lg:px-0">
             <Head>
                 <title>Type the Word</title>
                 <meta
