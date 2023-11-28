@@ -12,6 +12,7 @@ import { useDebouncedValue } from '~/lib/hooks'
 import { Navigation } from '~/components/navigation'
 import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
 import { Footer } from '~/components/footer'
+import { Loading } from '~/components/loading'
 
 export const DEFAULT_PASSAGE_REFERENCE = 'psalm 23'
 
@@ -77,7 +78,7 @@ export default function Home(props: { passage?: string }) {
 
             <main className="relative mx-auto w-full flex-grow">
                 {passage.isLoading ? (
-                    <>Loading... </>
+                    <Loading />
                 ) : passage.error ? (
                     <>We hit a whoopsie! :(</>
                 ) : (
