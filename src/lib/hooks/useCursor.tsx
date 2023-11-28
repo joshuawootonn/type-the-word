@@ -14,7 +14,7 @@ export function useCursor(arenaId: string): void {
 
     useEffect(() => {
         function move() {
-            const arena = document.querySelector('.arena')
+            const arena = document.querySelector(`#${CSS.escape(arenaId)}`)
             const arenaRect = arena?.getBoundingClientRect()
             if (arenaRect == null) return
 

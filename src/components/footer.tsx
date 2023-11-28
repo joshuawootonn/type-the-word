@@ -17,6 +17,12 @@ export function Footer() {
             >
                 copywrite
             </Link>
+            <Link
+                className="svg-outline relative text-xs no-underline"
+                href={'/why'}
+            >
+                why?
+            </Link>
         </footer>
     )
 }

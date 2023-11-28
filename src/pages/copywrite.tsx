@@ -16,7 +16,7 @@ export default function Home() {
             </Head>
 
             <Navigation />
-            <main className="prose mx-auto mb-8 w-full pt-4 lg:pt-8">
+            <main className="prose mx-auto mb-8 w-full flex-grow pt-4 lg:pt-8">
                 <h1 className="">Copywrite</h1>
                 <p>
                     Scripture quotations are from the ESV® Bible (The Holy
