@@ -156,6 +156,7 @@ export type ParsedPassage = {
 }
 
 export function parseChapter(passage: string): ParsedPassage {
+    console.log(passage)
     const dom = new JSDOM(passage)
     dom.window.document.querySelectorAll('sup.footnote').forEach(node => {
         node.parentNode?.removeChild(node)
@@ -269,6 +270,9 @@ export function parseChapter(passage: string): ParsedPassage {
             if (node.attrs.find(attr => attr.value.includes('extra_text'))) {
                 context.book = bookSchema.parse(
                     text.trimStart().split(' ').at(0)?.toLowerCase(),
+                )
+                context.chapter = parseInt(
+                    text.trimStart().split(' ').at(1)?.split(':').at(0) ?? '',
                 )
             }
             return {
