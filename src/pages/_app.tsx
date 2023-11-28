@@ -33,7 +33,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     }, [router.events])
 
     return (
-        <div className={'overflow-y-hidden ' + martian.className}>
+        <div className={'overflow-y-hidden' + martian.className}>
             <SessionProvider session={session}>
                 <Component {...pageProps} />
             </SessionProvider>
