@@ -1,10 +1,12 @@
 import { signIn, signOut, useSession } from 'next-auth/react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 export function Navigation() {
     const { data: sessionData } = useSession()
 
+    const router = useRouter()
     return (
         <nav className="mx-auto mb-2 flex w-full items-center justify-between pt-4 lg:pt-8">
             <Link href={'/'}>
@@ -29,7 +31,15 @@ export function Navigation() {
                             sideOffset={-2}
                             align="end"
                         >
-                            <DropdownMenu.Item asChild={true}>
+                            <DropdownMenu.Item
+                                className={
+                                    ' outline-none focus:bg-black focus:text-white'
+                                }
+                                onSelect={() => {
+                                    // This is necessary because when I use `asChild` there is a flicker on navigation.
+                                    void router.push('/history')
+                                }}
+                            >
                                 <Link
                                     className="block cursor-pointer px-3 py-1 no-underline outline-none focus:bg-black focus:text-white "
                                     href={'/history'}
