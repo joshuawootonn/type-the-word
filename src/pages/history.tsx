@@ -3,6 +3,35 @@ import Head from 'next/head'
 import { Navigation } from '~/components/navigation'
 import { api } from '~/utils/api'
 import { format } from 'date-fns'
+import { useEffect, useRef } from 'react'
+
+function Loading(
+    { initialDots }: { initialDots?: number } = { initialDots: 1 },
+) {
+    const initialText = useRef(
+        `Loading${new Array(initialDots)
+            .fill('')
+            .map(() => '.')
+            .join('')}`,
+    )
+    const ref = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (ref.current) {
+                const isMaxLength =
+                    ref.current.innerText.replace('Loading', '').length >= 3
+                ref.current.innerText = isMaxLength
+                    ? 'Loading.'
+                    : ref.current.innerText + '.'
+            }
+        }, 500)
+
+        return () => clearInterval(interval)
+    }, [])
+
+    return <div ref={ref}>{initialText.current}</div>
+}
 
 export default function Home() {
     const log = api.typingSession.getLog.useQuery()
@@ -25,9 +54,9 @@ export default function Home() {
                 <hr className="mx-0 w-full border-t-2 border-black" />
                 <h2>Summary</h2>
                 {summary.isLoading ? (
-                    <>Loading... </>
+                    <Loading initialDots={2} />
                 ) : summary.error ? (
-                    <>We hit a whoopsie! :(</>
+                    <div>We hit a whoopsie! :(</div>
                 ) : (
                     <div className="flex flex-row gap-3">
                         {summary.data.map(entry => {
@@ -55,9 +84,9 @@ export default function Home() {
                 <hr className="mx-0 w-full border-t-2 border-black" />
                 <h2>Log</h2>
                 {log.isLoading ? (
-                    <>Loading... </>
+                    <Loading />
                 ) : log.error ? (
-                    <>We hit a whoopsie! :(</>
+                    <div>We hit a whoopsie! :(</div>
                 ) : (
                     log.data.map(entry => {
                         return (
@@ -87,7 +116,7 @@ export default function Home() {
 
                                 <span className="shrink-0">
                                     {format(entry.createdAt, 'haaa')} {'- '}
-                                    {format(entry.createdAt, 'dd/MM')}
+                                    {format(entry.createdAt, 'MM/dd')}
                                 </span>
                             </div>
                         )
