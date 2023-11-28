@@ -27,7 +27,7 @@ export async function getServerSideProps() {
 
 export default function Home() {
     return (
-        <div className="container mx-auto flex min-h-screen max-w-page flex-col px-4 lg:px-0">
+        <div className="min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0">
             <Head>
                 <title>Type the Word - Copywrite</title>
                 <meta

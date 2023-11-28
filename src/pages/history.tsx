@@ -38,7 +38,7 @@ export default function Home() {
     const summary = api.typingSession.getHistorySummary.useQuery()
 
     return (
-        <div className="container mx-auto flex min-h-screen max-w-page flex-col px-4 lg:px-0">
+        <div className="min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0">
             <Head>
                 <title>Type the Word - History</title>
                 <meta

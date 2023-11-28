@@ -35,7 +35,10 @@ const MyApp: AppType<{ session: Session | null }> = ({
 
     return (
         <div
-            className={clsx('min-h-screen overflow-hidden', martian.className)}
+            className={clsx(
+                'min-h-[calc(100vh_-_1px)] overflow-hidden',
+                martian.className,
+            )}
         >
             <SessionProvider session={session}>
                 <Component {...pageProps} />
