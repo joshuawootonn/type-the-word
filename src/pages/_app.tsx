@@ -9,6 +9,7 @@ import { useEffect } from 'react'
 import { env } from '~/env.mjs'
 import '~/styles/globals.css'
 import { api } from '~/utils/api'
+import clsx from 'clsx'
 
 const martian = Martian_Mono({ subsets: ['latin'], variable: '--font-martian' })
 
@@ -33,7 +34,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     }, [router.events])
 
     return (
-        <div className={'overflow-y-hidden' + martian.className}>
+        <div className={clsx('overflow-y-hidden', martian.className)}>
             <SessionProvider session={session}>
                 <Component {...pageProps} />
             </SessionProvider>
