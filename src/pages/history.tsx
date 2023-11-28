@@ -5,6 +5,7 @@ import { api } from '~/utils/api'
 import { format } from 'date-fns'
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { Footer } from '~/components/footer'
 
 function Loading(
     { initialDots }: { initialDots?: number } = { initialDots: 1 },
@@ -123,22 +124,7 @@ export default function Home() {
                     })
                 )}
             </main>
-            <footer className="prose mx-auto flex w-full items-start justify-start space-x-3 py-2">
-                <a
-                    className="svg-outline relative text-xs no-underline"
-                    href="https://www.esv.org/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    (ESV)
-                </a>
-                <Link
-                    className="svg-outline relative  text-xs no-underline"
-                    href={'/copywrite'}
-                >
-                    copywrite
-                </Link>
-            </footer>
+            <Footer />
         </div>
     )
 }

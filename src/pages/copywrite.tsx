@@ -1,6 +1,7 @@
 import Head from 'next/head'
 
 import { Navigation } from '~/components/navigation'
+import { Footer } from '~/components/footer'
 
 export default function Home() {
     return (
@@ -32,6 +33,7 @@ export default function Home() {
                     Bible.
                 </p>
             </main>
+            <Footer />
         </div>
     )
 }
