@@ -31,15 +31,7 @@ export function Navigation() {
                             sideOffset={-2}
                             align="end"
                         >
-                            <DropdownMenu.Item
-                                className={
-                                    ' outline-none focus:bg-black focus:text-white'
-                                }
-                                onSelect={() => {
-                                    // This is necessary because when I use `asChild` there is a flicker on navigation.
-                                    void router.push('/history')
-                                }}
-                            >
+                            <DropdownMenu.Item asChild={true}>
                                 <Link
                                     className="block cursor-pointer px-3 py-1 no-underline outline-none focus:bg-black focus:text-white "
                                     href={'/history'}
