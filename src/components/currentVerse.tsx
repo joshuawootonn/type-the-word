@@ -130,6 +130,16 @@ export function CurrentVerse({
 
     const isActiveTimer = useRef<NodeJS.Timer>()
 
+    useEffect(() => {
+        clearTimeout(isActiveTimer.current)
+
+        isActiveTimer.current = setTimeout(() => {
+            setIsArenaActive(false)
+        }, 3000)
+
+        return () => clearTimeout(isActiveTimer.current)
+    }, [keystrokes.length])
+
     function handleInput(e: React.KeyboardEvent<HTMLInputElement>) {
         if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -186,11 +196,6 @@ export function CurrentVerse({
                 setPosition(position)
                 setKeystrokes(next)
             }
-
-            clearTimeout(isActiveTimer.current)
-            isActiveTimer.current = setTimeout(() => {
-                setIsArenaActive(false)
-            }, 3000)
         }
     }
 
