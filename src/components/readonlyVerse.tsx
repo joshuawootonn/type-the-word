@@ -44,7 +44,7 @@ export function ReadonlyVerse({
             a.translation === verse.verse.translation,
     )
 
-    const setCurrentVerse = useSetAtom(currentVerseAtom)
+    const [currentVerse, setCurrentVerse] = useAtom(currentVerseAtom)
     const setPosition = useSetAtom(positionAtom)
     const setKeystrokes = useSetAtom(keystrokesAtom)
 
@@ -115,7 +115,11 @@ export function ReadonlyVerse({
                         top: rect.top - arenaRect.top - 8,
                     }}
                 >
-                    <span>Switch to verse {verse.verse.value}</span>
+                    {Boolean(currentVerse) ? (
+                        <span>Switch to verse {verse.verse.value}</span>
+                    ) : (
+                        <span>Start typing at verse {verse.verse.value}</span>
+                    )}
                 </button>
             ) : null}
         </span>

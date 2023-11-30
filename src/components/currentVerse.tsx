@@ -1,7 +1,8 @@
 import { Block, Inline, ParsedPassage, Verse } from '~/lib/parseEsv'
-import React, { useEffect, useRef } from 'react'
-import { useAtom, useSetAtom } from 'jotai'
+import React, { useContext, useEffect, useRef } from 'react'
+import { useAtom } from 'jotai'
 import {
+    ArenaContext,
     autofocusAtom,
     currentVerseAtom,
     isArenaActiveAtom,
@@ -15,6 +16,7 @@ import { getPosition, isAtomComplete, isValidKeystroke } from '~/lib/keystroke'
 import { isAtomTyped, isVerseSameShape } from '~/lib/isEqual'
 import clsx from 'clsx'
 import { Word } from '~/components/word'
+import { useRect } from '~/lib/hooks/useRect'
 
 function getWords(verse: string, blocks: Block[]): Inline[] {
     return blocks.flatMap(block => {
@@ -107,10 +109,14 @@ export function CurrentVerse({
     const addTypedVerseToSession =
         api.typingSession.addTypedVerseToSession.useMutation()
 
-    const [currentVerse, setCurrentVerse] = useAtom(currentVerseAtom)
+    const { rect: arenaRect } = useContext(ArenaContext)
+    const [isArenaActive, setIsArenaActive] = useAtom(isArenaActiveAtom)
+    const [isArenaFocused, setIsArenaFocused] = useAtom(isArenaFocusedAtom)
 
-    const setIsArenaActive = useSetAtom(isArenaActiveAtom)
-    const setIsArenaFocused = useSetAtom(isArenaFocusedAtom)
+    const ref = useRef<HTMLSpanElement>(null)
+    const rect = useRect(ref)
+
+    const [currentVerse, setCurrentVerse] = useAtom(currentVerseAtom)
 
     // This is necessary to autofocus on SSR
     useEffect(() => {
@@ -123,6 +129,10 @@ export function CurrentVerse({
 
     function handleInput(e: React.KeyboardEvent<HTMLInputElement>) {
         if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+            }
+
             let isVerseComplete = false
 
             setIsArenaActive(true)
@@ -144,9 +154,17 @@ export function CurrentVerse({
                 const verse = getVerse(currentVerse, passage.nodes)
                 const nextVerse = getNextVerse(currentVerse, passage.nodes)
 
-                setCurrentVerse(nextVerse?.verse.value ?? '')
-                setPosition([])
-                setKeystrokes([])
+                if (nextVerse?.verse.verse) {
+                    setCurrentVerse(nextVerse?.verse.value)
+                    setPosition([])
+                    setKeystrokes([])
+                } else {
+                    setCurrentVerse('')
+                    inputRef.current?.blur()
+                    setPosition([])
+                    setKeystrokes([])
+                }
+
                 if (
                     typingSession?.data?.id != null &&
                     sessionData?.user?.id != null
@@ -180,8 +198,6 @@ export function CurrentVerse({
           )
         : position
 
-    const ref = useRef<HTMLSpanElement>(null)
-
     const isTypedInSession = typingSession.data?.typedVerses.find(
         a =>
             a.verse === verse.verse.verse &&
@@ -190,7 +206,6 @@ export function CurrentVerse({
             a.translation === verse.verse.translation,
     )
 
-    console.log('isTypedInSession', isTypedInSession, typingSession.data)
     return (
         <span
             className={clsx(
@@ -267,15 +282,34 @@ export function CurrentVerse({
                 return null
             })}
 
+            {rect && arenaRect && !isArenaFocused ? (
+                <button
+                    className={clsx(
+                        'svg-outline absolute z-10 border-2 border-black bg-white/80 opacity-0 backdrop-blur-sm transition-opacity duration-100',
+                        !isArenaActive && 'hover:opacity-100',
+                        'focus:opacity-100',
+                    )}
+                    style={{
+                        width: arenaRect.width + 16,
+                        height: rect.height + 16,
+                        left: -8,
+                        top: rect.top - arenaRect.top - 8,
+                    }}
+                    onClick={() => {
+                        setIsArenaFocused(true)
+                    }}
+                >
+                    <span>Continue typing verse {verse.verse.value}</span>
+                </button>
+            ) : null}
             <input
                 type="text"
                 className="peer fixed h-0 max-h-0 opacity-0"
                 onKeyDown={e => {
                     handleInput(e)
                 }}
-                onFocus={() => {
-                    setIsArenaFocused(true)
-                }}
+                tabIndex={-1}
+                onFocus={() => setIsArenaFocused(true)}
                 onBlur={() => setIsArenaFocused(false)}
                 ref={inputRef}
                 autoFocus={true}
