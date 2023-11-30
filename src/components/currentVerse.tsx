@@ -121,7 +121,10 @@ export function CurrentVerse({
     // This is necessary to autofocus on SSR
     useEffect(() => {
         if (autoFocus) {
-            inputRef.current?.focus()
+            // This redundant call is so because the `input.onFocus`  wasn't firing
+            // for chrome hard reload, and ff soft/hard reload.
+            setIsArenaFocused(true)
+            return inputRef.current?.focus()
         }
     }, [])
 
@@ -305,12 +308,14 @@ export function CurrentVerse({
             <input
                 type="text"
                 className="peer fixed h-0 max-h-0 opacity-0"
-                onKeyDown={e => {
-                    handleInput(e)
-                }}
+                onKeyDown={e => handleInput(e)}
                 tabIndex={-1}
-                onFocus={() => setIsArenaFocused(true)}
-                onBlur={() => setIsArenaFocused(false)}
+                onFocus={() => {
+                    setIsArenaFocused(true)
+                }}
+                onBlur={() => {
+                    setIsArenaFocused(false)
+                }}
                 ref={inputRef}
                 autoFocus={true}
             />
