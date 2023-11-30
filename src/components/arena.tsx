@@ -40,10 +40,12 @@ function HydrateAtoms({
 
 export function Arena({
     passage,
-    autofocus,
+    autofocus = true,
+    autoSelect = true,
 }: {
     passage: ParsedPassage
-    autofocus: boolean
+    autofocus?: boolean
+    autoSelect?: boolean
 }) {
     const arenaId = useId()
 
@@ -54,7 +56,10 @@ export function Arena({
         <Provider>
             <HydrateAtoms
                 initialValues={[
-                    [currentVerseAtom, passage.firstVerse.value],
+                    [
+                        currentVerseAtom,
+                        autoSelect ? passage.firstVerse.value : '',
+                    ],
                     [autofocusAtom, autofocus],
                 ]}
             >

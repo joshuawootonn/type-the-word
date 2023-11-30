@@ -102,11 +102,7 @@ export default function Home() {
                 ) : one.error ? (
                     <>We hit a whoopsie! :(</>
                 ) : (
-                    <Arena
-                        autofocus={true}
-                        passage={one.data}
-                        key={JSON.stringify(one.data)}
-                    />
+                    <Arena passage={one.data} key={JSON.stringify(one.data)} />
                 )}
                 {two.isLoading ? (
                     <Loading />
@@ -114,7 +110,8 @@ export default function Home() {
                     <>We hit a whoopsie! :(</>
                 ) : (
                     <Arena
-                        autofocus={true}
+                        autofocus={false}
+                        autoSelect={false}
                         passage={two.data}
                         key={JSON.stringify(two.data)}
                     />
@@ -125,7 +122,8 @@ export default function Home() {
                     <>We hit a whoopsie! :(</>
                 ) : (
                     <Arena
-                        autofocus={true}
+                        autofocus={false}
+                        autoSelect={false}
                         passage={three.data}
                         key={JSON.stringify(three.data)}
                     />
@@ -136,7 +134,8 @@ export default function Home() {
                     <>We hit a whoopsie! :(</>
                 ) : (
                     <Arena
-                        autofocus={true}
+                        autofocus={false}
+                        autoSelect={false}
                         passage={four.data}
                         key={JSON.stringify(four.data)}
                     />
@@ -147,7 +146,8 @@ export default function Home() {
                     <>We hit a whoopsie! :(</>
                 ) : (
                     <Arena
-                        autofocus={true}
+                        autofocus={false}
+                        autoSelect={false}
                         passage={five.data}
                         key={JSON.stringify(five.data)}
                     />
