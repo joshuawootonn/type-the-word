@@ -14,9 +14,9 @@ export function Footer() {
             <span>/</span>
             <Link
                 className="svg-outline relative text-xs no-underline"
-                href={'/copywrite'}
+                href={'/copyright'}
             >
-                copywrite
+                copyright
             </Link>
             <span>/</span>
             <Link
