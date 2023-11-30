@@ -205,7 +205,7 @@ export const typingSessionRouter = createTRPCRouter({
                 lastTypingSession &&
                 differenceInMinutes(
                     subMinutes(new Date(), 15),
-                    lastTypingSession?.createdAt,
+                    lastTypingSession?.updatedAt,
                 ) < 15
             ) {
                 return lastTypingSession
