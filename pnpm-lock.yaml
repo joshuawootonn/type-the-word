@@ -41,9 +41,6 @@ dependencies:
   date-fns:
     specifier: ^2.30.0
     version: 2.30.0
-  debounce:
-    specifier: ^2.0.0
-    version: 2.0.0
   drizzle-orm:
     specifier: ^0.28.5
     version: 0.28.6(@planetscale/database@1.11.0)
@@ -2192,11 +2189,6 @@ packages:
     engines: {node: '>=0.11'}
     dependencies:
       '@babel/runtime': 7.22.15
-    dev: false
-
-  /debounce@2.0.0:
-    resolution: {integrity: sha512-xRetU6gL1VJbs85Mc4FoEGSjQxzpdxRyFhe3lmWFyy2EzydIcD4xzUvRJMD+NPDfMwKNhxa3PvsIOU32luIWeA==}
-    engines: {node: '>=18'}
     dev: false
 
   /debug@3.2.7:
