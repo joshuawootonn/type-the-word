@@ -106,6 +106,13 @@ export function CurrentVerse({
             enabled: sessionData?.user?.id != null,
         },
     )
+    const chapterHistory = api.chapterHistory.getChapterHistory.useQuery(
+        { chapter: verse.verse.chapter, book: verse.verse.book },
+        {
+            enabled: sessionData?.user?.id != null,
+        },
+    )
+
     const addTypedVerseToSession =
         api.typingSession.addTypedVerseToSession.useMutation()
 
@@ -214,12 +221,18 @@ export function CurrentVerse({
             a.translation === verse.verse.translation,
     )
 
+    const isTypedInHistory = chapterHistory.data?.verses[verse.verse.verse]
+
     return (
         <span
             className={clsx(
                 'verse break-spaces text-balance group inline h-3 hover:cursor-pointer',
                 isCurrentVerse && 'active-verse',
-                isTypedInSession && 'text-gray-400',
+                isTypedInSession
+                    ? 'text-emerald-500'
+                    : isTypedInHistory
+                    ? 'text-slate-500'
+                    : 'text-black',
             )}
             ref={ref}
             onClick={() => {

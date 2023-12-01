@@ -10,6 +10,8 @@ import {
     varchar,
 } from 'drizzle-orm/mysql-core'
 import { type AdapterAccount } from 'next-auth/adapters'
+import { createSelectSchema } from 'drizzle-zod'
+import { z } from 'zod'
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -213,6 +215,11 @@ export const typedVerses = mysqlTable(
         userIdIdx: index('userId_idx').on(typedVerse.userId),
     }),
 )
+
+export const chaptersSchema = createSelectSchema(typedVerses).shape.chapter
+export type Chapter = z.infer<typeof chaptersSchema>
+export const booksSchema = createSelectSchema(typedVerses).shape.book
+export type Book = z.infer<typeof booksSchema>
 
 export const typedVerseRelations = relations(typedVerses, ({ one }) => ({
     user: one(users, {

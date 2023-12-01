@@ -249,7 +249,6 @@ export const typingSessionRouter = createTRPCRouter({
                 return typingSession
             },
         ),
-
     getHistorySummary: protectedProcedure.query(
         async ({
             ctx: { db, session, repositories },

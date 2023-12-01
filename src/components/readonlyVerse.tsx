@@ -35,6 +35,12 @@ export function ReadonlyVerse({
             enabled: sessionData?.user?.id != null,
         },
     )
+    const chapterHistory = api.chapterHistory.getChapterHistory.useQuery(
+        { chapter: verse.verse.chapter, book: verse.verse.book },
+        {
+            enabled: sessionData?.user?.id != null,
+        },
+    )
 
     const isTypedInSession = typingSession.data?.typedVerses.find(
         a =>
@@ -43,6 +49,8 @@ export function ReadonlyVerse({
             a.book === verse.verse.book &&
             a.translation === verse.verse.translation,
     )
+
+    const isTypedInHistory = chapterHistory.data?.verses[verse.verse.verse]
 
     const [currentVerse, setCurrentVerse] = useAtom(currentVerseAtom)
     const setPosition = useSetAtom(positionAtom)
@@ -53,7 +61,11 @@ export function ReadonlyVerse({
             className={clsx(
                 'verse break-spaces text-balance group inline h-3 hover:cursor-pointer',
                 isCurrentVerse && 'active-verse',
-                isTypedInSession && 'text-gray-400',
+                isTypedInSession
+                    ? 'text-emerald-500'
+                    : isTypedInHistory
+                    ? 'text-slate-500'
+                    : 'text-black',
             )}
             ref={ref}
             onClick={() => {

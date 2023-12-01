@@ -1,7 +1,7 @@
 import { PlanetScaleDatabase } from 'drizzle-orm/planetscale-serverless'
 import * as schema from '~/server/db/schema'
 import { desc, eq, SQL } from 'drizzle-orm'
-import { typedVerses, typingSessions } from '~/server/db/schema'
+import { Book, Chapter, typedVerses, typingSessions } from '~/server/db/schema'
 import { createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
@@ -60,14 +60,30 @@ export class TypingSessionRepository {
 
     async getMany({
         userId,
+        typedVerse,
     }: {
         userId: string | SQL
+        typedVerse?: {
+            book: Book
+            chapter: Chapter
+            translation: 'esv'
+        }
     }): Promise<TypingSession[]> {
         const where = eq(typingSessions.userId, userId)
 
         return await this.db.query.typingSessions.findMany({
             with: {
-                typedVerses: true,
+                typedVerses: typedVerse
+                    ? {
+                          where: (typedVerses, { eq }) =>
+                              eq(typedVerses.book, typedVerse.book) &&
+                              eq(typedVerses.chapter, typedVerse.chapter) &&
+                              eq(
+                                  typedVerses.translation,
+                                  typedVerse.translation,
+                              ),
+                      }
+                    : true,
             },
             where,
             orderBy: [desc(typingSessions.createdAt)],
