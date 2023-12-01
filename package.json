@@ -26,6 +26,7 @@
         "@trpc/server": "^10.37.1",
         "clsx": "^2.0.0",
         "date-fns": "^2.30.0",
+        "debounce": "^2.0.0",
         "drizzle-orm": "^0.28.5",
         "drizzle-zod": "^0.5.1",
         "fast-deep-equal": "^3.1.3",
