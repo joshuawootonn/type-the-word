@@ -1,27 +1,7 @@
 import { createTRPCRouter, protectedProcedure } from '../trpc'
-import {
-    TypedVerse,
-    typingSessionSchema,
-} from '~/server/repositories/typingSession.repository'
+import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import { z } from 'zod'
 import { booksSchema, chaptersSchema } from '~/server/db/schema'
-
-const chapterHistorySchema = z.array(typingSessionSchema).transform(t => {
-    const verses: Record<number, TypedVerse[]> = {}
-
-    for (const session of t) {
-        for (const verse of session.typedVerses) {
-            const acc = verses[verse.verse] ?? []
-            verses[verse.verse] = [...acc, verse]
-        }
-    }
-
-    return {
-        verses,
-    }
-})
-
-type ChapterHistory = z.infer<typeof chapterHistorySchema>
 
 export const chapterHistoryRouter = createTRPCRouter({
     getChapterHistory: protectedProcedure
@@ -35,7 +15,7 @@ export const chapterHistoryRouter = createTRPCRouter({
             async ({
                 ctx: { session, repositories },
                 input,
-            }): Promise<ChapterHistory> => {
+            }): Promise<{ verses: Record<number, TypedVerse[]> }> => {
                 const typingSessions = await repositories.typingSession.getMany(
                     {
                         userId: session.user.id,
@@ -47,7 +27,25 @@ export const chapterHistoryRouter = createTRPCRouter({
                     },
                 )
 
-                return chapterHistorySchema.parse(typingSessions)
+                const verses: Record<number, TypedVerse[]> = {}
+
+                for (const session of typingSessions) {
+                    for (const verse of session.typedVerses) {
+                        if (
+                            verse.book !== input.book ||
+                            verse.chapter !== input.chapter
+                        ) {
+                            continue
+                        }
+
+                        const acc = verses[verse.verse] ?? []
+                        verses[verse.verse] = [...acc, verse]
+                    }
+                }
+
+                return {
+                    verses,
+                }
             },
         ),
 })
