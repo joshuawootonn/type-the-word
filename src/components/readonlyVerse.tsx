@@ -126,7 +126,6 @@ export function ReadonlyVerse({
                     <line
                         stroke={'black'}
                         strokeWidth={6}
-                        strokeDasharray={'6 5'}
                         x1="0px"
                         y1="0px"
                         x2="0px"
