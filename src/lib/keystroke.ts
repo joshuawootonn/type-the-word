@@ -3,6 +3,7 @@ import React from 'react'
 import {
     isAtomEqual,
     isAtomTyped,
+    validEmDash,
     validEnter,
     validQuotes,
     validSingleQuotes,
@@ -21,6 +22,10 @@ export function cleanInputKey(key: string): string {
 
     if (validEnter.includes(key)) {
         return '\n'
+    }
+
+    if (validEmDash.includes(key)) {
+        return '—'
     }
 
     return key

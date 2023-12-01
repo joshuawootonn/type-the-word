@@ -23,6 +23,8 @@ export const validSingleQuotes = ["'", '‘', '’', '‛', '❛', '❜', '']
 
 export const validEnter = ['Enter', '\n']
 
+export const validEmDash = ['-', '–', '—']
+
 export function isAtomTyped(atom: Inline | Paragraph): boolean {
     switch (atom.type) {
         case 'verseNumber':
