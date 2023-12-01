@@ -113,8 +113,56 @@ export function CurrentVerse({
         },
     )
 
+    const utils = api.useContext()
     const addTypedVerseToSession =
-        api.typingSession.addTypedVerseToSession.useMutation()
+        api.typingSession.addTypedVerseToSession.useMutation({
+            async onMutate(newPost) {
+                // Cancel outgoing fetches (so they don't overwrite our optimistic update)
+                // await utils.type.list.cancel();
+                await utils.typingSession.getOrCreateTypingSession.cancel()
+
+                // Get the data from the queryCache
+                const prevData =
+                    utils.typingSession.getOrCreateTypingSession.getData()
+
+                // Optimistically update the data with our new post
+                utils.typingSession.getOrCreateTypingSession.setData(
+                    undefined,
+                    old => {
+                        if (old == null) {
+                            return undefined
+                        }
+
+                        return {
+                            ...old,
+                            typedVerses: [
+                                ...old.typedVerses,
+                                {
+                                    ...newPost,
+                                    id: crypto.randomUUID(),
+                                    userId: crypto.randomUUID(),
+                                    createdAt: new Date(),
+                                },
+                            ],
+                        }
+                    },
+                )
+
+                // Return the previous data so we can revert if something goes wrong
+                return { prevData }
+            },
+            onError(err, newPost, ctx) {
+                // If the mutation fails, use the context-value from onMutate
+                utils.typingSession.getOrCreateTypingSession.setData(
+                    undefined,
+                    ctx?.prevData,
+                )
+            },
+            onSettled() {
+                // Sync with server once mutation has settled
+                void utils.typingSession.getOrCreateTypingSession.invalidate()
+            },
+        })
 
     const { rect: arenaRect } = useContext(ArenaContext)
     const [isArenaActive, setIsArenaActive] = useAtom(isArenaActiveAtom)
