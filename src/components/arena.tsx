@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useRef } from 'react'
+import React, { useId, useRef } from 'react'
 
 import { Inline, ParsedPassage } from '~/lib/parseEsv'
 

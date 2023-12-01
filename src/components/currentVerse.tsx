@@ -228,9 +228,7 @@ export function CurrentVerse({
             className={clsx(
                 'verse break-spaces text-balance group inline h-3 hover:cursor-pointer',
                 isCurrentVerse && 'active-verse',
-                isTypedInSession
-                    ? 'text-emerald-500'
-                    : isTypedInHistory
+                isTypedInSession ?? isTypedInHistory
                     ? 'text-slate-500'
                     : 'text-black',
             )}
@@ -303,10 +301,34 @@ export function CurrentVerse({
                 return null
             })}
 
+            {isTypedInSession && rect && arenaRect ? (
+                <svg
+                    className={
+                        'absolute -left-8 bottom-0 right-full top-0 z-0 w-1 rounded-none'
+                    }
+                    style={{
+                        height: rect.height + 16,
+                        left: -20,
+                        top: rect.top - arenaRect.top - 8,
+                    }}
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <line
+                        stroke={'black'}
+                        strokeWidth={6}
+                        strokeDasharray={'6 5'}
+                        x1="0px"
+                        y1="0px"
+                        x2="0px"
+                        y2="100%"
+                    />
+                </svg>
+            ) : null}
+
             {rect && arenaRect && !isArenaFocused ? (
                 <button
                     className={clsx(
-                        'svg-outline absolute z-10 border-2 border-black bg-white/80 opacity-0 backdrop-blur-sm transition-opacity duration-100',
+                        'svg-outline absolute z-10 border-2 border-black bg-white/80 text-black opacity-0 backdrop-blur-sm transition-opacity duration-100',
                         !isArenaActive && 'hover:opacity-100',
                         'focus:opacity-100',
                     )}
