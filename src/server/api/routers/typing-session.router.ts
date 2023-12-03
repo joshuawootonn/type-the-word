@@ -1,5 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from '../trpc'
-import { typedVerses, typingSessions } from '~/server/db/schema'
+import { Book, typedVerses, typingSessions } from '~/server/db/schema'
 import { eq, sql } from 'drizzle-orm'
 import { createInsertSchema } from 'drizzle-zod'
 import { differenceInMinutes, subMinutes } from 'date-fns'
@@ -36,6 +36,14 @@ function toProperCase(str: string) {
     return str.replace(/\w\S*/g, function (txt: string) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
     })
+}
+
+function toPluralBookForm(book: Book) {
+    if (book === 'psalm') {
+        return 'psalms'
+    }
+
+    return book
 }
 
 function typingSessionToString(typingSession: TypingSession) {
@@ -126,6 +134,7 @@ function typingSessionToString(typingSession: TypingSession) {
 
 export type BookSummary = {
     book: string
+    label: string
     totalVerses: number
     typedVerses: number
 }
@@ -171,7 +180,8 @@ function getBookSummary(typingSessions: TypingSession[]): BookSummary[] {
                 ) ?? 0
 
             return {
-                book: toProperCase(book),
+                label: toProperCase(toPluralBookForm(book)),
+                book,
                 totalVerses: versesInCurrentBook,
                 typedVerses: typedVersesInThisBook.length,
             }

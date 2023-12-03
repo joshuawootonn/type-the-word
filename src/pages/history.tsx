@@ -39,7 +39,7 @@ export default function Home() {
                                     key={entry.book}
                                 >
                                     <div className="max-w-[fit-content] bg-black px-2 text-white">
-                                        {entry.book}
+                                        {entry.label}
                                     </div>
                                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                                         {Math.floor(
