@@ -5,7 +5,7 @@ module.exports = {
     content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
     theme: {
         fontFamily: {
-            mono: ['var(--font-martian)', ...defaultTheme.fontFamily.mono],
+            sans: ['var(--font-outfit)', ...defaultTheme.fontFamily.mono],
         },
         extend: {
             colors: {

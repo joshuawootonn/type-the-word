@@ -48,7 +48,7 @@ export default function Home(props: { passage?: string }) {
                 <title>Type the Word</title>
                 <meta
                     name="description"
-                    content="A typing practice that track you typing through the Bible. Improve your typing skills while exploring biblical passages and verses. Enhance your accuracy and speed as you type through the sacred text."
+                    content="Practice your typing while meditating on the Bible. Type the word is an easy to "
                 />
                 <link rel="icon" href="/favicon.ico" />
             </Head>

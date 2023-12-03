@@ -86,18 +86,15 @@ export function Arena({
 
                                 case 'h2':
                                     return (
-                                        <h2
-                                            key={pIndex}
-                                            className="tracking-tight"
-                                        >
+                                        <h2 key={pIndex} className="text-4xl">
                                             {node.text}
                                         </h2>
                                     )
                                 case 'h3':
                                     return (
                                         <h3
+                                            className="text-3xl font-medium"
                                             key={pIndex}
-                                            className="tracking-tight"
                                         >
                                             {node.text}
                                         </h3>
@@ -105,8 +102,8 @@ export function Arena({
                                 case 'h4':
                                     return (
                                         <h4
+                                            className="text-2xl font-medium"
                                             key={pIndex}
-                                            className="tracking-tight"
                                         >
                                             {node.text}
                                         </h4>

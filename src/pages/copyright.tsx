@@ -5,7 +5,7 @@ import { Footer } from '~/components/footer'
 
 export default function Home() {
     return (
-        <div className="min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0">
+        <div className="min-h-screen-1px  container mx-auto flex max-w-page flex-col px-4 lg:px-0">
             <Head>
                 <title>Type the Word - Copyright</title>
                 <meta
@@ -16,7 +16,7 @@ export default function Home() {
             </Head>
 
             <Navigation />
-            <main className="prose mx-auto mb-8 w-full flex-grow pt-4 lg:pt-8">
+            <main className="prose mx-auto mb-8 w-full flex-grow pt-4 text-lg lg:pt-8">
                 <h1 className="">Copyright</h1>
                 <p>
                     Scripture quotations are from the ESV® Bible (The Holy

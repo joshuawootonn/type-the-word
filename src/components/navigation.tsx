@@ -10,7 +10,7 @@ export function Navigation() {
     return (
         <nav className="mx-auto mb-2 flex w-full items-center justify-between pt-4 lg:pt-8">
             <Link href={'/'}>
-                <h1 className="m-0 font-mono text-xl font-extrabold tracking-tight text-black">
+                <h1 className="m-0  text-xl font-extrabold tracking-tight text-black">
                     Type the Word
                 </h1>
             </Link>

@@ -24,7 +24,7 @@ export function Cursor({ arenaId }: { arenaId: string }) {
             <div
                 id={`${arenaId}-cursor`}
                 className={clsx(
-                    'rounded-sm/10 absolute bg-black/20',
+                    'absolute rounded-lg bg-black',
                     !isArenaActive && 'blink',
                     isArenaFocused ? 'opacity-100' : 'opacity-0',
                 )}

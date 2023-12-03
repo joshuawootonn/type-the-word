@@ -114,7 +114,7 @@ export function ReadonlyVerse({
             {isTypedInSession && rect && arenaRect ? (
                 <svg
                     className={
-                        'absolute -left-3 bottom-0 right-full top-0 z-0 w-1 rounded-none md:-left-5'
+                        'absolute -left-3 right-full z-0 w-4 rounded-none md:-left-6'
                     }
                     style={{
                         height: rect.height + 16,
@@ -124,10 +124,12 @@ export function ReadonlyVerse({
                 >
                     <line
                         stroke={'black'}
-                        strokeWidth={6}
-                        x1="0px"
-                        y1="0px"
-                        x2="0px"
+                        strokeWidth={'2'}
+                        strokeLinejoin={'round'}
+                        strokeLinecap={'round'}
+                        x1="5px"
+                        y1="0%"
+                        x2="5px"
                         y2="100%"
                     />
                 </svg>

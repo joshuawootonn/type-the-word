@@ -58,8 +58,8 @@ export function useCursor(arenaId: string): void {
                         left: 0,
                         x: `${nextLeft}px`,
                         y: `${nextTop}px`,
-                        width: `${activeRect.width}px`,
-                        height: '19px',
+                        width: `2px`,
+                        height: '22px',
                     },
                     { easing: [0.25, 0.46, 0.45, 0.94], duration: 0.085 },
                 )

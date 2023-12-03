@@ -55,7 +55,7 @@ export default function Home() {
 
             <Navigation />
 
-            <main className="prose relative mx-auto w-full flex-grow pt-4 lg:pt-8">
+            <main className="prose relative mx-auto w-full flex-grow pt-4 text-lg lg:pt-8">
                 <h1>Why?</h1>
                 <hr className="mx-0 w-full border-t-2 border-black" />
                 <h2>Why did I make typetheword.site?</h2>
