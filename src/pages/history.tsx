@@ -31,11 +31,11 @@ export default function Home() {
                 ) : summary.error ? (
                     <div>We hit a whoopsie! :(</div>
                 ) : (
-                    <div className="flex flex-row gap-3">
+                    <div className="flex shrink-0 flex-row flex-wrap gap-3">
                         {summary.data.map(entry => {
                             return (
                                 <div
-                                    className="relative z-0 h-40 w-40 border-2 border-black"
+                                    className="relative z-0 aspect-square basis-[calc(25%-9px)] border-2 border-black"
                                     key={entry.book}
                                 >
                                     <div className="max-w-[fit-content] bg-black px-2 text-white">
