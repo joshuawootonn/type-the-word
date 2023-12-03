@@ -44,6 +44,9 @@ module.exports = {
             maxWidth: {
                 page: '65ch',
             },
+            screens: {
+                sm: '540px',
+            },
         },
     },
     plugins: [require('@tailwindcss/typography')],

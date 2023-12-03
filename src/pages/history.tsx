@@ -31,11 +31,11 @@ export default function Home() {
                 ) : summary.error ? (
                     <div>We hit a whoopsie! :(</div>
                 ) : (
-                    <div className="flex shrink-0 flex-row flex-wrap gap-3">
+                    <div className="xs: grid shrink-0 grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 ">
                         {summary.data.map(entry => {
                             return (
                                 <div
-                                    className="relative z-0 aspect-square basis-[calc(25%-9px)] border-2 border-black"
+                                    className="basis relative z-0 aspect-square border-2 border-black"
                                     key={entry.book}
                                 >
                                     <div className="max-w-[fit-content] bg-black px-2 text-white">
@@ -63,35 +63,71 @@ export default function Home() {
                 ) : (
                     log.data.map(entry => {
                         return (
-                            <div
-                                className="flex w-full grow flex-row items-center justify-between"
-                                key={entry.createdAt.toString()}
-                            >
-                                <span className="shrink-0">
-                                    {entry.location}
-                                </span>
-                                <svg
-                                    height={2}
-                                    className={'mx-4 grow'}
-                                    xmlns="http://www.w3.org/2000/svg"
+                            <>
+                                <div
+                                    className="hidden w-full grow flex-row items-center justify-between md:flex"
+                                    key={entry.createdAt.toString()}
                                 >
-                                    <line
-                                        stroke="black"
-                                        stroke-width="4"
-                                        fill="transparent"
-                                        stroke-dasharray="6 5"
-                                        x="0"
-                                        y="0"
-                                        x2="100%"
-                                        y2="0"
-                                    />
-                                </svg>
+                                    <span className="shrink-0">
+                                        {entry.location}
+                                    </span>
+                                    <svg
+                                        height={2}
+                                        className={'mx-4 inline grow'}
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <line
+                                            stroke="black"
+                                            stroke-width="4"
+                                            fill="transparent"
+                                            stroke-dasharray="6 5"
+                                            x="0"
+                                            y="0"
+                                            x2="100%"
+                                            y2="0"
+                                        />
+                                    </svg>
 
-                                <span className="shrink-0">
-                                    {format(entry.createdAt, 'haaa')} {'- '}
-                                    {format(entry.createdAt, 'MM/dd')}
-                                </span>
-                            </div>
+                                    <span className="shrink-0">
+                                        {format(entry.createdAt, 'haaa')} {'- '}
+                                        {format(entry.createdAt, 'MM/dd')}
+                                    </span>
+                                </div>
+
+                                <div
+                                    className="not-prose mb-2 flex w-full grow flex-col md:hidden"
+                                    key={entry.createdAt.toString()}
+                                >
+                                    <div className="flex items-center">
+                                        <span className="max-w-full shrink-0 whitespace-pre-wrap">
+                                            {entry.location}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <svg
+                                            height={2}
+                                            className={'mr-4 inline grow'}
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <line
+                                                stroke="black"
+                                                stroke-width="4"
+                                                fill="transparent"
+                                                stroke-dasharray="6 5"
+                                                x="0"
+                                                y="0"
+                                                x2="100%"
+                                                y2="0"
+                                            />
+                                        </svg>
+                                        <div className="shrink-0">
+                                            {format(entry.createdAt, 'haaa')}{' '}
+                                            {'- '}
+                                            {format(entry.createdAt, 'MM/dd')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
                         )
                     })
                 )}

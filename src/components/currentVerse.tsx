@@ -352,11 +352,10 @@ export function CurrentVerse({
             {isTypedInSession && rect && arenaRect ? (
                 <svg
                     className={
-                        'absolute -left-8 bottom-0 right-full top-0 z-0 w-1 rounded-none'
+                        'absolute -left-3 bottom-0 right-full top-0 z-0 w-1 rounded-none md:-left-5'
                     }
                     style={{
                         height: rect.height + 16,
-                        left: -20,
                         top: rect.top - arenaRect.top - 8,
                     }}
                     xmlns="http://www.w3.org/2000/svg"
