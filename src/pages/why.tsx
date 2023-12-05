@@ -55,103 +55,110 @@ export default function Home() {
 
             <Navigation />
 
-            <main className="prose relative mx-auto w-full flex-grow pt-4 text-lg lg:pt-8">
-                <h1>Why?</h1>
-                <hr className="mx-0 w-full border-t-[1.5px]  border-black" />
-                <h2>Why did I make typetheword.site?</h2>
-                <p>
-                    A couple of years ago, I typed out Psalm 1-137. Not only did
-                    this improve my typing, but it also encouraged me daily.
-                    When I later discovered{' '}
-                    <a
-                        href={'https://monkeytype.com'}
-                        className="svg-outline relative"
-                    >
-                        monkey type
-                    </a>
-                    , it made sense to combine the two ideas. Typing the Bible
-                    makes you look at every word and see the passage a new. When
-                    I was developing this site, I used{' '}
-                    <Link
-                        href={'/passage/john_11:34-36'}
-                        className="svg-outline relative"
-                    >
-                        John 11:35
-                    </Link>{' '}
-                    as the edgecase since its the shortest verse in the Bible.
-                    Typing it over and over made me realize that Jesus wept
-                    because he loved Lazarus. He died for us because he loves us
-                    with the same love.
-                    <br />
-                    <br />
-                    My hope is that by typing the word you will also see the
-                    Bible in a deeper way.
-                </p>
-                <hr className="mx-0 w-full border-t-[1.5px]  border-black" />
-                <h2>Why meditate on God&apos;s word?</h2>
-                <p>
-                    In the process of making typetheword.site, these scriptures
-                    were great reminders of why we should meditate on God&apos;s
-                    word. If you have others, feel free to{' '}
-                    <EmailLink>email me</EmailLink>. I would love to make this
-                    page a long list of all the scripture pointing to why we
-                    should meditate on God&apos;s word.
-                </p>{' '}
-                {one.isLoading ? (
-                    <Loading />
-                ) : one.error ? (
-                    <>We hit a whoopsie! :(</>
-                ) : (
-                    <Arena passage={one.data} key={JSON.stringify(one.data)} />
-                )}
-                {two.isLoading ? (
-                    <Loading />
-                ) : two.error ? (
-                    <>We hit a whoopsie! :(</>
-                ) : (
-                    <Arena
-                        autofocus={false}
-                        autoSelect={false}
-                        passage={two.data}
-                        key={JSON.stringify(two.data)}
-                    />
-                )}
-                {three.isLoading ? (
-                    <Loading />
-                ) : three.error ? (
-                    <>We hit a whoopsie! :(</>
-                ) : (
-                    <Arena
-                        autofocus={false}
-                        autoSelect={false}
-                        passage={three.data}
-                        key={JSON.stringify(three.data)}
-                    />
-                )}
-                {four.isLoading ? (
-                    <Loading />
-                ) : four.error ? (
-                    <>We hit a whoopsie! :(</>
-                ) : (
-                    <Arena
-                        autofocus={false}
-                        autoSelect={false}
-                        passage={four.data}
-                        key={JSON.stringify(four.data)}
-                    />
-                )}
-                {five.isLoading ? (
-                    <Loading />
-                ) : five.error ? (
-                    <>We hit a whoopsie! :(</>
-                ) : (
-                    <Arena
-                        autofocus={false}
-                        autoSelect={false}
-                        passage={five.data}
-                        key={JSON.stringify(five.data)}
-                    />
-                )}
+            <main className="prose relative mx-auto w-full flex-grow pt-4 text-lg  lg:pt-8">
+                <div className={'prose-h2:text-3xl prose-p:text-xl'}>
+                    <h1>Why?</h1>
+                    <hr className="mx-0 w-full border-t-[1.5px]  border-black" />
+                    <h2>Why did I make typetheword.site?</h2>
+                    <p>
+                        A couple of years ago, I typed out Psalm 1-137. Not only
+                        did this improve my typing, but it also encouraged me
+                        daily. When I later discovered{' '}
+                        <a
+                            href={'https://monkeytype.com'}
+                            className="svg-outline relative"
+                        >
+                            monkey type
+                        </a>
+                        , it made sense to combine the two ideas. Typing the
+                        Bible makes you look at every word and see the passage a
+                        new. When I was developing this site, I used{' '}
+                        <Link
+                            href={'/passage/john_11:34-36'}
+                            className="svg-outline relative"
+                        >
+                            John 11:35
+                        </Link>{' '}
+                        as the edgecase since its the shortest verse in the
+                        Bible. Typing it over and over made me realize that
+                        Jesus wept because he loved Lazarus. He died for us
+                        because he loves us with the same love.
+                        <br />
+                        <br />
+                        My hope is that by typing the word you will also see the
+                        Bible in a deeper way.
+                    </p>
+                    <hr className="mx-0 w-full border-t-[1.5px]  border-black" />
+                    <h2>Why meditate on God&apos;s word?</h2>
+                    <p>
+                        In the process of making typetheword.site, these
+                        scriptures were great reminders of why we should
+                        meditate on God&apos;s word. If you have others, feel
+                        free to <EmailLink>email me</EmailLink>. I would love to
+                        make this page a long list of all the scripture pointing
+                        to why we should meditate on God&apos;s word.
+                    </p>
+                </div>
+                <div className={'prose-h2:text-2xl'}>
+                    {one.isLoading ? (
+                        <Loading />
+                    ) : one.error ? (
+                        <>We hit a whoopsie! :(</>
+                    ) : (
+                        <Arena
+                            passage={one.data}
+                            key={JSON.stringify(one.data)}
+                        />
+                    )}
+                    {two.isLoading ? (
+                        <Loading />
+                    ) : two.error ? (
+                        <>We hit a whoopsie! :(</>
+                    ) : (
+                        <Arena
+                            autofocus={false}
+                            autoSelect={false}
+                            passage={two.data}
+                            key={JSON.stringify(two.data)}
+                        />
+                    )}
+                    {three.isLoading ? (
+                        <Loading />
+                    ) : three.error ? (
+                        <>We hit a whoopsie! :(</>
+                    ) : (
+                        <Arena
+                            autofocus={false}
+                            autoSelect={false}
+                            passage={three.data}
+                            key={JSON.stringify(three.data)}
+                        />
+                    )}
+                    {four.isLoading ? (
+                        <Loading />
+                    ) : four.error ? (
+                        <>We hit a whoopsie! :(</>
+                    ) : (
+                        <Arena
+                            autofocus={false}
+                            autoSelect={false}
+                            passage={four.data}
+                            key={JSON.stringify(four.data)}
+                        />
+                    )}
+                    {five.isLoading ? (
+                        <Loading />
+                    ) : five.error ? (
+                        <>We hit a whoopsie! :(</>
+                    ) : (
+                        <Arena
+                            autofocus={false}
+                            autoSelect={false}
+                            passage={five.data}
+                            key={JSON.stringify(five.data)}
+                        />
+                    )}
+                </div>
             </main>
             <Footer />
         </div>

@@ -41,7 +41,7 @@ export default function Home() {
                                     <div className="max-w-[fit-content] bg-black px-2 text-white">
                                         {entry.label}
                                     </div>
-                                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-mono text-2xl">
+                                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl font-bold  ">
                                         {Math.floor(
                                             (entry.typedVerses /
                                                 entry.totalVerses) *
@@ -65,7 +65,7 @@ export default function Home() {
                         return (
                             <>
                                 <div
-                                    className="hidden w-full grow flex-row items-center justify-between md:flex"
+                                    className="hidden w-full grow flex-row items-center justify-between text-xl md:flex"
                                     key={entry.createdAt.toString()}
                                 >
                                     <span className="shrink-0">
