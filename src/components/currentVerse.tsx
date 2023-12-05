@@ -277,7 +277,7 @@ export function CurrentVerse({
                 'verse break-spaces text-balance group inline h-3 hover:cursor-pointer',
                 isCurrentVerse && 'active-verse',
                 isTypedInSession ?? isTypedInHistory
-                    ? 'text-slate-500'
+                    ? 'text-gray-500'
                     : 'text-black',
             )}
             ref={ref}
