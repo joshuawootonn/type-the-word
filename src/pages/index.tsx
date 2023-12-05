@@ -55,13 +55,13 @@ export default function Home(props: { passage?: string }) {
 
             <Navigation />
             <div className="prose mx-auto mb-8 flex w-full items-center justify-start space-x-3 pt-4 lg:pt-8">
-                <label htmlFor="passage" className="text-black">
+                <label htmlFor="passage" className="font-medium text-black">
                     Passage:
                 </label>
                 <div className={'svg-outline relative'}>
                     <input
                         type="text"
-                        className="border-2 border-black p-1"
+                        className="border-2 border-black p-1 font-medium"
                         value={value}
                         onFocus={e => e.target.select()}
                         onChange={e => {

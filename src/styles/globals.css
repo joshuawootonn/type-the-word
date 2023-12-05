@@ -2,19 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-    html {
-        font-family:
-            var(--font-martian) ui-monospace,
-            SFMono-Regular,
-            Menlo,
-            Monaco,
-            Consolas,
-            'Liberation Mono',
-            'Courier New',
-            monospace;
-    }
-}
 /* focus-within is required because inputs have no content, and `:before` is prepended to content.*/
 .svg-outline:focus-within *,.svg-outline:focus {
     @apply outline-none;

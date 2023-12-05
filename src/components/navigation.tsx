@@ -19,7 +19,7 @@ export function Navigation() {
                     <DropdownMenu.Root>
                         <DropdownMenu.Trigger asChild>
                             <button
-                                className="svg-outline relative border-2 border-black px-3 py-1 font-semibold text-black"
+                                className="svg-outline relative border-2 border-black px-3 py-1 font-medium text-black"
                                 aria-label="Customise options"
                             >
                                 {sessionData.user.name}
@@ -33,14 +33,14 @@ export function Navigation() {
                         >
                             <DropdownMenu.Item asChild={true}>
                                 <Link
-                                    className="block cursor-pointer px-3 py-1 no-underline outline-none focus:bg-black focus:text-white "
+                                    className="text-medium block cursor-pointer px-3 py-1 no-underline outline-none focus:bg-black focus:text-white "
                                     href={'/history'}
                                 >
                                     History
                                 </Link>
                             </DropdownMenu.Item>
                             <DropdownMenu.Item
-                                className="cursor-pointer px-3 py-1 outline-none focus:bg-black focus:text-white "
+                                className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white "
                                 onClick={() => void signOut()}
                             >
                                 Sign out

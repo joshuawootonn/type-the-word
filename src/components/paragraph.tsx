@@ -5,6 +5,7 @@ import { currentVerseAtom } from '~/components/arena'
 import { useAtom } from 'jotai'
 import { CurrentVerse } from '~/components/currentVerse'
 import { ReadonlyVerse } from '~/components/readonlyVerse'
+import { robotoMono } from '~/pages/_app'
 
 export function Paragraph({
     node,
@@ -15,7 +16,13 @@ export function Paragraph({
 }) {
     const [currentVerse] = useAtom(currentVerseAtom)
     return (
-        <p className={clsx('text-lg', node.metadata.blockIndent && 'ml-3')}>
+        <p
+            className={clsx(
+                'text-lg',
+                node.metadata.blockIndent && 'ml-3',
+                robotoMono.className,
+            )}
+        >
             {node.nodes.map((verse, vIndex) => {
                 const isCurrentVerse = verse.verse.value === currentVerse
 

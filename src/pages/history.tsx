@@ -24,7 +24,7 @@ export default function Home() {
             <Navigation />
             <main className="prose mx-auto mb-8 w-full flex-grow pt-4 text-lg lg:pt-8">
                 <h1 className="">History</h1>
-                <hr className="mx-0 w-full border-t-2 border-black" />
+                <hr className="mx-0 w-full border-t-[1.5px] border-black" />
                 <h2>Summary</h2>
                 {summary.isLoading ? (
                     <Loading initialDots={2} />
@@ -41,7 +41,7 @@ export default function Home() {
                                     <div className="max-w-[fit-content] bg-black px-2 text-white">
                                         {entry.label}
                                     </div>
-                                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-mono text-2xl">
                                         {Math.floor(
                                             (entry.typedVerses /
                                                 entry.totalVerses) *
@@ -54,7 +54,7 @@ export default function Home() {
                         })}
                     </div>
                 )}
-                <hr className="mx-0 w-full border-t-2 border-black" />
+                <hr className="mx-0 w-full border-t-[1.5px] border-black" />
                 <h2>Log</h2>
                 {log.isLoading ? (
                     <Loading />
@@ -78,7 +78,7 @@ export default function Home() {
                                     >
                                         <line
                                             stroke="black"
-                                            stroke-width="4"
+                                            stroke-width="3"
                                             fill="transparent"
                                             stroke-dasharray="6 5"
                                             x="0"
