@@ -56,7 +56,7 @@ export function PassageSelector({
                   book.toLowerCase().includes(bookQuery.toLowerCase()),
               )
 
-    const chapters = new Array(metadata[currentBook]?.chapters ?? 0)
+    const chapters = new Array(metadata[book]?.chapters ?? 0)
         .fill('')
         .map((_, i) => `${i + 1}`)
     const filteredChapters =
@@ -70,12 +70,12 @@ export function PassageSelector({
 
     return (
         <>
-            <label htmlFor="passage" className="font-medium text-black">
+            <label htmlFor="passage" className="text-lg font-medium text-black">
                 Passage:
             </label>
-            <div className={'not-prose flex flex-row space-x-2'}>
+            <div className={'not-prose flex flex-row'}>
                 <Combobox
-                    className="relative"
+                    className="relative z-40"
                     as="div"
                     value={book}
                     onChange={next => setBook(next)}
@@ -90,7 +90,7 @@ export function PassageSelector({
                         }}
                         displayValue={book => metadata[book]?.name}
                         className={
-                            'svg-outline relative w-32 border-2 border-black p-1 font-medium outline-none selection:bg-emerald-100'
+                            'svg-outline relative w-32 border-2 border-black p-1 font-medium outline-none'
                         }
                     />
                     <ScrollArea.Root>
@@ -149,7 +149,7 @@ export function PassageSelector({
                 </Combobox>
                 <Combobox
                     as="div"
-                    className="relative"
+                    className="relative z-40 -translate-x-0.5"
                     value={currentChapter}
                     onChange={next => {
                         const nextUrl = `${book}_${next}`
@@ -164,7 +164,7 @@ export function PassageSelector({
                         onChange={event => setChapterQuery(event.target.value)}
                         onFocus={event => event.currentTarget.select()}
                         className={
-                            'svg-outline relative w-16 border-2 border-black p-1 font-medium outline-none selection:bg-emerald-100'
+                            'svg-outline relative w-16 border-2 border-black p-1 font-medium outline-none'
                         }
                     />
                     <ScrollArea.Root>

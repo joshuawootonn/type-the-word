@@ -39,7 +39,7 @@ export default function Home(props: { passage?: string }) {
     const [value, setValue] = useState(
         props.passage ?? DEFAULT_PASSAGE_REFERENCE,
     )
-    const debouncedValue = useDebouncedValue(value, 1000)
+    const debouncedValue = useDebouncedValue(value, 0)
     const passage = api.passage.passage.useQuery(debouncedValue)
 
     return (
