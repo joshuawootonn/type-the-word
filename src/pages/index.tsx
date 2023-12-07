@@ -13,6 +13,7 @@ import { Navigation } from '~/components/navigation'
 import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
 import { Footer } from '~/components/footer'
 import { Loading } from '~/components/loading'
+import { PassageSelector } from '~/components/passageSelector'
 
 export const DEFAULT_PASSAGE_REFERENCE = 'psalm 23'
 
@@ -35,7 +36,6 @@ export async function getStaticProps() {
 }
 
 export default function Home(props: { passage?: string }) {
-    const { push } = useRouter()
     const [value, setValue] = useState(
         props.passage ?? DEFAULT_PASSAGE_REFERENCE,
     )
@@ -55,25 +55,7 @@ export default function Home(props: { passage?: string }) {
 
             <Navigation />
             <div className="prose mx-auto mb-8 flex w-full items-center justify-start space-x-3 pt-4 lg:pt-8">
-                <label htmlFor="passage" className="font-medium text-black">
-                    Passage:
-                </label>
-                <div className={'svg-outline relative'}>
-                    <input
-                        type="text"
-                        className="border-2 border-black p-1 font-medium"
-                        value={value}
-                        onFocus={e => e.target.select()}
-                        onChange={e => {
-                            const passage = e.target.value
-                                .trim()
-                                .split(' ')
-                                .join('_')
-                            void push(`/passage/${passage}`)
-                            setValue(e.target.value)
-                        }}
-                    />
-                </div>
+                <PassageSelector value={value} setValue={setValue} />
             </div>
 
             <main className="relative mx-auto w-full flex-grow">
