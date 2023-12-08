@@ -3,6 +3,7 @@ import React, {
     ComponentPropsWithoutRef,
     forwardRef,
     Fragment,
+    useEffect,
     useRef,
     useState,
 } from 'react'
@@ -11,8 +12,11 @@ import metadata from '../lib/book-contents-simple.json'
 import { z } from 'zod'
 import { typedVerses } from '~/server/db/schema'
 import clsx from 'clsx'
-import { ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import * as ScrollArea from '@radix-ui/react-scroll-area'
+import { DecodedUrl, decodeUrl } from '~/lib/url'
+
+const bookSchema = z.enum(typedVerses.book.enumValues)
+type Book = z.infer<typeof bookSchema>
 
 const simpleBibleMetadataSchema = z.record(
     z.enum(typedVerses.book.enumValues),
@@ -24,7 +28,7 @@ const simpleBibleMetadataSchema = z.record(
 
 const simpleBibleMetadata = simpleBibleMetadataSchema.parse(metadata)
 
-const books = Object.keys(metadata)
+const books = Object.keys(metadata) as Book[]
 
 const ForwardedRefInput = forwardRef(function InnerForwardedRefInput(
     props: ComponentPropsWithoutRef<'input'>,
@@ -33,18 +37,37 @@ const ForwardedRefInput = forwardRef(function InnerForwardedRefInput(
     return <input {...props} ref={ref} />
 })
 
+function getInitialValues(text: DecodedUrl): {
+    book: Book
+    chapter: string
+} {
+    const chunks = text.trim().split(' ')
+    const book = chunks.slice(0, -1).join('_').toLowerCase()
+    const chapter = chunks.at(-1)?.split(':').at(0) ?? '1'
+
+    const result = bookSchema.safeParse(book)
+
+    if (result.success) {
+        return { book: result.data, chapter }
+    }
+
+    return { book: 'genesis', chapter: '1' }
+}
+
 export function PassageSelector({
     value,
     setValue,
 }: {
-    value: string
-    setValue: (value: string) => void
+    value: DecodedUrl
+    setValue: (value: DecodedUrl) => void
 }) {
-    const [book, setBook] = useState(value.split(' ').at(0))
+    const initialValues = getInitialValues(value)
+    const [book, setBook] = useState<Book>(initialValues.book)
+    const [chapter, setChapter] = useState<string>(initialValues.chapter)
+
     const [bookQuery, setBookQuery] = useState('')
-    const currentBook = value.split(' ').at(0)
     const [chapterQuery, setChapterQuery] = useState('')
-    const currentChapter = value.split(' ').at(1) ?? '1'
+
     const { push } = useRouter()
 
     const chapterRef = useRef<HTMLInputElement>(null)
@@ -56,9 +79,26 @@ export function PassageSelector({
                   book.toLowerCase().includes(bookQuery.toLowerCase()),
               )
 
-    const chapters = new Array(metadata[book]?.chapters ?? 0)
+    const chapters = new Array(simpleBibleMetadata[book]?.chapters ?? 0)
         .fill('')
         .map((_, i) => `${i + 1}`)
+
+    useEffect(() => {
+        const nextUrl = `${book}_${chapter}`
+        const nextValue = decodeUrl(nextUrl)
+        if (value !== nextValue) {
+            const t = setTimeout(() => {
+                console.log('hit')
+                setValue(nextValue)
+                void push(`/passage/${nextUrl}`)
+            }, 5000)
+
+            return () => {
+                clearTimeout(t)
+            }
+        }
+    }, [book, chapter, push, setValue, value])
+
     const filteredChapters =
         chapterQuery === ''
             ? chapters
@@ -78,17 +118,23 @@ export function PassageSelector({
                     className="relative z-40"
                     as="div"
                     value={book}
-                    onChange={next => setBook(next)}
+                    onChange={next => {
+                        setBook(next)
+                    }}
                 >
                     <Combobox.Input
                         onChange={event => setBookQuery(event.target.value)}
-                        onFocus={event => event.currentTarget.select()}
+                        onFocus={event => {
+                            event.currentTarget.select()
+                        }}
                         onKeyUp={e => {
                             if (e.key === 'Enter' || e.keyCode === 13) {
                                 chapterRef.current?.focus()
                             }
                         }}
-                        displayValue={book => metadata[book]?.name}
+                        displayValue={(book: Book) =>
+                            simpleBibleMetadata[book]?.name ?? ''
+                        }
                         className={
                             'svg-outline relative w-32 border-2 border-black p-1 font-medium outline-none'
                         }
@@ -115,11 +161,14 @@ export function PassageSelector({
                                                         : 'bg-white text-black',
                                                 )}
                                                 onClick={e => {
-                                                    chapterRef.current?.focus()
-                                                    chapterRef.current?.select()
+                                                    setTimeout(
+                                                        () =>
+                                                            chapterRef.current?.focus(),
+                                                    )
                                                 }}
                                             >
-                                                {metadata[book]?.name ?? book}
+                                                {simpleBibleMetadata[book]
+                                                    ?.name ?? book}
                                             </li>
                                         )}
                                     </Combobox.Option>
@@ -140,9 +189,9 @@ export function PassageSelector({
                             className="h-5 w-5 text-black"
                         >
                             <path
-                                fill-rule="evenodd"
+                                fillRule="evenodd"
                                 d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z"
-                                clip-rule="evenodd"
+                                clipRule="evenodd"
                             ></path>
                         </svg>
                     </Combobox.Button>
@@ -150,10 +199,11 @@ export function PassageSelector({
                 <Combobox
                     as="div"
                     className="relative z-40 -translate-x-0.5"
-                    value={currentChapter}
+                    value={chapter}
                     onChange={next => {
+                        setChapter(next)
                         const nextUrl = `${book}_${next}`
-                        const nextValue = `${book} ${next}`
+                        const nextValue = decodeUrl(nextUrl)
                         setValue(nextValue)
                         void push(`/passage/${nextUrl}`)
                     }}
@@ -210,9 +260,9 @@ export function PassageSelector({
                             className="h-5 w-5 text-black"
                         >
                             <path
-                                fill-rule="evenodd"
+                                fillRule="evenodd"
                                 d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z"
-                                clip-rule="evenodd"
+                                clipRule="evenodd"
                             ></path>
                         </svg>
                     </Combobox.Button>

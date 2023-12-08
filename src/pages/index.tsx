@@ -7,15 +7,15 @@ import { createServerSideHelpers } from '@trpc/react-query/server'
 import { AppRouter, appRouter } from '~/server/api/root'
 import superjson from 'superjson'
 import { db } from '~/server/db'
-import { useRouter } from 'next/router'
 import { useDebouncedValue } from '~/lib/hooks'
 import { Navigation } from '~/components/navigation'
 import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
 import { Footer } from '~/components/footer'
 import { Loading } from '~/components/loading'
 import { PassageSelector } from '~/components/passageSelector'
+import { DecodedUrl, decodeUrl } from '~/lib/url'
 
-export const DEFAULT_PASSAGE_REFERENCE = 'psalm 23'
+export const DEFAULT_PASSAGE_REFERENCE = 'psalm_23'
 
 export async function getStaticProps() {
     const helpers = createServerSideHelpers<AppRouter>({
@@ -30,14 +30,14 @@ export async function getStaticProps() {
         transformer: superjson,
     })
 
-    await helpers.passage.passage.prefetch(DEFAULT_PASSAGE_REFERENCE)
+    await helpers.passage.passage.prefetch(decodeUrl(DEFAULT_PASSAGE_REFERENCE))
 
     return { props: { trpcState: helpers.dehydrate() } }
 }
 
-export default function Home(props: { passage?: string }) {
-    const [value, setValue] = useState(
-        props.passage ?? DEFAULT_PASSAGE_REFERENCE,
+export default function Home(props: { passage?: DecodedUrl }) {
+    const [value, setValue] = useState<DecodedUrl>(
+        props.passage ?? decodeUrl(DEFAULT_PASSAGE_REFERENCE),
     )
     const debouncedValue = useDebouncedValue(value, 0)
     const passage = api.passage.passage.useQuery(debouncedValue)
