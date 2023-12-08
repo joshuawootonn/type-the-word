@@ -97,7 +97,7 @@ export function PassageSelector({
                 console.log('hit')
                 setValue(nextValue)
                 void push(`/passage/${nextUrl}`)
-            }, 5000)
+            }, 3000)
 
             return () => {
                 clearTimeout(t)
@@ -142,7 +142,7 @@ export function PassageSelector({
                             simpleBibleMetadata[book]?.name ?? ''
                         }
                         className={
-                            'w-32 border-2 border-black p-1 font-medium outline-none'
+                            'w-40 border-2 border-black p-1 font-medium outline-none'
                         }
                     />
                     <ScrollArea.Root>
