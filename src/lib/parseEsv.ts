@@ -268,12 +268,11 @@ export function parseChapter(passage: string): ParsedPassage {
                 .join('')
 
             if (node.attrs.find(attr => attr.value.includes('extra_text'))) {
-                context.book = bookSchema.parse(
-                    text.trimStart().split(' ').at(0)?.toLowerCase(),
-                )
-                context.chapter = parseInt(
-                    text.trimStart().split(' ').at(1)?.split(':').at(0) ?? '',
-                )
+                const chunks = text.trim().split(' ')
+                const book = chunks.slice(0, -1).join('_').toLowerCase()
+                const chapter = parseInt(chunks.at(-1)?.split(':').at(0) ?? '')
+                context.book = bookSchema.parse(book)
+                context.chapter = chapter
             }
             return {
                 type: 'h2',
@@ -300,7 +299,10 @@ export function parseChapter(passage: string): ParsedPassage {
                     .join(''),
             }
         }
-        if (node.nodeName === 'p') {
+        // todo: this was a hack to get song of solomon working....
+        // a heading is within a p element there so it kinda breaks the parsing.
+        // ideally this would not include span and it would handle ^
+        if (node.nodeName === 'p' || node.nodeName === 'span') {
             const nodes: Inline[] = node.childNodes.flatMap(parseInline)
 
             if (inlineToString(nodes) === '( ) ') {
