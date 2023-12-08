@@ -1,15 +1,20 @@
 import { animate } from 'motion'
 import { useEffect, useRef } from 'react'
+function pythagorean(x1: number, x2: number, y1: number, y2: number): number {
+    return Math.sqrt(
+        Math.pow(Math.abs(x2 - x1), 2) + Math.pow(Math.abs(y2 - y1), 2),
+    )
+}
 
 export function useCursor(arenaId: string): void {
     const prev = useRef<{
-        top: string | number
-        left: string | number
-        width: string | number
+        top: number
+        left: number
+        width: number
     }>({
-        top: `0px`,
-        left: `0px`,
-        width: `0px`,
+        top: 0,
+        left: 0,
+        width: 0,
     })
 
     useEffect(() => {
@@ -44,6 +49,14 @@ export function useCursor(arenaId: string): void {
                     activeRect.width === prev.current.width
                 )
                     return
+
+                const distance = pythagorean(
+                    prev.current.left ?? 0,
+                    nextLeft,
+                    prev.current.top ?? 0,
+                    nextTop,
+                )
+
                 prev.current = {
                     top: nextTop,
                     left: nextLeft,
@@ -61,7 +74,10 @@ export function useCursor(arenaId: string): void {
                         width: `2px`,
                         height: '22px',
                     },
-                    { easing: [0.25, 0.46, 0.45, 0.94], duration: 0.085 },
+                    {
+                        easing: [0.25, 0.46, 0.45, 0.94],
+                        duration: distance > 30 ? 0 : 0.085,
+                    },
                 )
 
                 return
