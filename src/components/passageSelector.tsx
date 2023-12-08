@@ -113,7 +113,7 @@ export function PassageSelector({
             <label htmlFor="passage" className="text-lg font-medium text-black">
                 Passage:
             </label>
-            <div className={'not-prose flex flex-row'}>
+            <div className={'not-prose svg-outline relative flex flex-row '}>
                 <Combobox
                     className="relative z-40"
                     as="div"
@@ -136,7 +136,7 @@ export function PassageSelector({
                             simpleBibleMetadata[book]?.name ?? ''
                         }
                         className={
-                            'svg-outline relative w-32 border-2 border-black p-1 font-medium outline-none'
+                            'w-32 border-2 border-black p-1 font-medium outline-none'
                         }
                     />
                     <ScrollArea.Root>
@@ -214,7 +214,7 @@ export function PassageSelector({
                         onChange={event => setChapterQuery(event.target.value)}
                         onFocus={event => event.currentTarget.select()}
                         className={
-                            'svg-outline relative w-16 border-2 border-black p-1 font-medium outline-none'
+                            'w-16 border-2 border-black p-1 font-medium outline-none'
                         }
                     />
                     <ScrollArea.Root>
