@@ -42,8 +42,14 @@ function getInitialValues(text: DecodedUrl): {
     chapter: string
 } {
     const chunks = text.trim().split(' ')
-    const book = chunks.slice(0, -1).join('_').toLowerCase()
-    const chapter = chunks.at(-1)?.split(':').at(0) ?? '1'
+    const potentialChapter = chunks.at(-1)?.split(':').at(0)
+    const parsedChapter = z.number().safeParse(potentialChapter)
+    const includesChapter = parsedChapter.success
+
+    const book = includesChapter
+        ? chunks.slice(0, -1).join('_').toLowerCase()
+        : chunks.join('_').toLowerCase()
+    const chapter = includesChapter ? parsedChapter.data.toString() : '1'
 
     const result = bookSchema.safeParse(book)
 
