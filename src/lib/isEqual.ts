@@ -49,6 +49,10 @@ export function isLetterEqual(a?: string, b?: string): boolean {
         return validSingleQuotes.includes(a)
     }
 
+    if (validEmDash.includes(b)) {
+        return validEmDash.includes(a)
+    }
+
     return a === b
 }
 
