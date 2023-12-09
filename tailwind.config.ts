@@ -5,10 +5,7 @@ module.exports = {
     content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
     theme: {
         fontFamily: {
-            sans: [
-                'var(--font-neue-montreal)',
-                ...defaultTheme.fontFamily.sans,
-            ],
+            sans: ['var(--font-inter)', ...defaultTheme.fontFamily.sans],
             mono: ['var(--font-roboto-mono)', ...defaultTheme.fontFamily.mono],
         },
         extend: {

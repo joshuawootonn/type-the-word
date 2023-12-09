@@ -58,7 +58,7 @@ export default function Home() {
             <main className="prose relative mx-auto w-full flex-grow pt-4 text-lg  lg:pt-8">
                 <div className={'prose-h2:text-3xl prose-p:text-xl'}>
                     <h1>Why?</h1>
-                    <hr className="mx-0 w-full border-t-[1.5px]  border-black" />
+                    <hr className="mx-0 w-full border-t-2  border-black" />
                     <h2>Why did I make typetheword.site?</h2>
                     <p>
                         A couple of years ago, I typed out Psalm 1-137. Not only
@@ -88,7 +88,7 @@ export default function Home() {
                         My hope is that by typing the word you will also see the
                         Bible in a deeper way.
                     </p>
-                    <hr className="mx-0 w-full border-t-[1.5px]  border-black" />
+                    <hr className="mx-0 w-full border-t-2  border-black" />
                     <h2>Why meditate on God&apos;s word?</h2>
                     <p>
                         In the process of making typetheword.site, these

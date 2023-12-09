@@ -17,9 +17,9 @@ export const robotoMono = Roboto_Mono({
     variable: '--font-roboto-mono',
 })
 
-const neueMontreal = localFont({
-    src: '../../public/neue-montreal/NeueMontreal-Variable.woff2',
-    variable: '--font-neue-montreal',
+const rethink = localFont({
+    src: '../../public/Rethink.ttf',
+    variable: '--font-inter',
 })
 
 const MyApp: AppType<{ session: Session | null }> = ({
@@ -45,8 +45,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
     return (
         <div
             className={clsx(
-                'font-sans min-h-[calc(100vh_-_1px)] overflow-hidden',
-                neueMontreal.variable,
+                'min-h-[calc(100vh_-_1px)] overflow-hidden font-sans',
+                rethink.variable,
             )}
         >
             <SessionProvider session={session}>

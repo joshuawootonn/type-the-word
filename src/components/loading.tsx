@@ -20,10 +20,14 @@ export function Loading(
                     ? 'Loading.'
                     : ref.current.innerText + '.'
             }
-        }, 500)
+        }, 240)
 
         return () => clearInterval(interval)
     }, [])
 
-    return <div ref={ref}>{initialText.current}</div>
+    return (
+        <div className={'text-xl font-normal'} ref={ref}>
+            {initialText.current}
+        </div>
+    )
 }
