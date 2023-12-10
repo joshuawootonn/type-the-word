@@ -11,6 +11,7 @@ import {
 import { z } from 'zod'
 import { getBibleMetadata } from '~/server/bibleMetadata'
 import toProperCase from '~/lib/toProperCase'
+import { passageReferenceSchema } from '~/lib/passageReference'
 
 const addTypedVerseInputSchema = createInsertSchema(typedVerses).omit({
     userId: true,
@@ -159,7 +160,7 @@ function getBookSummary(typingSessions: TypingSession[]): BookSummary[] {
                 ) ?? 0
 
             return {
-                label: toProperCase(toPluralBookForm(book)),
+                label: passageReferenceSchema.parse(toPluralBookForm(book)),
                 book,
                 totalVerses: versesInCurrentBook,
                 typedVerses: typedVersesInThisBook.length,

@@ -31,7 +31,7 @@ export default function Home() {
                 ) : summary.error ? (
                     <div>We hit a whoopsie! :(</div>
                 ) : (
-                    <div className="xs: grid shrink-0 grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 ">
+                    <div className="xs: grid shrink-0 grid-cols-2 gap-3 sm:grid-cols-3">
                         {summary.data.map(entry => {
                             return (
                                 <div
