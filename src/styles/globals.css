@@ -3,11 +3,12 @@
 @tailwind utilities;
 
 /*
-  Radix ui popups use margin right to prevent overflow hidden from causing layout shift when popups come up.
-  We want to use `scrollbar-gutter: stable` to prevent layout shift, so I have to prevent the margin right radix is using.
+  Radix ui popups use `margin-right` to prevent overflow hidden from causing layout shift when popups come up.
+  We want to use `margin-left` to prevent layout shift, so that it matches between overflow on 119 and no overflow on 1.
+  So we need to override the margin-right with and set margin-left to 100vw (screen - gutter) - 100% (content width).
  */
 html{
-    scrollbar-gutter: stable;
+    margin-left: calc(100vw - 100%);
 }
 body[style] {
     margin: 0 auto !important;
