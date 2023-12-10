@@ -1,8 +1,8 @@
 // todo: shitty name but I got nothing
 
-import { bookSchema } from '~/lib/parseEsv'
 import { z } from 'zod'
 import { getBibleMetadata } from '~/server/bibleMetadata'
+import { bookSchema } from '~/lib/types/book'
 
 export const passageObjectSchema = z.object({
     book: bookSchema,
@@ -21,12 +21,14 @@ export const stringToPassageObject = z.string().transform(text => {
         ?.at(0)
         ?.split(' ')
         .join('_')
-    const chapter = Array.from(
-        trimmedText.matchAll(/(?<=[0-9a-zA-Z]) ([0-9: -])*/g),
-        m => m[0],
+    const chapter = parseInt(
+        Array.from(
+            trimmedText.matchAll(/(?<=[0-9a-zA-Z]) ([0-9: -])*/g),
+            m => m[0],
+        )
+            .at(-1)
+            ?.trim() ?? '1',
     )
-        .at(-1)
-        ?.trim()
 
     if (book === undefined) throw new Error(`Could not parse book from ${text}`)
 
@@ -41,10 +43,9 @@ export const stringToPassageObject = z.string().transform(text => {
 
     return passageObjectSchema.parse({
         book: bookResult.data,
-        chapter: chapter ? parseInt(chapter) : undefined,
+        chapter: chapter,
         verses: chapter
-            ? metadata[bookResult.data]?.chapters?.at(parseInt(chapter) - 1)
-                  ?.length
+            ? metadata[bookResult.data]?.chapters?.at(chapter - 1)?.length
             : undefined,
     })
 })

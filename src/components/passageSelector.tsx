@@ -10,19 +10,17 @@ import React, {
 import { Combobox } from '@headlessui/react'
 import metadata from '../lib/simple-bible-metadata.json'
 import { z } from 'zod'
-import { typedVerses } from '~/server/db/schema'
 import clsx from 'clsx'
 import * as ScrollArea from '@radix-ui/react-scroll-area'
 import {
     PassageReference,
     passageReferenceSchema,
 } from '~/lib/passageReference'
-
-const bookSchema = z.enum(typedVerses.book.enumValues)
-type Book = z.infer<typeof bookSchema>
+import { stringToPassageObject } from '~/lib/passageObject'
+import { Book, bookSchema } from '~/lib/types/book'
 
 const simpleBibleMetadataSchema = z.record(
-    z.enum(typedVerses.book.enumValues),
+    bookSchema,
     z.object({
         chapters: z.number(),
         name: z.string(),
@@ -44,20 +42,13 @@ function getInitialValues(text: PassageReference): {
     book: Book
     chapter: string
 } {
-    const chunks = text.trim().split(' ')
-    const potentialChapter = chunks.at(-1)?.split(':').at(0)
-    const parsedChapter = z.number().safeParse(potentialChapter)
-    const includesChapter = parsedChapter.success
+    const passage = stringToPassageObject.safeParse(text)
 
-    const book = includesChapter
-        ? chunks.slice(0, -1).join('_').toLowerCase()
-        : chunks.join('_').toLowerCase()
-    const chapter = includesChapter ? parsedChapter.data.toString() : '1'
-
-    const result = bookSchema.safeParse(book)
-
-    if (result.success) {
-        return { book: result.data, chapter }
+    if (passage.success) {
+        return {
+            book: passage.data.book,
+            chapter: passage.data.chapter?.toString() ?? '1',
+        }
     }
 
     return { book: 'genesis', chapter: '1' }
