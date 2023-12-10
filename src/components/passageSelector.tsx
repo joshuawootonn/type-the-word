@@ -91,8 +91,7 @@ export function PassageSelector({
         const nextValue = passageReferenceSchema.parse(nextUrl)
         if (value !== nextValue) {
             const t = setTimeout(() => {
-                setValue(nextValue)
-                void push(`/passage/${nextUrl}`)
+                onSubmit({ book, chapter })
             }, 3000)
 
             return () => {
@@ -109,6 +108,15 @@ export function PassageSelector({
                       .toLowerCase()
                       .includes(chapterQuery.toLowerCase())
               })
+
+    function onSubmit({ book, chapter }: { book: Book; chapter: string }) {
+        setBook(book)
+        setChapter(chapter)
+        const nextUrl = `${book}_${chapter}`
+        const nextValue = passageReferenceSchema.parse(nextUrl)
+        setValue(nextValue)
+        void push(`/passage/${nextUrl}`)
+    }
 
     return (
         <>
@@ -203,11 +211,7 @@ export function PassageSelector({
                     className="relative z-40 -translate-x-0.5"
                     value={chapter}
                     onChange={next => {
-                        setChapter(next)
-                        const nextUrl = `${book}_${next}`
-                        const nextValue = passageReferenceSchema.parse(nextUrl)
-                        setValue(nextValue)
-                        void push(`/passage/${nextUrl}`)
+                        onSubmit({ book, chapter: next })
                     }}
                 >
                     <Combobox.Input
@@ -215,6 +219,11 @@ export function PassageSelector({
                         as={ForwardedRefInput}
                         onChange={event => setChapterQuery(event.target.value)}
                         onFocus={event => event.currentTarget.select()}
+                        onKeyUp={event => {
+                            if (event.key === 'Enter' || event.keyCode === 13) {
+                                onSubmit({ book, chapter })
+                            }
+                        }}
                         className={
                             'w-16 rounded-none border-2 border-black p-1 font-medium outline-none'
                         }
