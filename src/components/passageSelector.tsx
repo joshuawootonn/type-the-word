@@ -76,7 +76,10 @@ export function PassageSelector({
         bookQuery === ''
             ? books
             : books.filter(book =>
-                  book.toLowerCase().includes(bookQuery.toLowerCase()),
+                  bookQuery
+                      .toLowerCase()
+                      .split(' ')
+                      .every(part => book.toLowerCase().includes(part)),
               )
 
     const chapters = new Array(simpleBibleMetadata[book]?.chapters ?? 0)
