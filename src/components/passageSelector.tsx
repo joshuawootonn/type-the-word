@@ -8,12 +8,15 @@ import React, {
     useState,
 } from 'react'
 import { Combobox } from '@headlessui/react'
-import metadata from '../lib/book-contents-simple.json'
+import metadata from '../lib/simple-bible-metadata.json'
 import { z } from 'zod'
 import { typedVerses } from '~/server/db/schema'
 import clsx from 'clsx'
 import * as ScrollArea from '@radix-ui/react-scroll-area'
-import { DecodedUrl, decodeUrl } from '~/lib/url'
+import {
+    PassageReference,
+    passageReferenceSchema,
+} from '~/lib/passageReference'
 
 const bookSchema = z.enum(typedVerses.book.enumValues)
 type Book = z.infer<typeof bookSchema>
@@ -37,7 +40,7 @@ const ForwardedRefInput = forwardRef(function InnerForwardedRefInput(
     return <input {...props} ref={ref} />
 })
 
-function getInitialValues(text: DecodedUrl): {
+function getInitialValues(text: PassageReference): {
     book: Book
     chapter: string
 } {
@@ -64,8 +67,8 @@ export function PassageSelector({
     value,
     setValue,
 }: {
-    value: DecodedUrl
-    setValue: (value: DecodedUrl) => void
+    value: PassageReference
+    setValue: (value: PassageReference) => void
 }) {
     const initialValues = getInitialValues(value)
     const [book, setBook] = useState<Book>(initialValues.book)
@@ -91,10 +94,9 @@ export function PassageSelector({
 
     useEffect(() => {
         const nextUrl = `${book}_${chapter}`
-        const nextValue = decodeUrl(nextUrl)
+        const nextValue = passageReferenceSchema.parse(nextUrl)
         if (value !== nextValue) {
             const t = setTimeout(() => {
-                console.log('hit')
                 setValue(nextValue)
                 void push(`/passage/${nextUrl}`)
             }, 3000)
@@ -209,7 +211,7 @@ export function PassageSelector({
                     onChange={next => {
                         setChapter(next)
                         const nextUrl = `${book}_${next}`
-                        const nextValue = decodeUrl(nextUrl)
+                        const nextValue = passageReferenceSchema.parse(nextUrl)
                         setValue(nextValue)
                         void push(`/passage/${nextUrl}`)
                     }}

@@ -9,34 +9,13 @@ import {
     typingSessionSchema,
 } from '~/server/repositories/typingSession.repository'
 import { z } from 'zod'
-import metadata from '../../bibleMetadata.json'
+import { getBibleMetadata } from '~/server/bibleMetadata'
+import toProperCase from '~/lib/toProperCase'
 
 const addTypedVerseInputSchema = createInsertSchema(typedVerses).omit({
     userId: true,
     id: true,
 })
-
-const bibleMetadataSchema = z.record(
-    z.enum(typedVerses.book.enumValues),
-    z.object({
-        chapters: z.array(z.object({ length: z.number() })),
-        testament: z.enum(['OT', 'NT']),
-        name: z.string(),
-    }),
-)
-type BibleMetadata = z.infer<typeof bibleMetadataSchema>
-
-function getBibleMetadata(): BibleMetadata {
-    const bibleMetadata = bibleMetadataSchema.parse(metadata)
-
-    return bibleMetadata
-}
-
-function toProperCase(str: string) {
-    return str.replace(/\w\S*/g, function (txt: string) {
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-    })
-}
 
 function toPluralBookForm(book: Book) {
     if (book === 'psalm') {

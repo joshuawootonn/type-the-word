@@ -2,7 +2,8 @@ import { z } from 'zod'
 import { env } from '~/env.mjs'
 import { createTRPCRouter, publicProcedure } from '../trpc'
 import { parseChapter, ParsedPassage } from '~/lib/parseEsv'
-import { decodedUrlSchema } from '~/lib/url'
+import { passageReferenceSchema } from '~/lib/passageReference'
+import { stringToPassageObject } from '~/lib/passageObject'
 
 const passageSchema = z.object({
     query: z.string(),
@@ -24,10 +25,16 @@ const passageSchema = z.object({
 
 export const passageRouter = createTRPCRouter({
     passage: publicProcedure
-        .input(decodedUrlSchema)
+        .input(passageReferenceSchema)
         .query(async ({ input }): Promise<ParsedPassage> => {
+            const passageData = stringToPassageObject.parse(input)
+
+            const verseSuffix = passageData.verses
+                ? `:1-${passageData.verses}`
+                : ''
+
             const response = await fetch(
-                `https://api.esv.org/v3/passage/html/?q=${input}`,
+                `https://api.esv.org/v3/passage/html/?q=${input}${verseSuffix}`,
                 {
                     headers: {
                         Authorization: `Token ${env.CROSSWAY_SECRET}`,

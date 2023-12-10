@@ -13,7 +13,10 @@ import { TypingSessionRepository } from '~/server/repositories/typingSession.rep
 import { Footer } from '~/components/footer'
 import { Loading } from '~/components/loading'
 import { PassageSelector } from '~/components/passageSelector'
-import { DecodedUrl, decodeUrl } from '~/lib/url'
+import {
+    PassageReference,
+    passageReferenceSchema,
+} from '~/lib/passageReference'
 
 export const DEFAULT_PASSAGE_REFERENCE = 'psalm_23'
 
@@ -30,14 +33,17 @@ export async function getStaticProps() {
         transformer: superjson,
     })
 
-    await helpers.passage.passage.prefetch(decodeUrl(DEFAULT_PASSAGE_REFERENCE))
+    await helpers.passage.passage.prefetch(
+        passageReferenceSchema.parse(DEFAULT_PASSAGE_REFERENCE),
+    )
 
     return { props: { trpcState: helpers.dehydrate() } }
 }
 
-export default function Home(props: { passage?: DecodedUrl }) {
-    const [value, setValue] = useState<DecodedUrl>(
-        props.passage ?? decodeUrl(DEFAULT_PASSAGE_REFERENCE),
+export default function Home(props: { passage?: PassageReference }) {
+    const [value, setValue] = useState<PassageReference>(
+        props.passage ??
+            passageReferenceSchema.parse(DEFAULT_PASSAGE_REFERENCE),
     )
     const debouncedValue = useDebouncedValue(value, 0)
     const passage = api.passage.passage.useQuery(debouncedValue)

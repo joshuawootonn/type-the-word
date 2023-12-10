@@ -268,11 +268,16 @@ export function parseChapter(passage: string): ParsedPassage {
                 .join('')
 
             if (node.attrs.find(attr => attr.value.includes('extra_text'))) {
-                const chunks = text.trim().split(' ')
-                const book = chunks.slice(0, -1).join('_').toLowerCase()
-                const chapter = parseInt(chunks.at(-1)?.split(':').at(0) ?? '')
-                context.book = bookSchema.parse(book)
-                context.chapter = chapter
+                const trimmedText = text.trim().toLowerCase()
+                const book = /([0-9])*([A-Za-z ])+(?!([0-9:]))/
+                    .exec(trimmedText)
+                    ?.at(0)
+                const chapter = /(?<=[0-9a-zA-Z] )([0-9: -])*/
+                    .exec(trimmedText)
+                    ?.at(0)
+
+                context.book = bookSchema.parse(book?.split(' ').join('_'))
+                context.chapter = chapter ? parseInt(chapter) : undefined
             }
             return {
                 type: 'h2',

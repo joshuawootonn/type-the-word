@@ -5,7 +5,7 @@ import { db } from '~/server/db'
 import Page, { DEFAULT_PASSAGE_REFERENCE } from '../index'
 import { GetServerSidePropsContext } from 'next'
 import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
-import { decodeUrl } from '~/lib/url'
+import { passageReferenceSchema } from '~/lib/passageReference'
 
 export async function getServerSideProps({
     params,
@@ -30,8 +30,10 @@ export async function getServerSideProps({
 
     const passage =
         typeof params.passage === 'string'
-            ? decodeUrl(params.passage)
-            : decodeUrl(params.passage.at(0) ?? DEFAULT_PASSAGE_REFERENCE)
+            ? passageReferenceSchema.parse(params.passage)
+            : passageReferenceSchema.parse(
+                  params.passage.at(0) ?? DEFAULT_PASSAGE_REFERENCE,
+              )
 
     await helpers.passage.passage.prefetch(passage)
 
