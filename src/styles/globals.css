@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  Radix ui popups use margin right to prevent overflow hidden from causing layout shift when popups come up.
+  We want to use `scrollbar-gutter: stable` to prevent layout shift, so I have to prevent the margin right radix is using.
+ */
+html{
+    scrollbar-gutter: stable;
+}
+body[style] {
+    margin: 0 auto !important;
+}
+
 /* focus-within is required because inputs have no content, and `:before` is prepended to content.*/
 .svg-outline:focus-within *,.svg-outline:focus {
     @apply outline-none;
