@@ -26,6 +26,8 @@
         "next-env.d.ts",
         "**/*.ts",
         "**/*.tsx",
+        "**/*.js",
+        "**/*.jsx",
         "**/*.cjs",
         "**/*.mjs",
         ".prettierrc.js"

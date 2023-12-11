@@ -58,6 +58,10 @@ export default function Home(props: { passage?: PassageReference }) {
                     name="description"
                     content="Practice your typing while meditating on the Bible. Type the word is an easy to "
                 />
+                <meta
+                    property="og:image"
+                    content="https://typetheword.site/api/og"
+                />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 

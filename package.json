@@ -26,6 +26,7 @@
         "@trpc/next": "^10.37.1",
         "@trpc/react-query": "^10.37.1",
         "@trpc/server": "^10.37.1",
+        "@vercel/og": "^0.5.20",
         "clsx": "^2.0.0",
         "date-fns": "^2.30.0",
         "drizzle-orm": "^0.28.5",
