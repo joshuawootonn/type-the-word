@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import { typedVerses } from '~/server/db/schema'
 
 import metadata from './bible-metadata.json'
+import { bookSchema } from '~/lib/types/book'
 
 const bibleMetadataSchema = z.record(
-    z.enum(typedVerses.book.enumValues),
+    z.enum(bookSchema.options),
     z.object({
         chapters: z.array(z.object({ length: z.number() })),
         testament: z.enum(['OT', 'NT']),
