@@ -17,6 +17,7 @@ import {
     PassageReference,
     passageReferenceSchema,
 } from '~/lib/passageReference'
+import { useRouter } from 'next/router'
 
 export const DEFAULT_PASSAGE_REFERENCE = 'psalm_23'
 
@@ -47,6 +48,7 @@ export default function Home(props: { passage?: PassageReference }) {
     )
     const debouncedValue = useDebouncedValue(value, 0)
     const passage = api.passage.passage.useQuery(debouncedValue)
+    const router = useRouter()
 
     return (
         <div className="min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0">
@@ -65,7 +67,7 @@ export default function Home(props: { passage?: PassageReference }) {
             </div>
 
             <main className="relative mx-auto w-full flex-grow">
-                {passage.isLoading ? (
+                {router.isFallback || passage.isLoading ? (
                     <Loading />
                 ) : passage.error ? (
                     <>We hit a whoopsie! :(</>
