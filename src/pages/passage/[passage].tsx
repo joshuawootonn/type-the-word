@@ -8,21 +8,6 @@ import { TypingSessionRepository } from '~/server/repositories/typingSession.rep
 import { passageReferenceSchema } from '~/lib/passageReference'
 
 export function getStaticPaths() {
-    // const metadata = getBibleMetadata()
-    //
-    // const paths = Object.entries(metadata)
-    //     .flatMap(([book, chapters]) => {
-    //         return chapters.chapters.map((chapter, i) => {
-    //             const passage = toPassageUrl(book, `${i + 1}`)
-    //             return {
-    //                 params: {
-    //                     passage,
-    //                 },
-    //             }
-    //         })
-    //     })
-    //     .slice(0, 10)
-
     return { paths: [], fallback: 'blocking' }
 }
 export async function getStaticProps({
