@@ -18,6 +18,10 @@ export default function Home() {
                     name="description"
                     content="History of all the passages you have typed."
                 />
+                <meta
+                    property="og:image"
+                    content="https://typetheword.site/api/og?path=history"
+                />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 

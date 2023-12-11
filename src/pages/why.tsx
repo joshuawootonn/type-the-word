@@ -50,6 +50,10 @@ export default function Home() {
                     name="description"
                     content="A typing practice that track you typing through the Bible. Improve your typing skills while exploring biblical passages and verses. Enhance your accuracy and speed as you type through the sacred text."
                 />
+                <meta
+                    property="og:image"
+                    content="https://typetheword.site/api/og/why?"
+                />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 

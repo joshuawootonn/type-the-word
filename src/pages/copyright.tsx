@@ -12,6 +12,10 @@ export default function Home() {
                     name="description"
                     content="Copyright for Type the Word."
                 />
+                <meta
+                    property="og:image"
+                    content="https://typetheword.site/api/og"
+                />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 

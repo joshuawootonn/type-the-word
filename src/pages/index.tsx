@@ -18,6 +18,7 @@ import {
     passageReferenceSchema,
 } from '~/lib/passageReference'
 import { useRouter } from 'next/router'
+import { passageUrlSchema } from '~/lib/passageUrl'
 
 export const DEFAULT_PASSAGE_REFERENCE = 'psalm_23'
 
@@ -60,7 +61,13 @@ export default function Home(props: { passage?: PassageReference }) {
                 />
                 <meta
                     property="og:image"
-                    content="https://typetheword.site/api/og"
+                    content={`https://typetheword.site/api/og${
+                        props.passage
+                            ? `?passage=${passageUrlSchema.parse(
+                                  props.passage,
+                              )}`
+                            : ''
+                    }`}
                 />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
