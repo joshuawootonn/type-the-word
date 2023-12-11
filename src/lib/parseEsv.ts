@@ -86,7 +86,6 @@ export type ParsedPassage = {
 }
 
 export function parseChapter(passage: string): ParsedPassage {
-    console.log(passage)
     const dom = new JSDOM(passage)
     dom.window.document.querySelectorAll('sup.footnote').forEach(node => {
         node.parentNode?.removeChild(node)
