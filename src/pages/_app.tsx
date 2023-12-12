@@ -2,7 +2,7 @@ import * as Fathom from 'fathom-client'
 import { type Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
 import { type AppType } from 'next/app'
-import { Roboto_Mono } from 'next/font/google'
+import { IBM_Plex_Mono, Poppins } from 'next/font/google'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
@@ -10,16 +10,17 @@ import { env } from '~/env.mjs'
 import '~/styles/globals.css'
 import { api } from '~/utils/api'
 import clsx from 'clsx'
-import localFont from 'next/font/local'
 
-export const robotoMono = Roboto_Mono({
+export const ibmPlexMono = IBM_Plex_Mono({
+    weight: ['400', '500', '600', '700'],
     subsets: ['latin'],
-    variable: '--font-roboto-mono',
+    variable: '--font-ibm-plex',
 })
 
-const rethink = localFont({
-    src: '../../public/Rethink.ttf',
-    variable: '--font-inter',
+const poppins = Poppins({
+    weight: ['400', '500', '600', '700'],
+    subsets: ['latin'],
+    variable: '--font-poppins',
 })
 
 const MyApp: AppType<{ session: Session | null }> = ({
@@ -46,7 +47,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
         <div
             className={clsx(
                 'min-h-[calc(100vh_-_1px)] overflow-hidden font-sans',
-                rethink.variable,
+                poppins.variable,
+                ibmPlexMono.variable,
             )}
         >
             <SessionProvider session={session}>
