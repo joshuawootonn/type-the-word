@@ -98,9 +98,11 @@ export default function Home() {
                         In the process of making typetheword.site, these
                         scriptures were great reminders of why we should
                         meditate on God&apos;s word. If you have others, feel
-                        free to <EmailLink>email me</EmailLink>. I would love to
-                        make this page a long list of all the scripture pointing
-                        to why we should meditate on God&apos;s word.
+                        free to{' '}
+                        <EmailLink className="underline">email me</EmailLink>. I
+                        would love to make this page a long list of all the
+                        scripture pointing to why we should meditate on
+                        God&apos;s word.
                     </p>
                 </div>
                 <div className={'prose-h2:text-2xl'}>

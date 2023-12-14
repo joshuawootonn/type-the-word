@@ -3,7 +3,15 @@ import clsx from 'clsx'
 import * as Popover from '@radix-ui/react-popover'
 import { useEffect, useState } from 'react'
 
-export function EmailLink({ children }: { children?: string }) {
+export function EmailLink({
+    children,
+    className,
+    popoverClassName,
+}: {
+    children?: string
+    className?: string
+    popoverClassName?: string
+}) {
     const [isOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
@@ -24,7 +32,8 @@ export function EmailLink({ children }: { children?: string }) {
                 <button
                     tabIndex={0}
                     className={clsx(
-                        'svg-outline-sm z-[5] font-medium text-black underline',
+                        'svg-outline-sm z-[5] font-medium text-black',
+                        className,
                     )}
                     onClick={e => {
                         setIsOpen(true)
@@ -45,7 +54,12 @@ export function EmailLink({ children }: { children?: string }) {
                 align={'center'}
                 sideOffset={5}
             >
-                <div className="border-2 border-black bg-white px-2 py-1">
+                <div
+                    className={clsx(
+                        'border-2 border-black bg-white px-2 py-1 font-medium',
+                        popoverClassName,
+                    )}
+                >
                     Copied
                 </div>
 
