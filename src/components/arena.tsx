@@ -102,7 +102,7 @@ export function Arena({
                                 case 'h4':
                                     return (
                                         <h4
-                                            className="text-xl font-medium tracking-wide"
+                                            className="text-lg font-medium tracking-wide"
                                             key={pIndex}
                                         >
                                             {node.text}
