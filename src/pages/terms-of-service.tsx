@@ -42,9 +42,9 @@ export default function Home() {
                     </p>
                     <h2>Limitations</h2>
                     <p>
-                        You are responsible for your account's security and all
-                        activities on your account. You must not, in the use of
-                        this site, violate any applicable laws, including,
+                        You are responsible for your account&apos;s security and
+                        all activities on your account. You must not, in the use
+                        of this site, violate any applicable laws, including,
                         without limitation, copyright laws, or any other laws
                         regarding the security of your personal data, or
                         otherwise misuse this site. I reserve the right to
@@ -55,17 +55,17 @@ export default function Home() {
                     </p>
                     <h2>Limitations on Automated Use</h2>
                     <p>
-                        You shouldn't use bots or access Type the Word. If you
-                        do, I'll block you, and delete your account.
+                        You shouldn&apos;t use bots or access Type the Word. If
+                        you do, I&apos;ll block you, and delete your account.
                     </p>
                     <h2>Contact</h2>
                     <p>
                         <EmailLink>Contact me</EmailLink> if you have any
-                        questions about Type the Words' terms of service.
+                        questions about Type the Words&apos; terms of service.
                     </p>
                     <p>
-                        Terms based on MonkeyType's terms which were evidently
-                        based on Glitch's terms.
+                        Terms based on MonkeyType&apos;s terms which were
+                        evidently based on Glitch&apos;s terms.
                     </p>
                 </div>
             </main>

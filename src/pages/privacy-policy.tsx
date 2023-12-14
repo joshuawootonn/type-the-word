@@ -41,11 +41,11 @@ export default function Home() {
                     <h2>Contact</h2>
                     <p>
                         <EmailLink>Contact me</EmailLink> if you have any
-                        questions about Type the Words' privacy policy, the data
-                        it holds on you, or you would like to exercise one of
-                        your data protection rights.
+                        questions about Type the Words&apos; privacy policy, the
+                        data it holds on you, or you would like to exercise one
+                        of your data protection rights.
                     </p>
-                    <p>Terms based on MonkeyType's privacy policy.</p>
+                    <p>Terms based on MonkeyType&apos;s privacy policy.</p>
                 </div>
             </main>
             <Footer />
