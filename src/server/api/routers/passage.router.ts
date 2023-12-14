@@ -31,11 +31,15 @@ export const passageRouter = createTRPCRouter({
 
             const verseSuffix =
                 passageData.firstVerse && passageData.lastVerse
-                    ? `:${passageData.firstVerse}-${passageData.lastVerse}`
+                    ? passageData.firstVerse === passageData.lastVerse
+                        ? `:${passageData.firstVerse}`
+                        : `:${passageData.firstVerse}-${passageData.lastVerse}`
                     : ''
 
             const response = await fetch(
-                `https://api.esv.org/v3/passage/html/?q=${input}${verseSuffix}`,
+                `https://api.esv.org/v3/passage/html/?q=${passageData.book
+                    .split('_')
+                    .join(' ')} ${passageData.chapter}${verseSuffix}`,
                 {
                     headers: {
                         Authorization: `Token ${env.CROSSWAY_SECRET}`,
