@@ -89,7 +89,8 @@ export function PassageSelector({
     useEffect(() => {
         const nextUrl = `${book}_${chapter}`
         const nextValue = passageReferenceSchema.parse(nextUrl)
-        if (value !== nextValue) {
+        // I use `!includes` to prevent passage selector from clearing url specified verses
+        if (!value.includes(nextValue)) {
             const t = setTimeout(() => {
                 onSubmit({ book, chapter })
             }, 3000)
