@@ -17,6 +17,7 @@ import { isAtomTyped, isVerseSameShape } from '~/lib/isEqual'
 import clsx from 'clsx'
 import { Word } from '~/components/word'
 import { useRect } from '~/lib/hooks/useRect'
+import { trackEvent } from 'fathom-client'
 
 function getWords(verse: string, blocks: Block[]): Inline[] {
     return blocks.flatMap(block => {
@@ -233,6 +234,7 @@ export function CurrentVerse({
                     setKeystrokes([])
                 }
 
+                trackEvent('typed-verse')
                 if (
                     typingSession?.data?.id != null &&
                     sessionData?.user?.id != null
