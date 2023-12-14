@@ -65,12 +65,12 @@ export default function Home() {
                 ) : log.error ? (
                     <div>We hit a whoopsie! :(</div>
                 ) : (
-                    log.data.map(entry => {
+                    log.data.map((entry, i) => {
                         return (
                             <>
                                 <div
                                     className="hidden w-full grow flex-row items-center justify-between text-xl md:flex"
-                                    key={entry.createdAt.toString()}
+                                    key={i}
                                 >
                                     <span className="shrink-0">
                                         {entry.location}
