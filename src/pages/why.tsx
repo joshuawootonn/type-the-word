@@ -72,7 +72,7 @@ export default function Home() {
                             href={'https://monkeytype.com'}
                             className="svg-outline relative"
                         >
-                            monkey type
+                            monkeytype
                         </a>
                         , it made sense to combine the two ideas. Typing the
                         Bible makes you look at every word and see the passage
