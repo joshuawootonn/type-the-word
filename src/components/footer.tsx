@@ -73,7 +73,9 @@ export function Footer() {
                 github
             </Link>
             <span>/</span>
-            <EmailLink className={'shrink-0'}>email me feedback</EmailLink>
+            <EmailLink className={'shrink-0 font-normal'}>
+                email me feedback
+            </EmailLink>
         </footer>
     )
 }
