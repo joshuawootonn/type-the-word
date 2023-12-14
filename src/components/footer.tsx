@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { EmailLink } from '~/components/emailLink'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { signOut } from 'next-auth/react'
 
 export function Footer() {
     return (
@@ -14,14 +13,14 @@ export function Footer() {
             >
                 (ESV)
             </a>
-            <span>/</span>
+            <div>/</div>
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
                     <button
                         className="svg-outline relative no-underline"
                         aria-label="Customise options"
                     >
-                        Legal
+                        legal
                     </button>
                 </DropdownMenu.Trigger>
 
@@ -58,12 +57,13 @@ export function Footer() {
                 </DropdownMenu.Content>
             </DropdownMenu.Root>
 
-            <span>/</span>
+            <div>/</div>
             <Link className="svg-outline relative no-underline" href={'/why'}>
                 why?
             </Link>
 
-            <div className="flex-grow"> </div>
+            <div className="hidden flex-grow md:block"> </div>
+            <div className="block md:hidden">/</div>
             <Link
                 className="svg-outline relative no-underline"
                 href={'https://github.com/joshuawootonn/type-the-word'}
@@ -72,7 +72,7 @@ export function Footer() {
             >
                 github
             </Link>
-            <span>/</span>
+            <div>/</div>
             <EmailLink className={'shrink-0 font-normal'}>
                 email me feedback
             </EmailLink>
