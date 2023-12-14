@@ -65,9 +65,9 @@ export default function Home() {
                     <hr className="mx-0 w-full border-t-2  border-black" />
                     <h2>Why did I make typetheword.site?</h2>
                     <p>
-                        A couple of years ago, I typed out Psalm 1-137. Not only
-                        did this improve my typing, but it also encouraged me
-                        daily. When I later discovered{' '}
+                        A couple of years ago, I typed out Psalms 1 to 137 over
+                        a 6 month period. Not only did this improve my typing,
+                        but it also encouraged me daily. When I later discovered{' '}
                         <a
                             href={'https://monkeytype.com'}
                             className="svg-outline relative"
@@ -75,8 +75,8 @@ export default function Home() {
                             monkey type
                         </a>
                         , it made sense to combine the two ideas. Typing the
-                        Bible makes you look at every word and see the passage a
-                        new. When I was developing this site, I used{' '}
+                        Bible makes you look at every word and see the passage
+                        anew. When I was developing this site, I used{' '}
                         <Link
                             href={'/passage/john_11:34-36'}
                             className="svg-outline relative"
