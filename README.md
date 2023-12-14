@@ -1,4 +1,26 @@
-# type the word
 
-Typing the bible is a good way to meditate on it and practice your typing at the same time. I have done this a lot by hand in the past, and now I am making something that will keep track of what, where, and when I have typed in the past.
+![og](https://github.com/joshuawootonn/type-the-word/assets/20950876/b74efaba-0b77-4df4-8787-e0b3caefb1fc)
 
+  A couple of years ago, I typed out Psalms 1 to 137 over                     a 6 month period. Not only did this improve my typing,
+                        but it also encouraged me daily. When I later discovered 
+                        <a
+                            href="https://monkeytype.com"
+                        >
+                            monkey type
+                        </a>
+                        , it made sense to combine the two ideas. Typing the
+                        Bible makes you look at every word and see the passage
+                        anew. When I was developing this site, I used 
+                        <a
+                            href="https://typetheword.site/passage/john_11:34-36"
+                        >
+                            John 11:35
+                        </a>
+                        as the edgecase since its the shortest verse in the
+                        Bible. Typing it over and over made me realize that
+                        Jesus wept because he loved Lazarus. He died for us
+                        because he loves us with the same love.
+                        <br />
+                        <br />
+                        My hope is that by typing the word you will also see the
+                        Bible in a deeper way.
