@@ -29,9 +29,10 @@ export const passageRouter = createTRPCRouter({
         .query(async ({ input }): Promise<ParsedPassage> => {
             const passageData = stringToPassageObject.parse(input)
 
-            const verseSuffix = passageData.verses
-                ? `:1-${passageData.verses}`
-                : ''
+            const verseSuffix =
+                passageData.firstVerse && passageData.lastVerse
+                    ? `:${passageData.firstVerse}-${passageData.lastVerse}`
+                    : ''
 
             const response = await fetch(
                 `https://api.esv.org/v3/passage/html/?q=${input}${verseSuffix}`,
