@@ -1,23 +1,45 @@
 import { describe, expect, test } from 'vitest'
 import { stringToPassageObject } from '~/lib/passageObject'
 
-describe('Enter/space are valid keystrokes', () => {
-    test('WHEN  double space at the end of a word THEN second space  prevented', () => {
+describe('passageObject parsing', () => {
+    test('WHEN multiword book THEN success', () => {
         const result = stringToPassageObject.parse('Song of Solomon 1')
 
         expect(result).toEqual({
             book: 'song_of_solomon',
             chapter: 1,
-            verses: 17,
+            firstVerse: 1,
+            lastVerse: 17,
         })
     })
-    test('WHEN  double space at the end of a word THEN second space  prevented', () => {
-        const result = stringToPassageObject.parse('John 3')
+    test('WHEN single word book THEN success', () => {
+        const result = stringToPassageObject.parse('1 John 3')
+
+        expect(result).toEqual({
+            book: '1_john',
+            chapter: 3,
+            firstVerse: 1,
+            lastVerse: 24,
+        })
+    })
+    test('WHEN verse included THEN success', () => {
+        const result = stringToPassageObject.parse('John 3:16')
 
         expect(result).toEqual({
             book: 'john',
             chapter: 3,
-            verses: 36,
+            firstVerse: 16,
+            lastVerse: 16,
+        })
+    })
+    test('WHEN verses included THEN success', () => {
+        const result = stringToPassageObject.parse('John 3:10-12')
+
+        expect(result).toEqual({
+            book: 'john',
+            chapter: 3,
+            firstVerse: 10,
+            lastVerse: 12,
         })
     })
 })
