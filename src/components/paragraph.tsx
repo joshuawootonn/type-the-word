@@ -26,6 +26,8 @@ export function Paragraph({
             {node.nodes.map((verse, vIndex) => {
                 const isCurrentVerse = verse.verse.value === currentVerse
 
+                if (verse.nodes.length === 0) return null
+
                 return isCurrentVerse ? (
                     <CurrentVerse
                         key={vIndex}
