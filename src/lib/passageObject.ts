@@ -19,25 +19,24 @@ export const stringToPassageObject = z.string().transform(text => {
     const includesVerses = trimmedText.includes(':')
     const includesRangeOfVerses = includesVerses && trimmedText.includes('-')
 
-    const book = Array.from(
+    const bookText = Array.from(
         trimmedText.matchAll(/([0-9])*([A-Za-z ])+(?!([0-9:]))/g),
         m => m[0],
-    )
-        ?.at(0)
-        ?.split(' ')
-        .join('_')
+    )?.at(0)
+
+    const book = bookText?.split(' ').join('_')
+
+    const textWithoutBook = trimmedText.replace(bookText ?? '', '')
 
     const chapter = parseInt(
-        Array.from(
-            trimmedText.matchAll(/(?<=(([0-9])*([A-Za-z ])+))([0-9])+/g),
-            m => m[0],
-        )
-            .at(-1)
+        Array.from(textWithoutBook.matchAll(/([0-9])+/g), m => m[0])
+            .at(0)
             ?.trim() ?? '1',
     )
+    const textWithoutChapter = textWithoutBook.replace(chapter.toString(), '')
 
     const verseText = Array.from(
-        trimmedText.matchAll(/(?<=[0-9a-zA-Z: ])([0-9\-])+(?!:)/g),
+        textWithoutChapter.matchAll(/([0-9\-])+/g),
         m => m[0],
     )
         .at(-1)
@@ -54,30 +53,35 @@ export const stringToPassageObject = z.string().transform(text => {
 
     const metadata = getBibleMetadata()
 
-    if (includesRangeOfVerses) {
-        const verses = verseText?.split('-')
-        const firstVerse = z.number().parse(parseInt(verses?.at(0) ?? ''))
-        const lastVerse = z.number().parse(parseInt(verses?.at(-1) ?? ''))
+    try {
+        if (includesRangeOfVerses) {
+            const verses = verseText?.split('-')
+            const firstVerse = z.number().parse(parseInt(verses?.at(0) ?? ''))
+            const lastVerse = z.number().parse(parseInt(verses?.at(-1) ?? ''))
 
-        return passageObjectSchema.parse({
-            book: bookResult.data,
-            chapter: chapter,
-            firstVerse,
-            lastVerse,
-        })
+            return passageObjectSchema.parse({
+                book: bookResult.data,
+                chapter: chapter,
+                firstVerse,
+                lastVerse,
+            })
+        }
+
+        if (includesVerses) {
+            const verse = z.number().parse(parseInt(verseText ?? ''))
+
+            return passageObjectSchema.parse({
+                book: bookResult.data,
+                chapter: chapter,
+                firstVerse: verse,
+                lastVerse: verse,
+            })
+        }
+    } catch (e) {
+        console.log(
+            'Failed to parse passage in url. Falling back to full chapter',
+        )
     }
-
-    if (includesVerses) {
-        const verse = z.number().parse(parseInt(verseText ?? ''))
-
-        return passageObjectSchema.parse({
-            book: bookResult.data,
-            chapter: chapter,
-            firstVerse: verse,
-            lastVerse: verse,
-        })
-    }
-
     return passageObjectSchema.parse({
         book: bookResult.data,
         chapter: chapter,
