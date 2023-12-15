@@ -1,5 +1,11 @@
 import { Block, Inline, ParsedPassage, Verse } from '~/lib/parseEsv'
-import React, { useContext, useEffect, useRef } from 'react'
+import React, {
+    FormEvent,
+    FormEventHandler,
+    useContext,
+    useEffect,
+    useRef,
+} from 'react'
 import { useAtom } from 'jotai'
 import {
     ArenaContext,
@@ -18,6 +24,18 @@ import clsx from 'clsx'
 import { Word } from '~/components/word'
 import { useRect } from '~/lib/hooks/useRect'
 import { trackEvent } from 'fathom-client'
+import { z } from 'zod'
+
+const nativeInputEventSchema = z.discriminatedUnion('inputType', [
+    z.object({
+        data: z.string(),
+        inputType: z.literal('insertText'),
+    }),
+    z.object({
+        data: z.null(),
+        inputType: z.literal('deleteContentBackward'),
+    }),
+])
 
 function getWords(verse: string, blocks: Block[]): Inline[] {
     return blocks.flatMap(block => {
@@ -196,12 +214,17 @@ export function CurrentVerse({
         return () => clearTimeout(isActiveTimer.current)
     }, [keystrokes.length])
 
-    function handleInput(e: React.KeyboardEvent<HTMLInputElement>) {
-        if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-            }
+    function handleInput(event: FormEvent<HTMLInputElement>) {
+        const result = nativeInputEventSchema.safeParse(event.nativeEvent)
 
+        if (result.success) {
+            const nativeInputEvent = result.data
+            if (
+                nativeInputEvent.inputType === 'insertText' &&
+                nativeInputEvent.data === ' '
+            ) {
+                event.preventDefault()
+            }
             let isVerseComplete = false
 
             setIsArenaActive(true)
@@ -209,7 +232,11 @@ export function CurrentVerse({
             if (currentVerseNodes == null) {
                 throw new Error('Current ReadonlyVerse is invalid.')
             }
-            const next = isValidKeystroke(e.key, currentVerseNodes, keystrokes)
+            const next = isValidKeystroke(
+                nativeInputEvent,
+                currentVerseNodes,
+                keystrokes,
+            )
 
             if (next == null) return keystrokesAtom
             const position = getPosition(next)
@@ -398,7 +425,7 @@ export function CurrentVerse({
             <input
                 type="text"
                 className="peer fixed h-0 max-h-0 opacity-0"
-                onKeyDown={e => handleInput(e)}
+                onInput={handleInput}
                 tabIndex={-1}
                 onFocus={() => {
                     setIsArenaFocused(true)

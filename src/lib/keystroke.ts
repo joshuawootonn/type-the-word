@@ -1,5 +1,5 @@
 import { Inline } from '~/lib/parseEsv'
-import React from 'react'
+import React, { FormEvent } from 'react'
 import {
     isAtomEqual,
     isAtomTyped,
@@ -82,7 +82,9 @@ export function isAtomComplete(atom: Inline | undefined): boolean {
 }
 
 export function isValidKeystroke(
-    key: React.KeyboardEvent<HTMLInputElement>['key'],
+    e:
+        | { data: string; inputType: 'insertText' }
+        | { data: null; inputType: 'deleteContentBackward' },
     currentVerse: Inline[],
     prev: Keystroke[],
 ) {
@@ -99,33 +101,24 @@ export function isValidKeystroke(
      * When you complete a correct word you can't undo it.
      */
     if (
-        (key === 'Backspace' && prevPosition.length === 0) ||
-        (key === 'Backspace' &&
+        (e.inputType === 'deleteContentBackward' &&
+            prevPosition.length === 0) ||
+        (e.inputType === 'deleteContentBackward' &&
             isAtomComplete(prevCurrentTyped) &&
             isPrevCurrentCorrect)
     )
         return
 
     if (
-        (key === ' ' || key === 'Enter') &&
+        e.inputType === 'insertText' &&
+        e.data === ' ' &&
         (lastLetter(prevCurrentTyped) === ' ' ||
             lastLetter(prevCurrentTyped) === '\n')
     )
         return
 
-    /**
-     * If the correct word cap is a newline then prevent a space.
-     */
-
-    if (
-        (lastLetter(prevCurrentCorrect) === ' ' && key === 'Enter') ||
-        (lastLetter(prevCurrentCorrect) === '\n' && key === ' ')
-    ) {
-        return
-    }
-
     return prev.concat({
-        type: key === 'Backspace' ? 'backspace' : 'insert',
-        key,
+        type: e.inputType === 'deleteContentBackward' ? 'backspace' : 'insert',
+        key: e.data ?? '',
     })
 }
