@@ -29,3 +29,7 @@ body[style] {
 .min-h-screen-1px {
     @apply min-h-[calc(100vh_-_1px)];
 }
+
+body{
+    @apply dark:bg-black;
+}
