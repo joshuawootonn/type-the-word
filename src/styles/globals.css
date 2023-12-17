@@ -33,3 +33,14 @@ body[style] {
 body{
     @apply dark:bg-black;
 }
+
+/* if dark mode make scrollbar dark */
+@media (prefers-color-scheme: dark) {
+    ::-webkit-scrollbar {
+        @apply bg-black;
+    }
+    ::-webkit-scrollbar-thumb {
+        @apply bg-gray-500;
+        border-radius: 10px;
+    }
+}

@@ -59,18 +59,18 @@ export default function Home() {
 
             <Navigation />
 
-            <main className="prose relative mx-auto w-full flex-grow pt-4 text-lg  lg:pt-8">
+            <main className="prose relative mx-auto w-full flex-grow pt-4 text-lg  lg:pt-8 dark:text-white">
                 <div className={'prose-h2:text-3xl prose-p:text-xl'}>
-                    <h1>Why?</h1>
-                    <hr className="mx-0 w-full border-t-2  border-black" />
-                    <h2>Why did I make typetheword.site?</h2>
-                    <p>
+                    <h1 className="dark:text-white">Why?</h1>
+                    <hr className="mx-0 w-full border-t-2  border-black dark:border-white" />
+                    <h2 className="dark:text-white">Why did I make typetheword.site?</h2>
+                    <p className="dark:text-white">
                         A couple of years ago, I typed out Psalms 1 to 137 over
                         a 6 month period. Not only did this improve my typing,
                         but it also encouraged me daily. When I later discovered{' '}
                         <a
                             href={'https://monkeytype.com'}
-                            className="svg-outline relative"
+                            className="svg-outline relative dark:text-white"
                         >
                             monkeytype
                         </a>
@@ -79,7 +79,7 @@ export default function Home() {
                         anew. When I was developing this site, I used{' '}
                         <Link
                             href={'/passage/john_11:34-36'}
-                            className="svg-outline relative"
+                            className="svg-outline relative dark:text-white"
                         >
                             John 11:35
                         </Link>{' '}
@@ -93,13 +93,13 @@ export default function Home() {
                         Bible in a deeper way.
                     </p>
                     <hr className="mx-0 w-full border-t-2  border-black" />
-                    <h2>Why meditate on God&apos;s word?</h2>
+                    <h2 className="dark:text-white">Why meditate on God&apos;s word?</h2>
                     <p>
                         In the process of making typetheword.site, these
                         scriptures were great reminders of why we should
                         meditate on God&apos;s word. If you have others, feel
                         free to{' '}
-                        <EmailLink className="underline">email me</EmailLink>. I
+                        <EmailLink className="underline dark:text-white">email me</EmailLink>. I
                         would love to make this page a long list of all the
                         scripture pointing to why we should meditate on
                         God&apos;s word.

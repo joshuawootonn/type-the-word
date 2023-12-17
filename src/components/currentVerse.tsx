@@ -303,7 +303,7 @@ export function CurrentVerse({
     return (
         <span
             className={clsx(
-                'verse break-spaces text-balance group inline h-3 hover:cursor-pointer',
+                'verse break-spaces text-balance group inline h-3 hover:cursor-pointer dark:text-white',
                 isCurrentVerse && 'active-verse',
                 isTypedInSession ?? isTypedInHistory
                     ? 'text-gray-400'
