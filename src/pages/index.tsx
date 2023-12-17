@@ -52,7 +52,7 @@ export default function Home(props: { passage?: PassageReference }) {
     const router = useRouter()
 
     return (
-        <div className="min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0">
+        <div className="dark:bg-black min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0">
             <Head>
                 <title>Type the Word</title>
                 <meta
@@ -77,7 +77,7 @@ export default function Home(props: { passage?: PassageReference }) {
                 <PassageSelector value={value} setValue={setValue} />
             </div>
 
-            <main className="relative mx-auto w-full flex-grow">
+            <main className="relative mx-auto w-full flex-grow dark:text-white">
                 {router.isFallback || passage.isLoading ? (
                     <Loading />
                 ) : passage.error ? (

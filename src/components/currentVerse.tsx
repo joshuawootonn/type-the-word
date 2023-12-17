@@ -330,7 +330,7 @@ export function CurrentVerse({
                 if (atom.type === 'verseNumber') {
                     return (
                         <b
-                            className={clsx(isIndented && 'absolute -left-0')}
+                            className={clsx(isIndented && 'absolute -left-0 dark:text-white')}
                             key={aIndexPrime}
                         >
                             {atom.text.split(':').at(-1)}
@@ -342,7 +342,7 @@ export function CurrentVerse({
                         <span
                             key={aIndexPrime}
                             className={clsx(
-                                'space inline-flex h-[19px] w-[1ch] translate-y-[3px]',
+                                'space inline-flex h-[19px] w-[1ch] translate-y-[3px] dark:text-white',
                                 lastAtom != null &&
                                     typedAtom == null &&
                                     'active-space',
@@ -405,7 +405,7 @@ export function CurrentVerse({
             {rect && arenaRect && !isArenaFocused ? (
                 <button
                     className={clsx(
-                        'svg-outline absolute z-10 border-2 border-black bg-white/80 text-black opacity-0 backdrop-blur-sm transition-opacity duration-100',
+                        'svg-outline absolute z-10 border-2 border-black bg-white/80 dark:bg-black/80 text-black opacity-0 backdrop-blur-sm transition-opacity duration-100  dark:text-white',
                         !isArenaActive && 'hover:opacity-100',
                         'focus:opacity-100',
                     )}
@@ -424,7 +424,7 @@ export function CurrentVerse({
             ) : null}
             <input
                 type="text"
-                className="peer fixed h-0 max-h-0 opacity-0"
+                className="peer fixed h-0 max-h-0 opacity-0 dark:text-white"
                 onInput={handleInput}
                 tabIndex={-1}
                 onFocus={() => {

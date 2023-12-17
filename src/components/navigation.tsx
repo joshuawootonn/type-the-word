@@ -64,7 +64,7 @@ export function Navigation() {
                                 </Link>
                             </DropdownMenu.Item>
                             <DropdownMenu.Item
-                                className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white "
+                                className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black "
                                 onClick={() => void signOut()}
                             >
                                 Sign out
@@ -73,7 +73,7 @@ export function Navigation() {
                     </DropdownMenu.Root>
                 ) : (
                     <button
-                        className="svg-outline relative border-2 border-black px-3 py-1 font-semibold text-black"
+                        className="svg-outline relative border-2 border-black dark:border-white px-3 py-1 font-semibold text-black dark:text-white"
                         onClick={() => void signIn()}
                     >
                         Sign in

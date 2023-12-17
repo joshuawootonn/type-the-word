@@ -121,7 +121,7 @@ export function PassageSelector({
 
     return (
         <>
-            <label htmlFor="passage" className="text-lg font-medium text-black">
+            <label htmlFor="passage" className="text-lg font-medium text-black dark:text-white">
                 Passage:
             </label>
             <div className={'not-prose svg-outline relative flex flex-row '}>
@@ -154,7 +154,7 @@ export function PassageSelector({
                         <ScrollArea.Viewport>
                             <Combobox.Options
                                 className={
-                                    'absolute z-10 max-h-60 w-full -translate-y-0.5 overflow-auto border-2 border-black bg-white'
+                                    'absolute z-10 max-h-60 w-full -translate-y-0.5 overflow-auto border-2 border-black bg-white dark:bg-black'
                                 }
                             >
                                 {filteredBooks.map(book => (

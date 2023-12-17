@@ -6,18 +6,18 @@ export function Footer() {
     return (
         <footer className="flex w-full items-center justify-between space-x-3 py-2 text-sm">
             <a
-                className="svg-outline relative no-underline"
+                className="svg-outline relative no-underline dark:text-white"   
                 href="https://www.esv.org/"
                 target="_blank"
                 rel="noopener noreferrer"
             >
                 (ESV)
             </a>
-            <div>/</div>
+            <div className="dark:text-white">/</div>
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
                     <button
-                        className="svg-outline relative no-underline"
+                        className="svg-outline relative no-underline dark:text-white"
                         aria-label="Customise options"
                     >
                         legal
@@ -25,14 +25,14 @@ export function Footer() {
                 </DropdownMenu.Trigger>
 
                 <DropdownMenu.Content
-                    className="flex flex-col border-2 border-black bg-white text-black"
+                    className="flex flex-col border-2 border-black dark:border-white bg-white dark:bg-black text-black dark:text-white"
                     sideOffset={4}
                     align="center"
                     side="top"
                 >
                     <DropdownMenu.Item asChild={true}>
                         <Link
-                            className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-black focus:text-white"
+                            className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
                             href={'/copyright'}
                         >
                             copyright
@@ -40,7 +40,7 @@ export function Footer() {
                     </DropdownMenu.Item>
                     <DropdownMenu.Item asChild={true}>
                         <Link
-                            className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-black focus:text-white"
+                            className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
                             href={'/privacy-policy'}
                         >
                             privacy
@@ -48,7 +48,7 @@ export function Footer() {
                     </DropdownMenu.Item>
                     <DropdownMenu.Item asChild={true}>
                         <Link
-                            className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-black focus:text-white"
+                            className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
                             href={'/terms-of-service'}
                         >
                             terms
@@ -57,23 +57,23 @@ export function Footer() {
                 </DropdownMenu.Content>
             </DropdownMenu.Root>
 
-            <div>/</div>
-            <Link className="svg-outline relative no-underline" href={'/why'}>
+            <div className="dark:text-white">/</div>
+            <Link className="svg-outline relative no-underline dark:text-white" href={'/why'}>
                 why?
             </Link>
 
             <div className="hidden flex-grow md:block"> </div>
-            <div className="block md:hidden">/</div>
+            <div className="block md:hidden dark:text-white">/</div>
             <Link
-                className="svg-outline relative no-underline"
+                className="svg-outline relative no-underline dark:text-white"
                 href={'https://github.com/joshuawootonn/type-the-word'}
                 target="_blank"
                 rel="noopener noreferrer"
             >
                 github
             </Link>
-            <div>/</div>
-            <EmailLink className={'shrink-0 font-normal'}>
+            <div className="dark:text-white">/</div>
+            <EmailLink className={'shrink-0 font-normal dark:text-white'}>
                 email me feedback
             </EmailLink>
         </footer>

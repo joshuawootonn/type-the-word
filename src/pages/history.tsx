@@ -42,7 +42,7 @@ export default function Home() {
                                     className="basis relative z-0 aspect-square border-2 border-black"
                                     key={entry.book}
                                 >
-                                    <div className="max-w-[fit-content] bg-black px-2 text-white">
+                                    <div className="max-w-[fit-content] bg-black px-2 text-white dark:text-black">
                                         {entry.label}
                                     </div>
                                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl font-bold  ">
