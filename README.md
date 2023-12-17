@@ -24,3 +24,20 @@
                         <br />
                         My hope is that by typing the word you will also see the
                         Bible in a deeper way.
+
+
+
+## Contributing
+
+If you would like to contribute, Genesis 1, Psalm 23, and James 1 will load without an API key.
+
+Here are some features that others have requested:
+* [ ] New translations (Medium)
+  * [ ] NASB
+  * [ ] NLT
+  * [ ] NRSV2CE
+* [ ] Different languages (Medium) 
+  * Portuguese was requested
+* [ ] Dark mode (Easy)
+* Typing Speed / WPM (Hard)
+  * This will mainly be hard because I will have lots of opinions. If you want to implements it though we can chat. 
