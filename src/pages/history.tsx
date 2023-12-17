@@ -11,7 +11,7 @@ export default function Home() {
     const summary = api.typingSession.getHistorySummary.useQuery()
 
     return (
-        <div className="min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0">
+        <div className="min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0 dark:text-white">
             <Head>
                 <title>Type the Word - History</title>
                 <meta
@@ -28,7 +28,7 @@ export default function Home() {
             <Navigation />
             <main className="prose mx-auto mb-8 w-full flex-grow pt-4 text-lg lg:pt-8">
                 <h1 className="">History</h1>
-                <hr className="mx-0 w-full border-t-2 border-black" />
+                <hr className="mx-0 w-full border-t-2 border-black dark:text-white dark:border-white" />
                 <h2>Summary</h2>
                 {summary.isLoading ? (
                     <Loading initialDots={2} />
@@ -39,7 +39,7 @@ export default function Home() {
                         {summary.data.map(entry => {
                             return (
                                 <div
-                                    className="basis relative z-0 aspect-square border-2 border-black"
+                                    className="basis relative z-0 aspect-square border-2 border-black dark:border-white"
                                     key={entry.book}
                                 >
                                     <div className="max-w-[fit-content] bg-black px-2 text-white dark:text-black">
@@ -58,7 +58,7 @@ export default function Home() {
                         })}
                     </div>
                 )}
-                <hr className="mx-0 w-full border-t-2 border-black" />
+                <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
                 <h2>Log</h2>
                 {log.isLoading ? (
                     <Loading />
