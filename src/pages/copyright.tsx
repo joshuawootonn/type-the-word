@@ -20,8 +20,8 @@ export default function Home() {
             </Head>
 
             <Navigation />
-            <main className="prose mx-auto mb-8 w-full flex-grow pt-4 text-lg lg:pt-8 dark:text-white">
-                <h1 className="dark:text-white">Copyright</h1>
+            <main className="prose dark:prose-invert mx-auto mb-8 w-full flex-grow pt-4 text-lg lg:pt-8 dark:text-white">
+                <h1>Copyright</h1>
                 <p>
                     Scripture quotations are from the ESV® Bible (The Holy
                     Bible, English Standard Version®), © 2001 by Crossway, a
