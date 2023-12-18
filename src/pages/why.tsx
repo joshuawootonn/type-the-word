@@ -103,7 +103,7 @@ export default function Home() {
                         scriptures were great reminders of why we should
                         meditate on God&apos;s word. If you have others, feel
                         free to{' '}
-                        <EmailLink className="svg-outline-sm underline dark:text-white">
+                        <EmailLink className="svg-outline-sm underline">
                             email me
                         </EmailLink>
                         . I would love to make this page a long list of all the

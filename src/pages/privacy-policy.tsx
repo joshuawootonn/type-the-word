@@ -40,7 +40,7 @@ export default function Home() {
 
                     <h2 className="dark:text-white">Contact</h2>
                     <p>
-                        <EmailLink className="dark:text-white underline">Contact me</EmailLink> if you have any
+                        <EmailLink className="underline">Contact me</EmailLink> if you have any
                         questions about Type the Words&apos; privacy policy, the
                         data it holds on you, or you would like to exercise one
                         of your data protection rights.

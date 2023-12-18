@@ -32,7 +32,7 @@ export function EmailLink({
                 <button
                     tabIndex={0}
                     className={clsx(
-                        'relative z-[5] font-medium text-black',
+                        'relative z-[5] font-medium text-black dark:text-white',
                         className,
                     )}
                     onClick={e => {

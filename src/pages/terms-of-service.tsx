@@ -60,7 +60,7 @@ export default function Home() {
                     </p>
                     <h2 className="dark:text-white">Contact</h2>
                     <p>
-                        <EmailLink className="dark:text-white underline">Contact me</EmailLink> if you have any
+                        <EmailLink className="underline">Contact me</EmailLink> if you have any
                         questions about Type the Words&apos; terms of service.
                     </p>
                     <p>
