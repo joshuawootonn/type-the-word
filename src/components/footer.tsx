@@ -6,7 +6,7 @@ export function Footer() {
     return (
         <footer className="flex w-full items-center justify-between space-x-3 py-2 text-sm">
             <a
-                className="svg-outline relative no-underline dark:text-white"   
+                className="svg-outline relative no-underline dark:text-white"
                 href="https://www.esv.org/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -25,7 +25,7 @@ export function Footer() {
                 </DropdownMenu.Trigger>
 
                 <DropdownMenu.Content
-                    className="flex flex-col border-2 border-black dark:border-white bg-white dark:bg-black text-black dark:text-white"
+                    className="flex flex-col border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white"
                     sideOffset={4}
                     align="center"
                     side="top"
@@ -58,12 +58,15 @@ export function Footer() {
             </DropdownMenu.Root>
 
             <div className="dark:text-white">/</div>
-            <Link className="svg-outline relative no-underline dark:text-white" href={'/why'}>
+            <Link
+                className="svg-outline relative no-underline dark:text-white"
+                href={'/why'}
+            >
                 why?
             </Link>
 
             <div className="hidden flex-grow md:block"> </div>
-            <div className="block md:hidden dark:text-white">/</div>
+            <div className="block dark:text-white md:hidden">/</div>
             <Link
                 className="svg-outline relative no-underline dark:text-white"
                 href={'https://github.com/joshuawootonn/type-the-word'}
@@ -73,7 +76,9 @@ export function Footer() {
                 github
             </Link>
             <div className="dark:text-white">/</div>
-            <EmailLink className={'shrink-0 font-normal dark:text-white'}>
+            <EmailLink
+                className={'svg-outline shrink-0 font-normal dark:text-white'}
+            >
                 email me feedback
             </EmailLink>
         </footer>

@@ -15,15 +15,27 @@ body[style] {
 }
 
 /* focus-within is required because inputs have no content, and `:before` is prepended to content.*/
-.svg-outline:focus-within *,.svg-outline:focus {
+.svg-outline:focus-within *,.svg-outline:focus, .svg-outline-sm:focus-within *,.svg-outline-sm:focus {
     @apply outline-none;
 }
 
-.svg-outline:focus:before, .svg-outline:focus-within:before {
+
+
+.svg-outline:focus:before, .svg-outline:focus-within:before,.svg-outline-sm:focus:before, .svg-outline-sm:focus-within:before {
     @apply -inset-2;
     content: ' ';
     background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     position: absolute;
+}
+
+.svg-outline-sm:focus:before, .svg-outline-sm:focus-within:before {
+    @apply -inset-1;
+}
+
+@media (prefers-color-scheme: dark) {
+    .svg-outline:focus:before, .svg-outline:focus-within:before,.svg-outline-sm:focus:before, .svg-outline-sm:focus-within:before  {
+        background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="white" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
+    }
 }
 
 .min-h-screen-1px {

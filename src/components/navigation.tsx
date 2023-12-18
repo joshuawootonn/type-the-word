@@ -9,7 +9,11 @@ export function Navigation() {
     const router = useRouter()
     return (
         <nav className="mx-auto mb-2 flex w-full items-center justify-between pt-4 lg:pt-8">
-            <Link href={'/'} aria-label={'Type the Word logo'}>
+            <Link
+                className={'svg-outline relative'}
+                href={'/'}
+                aria-label={'Type the Word logo'}
+            >
                 <svg
                     width="180"
                     viewBox="0 0 103 19"

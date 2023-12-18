@@ -32,7 +32,7 @@ export function EmailLink({
                 <button
                     tabIndex={0}
                     className={clsx(
-                        'svg-outline-sm z-[5] font-medium text-black',
+                        'relative z-[5] font-medium text-black',
                         className,
                     )}
                     onClick={e => {
@@ -56,7 +56,7 @@ export function EmailLink({
             >
                 <div
                     className={clsx(
-                        'border-2 border-black bg-white dark:bg-black px-2 py-1 font-medium',
+                        'border-2 border-black bg-white px-2 py-1 font-medium dark:bg-black',
                         popoverClassName,
                     )}
                 >

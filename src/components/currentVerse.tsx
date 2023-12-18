@@ -330,7 +330,10 @@ export function CurrentVerse({
                 if (atom.type === 'verseNumber') {
                     return (
                         <b
-                            className={clsx(isIndented && 'absolute -left-0 dark:text-white')}
+                            className={clsx(
+                                isIndented &&
+                                    'absolute -left-0 dark:text-white',
+                            )}
                             key={aIndexPrime}
                         >
                             {atom.text.split(':').at(-1)}
@@ -405,7 +408,7 @@ export function CurrentVerse({
             {rect && arenaRect && !isArenaFocused ? (
                 <button
                     className={clsx(
-                        'svg-outline absolute z-10 border-2 border-black bg-white/80 dark:bg-black/80 text-black opacity-0 backdrop-blur-sm transition-opacity duration-100  dark:text-white',
+                        'svg-outline absolute z-10 border-2 border-black bg-white/80 text-black opacity-0 backdrop-blur-sm transition-opacity duration-100 dark:border-white dark:bg-black/80 dark:text-white',
                         !isArenaActive && 'hover:opacity-100',
                         'focus:opacity-100',
                     )}
