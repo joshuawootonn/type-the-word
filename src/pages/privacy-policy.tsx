@@ -22,12 +22,12 @@ export default function Home() {
 
             <Navigation />
 
-            <main className="prose relative mx-auto w-full flex-grow pt-4 text-lg  lg:pt-8 dark:text-white">
+            <main className="prose dark:prose-invert relative mx-auto w-full flex-grow pt-4 text-lg  lg:pt-8 dark:text-white">
                 <div className={'prose-h2:text-3xl prose-p:text-xl'}>
-                    <h1 className="dark:text-white">Privacy Policy</h1>
+                    <h1 >Privacy Policy</h1>
                     <hr className="mx-0 w-full border-t-2  border-black dark:border-white" />
 
-                    <h2 className="dark:text-white">Agreement</h2>
+                    <h2 >Agreement</h2>
                     <p>
                         What data do I collect? Type the Word collects the
                         following data:
@@ -38,7 +38,7 @@ export default function Home() {
                         </ul>
                     </p>
 
-                    <h2 className="dark:text-white">Contact</h2>
+                    <h2 >Contact</h2>
                     <p>
                         <EmailLink className="underline">Contact me</EmailLink> if you have any
                         questions about Type the Words&apos; privacy policy, the

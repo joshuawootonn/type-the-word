@@ -22,15 +22,15 @@ export default function Home() {
 
             <Navigation />
 
-            <main className="prose relative mx-auto w-full flex-grow pt-4 text-lg  lg:pt-8 dark:text-white">
+            <main className="prose dark:prose-invert relative mx-auto w-full flex-grow pt-4 text-lg  lg:pt-8 dark:text-white">
                 <div className={'prose-h2:text-3xl prose-p:text-xl'}>
-                    <h1 className="dark:text-white">Terms of Service</h1>
+                    <h1 >Terms of Service</h1>
                     <hr className="mx-0 w-full border-t-2  border-black dark:border-white" />
                     <p>
                         These terms of service were last updated on December 13,
                         2023.
                     </p>
-                    <h2 className="dark:text-white">Agreement</h2>
+                    <h2 >Agreement</h2>
                     <p>
                         By accessing this Website, accessible from
                         typetheword.site, you are agreeing to be bound by these
@@ -40,7 +40,7 @@ export default function Home() {
                         TERMS AND CONDITIONS OF THIS AGREEMENT, YOU ARE NOT
                         PERMITTED TO ACCESS OR USE OUR SERVICES.
                     </p>
-                    <h2 className="dark:text-white">Limitations</h2>
+                    <h2 >Limitations</h2>
                     <p>
                         You are responsible for your account&apos;s security and
                         all activities on your account. You must not, in the use
@@ -53,12 +53,12 @@ export default function Home() {
                         notice to you, if we believe that you have violated this
                         agreement.
                     </p>
-                    <h2 className="dark:text-white">Limitations on Automated Use</h2>
+                    <h2 >Limitations on Automated Use</h2>
                     <p>
                         You shouldn&apos;t use bots or access Type the Word. If
                         you do, I&apos;ll block you, and delete your account.
                     </p>
-                    <h2 className="dark:text-white">Contact</h2>
+                    <h2 >Contact</h2>
                     <p>
                         <EmailLink className="underline">Contact me</EmailLink> if you have any
                         questions about Type the Words&apos; terms of service.
