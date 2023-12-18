@@ -47,7 +47,7 @@ export function Navigation() {
                     <DropdownMenu.Root>
                         <DropdownMenu.Trigger asChild>
                             <button
-                                className="svg-outline relative border-2 border-black px-3 py-1 font-medium text-black"
+                                className="svg-outline relative border-2 border-black px-3 py-1 font-medium text-black dark:border-white dark:text-white"
                                 aria-label="Customise options"
                             >
                                 {sessionData.user.name}
@@ -55,20 +55,20 @@ export function Navigation() {
                         </DropdownMenu.Trigger>
 
                         <DropdownMenu.Content
-                            className="border-2 border-black text-black"
+                            className="border-2 border-black text-black dark:border-white dark:text-white"
                             sideOffset={-2}
                             align="end"
                         >
                             <DropdownMenu.Item asChild={true}>
                                 <Link
-                                    className="text-medium block cursor-pointer px-3 py-1 no-underline outline-none focus:bg-black focus:text-white "
+                                    className="text-medium block cursor-pointer px-3 py-1 no-underline outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
                                     href={'/history'}
                                 >
                                     History
                                 </Link>
                             </DropdownMenu.Item>
                             <DropdownMenu.Item
-                                className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black "
+                                className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
                                 onClick={() => void signOut()}
                             >
                                 Sign out
@@ -77,7 +77,7 @@ export function Navigation() {
                     </DropdownMenu.Root>
                 ) : (
                     <button
-                        className="svg-outline relative border-2 border-black dark:border-white px-3 py-1 font-semibold text-black dark:text-white"
+                        className="svg-outline relative border-2 border-black px-3 py-1 font-semibold text-black dark:border-white dark:text-white"
                         onClick={() => void signIn()}
                     >
                         Sign in
