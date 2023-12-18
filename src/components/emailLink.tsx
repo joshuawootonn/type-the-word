@@ -56,7 +56,7 @@ export function EmailLink({
             >
                 <div
                     className={clsx(
-                        'border-2 border-black bg-white px-2 py-1 font-medium dark:bg-black',
+                        'border-2 border-black bg-white px-2 py-1 font-medium dark:bg-black dark:border-white',
                         popoverClassName,
                     )}
                 >
