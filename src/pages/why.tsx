@@ -31,6 +31,8 @@ export async function getStaticProps() {
     await helpers.passage.passage.prefetch('joshua 1:8')
     await helpers.passage.passage.prefetch('psalm 1:1-3')
     await helpers.passage.passage.prefetch('matthew 4:4')
+    await helpers.passage.passage.prefetch('psalm 119:9-11')
+    await helpers.passage.passage.prefetch('psalm 19:7-11')
 
     return { props: { trpcState: helpers.dehydrate() } }
 }
@@ -41,6 +43,8 @@ export default function Home() {
     const three = api.passage.passage.useQuery('joshua 1:8')
     const four = api.passage.passage.useQuery('psalm 1:1-3')
     const five = api.passage.passage.useQuery('matthew 4:4')
+    const six = api.passage.passage.useQuery('psalm 119:9-11')
+    const seven = api.passage.passage.useQuery('psalm 19:7-11')
 
     return (
         <div className="min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0">
@@ -162,6 +166,30 @@ export default function Home() {
                             autoSelect={false}
                             passage={five.data}
                             key={JSON.stringify(five.data)}
+                        />
+                    )}
+                    {six.isLoading ? (
+                        <Loading />
+                    ) : six.error ? (
+                        <>We hit a whoopsie! :(</>
+                    ) : (
+                        <Arena
+                            autofocus={false}
+                            autoSelect={false}
+                            passage={six.data}
+                            key={JSON.stringify(six.data)}
+                        />
+                    )}
+                    {seven.isLoading ? (
+                        <Loading />
+                    ) : seven.error ? (
+                        <>We hit a whoopsie! :(</>
+                    ) : (
+                        <Arena
+                            autofocus={false}
+                            autoSelect={false}
+                            passage={seven.data}
+                            key={JSON.stringify(seven.data)}
                         />
                     )}
                 </div>
