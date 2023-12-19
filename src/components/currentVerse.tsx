@@ -314,6 +314,10 @@ export function CurrentVerse({
                 inputRef.current?.focus()
             }}
         >
+            <span
+                id={'scroll-anchor'}
+                className={'inline-block -translate-y-36'}
+            />
             {verse.nodes.map((atom, aIndexPrime) => {
                 const aIndex = verse.nodes
                     .slice(0, aIndexPrime)
@@ -428,6 +432,10 @@ export function CurrentVerse({
                 onInput={handleInput}
                 tabIndex={-1}
                 onFocus={() => {
+                    document.getElementById('scroll-anchor')?.scrollIntoView({
+                        block: 'start',
+                        behavior: 'smooth',
+                    })
                     setIsArenaFocused(true)
                 }}
                 onBlur={() => {
