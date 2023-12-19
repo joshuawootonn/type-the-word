@@ -6,7 +6,7 @@ import { EmailLink } from '~/components/emailLink'
 
 export default function Home() {
     return (
-        <div className="min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0 dark:text-white">
+        <div className="min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0">
             <Head>
                 <title>Type the Word</title>
                 <meta
@@ -22,7 +22,7 @@ export default function Home() {
 
             <Navigation />
 
-            <main className="prose dark:prose-invert relative mx-auto w-full flex-grow pt-4 text-lg  lg:pt-8 dark:text-white">
+            <main className="prose dark:prose-invert relative mx-auto w-full flex-grow pt-4 text-lg  lg:pt-8">
                 <div className={'prose-h2:text-3xl prose-p:text-xl'}>
                     <h1 >Terms of Service</h1>
                     <hr className="mx-0 w-full border-t-2  border-black dark:border-white" />

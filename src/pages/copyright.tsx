@@ -20,7 +20,7 @@ export default function Home() {
             </Head>
 
             <Navigation />
-            <main className="prose dark:prose-invert mx-auto mb-8 w-full flex-grow pt-4 text-lg lg:pt-8 dark:text-white">
+            <main className="prose dark:prose-invert mx-auto mb-8 w-full flex-grow pt-4 text-lg lg:pt-8">
                 <h1>Copyright</h1>
                 <p>
                     Scripture quotations are from the ESV® Bible (The Holy

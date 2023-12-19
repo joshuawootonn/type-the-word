@@ -59,11 +59,11 @@ export function ReadonlyVerse({
     return (
         <span
             className={clsx(
-                'verse break-spaces text-balance group inline h-3 hover:cursor-pointer dark:text-white',
+                'verse break-spaces text-balance group inline h-3 hover:cursor-pointer',
                 isCurrentVerse && 'active-verse',
                 isTypedInSession ?? isTypedInHistory
-                    ? 'text-gray-400'
-                    : 'text-black',
+                    ? 'text-gray-400 dark:text-gray-500'
+                    : 'text-black dark:text-white',
             )}
             ref={ref}
             onClick={() => {

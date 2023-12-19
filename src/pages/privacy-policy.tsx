@@ -22,7 +22,7 @@ export default function Home() {
 
             <Navigation />
 
-            <main className="prose dark:prose-invert relative mx-auto w-full flex-grow pt-4 text-lg  lg:pt-8 dark:text-white">
+            <main className="prose dark:prose-invert relative mx-auto w-full flex-grow pt-4 text-lg  lg:pt-8">
                 <div className={'prose-h2:text-3xl prose-p:text-xl'}>
                     <h1 >Privacy Policy</h1>
                     <hr className="mx-0 w-full border-t-2  border-black dark:border-white" />
