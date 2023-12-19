@@ -4,20 +4,20 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 
 export function Footer() {
     return (
-        <footer className="flex w-full items-center justify-between space-x-3 py-2 text-sm">
+        <footer className="flex w-full items-center justify-between space-x-3 py-2 text-sm dark:text-white">
             <a
-                className="svg-outline relative no-underline dark:text-white"
+                className="svg-outline relative no-underline"
                 href="https://www.esv.org/"
                 target="_blank"
                 rel="noopener noreferrer"
             >
                 (ESV)
             </a>
-            <div className="dark:text-white">/</div>
+            <div>/</div>
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
                     <button
-                        className="svg-outline relative no-underline dark:text-white"
+                        className="svg-outline relative no-underline"
                         aria-label="Customise options"
                     >
                         legal
@@ -25,7 +25,7 @@ export function Footer() {
                 </DropdownMenu.Trigger>
 
                 <DropdownMenu.Content
-                    className="flex flex-col border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white"
+                    className="flex flex-col border-2 border-black bg-white dark:border-white dark:bg-black"
                     sideOffset={4}
                     align="center"
                     side="top"
@@ -58,27 +58,22 @@ export function Footer() {
             </DropdownMenu.Root>
 
             <div className="dark:text-white">/</div>
-            <Link
-                className="svg-outline relative no-underline dark:text-white"
-                href={'/why'}
-            >
+            <Link className="svg-outline relative no-underline" href={'/why'}>
                 why?
             </Link>
 
             <div className="hidden flex-grow md:block"> </div>
-            <div className="block dark:text-white md:hidden">/</div>
+            <div className="block md:hidden">/</div>
             <Link
-                className="svg-outline relative no-underline dark:text-white"
+                className="svg-outline relative no-underline"
                 href={'https://github.com/joshuawootonn/type-the-word'}
                 target="_blank"
                 rel="noopener noreferrer"
             >
                 github
             </Link>
-            <div className="dark:text-white">/</div>
-            <EmailLink
-                className={'svg-outline shrink-0 font-normal dark:text-white'}
-            >
+            <div>/</div>
+            <EmailLink className={'svg-outline shrink-0 font-normal'}>
                 email me feedback
             </EmailLink>
         </footer>

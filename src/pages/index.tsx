@@ -77,7 +77,7 @@ export default function Home(props: { passage?: PassageReference }) {
                 <PassageSelector value={value} setValue={setValue} />
             </div>
 
-            <main className="relative mx-auto w-full flex-grow dark:text-white">
+            <main className="relative mx-auto w-full flex-grow">
                 {router.isFallback || passage.isLoading ? (
                     <Loading />
                 ) : passage.error ? (

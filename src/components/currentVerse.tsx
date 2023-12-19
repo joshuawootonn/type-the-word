@@ -303,7 +303,7 @@ export function CurrentVerse({
     return (
         <span
             className={clsx(
-                'verse break-spaces text-balance group inline h-3 hover:cursor-pointer dark:prose-p:text-white',
+                'verse break-spaces text-balance group inline h-3 hover:cursor-pointer',
                 isCurrentVerse && 'active-verse',
                 isTypedInSession ?? isTypedInHistory
                     ? 'text-gray-400'
@@ -345,7 +345,7 @@ export function CurrentVerse({
                         <span
                             key={aIndexPrime}
                             className={clsx(
-                                'space inline-flex h-[19px] w-[1ch] translate-y-[3px] dark:text-white',
+                                'space inline-flex h-[19px] w-[1ch] translate-y-[3px]',
                                 lastAtom != null &&
                                     typedAtom == null &&
                                     'active-space',
@@ -427,7 +427,7 @@ export function CurrentVerse({
             ) : null}
             <input
                 type="text"
-                className="peer fixed h-0 max-h-0 opacity-0 dark:text-white"
+                className="peer fixed h-0 max-h-0 opacity-0"
                 onInput={handleInput}
                 tabIndex={-1}
                 onFocus={() => {

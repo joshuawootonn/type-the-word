@@ -66,7 +66,7 @@ export function Arena({
                 <div
                     ref={arenaRef}
                     id={arenaId}
-                    className="arena prose dark:invert-prose relative z-0 w-full"
+                    className="arena prose relative z-0 w-full dark:prose-invert"
                 >
                     <ArenaContext.Provider
                         value={{
@@ -93,7 +93,7 @@ export function Arena({
                                 case 'h3':
                                     return (
                                         <h3
-                                            className="text-xl font-semibold tracking-wide dark:text-white"
+                                            className="text-xl font-semibold tracking-wide"
                                             key={pIndex}
                                         >
                                             {node.text}
@@ -102,7 +102,7 @@ export function Arena({
                                 case 'h4':
                                     return (
                                         <h4
-                                            className="text-lg font-medium tracking-wide dark:text-white"
+                                            className="text-lg font-medium tracking-wide"
                                             key={pIndex}
                                         >
                                             {node.text}
