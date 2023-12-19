@@ -68,7 +68,7 @@ export function PassageSelector({
     const [bookQuery, setBookQuery] = useState('')
     const [chapterQuery, setChapterQuery] = useState('')
 
-    const { push } = useRouter()
+    const router = useRouter()
 
     const chapterRef = useRef<HTMLInputElement>(null)
 
@@ -99,7 +99,7 @@ export function PassageSelector({
                 clearTimeout(t)
             }
         }
-    }, [book, chapter, push, setValue, value])
+    }, [book, chapter, setValue, value])
 
     const filteredChapters =
         chapterQuery === ''
@@ -116,7 +116,7 @@ export function PassageSelector({
         const nextUrl = `${book}_${chapter}`
         const nextValue = passageReferenceSchema.parse(nextUrl)
         setValue(nextValue)
-        void push(`/passage/${nextUrl}`)
+        void router.push(`/passage/${nextUrl}`, undefined, { scroll: false })
     }
 
     return (
