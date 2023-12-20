@@ -316,7 +316,9 @@ export function CurrentVerse({
         >
             <span
                 id={'scroll-anchor'}
-                className={'inline-block -translate-y-36'}
+                className={
+                    'inline-block -translate-y-[300px] lg:-translate-y-[330px]'
+                }
             />
             {verse.nodes.map((atom, aIndexPrime) => {
                 const aIndex = verse.nodes
