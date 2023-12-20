@@ -121,10 +121,17 @@ export function PassageSelector({
 
     return (
         <>
-            <label htmlFor="passage" className="text-lg font-medium text-black">
+            <label
+                htmlFor="passage"
+                className="text-lg font-medium text-black dark:text-white"
+            >
                 Passage:
             </label>
-            <div className={'not-prose svg-outline relative flex flex-row '}>
+            <div
+                className={
+                    'not-prose svg-outline relative flex flex-row dark:bg-black dark:text-white'
+                }
+            >
                 <Combobox
                     className="relative z-40"
                     as="div"
@@ -147,14 +154,14 @@ export function PassageSelector({
                             simpleBibleMetadata[book]?.name ?? ''
                         }
                         className={
-                            'w-40 rounded-none border-2 border-black p-1 font-medium outline-none'
+                            'w-40 rounded-none border-2 border-black p-1 font-medium outline-none dark:border-white dark:bg-black dark:text-white'
                         }
                     />
                     <ScrollArea.Root>
                         <ScrollArea.Viewport>
                             <Combobox.Options
                                 className={
-                                    'absolute z-10 max-h-60 w-full -translate-y-0.5 overflow-auto border-2 border-black bg-white'
+                                    'absolute z-10 max-h-60 w-full -translate-y-0.5 overflow-auto border-2 border-black bg-white dark:border-white dark:bg-black dark:text-white'
                                 }
                             >
                                 {filteredBooks.map(book => (
@@ -168,8 +175,8 @@ export function PassageSelector({
                                                 className={clsx(
                                                     'cursor-pointer px-2 py-1',
                                                     active
-                                                        ? 'bg-black text-white'
-                                                        : 'bg-white text-black',
+                                                        ? 'bg-invert text-white dark:bg-white dark:text-black'
+                                                        : 'bg-white text-black dark:bg-black dark:text-white',
                                                 )}
                                                 onClick={e => {
                                                     setTimeout(
@@ -197,7 +204,7 @@ export function PassageSelector({
                             viewBox="0 0 20 20"
                             fill="currentColor"
                             aria-hidden="true"
-                            className="h-5 w-5 text-black"
+                            className="h-5 w-5 text-black dark:text-white"
                         >
                             <path
                                 fillRule="evenodd"
@@ -226,14 +233,14 @@ export function PassageSelector({
                             }
                         }}
                         className={
-                            'w-16 rounded-none border-2 border-black p-1 font-medium outline-none'
+                            'w-16 rounded-none border-2 border-black p-1 font-medium outline-none dark:border-white dark:bg-black dark:text-white'
                         }
                     />
                     <ScrollArea.Root>
                         <ScrollArea.Viewport>
                             <Combobox.Options
                                 className={
-                                    'absolute z-10 max-h-60 w-full -translate-y-0.5 overflow-auto border-2 border-black bg-white'
+                                    'absolute z-10 max-h-60 w-full -translate-y-0.5 overflow-auto border-2 border-black bg-white dark:border-white dark:bg-black dark:text-white'
                                 }
                             >
                                 {filteredChapters.map((number, i) => (
@@ -247,8 +254,8 @@ export function PassageSelector({
                                                 className={clsx(
                                                     'cursor-pointer px-2 py-1',
                                                     active
-                                                        ? 'bg-black text-white'
-                                                        : 'bg-white text-black',
+                                                        ? 'bg-black text-white dark:bg-white dark:text-black'
+                                                        : 'bg-white text-black dark:bg-black dark:text-white',
                                                 )}
                                             >
                                                 {number}
@@ -269,7 +276,7 @@ export function PassageSelector({
                             viewBox="0 0 20 20"
                             fill="currentColor"
                             aria-hidden="true"
-                            className="h-5 w-5 text-black"
+                            className="h-5 w-5 text-black dark:bg-black dark:text-white"
                         >
                             <path
                                 fillRule="evenodd"

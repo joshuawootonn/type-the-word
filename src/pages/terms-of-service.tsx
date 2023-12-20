@@ -22,10 +22,10 @@ export default function Home() {
 
             <Navigation />
 
-            <main className="prose relative mx-auto w-full flex-grow pt-4 text-lg  lg:pt-8">
+            <main className="prose relative mx-auto w-full flex-grow pt-4 text-lg dark:prose-invert  lg:pt-8">
                 <div className={'prose-h2:text-3xl prose-p:text-xl'}>
                     <h1>Terms of Service</h1>
-                    <hr className="mx-0 w-full border-t-2  border-black" />
+                    <hr className="mx-0 w-full border-t-2  border-black dark:border-white" />
                     <p>
                         These terms of service were last updated on December 13,
                         2023.
@@ -60,8 +60,11 @@ export default function Home() {
                     </p>
                     <h2>Contact</h2>
                     <p>
-                        <EmailLink>Contact me</EmailLink> if you have any
-                        questions about Type the Words&apos; terms of service.
+                        <EmailLink className="svg-outline-sm underline">
+                            Contact me
+                        </EmailLink>{' '}
+                        if you have any questions about Type the Words&apos;
+                        terms of service.
                     </p>
                     <p>
                         Terms based on MonkeyType&apos;s terms which were

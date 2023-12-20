@@ -306,8 +306,8 @@ export function CurrentVerse({
                 'verse break-spaces text-balance group inline h-3 hover:cursor-pointer',
                 isCurrentVerse && 'active-verse',
                 isTypedInSession ?? isTypedInHistory
-                    ? 'text-gray-400'
-                    : 'text-black',
+                    ? 'text-gray-400 dark:text-gray-500'
+                    : 'text-black dark:text-white',
             )}
             ref={ref}
             onClick={() => {
@@ -409,7 +409,7 @@ export function CurrentVerse({
             {rect && arenaRect && !isArenaFocused ? (
                 <button
                     className={clsx(
-                        'svg-outline absolute z-10 border-2 border-black bg-white/80 text-black opacity-0 backdrop-blur-sm transition-opacity duration-100',
+                        'svg-outline absolute z-10 border-2 border-black bg-white/80 text-black opacity-0 backdrop-blur-sm transition-opacity duration-100 dark:border-white dark:bg-black/80 dark:text-white',
                         !isArenaActive && 'hover:opacity-100',
                         'focus:opacity-100',
                     )}

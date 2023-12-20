@@ -4,7 +4,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 
 export function Footer() {
     return (
-        <footer className="flex w-full items-center justify-between space-x-3 py-2 text-sm">
+        <footer className="flex w-full items-center justify-between space-x-3 py-2 text-sm dark:text-white">
             <a
                 className="svg-outline relative no-underline"
                 href="https://www.esv.org/"
@@ -25,14 +25,14 @@ export function Footer() {
                 </DropdownMenu.Trigger>
 
                 <DropdownMenu.Content
-                    className="flex flex-col border-2 border-black bg-white text-black"
+                    className="flex flex-col border-2 border-black bg-white dark:border-white dark:bg-black"
                     sideOffset={4}
                     align="center"
                     side="top"
                 >
                     <DropdownMenu.Item asChild={true}>
                         <Link
-                            className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-black focus:text-white"
+                            className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
                             href={'/copyright'}
                         >
                             copyright
@@ -40,7 +40,7 @@ export function Footer() {
                     </DropdownMenu.Item>
                     <DropdownMenu.Item asChild={true}>
                         <Link
-                            className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-black focus:text-white"
+                            className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
                             href={'/privacy-policy'}
                         >
                             privacy
@@ -48,7 +48,7 @@ export function Footer() {
                     </DropdownMenu.Item>
                     <DropdownMenu.Item asChild={true}>
                         <Link
-                            className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-black focus:text-white"
+                            className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
                             href={'/terms-of-service'}
                         >
                             terms
@@ -73,7 +73,7 @@ export function Footer() {
                 github
             </Link>
             <div>/</div>
-            <EmailLink className={'shrink-0 font-normal'}>
+            <EmailLink className={'svg-outline shrink-0 font-normal'}>
                 email me feedback
             </EmailLink>
         </footer>

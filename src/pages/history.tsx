@@ -11,7 +11,7 @@ export default function Home() {
     const summary = api.typingSession.getHistorySummary.useQuery()
 
     return (
-        <div className="min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0">
+        <div className="min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 dark:text-white lg:px-0">
             <Head>
                 <title>Type the Word - History</title>
                 <meta
@@ -26,26 +26,26 @@ export default function Home() {
             </Head>
 
             <Navigation />
-            <main className="prose mx-auto mb-8 w-full flex-grow pt-4 text-lg lg:pt-8">
+            <main className="prose mx-auto mb-8 w-full flex-grow pt-4 text-lg dark:prose-invert dark:text-white lg:pt-8">
                 <h1 className="">History</h1>
-                <hr className="mx-0 w-full border-t-2 border-black" />
+                <hr className="mx-0 w-full border-t-2 border-black dark:border-white dark:text-white" />
                 <h2>Summary</h2>
                 {summary.isLoading ? (
                     <Loading initialDots={2} />
                 ) : summary.error ? (
                     <div>We hit a whoopsie! :(</div>
                 ) : (
-                    <div className="xs: grid shrink-0 grid-cols-2 gap-3 sm:grid-cols-3">
+                    <div className="grid shrink-0 grid-cols-2 gap-3 sm:grid-cols-3">
                         {summary.data.map(entry => {
                             return (
                                 <div
-                                    className="basis relative z-0 aspect-square border-2 border-black"
+                                    className="basis relative z-0 aspect-square border-2 border-black dark:border-white"
                                     key={entry.book}
                                 >
-                                    <div className="max-w-[fit-content] bg-black px-2 text-white">
+                                    <div className="max-w-[fit-content] bg-black px-2 text-white dark:bg-white dark:text-black">
                                         {entry.label}
                                     </div>
-                                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl font-bold  ">
+                                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl font-bold">
                                         {Math.floor(
                                             (entry.typedVerses /
                                                 entry.totalVerses) *
@@ -58,7 +58,7 @@ export default function Home() {
                         })}
                     </div>
                 )}
-                <hr className="mx-0 w-full border-t-2 border-black" />
+                <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
                 <h2>Log</h2>
                 {log.isLoading ? (
                     <Loading />

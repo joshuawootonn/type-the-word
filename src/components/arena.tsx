@@ -66,7 +66,7 @@ export function Arena({
                 <div
                     ref={arenaRef}
                     id={arenaId}
-                    className="arena prose relative z-0 w-full"
+                    className="arena prose relative z-0 w-full dark:prose-invert"
                 >
                     <ArenaContext.Provider
                         value={{
