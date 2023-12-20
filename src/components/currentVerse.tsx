@@ -394,7 +394,7 @@ export function CurrentVerse({
                     xmlns="http://www.w3.org/2000/svg"
                 >
                     <line
-                        stroke={'black'}
+                        className={'stroke-black dark:stroke-white'}
                         strokeWidth={'2'}
                         strokeLinejoin={'round'}
                         strokeLinecap={'round'}
