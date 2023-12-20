@@ -27,7 +27,7 @@ export function Word({
 
     return (
         <>
-            <span className={clsx('dark:text-white word', active && 'active-word')}>
+            <span className={clsx('word', active && 'active-word')}>
                 {wordWithoutEnder.map((letter, lIndex) => {
                     const typedLetter = typedWord?.letters.at(lIndex)
                     const isEqual = isLetterEqual(letter, typedLetter)

@@ -306,8 +306,8 @@ export function CurrentVerse({
                 'verse break-spaces text-balance group inline h-3 hover:cursor-pointer',
                 isCurrentVerse && 'active-verse',
                 isTypedInSession ?? isTypedInHistory
-                    ? 'text-gray-400'
-                    : 'text-black',
+                    ? 'text-gray-400 dark:text-gray-500'
+                    : 'text-black dark:text-white',
             )}
             ref={ref}
             onClick={() => {
@@ -330,10 +330,7 @@ export function CurrentVerse({
                 if (atom.type === 'verseNumber') {
                     return (
                         <b
-                            className={clsx(
-                                isIndented &&
-                                    'absolute -left-0 dark:text-white',
-                            )}
+                            className={clsx(isIndented && 'absolute -left-0')}
                             key={aIndexPrime}
                         >
                             {atom.text.split(':').at(-1)}

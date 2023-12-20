@@ -22,12 +22,12 @@ export default function Home() {
 
             <Navigation />
 
-            <main className="prose dark:prose-invert relative mx-auto w-full flex-grow pt-4 text-lg  lg:pt-8">
+            <main className="prose relative mx-auto w-full flex-grow pt-4 text-lg dark:prose-invert  lg:pt-8">
                 <div className={'prose-h2:text-3xl prose-p:text-xl'}>
-                    <h1 >Privacy Policy</h1>
+                    <h1>Privacy Policy</h1>
                     <hr className="mx-0 w-full border-t-2  border-black dark:border-white" />
 
-                    <h2 >Agreement</h2>
+                    <h2>Agreement</h2>
                     <p>
                         What data do I collect? Type the Word collects the
                         following data:
@@ -38,12 +38,14 @@ export default function Home() {
                         </ul>
                     </p>
 
-                    <h2 >Contact</h2>
+                    <h2>Contact</h2>
                     <p>
-                        <EmailLink className="underline">Contact me</EmailLink> if you have any
-                        questions about Type the Words&apos; privacy policy, the
-                        data it holds on you, or you would like to exercise one
-                        of your data protection rights.
+                        <EmailLink className="svg-outline-sm underline">
+                            Contact me
+                        </EmailLink>{' '}
+                        if you have any questions about Type the Words&apos;
+                        privacy policy, the data it holds on you, or you would
+                        like to exercise one of your data protection rights.
                     </p>
                     <p>Terms based on MonkeyType&apos;s privacy policy.</p>
                 </div>

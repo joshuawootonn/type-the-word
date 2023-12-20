@@ -138,7 +138,7 @@ export function ReadonlyVerse({
             {rect && arenaRect ? (
                 <button
                     className={clsx(
-                        'svg-outline absolute z-10 border-2 border-black dark:border-white bg-white/80 dark:bg-black/80 text-black dark:text-white opacity-0 backdrop-blur-sm transition-opacity duration-100',
+                        'svg-outline absolute z-10 border-2 border-black bg-white/80 text-black opacity-0 backdrop-blur-sm transition-opacity duration-100 dark:border-white dark:bg-black/80 dark:text-white',
                         !isArenaActive && 'hover:opacity-100',
                         'focus:opacity-100',
                     )}

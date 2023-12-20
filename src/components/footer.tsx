@@ -57,7 +57,7 @@ export function Footer() {
                 </DropdownMenu.Content>
             </DropdownMenu.Root>
 
-            <div className="dark:text-white">/</div>
+            <div>/</div>
             <Link className="svg-outline relative no-underline" href={'/why'}>
                 why?
             </Link>
