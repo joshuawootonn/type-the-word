@@ -63,13 +63,11 @@ export default function Home() {
 
             <Navigation />
 
-            <main className="prose dark:prose-invert relative mx-auto w-full flex-grow pt-4 text-lg lg:pt-8">
+            <main className="prose relative mx-auto w-full flex-grow pt-4 text-lg dark:prose-invert lg:pt-8">
                 <div className={'prose-h2:text-3xl prose-p:text-xl'}>
                     <h1>Why?</h1>
                     <hr className="mx-0 w-full border-t-2  border-black dark:border-white" />
-                    <h2>
-                        Why did I make typetheword.site?
-                    </h2>
+                    <h2>Why did I make typetheword.site?</h2>
                     <p>
                         A couple of years ago, I typed out Psalms 1 to 137 over
                         a 6 month period. Not only did this improve my typing,
@@ -99,9 +97,7 @@ export default function Home() {
                         Bible in a deeper way.
                     </p>
                     <hr className="mx-0 w-full border-t-2  border-black dark:border-white" />
-                    <h2>
-                        Why meditate on God&apos;s word?
-                    </h2>
+                    <h2>Why meditate on God&apos;s word?</h2>
                     <p>
                         In the process of making typetheword.site, these
                         scriptures were great reminders of why we should
@@ -122,6 +118,8 @@ export default function Home() {
                         <>We hit a whoopsie! :(</>
                     ) : (
                         <Arena
+                            autofocus={false}
+                            autoSelect={false}
                             passage={one.data}
                             key={JSON.stringify(one.data)}
                         />

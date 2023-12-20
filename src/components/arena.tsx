@@ -23,6 +23,7 @@ export const isArenaFocusedAtom = atom(false)
 
 export const currentVerseAtom = atom<string>('')
 export const autofocusAtom = atom(false)
+export const arenaIdAtom = atom<string>('')
 
 type InitialValues<T> = [PrimitiveAtom<T>, T]
 
@@ -61,6 +62,7 @@ export function Arena({
                         autoSelect ? passage.firstVerse.value : '',
                     ],
                     [autofocusAtom, autofocus],
+                    [arenaIdAtom, arenaId],
                 ]}
             >
                 <div

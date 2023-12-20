@@ -9,6 +9,7 @@ import React, {
 import { useAtom } from 'jotai'
 import {
     ArenaContext,
+    arenaIdAtom,
     autofocusAtom,
     currentVerseAtom,
     isArenaActiveAtom,
@@ -116,6 +117,7 @@ export function CurrentVerse({
     const inputRef = useRef<HTMLInputElement>(null)
     const [position, setPosition] = useAtom(positionAtom)
     const [keystrokes, setKeystrokes] = useAtom(keystrokesAtom)
+    const [arenaId] = useAtom(arenaIdAtom)
     const [autoFocus] = useAtom(autofocusAtom)
     const { data: sessionData } = useSession()
 
@@ -315,7 +317,7 @@ export function CurrentVerse({
             }}
         >
             <span
-                id={'scroll-anchor'}
+                id={`${arenaId}-scroll-anchor`}
                 className={
                     'inline-block -translate-y-[300px] lg:-translate-y-[330px]'
                 }
@@ -434,10 +436,12 @@ export function CurrentVerse({
                 onInput={handleInput}
                 tabIndex={-1}
                 onFocus={() => {
-                    document.getElementById('scroll-anchor')?.scrollIntoView({
-                        block: 'start',
-                        behavior: 'smooth',
-                    })
+                    document
+                        .getElementById(`${arenaId}-scroll-anchor`)
+                        ?.scrollIntoView({
+                            block: 'start',
+                            behavior: 'smooth',
+                        })
                     setIsArenaFocused(true)
                 }}
                 onBlur={() => {
