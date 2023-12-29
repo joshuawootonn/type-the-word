@@ -59,7 +59,7 @@ export function Navigation() {
                         </DropdownMenu.Trigger>
 
                         <DropdownMenu.Content
-                            className="border-2 border-black text-black dark:border-white dark:text-white"
+                            className="z-50 border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white"
                             sideOffset={-2}
                             align="end"
                         >

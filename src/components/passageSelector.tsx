@@ -133,7 +133,7 @@ export function PassageSelector({
                 }
             >
                 <Combobox
-                    className="relative z-40"
+                    className="relative"
                     as="div"
                     value={book}
                     onChange={next => {
@@ -161,7 +161,7 @@ export function PassageSelector({
                         <ScrollArea.Viewport>
                             <Combobox.Options
                                 className={
-                                    'absolute z-10 max-h-60 w-full -translate-y-0.5 overflow-auto border-2 border-black bg-white dark:border-white dark:bg-black dark:text-white'
+                                    'absolute z-50 max-h-60 w-full -translate-y-0.5 overflow-auto border-2 border-black bg-white dark:border-white dark:bg-black dark:text-white'
                                 }
                             >
                                 {filteredBooks.map(book => (
@@ -216,7 +216,8 @@ export function PassageSelector({
                 </Combobox>
                 <Combobox
                     as="div"
-                    className="relative z-40 -translate-x-0.5"
+                    // the translate from the children of this element are not moved here because that creates a new stacking context and negates the z-50 on the options.
+                    className="relative"
                     value={chapter}
                     onChange={next => {
                         onSubmit({ book, chapter: next })
@@ -233,14 +234,14 @@ export function PassageSelector({
                             }
                         }}
                         className={
-                            'w-16 rounded-none border-2 border-black p-1 font-medium outline-none dark:border-white dark:bg-black dark:text-white'
+                            'w-16 -translate-x-0.5 rounded-none border-2 border-black p-1 font-medium outline-none dark:border-white dark:bg-black dark:text-white'
                         }
                     />
                     <ScrollArea.Root>
                         <ScrollArea.Viewport>
                             <Combobox.Options
                                 className={
-                                    'absolute z-10 max-h-60 w-full -translate-y-0.5 overflow-auto border-2 border-black bg-white dark:border-white dark:bg-black dark:text-white'
+                                    'absolute z-50 max-h-60 w-full -translate-x-0.5 -translate-y-0.5 overflow-auto border-2 border-black bg-white dark:border-white dark:bg-black dark:text-white'
                                 }
                             >
                                 {filteredChapters.map((number, i) => (
