@@ -2,7 +2,7 @@ import React from 'react'
 import { useCursor } from '~/lib/hooks'
 import clsx from 'clsx'
 import { useAtom } from 'jotai'
-import { isArenaActiveAtom, isArenaFocusedAtom } from '~/components/arena'
+import { isArenaActiveAtom, isArenaFocusedAtom } from '~/components/passage'
 
 export function Cursor({ arenaId }: { arenaId: string }) {
     const [isArenaActive] = useAtom(isArenaActiveAtom)

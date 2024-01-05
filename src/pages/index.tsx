@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import { useState } from 'react'
 
-import { Arena } from '~/components/arena'
+import { Passage } from '~/components/passage'
 import { api } from '~/utils/api'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import { AppRouter, appRouter } from '~/server/api/root'
@@ -83,7 +83,7 @@ export default function Home(props: { passage?: PassageReference }) {
                 ) : passage.error ? (
                     <>We hit a whoopsie! :(</>
                 ) : (
-                    <Arena
+                    <Passage
                         autofocus={true}
                         passage={passage.data}
                         key={JSON.stringify(passage.data)}

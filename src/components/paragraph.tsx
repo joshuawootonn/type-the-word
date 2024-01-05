@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { Paragraph, ParsedPassage } from '~/lib/parseEsv'
 import React from 'react'
-import { currentVerseAtom } from '~/components/arena'
+import { currentVerseAtom } from '~/components/passage'
 import { useAtom } from 'jotai'
 import { CurrentVerse } from '~/components/currentVerse'
 import { ReadonlyVerse } from '~/components/readonlyVerse'

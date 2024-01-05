@@ -1,6 +1,6 @@
 import Head from 'next/head'
 
-import { Arena } from '~/components/arena'
+import { Passage } from '~/components/passage'
 import { api } from '~/utils/api'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import { AppRouter, appRouter } from '~/server/api/root'
@@ -117,7 +117,7 @@ export default function Home() {
                     ) : one.error ? (
                         <>We hit a whoopsie! :(</>
                     ) : (
-                        <Arena
+                        <Passage
                             autofocus={false}
                             autoSelect={false}
                             passage={one.data}
@@ -129,7 +129,7 @@ export default function Home() {
                     ) : two.error ? (
                         <>We hit a whoopsie! :(</>
                     ) : (
-                        <Arena
+                        <Passage
                             autofocus={false}
                             autoSelect={false}
                             passage={two.data}
@@ -141,7 +141,7 @@ export default function Home() {
                     ) : three.error ? (
                         <>We hit a whoopsie! :(</>
                     ) : (
-                        <Arena
+                        <Passage
                             autofocus={false}
                             autoSelect={false}
                             passage={three.data}
@@ -153,7 +153,7 @@ export default function Home() {
                     ) : four.error ? (
                         <>We hit a whoopsie! :(</>
                     ) : (
-                        <Arena
+                        <Passage
                             autofocus={false}
                             autoSelect={false}
                             passage={four.data}
@@ -165,7 +165,7 @@ export default function Home() {
                     ) : five.error ? (
                         <>We hit a whoopsie! :(</>
                     ) : (
-                        <Arena
+                        <Passage
                             autofocus={false}
                             autoSelect={false}
                             passage={five.data}
@@ -177,7 +177,7 @@ export default function Home() {
                     ) : six.error ? (
                         <>We hit a whoopsie! :(</>
                     ) : (
-                        <Arena
+                        <Passage
                             autofocus={false}
                             autoSelect={false}
                             passage={six.data}
@@ -189,7 +189,7 @@ export default function Home() {
                     ) : seven.error ? (
                         <>We hit a whoopsie! :(</>
                     ) : (
-                        <Arena
+                        <Passage
                             autofocus={false}
                             autoSelect={false}
                             passage={seven.data}

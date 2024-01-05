@@ -39,7 +39,7 @@ function HydrateAtoms({
     return children
 }
 
-export function Arena({
+export function Passage({
     passage,
     autofocus = true,
     autoSelect = true,

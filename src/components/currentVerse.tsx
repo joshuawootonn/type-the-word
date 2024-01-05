@@ -16,7 +16,7 @@ import {
     isArenaFocusedAtom,
     keystrokesAtom,
     positionAtom,
-} from '~/components/arena'
+} from '~/components/passage'
 import { useSession } from 'next-auth/react'
 import { api } from '~/utils/api'
 import { getPosition, isAtomComplete, isValidKeystroke } from '~/lib/keystroke'

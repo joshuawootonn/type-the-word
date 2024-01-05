@@ -5,7 +5,7 @@ import {
     isArenaActiveAtom,
     keystrokesAtom,
     positionAtom,
-} from '~/components/arena'
+} from '~/components/passage'
 import { useRect } from '~/lib/hooks/useRect'
 import { useAtom, useSetAtom } from 'jotai'
 import clsx from 'clsx'
