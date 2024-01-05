@@ -175,7 +175,7 @@ export function PassageSelector({
                                                 className={clsx(
                                                     'cursor-pointer px-2 py-1',
                                                     active
-                                                        ? 'bg-invert text-white dark:bg-white dark:text-black'
+                                                        ? 'bg-black text-white dark:bg-white dark:text-black'
                                                         : 'bg-white text-black dark:bg-black dark:text-white',
                                                 )}
                                                 onClick={e => {
