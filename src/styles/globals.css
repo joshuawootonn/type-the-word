@@ -52,3 +52,15 @@ body{
         color-scheme: dark;
     }
 }
+
+.correct{
+    @apply text-emerald-500;
+}
+
+.incorrect{
+    @apply text-rose-700;
+}
+
+.extra{
+    @apply text-rose-900;
+}

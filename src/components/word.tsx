@@ -33,14 +33,13 @@ export function Word({
                     const isEqual = isLetterEqual(letter, typedLetter)
                     return (
                         <span
-                            data-letter
                             key={lIndex}
                             className={clsx(
-                                'letter relative z-0',
-                                isEqual && 'correct text-emerald-500',
+                                'letter',
+                                isEqual && 'correct',
                                 typedLetter &&
                                     !isEqual &&
-                                    'incorrect text-rose-700',
+                                    'incorrect',
                                 isErrored &&
                                     'error underline decoration-rose-500 decoration-2',
                             )}
@@ -52,10 +51,9 @@ export function Word({
                 {extras?.map((letter, lIndex) => {
                     return (
                         <span
-                            data-letter
                             key={lIndex}
                             className={clsx(
-                                'letter extra relative z-0 text-rose-900',
+                                'letter extra',
                                 isErrored &&
                                     'error underline decoration-rose-500 decoration-2',
                             )}
@@ -65,7 +63,7 @@ export function Word({
                     )
                 })}
 
-                <span data-letter className={clsx('letter relative z-0')}>
+                <span  className={clsx('letter relative z-0')}>
                     {ender === '\n' ? (
                         <NewLineIndicator isActive={active} />
                     ) : ender === ' ' ? (
