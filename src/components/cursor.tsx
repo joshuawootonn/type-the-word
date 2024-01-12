@@ -2,12 +2,12 @@ import React from 'react'
 import { useCursor } from '~/lib/hooks'
 import clsx from 'clsx'
 import { useAtom } from 'jotai'
-import { isArenaActiveAtom, isArenaFocusedAtom } from '~/components/passage'
+import { isPassageActiveAtom, isPassageFocusedAtom } from '~/components/passage'
 
-export function Cursor({ arenaId }: { arenaId: string }) {
-    const [isArenaActive] = useAtom(isArenaActiveAtom)
-    const [isArenaFocused] = useAtom(isArenaFocusedAtom)
-    useCursor(arenaId)
+export function Cursor({ passageId }: { passageId: string }) {
+    const [isPassageActive] = useAtom(isPassageActiveAtom)
+    const [isPassageFocused] = useAtom(isPassageFocusedAtom)
+    useCursor(passageId)
     return (
         <>
             <style jsx>{`
@@ -22,11 +22,11 @@ export function Cursor({ arenaId }: { arenaId: string }) {
             `}</style>
 
             <div
-                id={`${arenaId}-cursor`}
+                id={`${passageId}-cursor`}
                 className={clsx(
                     'absolute rounded-lg bg-black dark:bg-white',
-                    !isArenaActive && 'blink',
-                    isArenaFocused ? 'opacity-100' : 'opacity-0',
+                    !isPassageActive && 'blink',
+                    isPassageFocused ? 'opacity-100' : 'opacity-0',
                 )}
             />
         </>

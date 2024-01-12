@@ -9,7 +9,7 @@ import { atom, PrimitiveAtom, Provider, useSetAtom } from 'jotai'
 import { useRect } from '~/lib/hooks/useRect'
 import { useHydrateAtoms } from 'jotai/react/utils'
 
-export const ArenaContext = React.createContext<{
+export const PassageContext = React.createContext<{
     rect: DOMRect | null
 }>({
     rect: null,
@@ -18,12 +18,12 @@ export const ArenaContext = React.createContext<{
 export const positionAtom = atom<Inline[]>([])
 export const keystrokesAtom = atom<Keystroke[]>([])
 
-export const isArenaActiveAtom = atom(false)
-export const isArenaFocusedAtom = atom(false)
+export const isPassageActiveAtom = atom(false)
+export const isPassageFocusedAtom = atom(false)
 
 export const currentVerseAtom = atom<string>('')
 export const autofocusAtom = atom(false)
-export const arenaIdAtom = atom<string>('')
+export const passageIdAtom = atom<string>('')
 
 type InitialValues<T> = [PrimitiveAtom<T>, T]
 
@@ -48,10 +48,10 @@ export function Passage({
     autofocus?: boolean
     autoSelect?: boolean
 }) {
-    const arenaId = useId()
+    const passageId = useId()
 
-    const arenaRef = useRef<HTMLDivElement>(null)
-    const arenaRect = useRect(arenaRef)
+    const passageRef = useRef<HTMLDivElement>(null)
+    const passageRect = useRect(passageRef)
 
     return (
         <Provider>
@@ -62,17 +62,17 @@ export function Passage({
                         autoSelect ? passage.firstVerse.value : '',
                     ],
                     [autofocusAtom, autofocus],
-                    [arenaIdAtom, arenaId],
+                    [passageIdAtom, passageId],
                 ]}
             >
                 <div
-                    ref={arenaRef}
-                    id={arenaId}
-                    className="arena prose relative z-0 w-full dark:prose-invert"
+                    ref={passageRef}
+                    id={passageId}
+                    className="passage prose relative z-0 w-full dark:prose-invert"
                 >
-                    <ArenaContext.Provider
+                    <PassageContext.Provider
                         value={{
-                            rect: arenaRect,
+                            rect: passageRect,
                         }}
                     >
                         {passage.nodes.map((node, pIndex) => {
@@ -115,8 +115,8 @@ export function Passage({
                                     break
                             }
                         })}
-                    </ArenaContext.Provider>
-                    <Cursor arenaId={arenaId} />
+                    </PassageContext.Provider>
+                    <Cursor passageId={passageId} />
                 </div>
             </HydrateAtoms>
         </Provider>

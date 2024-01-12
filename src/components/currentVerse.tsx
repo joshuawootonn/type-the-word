@@ -8,12 +8,12 @@ import React, {
 } from 'react'
 import { useAtom } from 'jotai'
 import {
-    ArenaContext,
-    arenaIdAtom,
+    PassageContext,
+    passageIdAtom,
     autofocusAtom,
     currentVerseAtom,
-    isArenaActiveAtom,
-    isArenaFocusedAtom,
+    isPassageActiveAtom,
+    isPassageFocusedAtom,
     keystrokesAtom,
     positionAtom,
 } from '~/components/passage'
@@ -117,7 +117,7 @@ export function CurrentVerse({
     const inputRef = useRef<HTMLInputElement>(null)
     const [position, setPosition] = useAtom(positionAtom)
     const [keystrokes, setKeystrokes] = useAtom(keystrokesAtom)
-    const [arenaId] = useAtom(arenaIdAtom)
+    const [passageId] = useAtom(passageIdAtom)
     const [autoFocus] = useAtom(autofocusAtom)
     const { data: sessionData } = useSession()
 
@@ -185,9 +185,9 @@ export function CurrentVerse({
             },
         })
 
-    const { rect: arenaRect } = useContext(ArenaContext)
-    const [isArenaActive, setIsArenaActive] = useAtom(isArenaActiveAtom)
-    const [isArenaFocused, setIsArenaFocused] = useAtom(isArenaFocusedAtom)
+    const { rect: passageRect } = useContext(PassageContext)
+    const [isPassageActive, setIsPassageActive] = useAtom(isPassageActiveAtom)
+    const [isPassageFocused, setIsPassageFocused] = useAtom(isPassageFocusedAtom)
 
     const ref = useRef<HTMLSpanElement>(null)
     const rect = useRect(ref)
@@ -199,7 +199,7 @@ export function CurrentVerse({
         if (autoFocus) {
             // This redundant call is so because the `input.onFocus`  wasn't firing
             // for chrome hard reload, and ff soft/hard reload.
-            setIsArenaFocused(true)
+            setIsPassageFocused(true)
             return inputRef.current?.focus()
         }
     }, [])
@@ -210,7 +210,7 @@ export function CurrentVerse({
         clearTimeout(isActiveTimer.current)
 
         isActiveTimer.current = setTimeout(() => {
-            setIsArenaActive(false)
+            setIsPassageActive(false)
         }, 3000)
 
         return () => clearTimeout(isActiveTimer.current)
@@ -229,7 +229,7 @@ export function CurrentVerse({
             }
             let isVerseComplete = false
 
-            setIsArenaActive(true)
+            setIsPassageActive(true)
             const currentVerseNodes = getWords(currentVerse, passage.nodes)
             if (currentVerseNodes == null) {
                 throw new Error('Current ReadonlyVerse is invalid.')
@@ -317,7 +317,7 @@ export function CurrentVerse({
             }}
         >
             <span
-                id={`${arenaId}-scroll-anchor`}
+                id={`${passageId}-scroll-anchor`}
                 className={
                     'inline-block -translate-y-[300px] lg:-translate-y-[330px]'
                 }
@@ -386,14 +386,14 @@ export function CurrentVerse({
                 return null
             })}
 
-            {isTypedInSession && rect && arenaRect ? (
+            {isTypedInSession && rect && passageRect ? (
                 <svg
                     className={
                         'absolute -bottom-1 -left-3 -top-1 right-full z-0 w-4 rounded-none md:-left-6'
                     }
                     style={{
                         height: rect.height + 16,
-                        top: rect.top - arenaRect.top - 8,
+                        top: rect.top - passageRect.top - 8,
                     }}
                     xmlns="http://www.w3.org/2000/svg"
                 >
@@ -410,21 +410,21 @@ export function CurrentVerse({
                 </svg>
             ) : null}
 
-            {rect && arenaRect && !isArenaFocused ? (
+            {rect && passageRect && !isPassageFocused ? (
                 <button
                     className={clsx(
                         'svg-outline absolute z-10 border-2 border-black bg-white/80 text-black opacity-0 backdrop-blur-sm transition-opacity duration-100 dark:border-white dark:bg-black/80 dark:text-white',
-                        !isArenaActive && 'hover:opacity-100',
+                        !isPassageActive && 'hover:opacity-100',
                         'focus:opacity-100',
                     )}
                     style={{
-                        width: arenaRect.width + 16,
+                        width: passageRect.width + 16,
                         height: rect.height + 16,
                         left: -8,
-                        top: rect.top - arenaRect.top - 8,
+                        top: rect.top - passageRect.top - 8,
                     }}
                     onClick={() => {
-                        setIsArenaFocused(true)
+                        setIsPassageFocused(true)
                     }}
                 >
                     <span>Continue typing verse {verse.verse.value}</span>
@@ -437,15 +437,15 @@ export function CurrentVerse({
                 tabIndex={-1}
                 onFocus={() => {
                     document
-                        .getElementById(`${arenaId}-scroll-anchor`)
+                        .getElementById(`${passageId}-scroll-anchor`)
                         ?.scrollIntoView({
                             block: 'start',
                             behavior: 'smooth',
                         })
-                    setIsArenaFocused(true)
+                    setIsPassageFocused(true)
                 }}
                 onBlur={() => {
-                    setIsArenaFocused(false)
+                    setIsPassageFocused(false)
                 }}
                 ref={inputRef}
                 autoFocus={true}

@@ -1,8 +1,8 @@
 import React, { useContext, useRef } from 'react'
 import {
-    ArenaContext,
+    PassageContext,
     currentVerseAtom,
-    isArenaActiveAtom,
+    isPassageActiveAtom,
     keystrokesAtom,
     positionAtom,
 } from '~/components/passage'
@@ -23,12 +23,12 @@ export function ReadonlyVerse({
     verse: Verse
 }) {
     const { data: sessionData } = useSession()
-    const { rect: arenaRect } = useContext(ArenaContext)
-    const [isArenaActive] = useAtom(isArenaActiveAtom)
+    const { rect: passageRect } = useContext(PassageContext)
+    const [isPassageActive] = useAtom(isPassageActiveAtom)
 
     const ref = useRef<HTMLSpanElement>(null)
     const rect = useRect(ref)
-    // const arenaRect = useRect(arenaRef)
+    // const passageRect = useRect(passageRef)
     const typingSession = api.typingSession.getOrCreateTypingSession.useQuery(
         undefined,
         {
@@ -111,14 +111,14 @@ export function ReadonlyVerse({
                 return null
             })}
 
-            {isTypedInSession && rect && arenaRect ? (
+            {isTypedInSession && rect && passageRect ? (
                 <svg
                     className={
                         'absolute -left-3 right-full z-0 w-4 rounded-none md:-left-6'
                     }
                     style={{
                         height: rect.height + 16,
-                        top: rect.top - arenaRect.top - 8,
+                        top: rect.top - passageRect.top - 8,
                     }}
                     xmlns="http://www.w3.org/2000/svg"
                 >
@@ -135,18 +135,18 @@ export function ReadonlyVerse({
                 </svg>
             ) : null}
 
-            {rect && arenaRect ? (
+            {rect && passageRect ? (
                 <button
                     className={clsx(
                         'svg-outline absolute z-10 border-2 border-black bg-white/80 text-black opacity-0 backdrop-blur-sm transition-opacity duration-100 dark:border-white dark:bg-black/80 dark:text-white',
-                        !isArenaActive && 'hover:opacity-100',
+                        !isPassageActive && 'hover:opacity-100',
                         'focus:opacity-100',
                     )}
                     style={{
-                        width: arenaRect.width + 16,
+                        width: passageRect.width + 16,
                         height: rect.height + 16,
                         left: -8,
-                        top: rect.top - arenaRect.top - 8,
+                        top: rect.top - passageRect.top - 8,
                     }}
                 >
                     {Boolean(currentVerse) ? (

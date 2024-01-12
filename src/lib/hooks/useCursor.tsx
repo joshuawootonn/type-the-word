@@ -6,7 +6,7 @@ function pythagorean(x1: number, x2: number, y1: number, y2: number): number {
     )
 }
 
-export function useCursor(arenaId: string): void {
+export function useCursor(passageId: string): void {
     const prev = useRef<{
         top: number
         left: number
@@ -19,13 +19,13 @@ export function useCursor(arenaId: string): void {
 
     useEffect(() => {
         function move() {
-            const arena = document.querySelector(`#${CSS.escape(arenaId)}`)
-            const arenaRect = arena?.getBoundingClientRect()
-            if (arenaRect == null) return
+            const passage = document.querySelector(`#${CSS.escape(passageId)}`)
+            const passageRect = passage?.getBoundingClientRect()
+            if (passageRect == null) return
 
             let activeElement = document.querySelector(
                 `#${CSS.escape(
-                    arenaId,
+                    passageId,
                 )} .active-verse .active-word:not(.error) .letter:not(.correct):not(.incorrect):not(.extra)`,
             )
 
@@ -41,8 +41,8 @@ export function useCursor(arenaId: string): void {
                             activeElement?.getBoundingClientRect() ?? activeRect
                     }
                 }
-                const nextTop = activeRect.top - arenaRect.top
-                const nextLeft = activeRect.left - arenaRect.left
+                const nextTop = activeRect.top - passageRect.top
+                const nextLeft = activeRect.left - passageRect.left
                 if (
                     nextTop === prev.current.top &&
                     nextLeft === prev.current.left &&
@@ -65,7 +65,7 @@ export function useCursor(arenaId: string): void {
 
                 // Don't try to use Glide. It uses some bunk default values that throw.
                 animate(
-                    `#${CSS.escape(arenaId)}-cursor`,
+                    `#${CSS.escape(passageId)}-cursor`,
                     {
                         top: 0,
                         left: 0,
@@ -92,5 +92,5 @@ export function useCursor(arenaId: string): void {
         return () => {
             cancelAnimationFrame(frame)
         }
-    }, [arenaId])
+    }, [passageId])
 }
