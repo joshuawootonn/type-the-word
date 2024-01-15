@@ -8,6 +8,7 @@ import {
     text,
     timestamp,
     varchar,
+    json,
 } from 'drizzle-orm/mysql-core'
 import { type AdapterAccount } from 'next-auth/adapters'
 import { createSelectSchema } from 'drizzle-zod'
@@ -165,3 +166,20 @@ export const typedVerseRelations = relations(typedVerses, ({ one }) => ({
         references: [typingSessions.id],
     }),
 }))
+
+export const passageResponse = mysqlTable('passageResponse', {
+    id: varchar('id', { length: 255 })
+        .notNull()
+        .$default(() => crypto.randomUUID())
+        .primaryKey(),
+    book: mysqlEnum('book', bookSchema.options).notNull(),
+    chapter: int('chapter').notNull(),
+    translation: mysqlEnum('translation', ['esv']).notNull(),
+    response: json('response').notNull(),
+    createdAt: timestamp('createdAt', { mode: 'date' })
+        .notNull()
+        .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+    updatedAt: timestamp('updatedAt', { mode: 'date' })
+        .notNull()
+        .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+})

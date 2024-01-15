@@ -35,9 +35,9 @@ export async function getStaticProps() {
         transformer: superjson,
     })
 
-    await helpers.passage.passage.prefetch(
-        passageReferenceSchema.parse(DEFAULT_PASSAGE_REFERENCE),
-    )
+    await helpers.passage.passage.prefetch({
+        reference: passageReferenceSchema.parse(DEFAULT_PASSAGE_REFERENCE),
+    })
 
     return { props: { trpcState: helpers.dehydrate() } }
 }
@@ -48,7 +48,10 @@ export default function Home(props: { passage?: PassageReference }) {
             passageReferenceSchema.parse(DEFAULT_PASSAGE_REFERENCE),
     )
     const debouncedValue = useDebouncedValue(value, 0)
-    const passage = api.passage.passage.useQuery(debouncedValue)
+    const passage = api.passage.passage.useQuery({
+        reference: debouncedValue,
+        savePassageResponseToDatabase: true,
+    })
     const router = useRouter()
 
     return (

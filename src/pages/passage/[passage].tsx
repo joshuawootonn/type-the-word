@@ -26,7 +26,9 @@ export async function getStaticProps({
     })
 
     if (params?.passage == null) {
-        await helpers.passage.passage.prefetch(DEFAULT_PASSAGE_REFERENCE)
+        await helpers.passage.passage.prefetch({
+            reference: DEFAULT_PASSAGE_REFERENCE,
+        })
 
         return { props: { trpcState: helpers.dehydrate() } }
     }
@@ -38,7 +40,9 @@ export async function getStaticProps({
                   params.passage.at(0) ?? DEFAULT_PASSAGE_REFERENCE,
               )
 
-    await helpers.passage.passage.prefetch(passage)
+    await helpers.passage.passage.prefetch({
+        reference: passage,
+    })
 
     return {
         props: { trpcState: helpers.dehydrate(), passage },

@@ -26,25 +26,29 @@ export async function getStaticProps() {
         transformer: superjson,
     })
 
-    await helpers.passage.passage.prefetch('john 8:31-32')
-    await helpers.passage.passage.prefetch('deuteronomy 17:18-20')
-    await helpers.passage.passage.prefetch('joshua 1:8')
-    await helpers.passage.passage.prefetch('psalm 1:1-3')
-    await helpers.passage.passage.prefetch('matthew 4:4')
-    await helpers.passage.passage.prefetch('psalm 119:9-11')
-    await helpers.passage.passage.prefetch('psalm 19:7-11')
+    await helpers.passage.passage.prefetch({ reference: 'john 8:31-32' })
+    await helpers.passage.passage.prefetch({
+        reference: 'deuteronomy 17:18-20',
+    })
+    await helpers.passage.passage.prefetch({ reference: 'joshua 1:8' })
+    await helpers.passage.passage.prefetch({ reference: 'psalm 1:1-3' })
+    await helpers.passage.passage.prefetch({ reference: 'matthew 4:4' })
+    await helpers.passage.passage.prefetch({ reference: 'psalm 119:9-11' })
+    await helpers.passage.passage.prefetch({ reference: 'psalm 19:7-11' })
 
     return { props: { trpcState: helpers.dehydrate() } }
 }
 
 export default function Home() {
-    const one = api.passage.passage.useQuery('john 8:31-32')
-    const two = api.passage.passage.useQuery('deuteronomy 17:18-20')
-    const three = api.passage.passage.useQuery('joshua 1:8')
-    const four = api.passage.passage.useQuery('psalm 1:1-3')
-    const five = api.passage.passage.useQuery('matthew 4:4')
-    const six = api.passage.passage.useQuery('psalm 119:9-11')
-    const seven = api.passage.passage.useQuery('psalm 19:7-11')
+    const one = api.passage.passage.useQuery({ reference: 'john 8:31-32' })
+    const two = api.passage.passage.useQuery({
+        reference: 'deuteronomy 17:18-20',
+    })
+    const three = api.passage.passage.useQuery({ reference: 'joshua 1:8' })
+    const four = api.passage.passage.useQuery({ reference: 'psalm 1:1-3' })
+    const five = api.passage.passage.useQuery({ reference: 'matthew 4:4' })
+    const six = api.passage.passage.useQuery({ reference: 'psalm 119:9-11' })
+    const seven = api.passage.passage.useQuery({ reference: 'psalm 19:7-11' })
 
     return (
         <div className="min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0">

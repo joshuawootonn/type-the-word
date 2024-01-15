@@ -8,6 +8,9 @@ import { stringToPassageObject } from '~/lib/passageObject'
 import psalm23 from '~/server/psalm-23.json'
 import james1 from '~/server/james-1.json'
 import genesis1 from '~/server/genesis-1.json'
+import { passageResponse } from '~/server/db/schema'
+import { and, eq, sql } from 'drizzle-orm'
+import { isBefore, subDays } from 'date-fns'
 
 const passageSchema = z.object({
     query: z.string(),
@@ -29,9 +32,17 @@ const passageSchema = z.object({
 
 export const passageRouter = createTRPCRouter({
     passage: publicProcedure
-        .input(passageReferenceSchema)
-        .query(async ({ input }): Promise<ParsedPassage> => {
-            const passageData = stringToPassageObject.parse(input)
+        .input(
+            z.object({
+                reference: passageReferenceSchema,
+                savePassageResponseToDatabase: z
+                    .boolean()
+                    .optional()
+                    .default(false),
+            }),
+        )
+        .query(async ({ input, ctx: { db } }): Promise<ParsedPassage> => {
+            const passageData = stringToPassageObject.parse(input.reference)
 
             const verseSuffix =
                 passageData.firstVerse && passageData.lastVerse
@@ -72,6 +83,53 @@ export const passageRouter = createTRPCRouter({
                 }
 
                 data = await response.json()
+
+                const referenceIsEntireChapter = !input.reference.includes(':')
+
+                if (
+                    input.savePassageResponseToDatabase &&
+                    passageData.chapter != null &&
+                    referenceIsEntireChapter
+                ) {
+                    const existingPassageResponse =
+                        await db.query.passageResponse.findFirst({
+                            where: and(
+                                eq(
+                                    passageResponse.chapter,
+                                    passageData.chapter,
+                                ),
+                                eq(passageResponse.book, passageData.book),
+                                eq(passageResponse.translation, 'esv'),
+                            ),
+                        })
+
+                    if (existingPassageResponse == null) {
+                        await db.insert(passageResponse).values({
+                            response: data,
+                            book: passageData.book,
+                            chapter: passageData.chapter,
+                            translation: 'esv',
+                        })
+                    } else if (
+                        isBefore(
+                            existingPassageResponse.updatedAt,
+                            subDays(new Date(), 31),
+                        )
+                    ) {
+                        await db
+                            .update(passageResponse)
+                            .set({
+                                response: data,
+                                updatedAt: sql`CURRENT_TIMESTAMP(3)`,
+                            })
+                            .where(
+                                eq(
+                                    passageResponse.id,
+                                    existingPassageResponse.id,
+                                ),
+                            )
+                    }
+                }
             }
 
             const parsedData = passageSchema.parse(data)
