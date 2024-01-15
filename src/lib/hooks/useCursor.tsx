@@ -10,11 +10,9 @@ export function useCursor(passageId: string): void {
     const prev = useRef<{
         top: number
         left: number
-        width: number
     }>({
         top: 0,
         left: 0,
-        width: 0,
     })
 
     useEffect(() => {
@@ -45,8 +43,7 @@ export function useCursor(passageId: string): void {
                 const nextLeft = activeRect.left - passageRect.left
                 if (
                     nextTop === prev.current.top &&
-                    nextLeft === prev.current.left &&
-                    activeRect.width === prev.current.width
+                    nextLeft === prev.current.left
                 )
                     return
 
@@ -60,7 +57,6 @@ export function useCursor(passageId: string): void {
                 prev.current = {
                     top: nextTop,
                     left: nextLeft,
-                    width: activeRect.width,
                 }
 
                 // Don't try to use Glide. It uses some bunk default values that throw.
