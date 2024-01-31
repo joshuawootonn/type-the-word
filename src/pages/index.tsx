@@ -35,8 +35,10 @@ export async function getStaticProps() {
         transformer: superjson,
     })
 
+    // todo: ideally I wouldn't be saving these to the database, but the `savePassageResponseToDatabase` option has to match the input of the client or there is no server optimization
     await helpers.passage.passage.prefetch({
         reference: passageReferenceSchema.parse(DEFAULT_PASSAGE_REFERENCE),
+        savePassageResponseToDatabase: true,
     })
 
     return { props: { trpcState: helpers.dehydrate() } }
@@ -52,6 +54,7 @@ export default function Home(props: { passage?: PassageReference }) {
         reference: debouncedValue,
         savePassageResponseToDatabase: true,
     })
+    console.log(passage.isLoading)
     const router = useRouter()
 
     return (

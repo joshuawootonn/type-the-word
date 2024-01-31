@@ -40,8 +40,10 @@ export async function getStaticProps({
                   params.passage.at(0) ?? DEFAULT_PASSAGE_REFERENCE,
               )
 
+    // todo: ideally I wouldn't be saving these to the database, but the `savePassageResponseToDatabase` option has to match the input of the client or there is no server optimization
     await helpers.passage.passage.prefetch({
         reference: passage,
+        savePassageResponseToDatabase: true,
     })
 
     return {
