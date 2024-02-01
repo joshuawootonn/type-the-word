@@ -38,7 +38,7 @@ Here are some features that others have requested:
   * [ ] NRSV2CE
 * [ ] Different languages (Medium) 
   * Portuguese was requested
-* [ ] Dark mode (Easy)
+* [x] Dark mode - Thanks @IsaacHatton
 * [ ] Typing Speed / WPM (Hard)
   * This will mainly be hard because I will have lots of opinions. If you want to implements it though we can chat. 
 * [ ] Keyboard shortcuts (Medium)
