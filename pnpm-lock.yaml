@@ -8,6 +8,9 @@ dependencies:
   '@auth/drizzle-adapter':
     specifier: ^0.3.2
     version: 0.3.2
+  '@baselime/trpc-opentelemetry-middleware':
+    specifier: ^0.1.2
+    version: 0.1.2(@opentelemetry/api@1.7.0)(@trpc/server@10.38.4)
   '@headlessui/react':
     specifier: ^1.7.17
     version: 1.7.17(react-dom@18.2.0)(react@18.2.0)
@@ -344,6 +347,17 @@ packages:
       '@babel/helper-validator-identifier': 7.22.20
       to-fast-properties: 2.0.0
     dev: true
+
+  /@baselime/trpc-opentelemetry-middleware@0.1.2(@opentelemetry/api@1.7.0)(@trpc/server@10.38.4):
+    resolution: {integrity: sha512-CSI0ELi3PKnTa7ujdz59sfoRSNAxDGIYNgGfOfnQK2/JpKUKyfGwY87oAetMsfFQWH39dBQM89Lbf7knpTdgOA==}
+    peerDependencies:
+      '@opentelemetry/api': ^1.5.0
+      '@trpc/server': ^10.0.0
+    dependencies:
+      '@opentelemetry/api': 1.7.0
+      '@trpc/server': 10.38.4
+      flat: 6.0.1
+    dev: false
 
   /@corex/deepmerge@4.0.43:
     resolution: {integrity: sha512-N8uEMrMPL0cu/bdboEWpQYb/0i2K5Qn8eCsxzOmxSggJbbQte7ljMRoXm917AbntqTGOzdTu+vP3KOOzoC70HQ==}
@@ -4427,6 +4441,12 @@ packages:
       keyv: 4.5.3
       rimraf: 3.0.2
     dev: true
+
+  /flat@6.0.1:
+    resolution: {integrity: sha512-/3FfIa8mbrg3xE7+wAhWeV+bd7L2Mof+xtZb5dRDKZ+wDvYJK4WDYeIOuOhre5Yv5aQObZrlbRmk3RTSiuQBtw==}
+    engines: {node: '>=18'}
+    hasBin: true
+    dev: false
 
   /flatted@3.2.9:
     resolution: {integrity: sha512-36yxDn5H7OFZQla0/jFJmbIKTdZAQHngCedGxiMmpNfEZM0sdEeT+WczLQrjK6D7o2aiyLYDnkw0R3JK0Qv1RQ==}

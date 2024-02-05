@@ -14,6 +14,7 @@ import { ZodError } from 'zod'
 import { getServerAuthSession } from '~/server/auth'
 import { db } from '~/server/db'
 import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
+import { tracing } from '@baselime/trpc-opentelemetry-middleware'
 
 /**
  * 1. CONTEXT
@@ -87,6 +88,8 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
         }
     },
 })
+
+t.procedure.use(tracing({ collectInput: true }))
 
 /**
  * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)
