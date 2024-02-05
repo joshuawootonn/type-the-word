@@ -10,6 +10,7 @@ import { env } from '~/env.mjs'
 import '~/styles/globals.css'
 import { api } from '~/utils/api'
 import clsx from 'clsx'
+import { AxiomWebVitals } from 'next-axiom'
 
 export const ibmPlexMono = IBM_Plex_Mono({
     weight: ['400', '500', '600', '700'],
@@ -51,6 +52,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                 ibmPlexMono.variable,
             )}
         >
+            <AxiomWebVitals />
             <SessionProvider session={session}>
                 <Component {...pageProps} />
             </SessionProvider>
