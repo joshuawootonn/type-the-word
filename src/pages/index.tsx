@@ -54,7 +54,6 @@ export default function Home(props: { passage?: PassageReference }) {
         reference: debouncedValue,
         savePassageResponseToDatabase: true,
     })
-    console.log(passage.isLoading)
     const router = useRouter()
 
     return (
