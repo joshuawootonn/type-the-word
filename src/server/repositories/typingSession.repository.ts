@@ -60,30 +60,14 @@ export class TypingSessionRepository {
 
     async getMany({
         userId,
-        typedVerse,
     }: {
         userId: string | SQL
-        typedVerse?: {
-            book: Book
-            chapter: Chapter
-            translation: 'esv'
-        }
     }): Promise<TypingSession[]> {
         const where = eq(typingSessions.userId, userId)
 
         return await this.db.query.typingSessions.findMany({
             with: {
-                typedVerses: typedVerse
-                    ? {
-                          where: (typedVerses, { eq }) =>
-                              eq(typedVerses.book, typedVerse.book) &&
-                              eq(typedVerses.chapter, typedVerse.chapter) &&
-                              eq(
-                                  typedVerses.translation,
-                                  typedVerse.translation,
-                              ),
-                      }
-                    : true,
+                typedVerses: true,
             },
             where,
             orderBy: [desc(typingSessions.createdAt)],

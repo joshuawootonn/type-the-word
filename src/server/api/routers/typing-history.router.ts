@@ -19,11 +19,6 @@ export const chapterHistoryRouter = createTRPCRouter({
                 const typingSessions = await repositories.typingSession.getMany(
                     {
                         userId: session.user.id,
-                        typedVerse: {
-                            book: input.book,
-                            translation: 'esv',
-                            chapter: input.chapter,
-                        },
                     },
                 )
 
