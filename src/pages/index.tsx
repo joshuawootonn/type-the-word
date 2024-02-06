@@ -1,5 +1,4 @@
 import Head from 'next/head'
-import { useState } from 'react'
 
 import { Passage } from '~/components/passage'
 import { api } from '~/utils/api'
@@ -7,7 +6,6 @@ import { createServerSideHelpers } from '@trpc/react-query/server'
 import { AppRouter, appRouter } from '~/server/api/root'
 import superjson from 'superjson'
 import { db } from '~/server/db'
-import { useDebouncedValue } from '~/lib/hooks'
 import { Navigation } from '~/components/navigation'
 import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
 import { Footer } from '~/components/footer'
@@ -45,13 +43,10 @@ export async function getStaticProps() {
 }
 
 export default function Home(props: { passage?: PassageReference }) {
-    const [value, setValue] = useState<PassageReference>(
-        props.passage ??
-            passageReferenceSchema.parse(DEFAULT_PASSAGE_REFERENCE),
-    )
-    const debouncedValue = useDebouncedValue(value, 0)
+    const value =
+        props.passage ?? passageReferenceSchema.parse(DEFAULT_PASSAGE_REFERENCE)
     const passage = api.passage.passage.useQuery({
-        reference: debouncedValue,
+        reference: value,
         savePassageResponseToDatabase: true,
     })
     const router = useRouter()
@@ -79,7 +74,7 @@ export default function Home(props: { passage?: PassageReference }) {
 
             <Navigation />
             <div className="prose mx-auto mb-8 flex w-full items-center justify-start space-x-3 pt-4 lg:pt-8">
-                <PassageSelector value={value} setValue={setValue} />
+                <PassageSelector value={value} />
             </div>
 
             <main className="relative mx-auto w-full flex-grow">

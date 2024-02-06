@@ -38,7 +38,7 @@ const ForwardedRefInput = forwardRef(function InnerForwardedRefInput(
     return <input {...props} ref={ref} />
 })
 
-function getInitialValues(text: PassageReference): {
+function getValues(text: PassageReference): {
     book: Book
     chapter: string
 } {
@@ -54,16 +54,10 @@ function getInitialValues(text: PassageReference): {
     return { book: 'genesis', chapter: '1' }
 }
 
-export function PassageSelector({
-    value,
-    setValue,
-}: {
-    value: PassageReference
-    setValue: (value: PassageReference) => void
-}) {
-    const initialValues = getInitialValues(value)
-    const [book, setBook] = useState<Book>(initialValues.book)
-    const [chapter, setChapter] = useState<string>(initialValues.chapter)
+export function PassageSelector({ value }: { value: PassageReference }) {
+    const values = getValues(value)
+    const [book, setBook] = useState<Book>(values.book)
+    const [chapter, setChapter] = useState<string>(values.chapter)
 
     const [bookQuery, setBookQuery] = useState('')
     const [chapterQuery, setChapterQuery] = useState('')
@@ -87,10 +81,15 @@ export function PassageSelector({
         .map((_, i) => `${i + 1}`)
 
     useEffect(() => {
-        const nextUrl = `${book}_${chapter}`
-        const nextValue = passageReferenceSchema.parse(nextUrl)
+        const values = getValues(value)
+        setBook(values.book)
+        setChapter(values.chapter)
+    }, [value])
+
+    useEffect(() => {
+        const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
         // I use `!includes` to prevent passage selector from clearing url specified verses
-        if (!value.includes(nextValue)) {
+        if (!router.pathname.includes(nextValue)) {
             const t = setTimeout(() => {
                 onSubmit({ book, chapter })
             }, 3000)
@@ -99,7 +98,7 @@ export function PassageSelector({
                 clearTimeout(t)
             }
         }
-    }, [book, chapter, setValue, value])
+    }, [book, chapter])
 
     const filteredChapters =
         chapterQuery === ''
@@ -114,8 +113,6 @@ export function PassageSelector({
         setBook(book)
         setChapter(chapter)
         const nextUrl = `${book}_${chapter}`
-        const nextValue = passageReferenceSchema.parse(nextUrl)
-        setValue(nextValue)
         void router.push(`/passage/${nextUrl}`, undefined, { scroll: false })
     }
 
