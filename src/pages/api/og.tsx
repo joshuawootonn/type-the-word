@@ -104,6 +104,8 @@ export default async function handler(req: NextApiRequest) {
         return createImage({ text: 'History' })
     } else if (search.has('path') && search.get('path') === 'why') {
         return createImage({ text: 'Why type through the Bible?' })
+    } else if (search.has('path') && search.get('path') === 'changelog') {
+        return createImage({ text: 'Changelog' })
     }
 
     if (search.has('passage')) {

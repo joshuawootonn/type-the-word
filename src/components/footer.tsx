@@ -72,6 +72,14 @@ export function Footer() {
             >
                 github
             </Link>
+
+            <div>/</div>
+            <Link
+                className="svg-outline relative no-underline"
+                href={'/changelog'}
+            >
+                changelog
+            </Link>
             <div>/</div>
             <EmailLink className={'svg-outline shrink-0 font-normal'}>
                 email me feedback
