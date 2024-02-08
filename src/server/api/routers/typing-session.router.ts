@@ -12,6 +12,7 @@ import { z } from 'zod'
 import { getBibleMetadata } from '~/server/bibleMetadata'
 import toProperCase from '~/lib/toProperCase'
 import { passageReferenceSchema } from '~/lib/passageReference'
+import { bookSchema } from '~/lib/types/book'
 
 const addTypedVerseInputSchema = createInsertSchema(typedVerses).omit({
     userId: true,
@@ -146,12 +147,12 @@ function getBookSummary(typingSessions: TypingSession[]): BookSummary[] {
             return aIndex - bIndex
         })
         .map(book => {
-            const typedVersesInThisBook = typingSessions.reduce<TypedVerse[]>(
-                (acc, curr) => [
-                    ...acc,
-                    ...curr.typedVerses.filter(verse => verse.book === book),
-                ],
-                [],
+            const typedVersesInThisBook = typingSessions.reduce(
+                (acc, curr) =>
+                    acc +
+                    curr.typedVerses.filter(verse => verse.book === book)
+                        .length,
+                0,
             )
             const versesInCurrentBook =
                 bibleMetadata[book]?.chapters.reduce(
@@ -163,11 +164,92 @@ function getBookSummary(typingSessions: TypingSession[]): BookSummary[] {
                 label: passageReferenceSchema.parse(toPluralBookForm(book)),
                 book,
                 totalVerses: versesInCurrentBook,
-                typedVerses: typedVersesInThisBook.length,
+                typedVerses: typedVersesInThisBook,
             }
         })
 
     return books
+}
+
+export type ChapterOverview = {
+    chapter: number
+    verses: number
+    typedVerses: number
+    percentage: number
+}
+
+export type BookOverview = {
+    book: string
+    label: string
+    percentage: number
+    chapters: ChapterOverview[]
+}
+
+function getBookOverview(typingSessions: TypingSession[]): BookOverview[] {
+    const bibleMetadata = getBibleMetadata()
+
+    let bookVerses: Record<
+        Partial<(typeof bookSchema.options)[number]>,
+        Record<number, Record<number, TypedVerse>>
+    > = {} as never
+    for (const typingSession of typingSessions) {
+        for (const verse of typingSession.typedVerses) {
+            if (bookVerses[verse.book] == null) {
+                bookVerses[verse.book] = {}
+            }
+            if (bookVerses[verse.book][verse.chapter] == null) {
+                bookVerses[verse.book][verse.chapter] = {}
+            }
+            if (bookVerses[verse.book][verse.chapter]) {
+                bookVerses = {
+                    ...bookVerses,
+                    [verse.book]: {
+                        ...bookVerses[verse.book],
+                        [verse.chapter]: {
+                            ...bookVerses[verse.book][verse.chapter],
+                            [verse.verse]: verse,
+                        },
+                    },
+                }
+            }
+        }
+    }
+
+    return Object.entries(bibleMetadata).map(([book, content]) => {
+        const validatedBook = bookSchema.parse(book)
+        let totalVersesCount = 0
+        let typedVersesCount = 0
+        return {
+            book,
+            chapters: content.chapters.map(
+                ({ length: chapterLength }, chapterIndex) => {
+                    const typedVerses =
+                        bookVerses[validatedBook]?.[chapterIndex + 1]
+                    const numberOfTypedVerses = Object.keys(
+                        typedVerses ?? {},
+                    ).length
+                    totalVersesCount += chapterLength
+                    typedVersesCount += numberOfTypedVerses
+                    return {
+                        chapter: chapterIndex + 1,
+                        verses: chapterLength,
+                        typedVerses: numberOfTypedVerses,
+                        percentage: Math.round(
+                            (numberOfTypedVerses / chapterLength) * 100,
+                        ),
+                        alt:
+                            Math.floor(
+                                (numberOfTypedVerses / chapterLength) * 10000,
+                            ) / 100,
+                    }
+                },
+            ),
+            label: content.name,
+            percentage: Math.round((typedVersesCount / totalVersesCount) * 100),
+            alt:
+                Math.floor((typedVersesCount / totalVersesCount) * 10000) / 100,
+        }
+    })
 }
 
 const typingSessionSummarySchema = typingSessionSchema.transform(
@@ -204,7 +286,8 @@ export const typingSessionRouter = createTRPCRouter({
             await db.insert(typingSessions).values({ userId: session.user.id })
 
             const newTypingSession = await repositories.typingSession.getOne({
-                id: sql`LAST_INSERT_ID()`,
+                id: sql`LAST_INSERT_ID
+        ()`,
             })
 
             return newTypingSession
@@ -239,6 +322,18 @@ export const typingSessionRouter = createTRPCRouter({
                 return typingSession
             },
         ),
+
+    getHistoryOverview: protectedProcedure.query(
+        async ({
+            ctx: { db, session, repositories },
+        }): Promise<BookOverview[]> => {
+            const typingSessions = await repositories.typingSession.getMany({
+                userId: session.user.id,
+            })
+
+            return getBookOverview(typingSessions)
+        },
+    ),
     getHistorySummary: protectedProcedure.query(
         async ({
             ctx: { db, session, repositories },

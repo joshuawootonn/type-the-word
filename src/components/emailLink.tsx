@@ -51,14 +51,14 @@ export function EmailLink({
                 align={'center'}
                 sideOffset={5}
             >
-                <div
+                <span
                     className={clsx(
-                        'border-2 border-black bg-white px-2 py-1 font-medium outline-none dark:border-white dark:bg-black',
+                        'block border-2 border-black bg-white px-2 py-1 font-medium outline-none dark:border-white dark:bg-black',
                         popoverClassName,
                     )}
                 >
                     Copied
-                </div>
+                </span>
 
                 <Popover.Arrow className="PopoverArrow dark:fill-white" />
             </Popover.Content>
