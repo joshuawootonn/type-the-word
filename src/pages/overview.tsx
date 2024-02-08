@@ -30,7 +30,7 @@ export default function Home() {
             <main className="prose mx-auto mb-8 w-full flex-grow pt-4 text-lg dark:prose-invert dark:text-white lg:pt-8">
                 <h1 className="">Overview (WIP)</h1>
                 <p>
-                    Type the word needs a better way of getting a macro view
+                    Type the word needs a better way of getting a macro
                     progress view. This is the home of that for now. That is
                     subject to change. I have yet to think how/if this will
                     overlap with the history page.{' '}
