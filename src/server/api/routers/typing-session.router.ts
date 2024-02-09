@@ -120,57 +120,6 @@ export type BookSummary = {
     typedVerses: number
 }
 
-function getBookSummary(typingSessions: TypingSession[]): BookSummary[] {
-    const bibleMetadata = getBibleMetadata()
-
-    const books = Array.from(
-        new Set(
-            typingSessions.reduce<TypedVerse['book'][]>(
-                (acc, curr) => [
-                    ...acc,
-                    ...curr.typedVerses.map(verse => verse.book),
-                ],
-                [],
-            ),
-        ),
-    )
-        .sort(function (a, b) {
-            const biblicalOrder = Object.keys(bibleMetadata)
-
-            const aIndex = biblicalOrder.findIndex(book => book === a)
-            const bIndex = biblicalOrder.findIndex(book => book === b)
-
-            if (aIndex === -1 || bIndex === -1) {
-                throw new Error('Book not found in typing session to string')
-            }
-
-            return aIndex - bIndex
-        })
-        .map(book => {
-            const typedVersesInThisBook = typingSessions.reduce(
-                (acc, curr) =>
-                    acc +
-                    curr.typedVerses.filter(verse => verse.book === book)
-                        .length,
-                0,
-            )
-            const versesInCurrentBook =
-                bibleMetadata[book]?.chapters.reduce(
-                    (acc, curr) => acc + curr.length,
-                    0,
-                ) ?? 0
-
-            return {
-                label: passageReferenceSchema.parse(toPluralBookForm(book)),
-                book,
-                totalVerses: versesInCurrentBook,
-                typedVerses: typedVersesInThisBook,
-            }
-        })
-
-    return books
-}
-
 export type ChapterOverview = {
     chapter: number
     verses: number
@@ -244,7 +193,9 @@ function getBookOverview(typingSessions: TypingSession[]): BookOverview[] {
                     }
                 },
             ),
-            label: content.name,
+            label: passageReferenceSchema.parse(
+                toPluralBookForm(validatedBook),
+            ),
             percentage: Math.round((typedVersesCount / totalVersesCount) * 100),
             alt:
                 Math.floor((typedVersesCount / totalVersesCount) * 10000) / 100,
@@ -322,7 +273,6 @@ export const typingSessionRouter = createTRPCRouter({
                 return typingSession
             },
         ),
-
     getHistoryOverview: protectedProcedure.query(
         async ({
             ctx: { db, session, repositories },
@@ -332,17 +282,6 @@ export const typingSessionRouter = createTRPCRouter({
             })
 
             return getBookOverview(typingSessions)
-        },
-    ),
-    getHistorySummary: protectedProcedure.query(
-        async ({
-            ctx: { db, session, repositories },
-        }): Promise<BookSummary[]> => {
-            const typingSessions = await repositories.typingSession.getMany({
-                userId: session.user.id,
-            })
-
-            return getBookSummary(typingSessions)
         },
     ),
     getLog: protectedProcedure.query(
