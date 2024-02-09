@@ -67,7 +67,9 @@ export class TypingSessionRepository {
 
         return await this.db.query.typingSessions.findMany({
             with: {
-                typedVerses: true,
+                typedVerses: {
+                    where: typedVerse => eq(typedVerse.userId, userId),
+                },
             },
             where,
             orderBy: [desc(typingSessions.createdAt)],
