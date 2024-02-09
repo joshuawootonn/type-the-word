@@ -51,7 +51,7 @@ export default function Home() {
                                 const isBookComplete = book.percentage >= 100
                                 return (
                                     <details key={book.book}>
-                                        <summary className="select-none">
+                                        <summary className="svg-outline-stubby relative select-none">
                                             <div className="ml-3 inline-flex w-[calc(100%-32px)] items-center justify-between">
                                                 <h3 className="m-0">
                                                     {book.label}
@@ -69,7 +69,7 @@ export default function Home() {
                                                 </div>
                                             </div>
                                         </summary>
-                                        <div className="grid grid-cols-[repeat(auto-fill,_minmax(max(16px),_1fr))] gap-2 p-4">
+                                        <div className="grid grid-cols-[repeat(auto-fill,_minmax(max(20px),_1fr))] gap-2 p-4">
                                             {book.chapters.map(
                                                 (chapterOverview, j) => {
                                                     // const isComplete = true
@@ -80,7 +80,7 @@ export default function Home() {
                                                         <div
                                                             key={j}
                                                             className={clsx(
-                                                                'relative h-4 w-4 border-2 border-black dark:border-white',
+                                                                'relative h-5 w-5 border-2 border-black dark:border-white',
                                                             )}
                                                         >
                                                             <Link
