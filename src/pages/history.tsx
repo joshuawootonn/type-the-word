@@ -66,7 +66,7 @@ export default function Home() {
                                                     </div>
                                                 </div>
                                             </summary>
-                                            <div className="grid grid-cols-[repeat(auto-fill,_minmax(max(32px),_1fr))] p-4">
+                                            <div className="grid grid-cols-[repeat(auto-fill,_minmax(max(28px),_1fr))] p-4">
                                                 {book.chapters.map(
                                                     (chapterOverview, j) => {
                                                         // const isComplete = true

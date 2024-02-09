@@ -113,13 +113,6 @@ function typingSessionToString(typingSession: TypingSession) {
     return `${books.join(', ')} `
 }
 
-export type BookSummary = {
-    book: string
-    label: string
-    totalVerses: number
-    typedVerses: number
-}
-
 export type ChapterOverview = {
     chapter: number
     verses: number
