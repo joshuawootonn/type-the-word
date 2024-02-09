@@ -8,8 +8,9 @@ import { Loading } from '~/components/loading'
 import clsx from 'clsx'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
+import { Fragment } from 'react'
 
-export default function Home() {
+export default function History() {
     const log = api.typingSession.getLog.useQuery()
     const overview = api.typingSession.getHistoryOverview.useQuery()
 
@@ -69,7 +70,6 @@ export default function Home() {
                                             <div className="grid grid-cols-[repeat(auto-fill,_minmax(max(28px),_1fr))] p-4">
                                                 {book.chapters.map(
                                                     (chapterOverview, j) => {
-                                                        // const isComplete = true
                                                         const isComplete =
                                                             chapterOverview.percentage >=
                                                             100
@@ -77,7 +77,6 @@ export default function Home() {
                                                             <Tooltip.Root
                                                                 key={j}
                                                             >
-                                                                {' '}
                                                                 <Tooltip.Trigger
                                                                     asChild
                                                                 >
@@ -179,11 +178,8 @@ export default function Home() {
                 ) : (
                     log.data.map((entry, i) => {
                         return (
-                            <>
-                                <div
-                                    className="hidden w-full grow flex-row items-center justify-between text-xl md:flex"
-                                    key={i}
-                                >
+                            <Fragment key={i}>
+                                <div className="hidden w-full grow flex-row items-center justify-between text-xl md:flex">
                                     <span className="shrink-0">
                                         {entry.location}
                                     </span>
@@ -243,7 +239,7 @@ export default function Home() {
                                         </div>
                                     </div>
                                 </div>
-                            </>
+                            </Fragment>
                         )
                     })
                 )}
