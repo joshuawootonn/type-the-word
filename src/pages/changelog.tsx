@@ -52,12 +52,33 @@ export default function Changelog() {
                         <h1 className="m-0">Changelog</h1>
                         <span>
                             (Updated{' '}
-                            <DateComponent date={new Date('2/6/2024')} />)
+                            <DateComponent date={new Date('2/9/2024')} />)
                         </span>
                     </div>
                     <p>New updates and improvements to Type the Word</p>
                     <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
                     <ul>
+                        <li>
+                            <DateComponent date={new Date('2/9/2024')} /> -{' '}
+                            Update the <code>/history</code> page with an
+                            overview section to see what passages you've typed.
+                            <div className="px-8 pb-8 pt-4">
+                                <video
+                                    className="m-0 rounded-lg"
+                                    autoPlay={true}
+                                    playsInline
+                                    muted
+                                    loop
+                                    style={{
+                                        maxWidth: '100%',
+                                    }}
+                                >
+                                    <source
+                                        src={'/assets/overview-section-3.mp4'}
+                                    />
+                                </video>
+                            </div>
+                        </li>
                         <li>
                             <DateComponent date={new Date('2/6/2024')} />
                             <ul>
