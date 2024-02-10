@@ -293,7 +293,7 @@ export function parseChapter(passage: string): ParsedPassage {
                             offset:
                                 context.lastVerse.metadata.offset +
                                 context.lastVerse.metadata.length,
-                            length: verseSection.length,
+                            length: verseSection.filter(isAtomTyped).length,
                         },
                     })
                 } else {
