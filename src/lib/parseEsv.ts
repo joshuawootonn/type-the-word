@@ -61,6 +61,7 @@ export type H4 = {
 }
 
 export type ParagraphMetadata = {
+    type: 'default' | 'quote'
     blockIndent: boolean
 }
 
@@ -323,6 +324,14 @@ export function parseChapter(passage: string): ParsedPassage {
                 text: inlineToString(nodes),
                 nodes: verses,
                 metadata: {
+                    type:
+                        node.attrs.find(
+                            attr =>
+                                attr.value.includes('block-indent') ||
+                                attr.value.includes('same-paragraph'),
+                        ) != undefined
+                            ? 'quote'
+                            : 'default',
                     blockIndent:
                         node.attrs.find(attr =>
                             attr.value.includes('block-indent'),

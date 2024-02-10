@@ -16,10 +16,12 @@ import { useSession } from 'next-auth/react'
 export function ReadonlyVerse({
     isCurrentVerse,
     isIndented,
+    isQuote,
     verse,
 }: {
     isCurrentVerse: boolean
     isIndented: boolean
+    isQuote: boolean
     verse: Verse
 }) {
     const { data: sessionData } = useSession()
@@ -116,10 +118,17 @@ export function ReadonlyVerse({
                     className={
                         'absolute -left-3 right-full z-0 w-4 rounded-none md:-left-6'
                     }
-                    style={{
-                        height: rect.height + 16,
-                        top: rect.top - passageRect.top - 8,
-                    }}
+                    style={
+                        isQuote
+                            ? {
+                                  height: rect.height + 48,
+                                  top: rect.top - passageRect.top - 24,
+                              }
+                            : {
+                                  height: rect.height + 20,
+                                  top: rect.top - passageRect.top - 10,
+                              }
+                    }
                     xmlns="http://www.w3.org/2000/svg"
                 >
                     <line

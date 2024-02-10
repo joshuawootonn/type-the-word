@@ -106,11 +106,13 @@ function getNextVerse(currentVerse: string, blocks: Block[]): Verse | null {
 export function CurrentVerse({
     verse,
     isCurrentVerse,
+    isQuote,
     isIndented,
     passage,
 }: {
     isCurrentVerse: boolean
     isIndented: boolean
+    isQuote: boolean
     verse: Verse
     passage: ParsedPassage
 }) {
@@ -187,7 +189,8 @@ export function CurrentVerse({
 
     const { rect: passageRect } = useContext(PassageContext)
     const [isPassageActive, setIsPassageActive] = useAtom(isPassageActiveAtom)
-    const [isPassageFocused, setIsPassageFocused] = useAtom(isPassageFocusedAtom)
+    const [isPassageFocused, setIsPassageFocused] =
+        useAtom(isPassageFocusedAtom)
 
     const ref = useRef<HTMLSpanElement>(null)
     const rect = useRect(ref)
@@ -391,10 +394,17 @@ export function CurrentVerse({
                     className={
                         'absolute -bottom-1 -left-3 -top-1 right-full z-0 w-4 rounded-none md:-left-6'
                     }
-                    style={{
-                        height: rect.height + 16,
-                        top: rect.top - passageRect.top - 8,
-                    }}
+                    style={
+                        isQuote
+                            ? {
+                                  height: rect.height + 48,
+                                  top: rect.top - passageRect.top - 24,
+                              }
+                            : {
+                                  height: rect.height + 20,
+                                  top: rect.top - passageRect.top - 10,
+                              }
+                    }
                     xmlns="http://www.w3.org/2000/svg"
                 >
                     <line

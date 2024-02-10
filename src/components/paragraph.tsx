@@ -34,6 +34,7 @@ export function Paragraph({
                         verse={verse}
                         isCurrentVerse={isCurrentVerse}
                         isIndented={node.metadata.blockIndent}
+                        isQuote={node.metadata.type === 'quote'}
                         passage={passage}
                     />
                 ) : (
@@ -42,6 +43,7 @@ export function Paragraph({
                         verse={verse}
                         isCurrentVerse={isCurrentVerse}
                         isIndented={node.metadata.blockIndent}
+                        isQuote={node.metadata.type === 'quote'}
                     />
                 )
             })}
