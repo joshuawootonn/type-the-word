@@ -6,7 +6,7 @@ import { bookSchema } from '~/lib/types/book'
 
 export const passageObjectSchema = z.object({
     book: bookSchema,
-    chapter: z.number().optional(),
+    chapter: z.number(),
     firstVerse: z.number().optional(),
     lastVerse: z.number().optional(),
 })

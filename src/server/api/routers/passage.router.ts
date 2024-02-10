@@ -11,6 +11,8 @@ import genesis1 from '~/server/genesis-1.json'
 import { passageResponse } from '~/server/db/schema'
 import { and, eq, sql } from 'drizzle-orm'
 import { isBefore, subDays } from 'date-fns'
+import { PlanetScaleDatabase } from 'drizzle-orm/planetscale-serverless'
+import { bookSchema } from '~/lib/types/book'
 
 const passageSchema = z.object({
     query: z.string(),
@@ -77,9 +79,28 @@ export const passageRouter = createTRPCRouter({
                 )
 
                 if (!response.ok) {
-                    throw new Error(
-                        `Failed to fetch status text with ${response.status}`,
+                    const existingPassageResponse =
+                        await db.query.passageResponse.findFirst({
+                            where: and(
+                                eq(
+                                    passageResponse.chapter,
+                                    passageData.chapter,
+                                ),
+                                eq(passageResponse.book, passageData.book),
+                                eq(passageResponse.translation, 'esv'),
+                            ),
+                        })
+
+                    if (existingPassageResponse == null)
+                        throw new Error(
+                            `Failed to fetch status text with ${response.status}`,
+                        )
+
+                    const parsedData = passageSchema.parse(
+                        existingPassageResponse.response,
                     )
+
+                    return parseChapter(parsedData.passages.at(0) ?? '')
                 }
 
                 data = await response.json()
