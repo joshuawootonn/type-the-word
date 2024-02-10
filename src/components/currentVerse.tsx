@@ -322,7 +322,7 @@ export function CurrentVerse({
             <span
                 id={`${passageId}-scroll-anchor`}
                 className={
-                    'inline-block -translate-y-[300px] lg:-translate-y-[330px]'
+                    'inline-block -translate-y-[300px] lg:-translate-y-[340px]'
                 }
             />
             {verse.nodes.map((atom, aIndexPrime) => {
