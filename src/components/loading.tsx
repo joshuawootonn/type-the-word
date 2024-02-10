@@ -1,10 +1,13 @@
 import { useEffect, useRef } from 'react'
 
 export function Loading(
-    { initialDots }: { initialDots?: number } = { initialDots: 1 },
+    { initialDots, text }: { initialDots?: number; text?: string } = {
+        initialDots: 1,
+        text: 'Loading',
+    },
 ) {
     const initialText = useRef(
-        `Loading${new Array(initialDots)
+        `${text}${new Array(initialDots)
             .fill('')
             .map(() => '.')
             .join('')}`,
@@ -15,9 +18,9 @@ export function Loading(
         const interval = setInterval(() => {
             if (ref.current) {
                 const isMaxLength =
-                    ref.current.innerText.replace('Loading', '').length >= 3
+                    ref.current.innerText.replace(text ?? '', '').length >= 3
                 ref.current.innerText = isMaxLength
-                    ? 'Loading.'
+                    ? `${text}.`
                     : ref.current.innerText + '.'
             }
         }, 240)
