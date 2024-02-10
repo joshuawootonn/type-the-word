@@ -127,6 +127,7 @@ export function CurrentVerse({
         undefined,
         {
             enabled: sessionData?.user?.id != null,
+            refetchOnMount: query => query.isStale(),
         },
     )
     const chapterHistory = api.chapterHistory.getChapterHistory.useQuery(
@@ -170,6 +171,18 @@ export function CurrentVerse({
                         }
                     },
                 )
+                const nextVerse = getNextVerse(currentVerse, passage.nodes)
+
+                if (nextVerse?.verse.verse) {
+                    setCurrentVerse(nextVerse?.verse.value)
+                    setPosition([])
+                    setKeystrokes([])
+                } else {
+                    setCurrentVerse('')
+                    inputRef.current?.blur()
+                    setPosition([])
+                    setKeystrokes([])
+                }
 
                 // Return the previous data so we can revert if something goes wrong
                 return { prevData }
@@ -253,19 +266,6 @@ export function CurrentVerse({
 
             if (isVerseComplete) {
                 const verse = getVerse(currentVerse, passage.nodes)
-                const nextVerse = getNextVerse(currentVerse, passage.nodes)
-
-                if (nextVerse?.verse.verse) {
-                    setCurrentVerse(nextVerse?.verse.value)
-                    setPosition([])
-                    setKeystrokes([])
-                } else {
-                    setCurrentVerse('')
-                    inputRef.current?.blur()
-                    setPosition([])
-                    setKeystrokes([])
-                }
-
                 trackEvent('typed-verse')
                 if (
                     typingSession?.data?.id != null &&
