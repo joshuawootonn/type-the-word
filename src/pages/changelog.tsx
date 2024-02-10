@@ -61,7 +61,8 @@ export default function Changelog() {
                         <li>
                             <DateComponent date={new Date('2/9/2024')} /> -{' '}
                             Update the <code>/history</code> page with an
-                            overview section to see what passages you've typed.
+                            overview section to see what passages you&apos;ve
+                            typed.
                             <div className="px-8 pb-8 pt-4">
                                 <video
                                     className="m-0 rounded-lg"
