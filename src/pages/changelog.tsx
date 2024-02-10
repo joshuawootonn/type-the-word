@@ -79,6 +79,29 @@ export default function Changelog() {
                                     />
                                 </video>
                             </div>
+                            <ul>
+                                <li>
+                                    Fixed weird gap in <i>typed</i> indicator in
+                                    sections that have quotes like{' '}
+                                    <Link href={'/passage/hebrews_2'}>
+                                        Hebrews 2
+                                    </Link>{' '}
+                                    verse 13.
+                                </li>
+                                <li>
+                                    Fixed the small animation happening between{' '}
+                                    <code>/passage</code> pages and other pages
+                                </li>
+                                <li>
+                                    Fixed flicker that would happen on
+                                    completing verses
+                                </li>
+                                <li>
+                                    Tweaked cursor animation logic to disable
+                                    vertical cursor animation, but animate for
+                                    longer words that are completed to early.
+                                </li>
+                            </ul>
                         </li>
                         <li>
                             <DateComponent date={new Date('2/6/2024')} />
