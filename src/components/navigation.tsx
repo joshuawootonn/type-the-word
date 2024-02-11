@@ -1,7 +1,6 @@
 import { signIn, signOut, useSession } from 'next-auth/react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import Head from 'next/head'
 
 export function Navigation() {
@@ -15,26 +14,27 @@ export function Navigation() {
             <style jsx global>{`
                 @keyframes bibleAnimation {
                     from {
-                        background-position: 0 0;
+                        background-position: 0px 0;
                     }
                     to {
-                        background-position: -649.42px 0;
+                        background-position: -741px 0;
                     }
                 }
 
                 .icon {
-                    height: 30px;
-                    width: 34.5px;
-                    background-image: url('https://www.typetheword.site/bible.svg');
+                    transform: translateY(1px);
+                    width: 39px;
+                    height: 33px;
+                    background-image: url('/bible.svg');
                     background-repeat: no-repeat;
-                    background-position: -649.42px 0;
+                    background-position: -741px 0;
                 }
                 .link {
                 }
 
                 .link:hover .icon,
                 .link:focus-visible .icon {
-                    animation: bibleAnimation 0.6s steps(19) forwards;
+                    animation: bibleAnimation 0.6s steps(20, jump-none) forwards;
                 }
 
                 @media (prefers-color-scheme: dark) {
@@ -44,7 +44,9 @@ export function Navigation() {
                 }
             `}</style>
             <Link
-                className={'link svg-outline relative flex space-x-1'}
+                className={
+                    'link svg-outline relative flex items-center space-x-1'
+                }
                 href={'/'}
                 aria-label={'Type the Word logo'}
             >
@@ -60,13 +62,7 @@ export function Navigation() {
                     </span>
                 </span>
 
-                <div className="icon">
-                    <img
-                        src="/bible.svg"
-                        alt="Bible"
-                        style={{ display: 'none' }}
-                    />
-                </div>
+                <div className="icon"></div>
             </Link>
             <div className="flex flex-col gap-4">
                 {sessionData ? (
