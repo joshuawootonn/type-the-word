@@ -80,10 +80,14 @@ export function Footer() {
             >
                 changelog
             </Link>
-            <div>/</div>
-            <EmailLink className={'svg-outline shrink-0 font-normal'}>
+            <div className="hidden md:block">/</div>
+            <EmailLink
+                className={'svg-outline hidden shrink-0 font-normal md:block'}
+            >
                 email me feedback
             </EmailLink>
+            <div>/</div>
+            <Link href={'https://discord.gg/a9eYv4sgWp'}>discord</Link>
         </footer>
     )
 }
