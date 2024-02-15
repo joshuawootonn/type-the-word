@@ -40,7 +40,7 @@ export default function Changelog() {
                 />
                 <meta
                     property="og:image"
-                    content="https://typetheword.site/api/og/changelog"
+                    content="https://typetheword.site/api/og?path=changelog"
                 />
                 <link rel="icon" href="/favicon.ico" />
             </Head>

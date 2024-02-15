@@ -60,7 +60,7 @@ export default function Home() {
                 />
                 <meta
                     property="og:image"
-                    content="https://typetheword.site/api/og/why?"
+                    content="https://typetheword.site/api/og?path=why"
                 />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
