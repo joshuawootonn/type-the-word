@@ -36,7 +36,7 @@ export default function Changelog() {
                 <title>Type the Word - Changelog</title>
                 <meta
                     name="description"
-                    content="All the changes happening in your favorite typing game"
+                    content="All the product changes happening to Type the Word."
                 />
                 <meta
                     property="og:image"
