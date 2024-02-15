@@ -1,7 +1,13 @@
 import { PlanetScaleDatabase } from 'drizzle-orm/planetscale-serverless'
 import * as schema from '~/server/db/schema'
-import { desc, eq, SQL } from 'drizzle-orm'
-import { Book, Chapter, typedVerses, typingSessions } from '~/server/db/schema'
+import { and, desc, eq, SQL } from 'drizzle-orm'
+import {
+    Book,
+    Chapter,
+    typedVerses,
+    typingSessions,
+    users,
+} from '~/server/db/schema'
 import { createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
@@ -65,12 +71,19 @@ export class TypingSessionRepository {
     }): Promise<TypingSession[]> {
         const where = eq(typingSessions.userId, userId)
 
-        return await this.db.query.typingSessions.findMany({
+        const builder = this.db.query.typingSessions.findMany({
             with: {
-                typedVerses: true,
+                typedVerses: {
+                    // This nested query automatically filters by typing session so I don't have to add it.
+                    // I would just add it to be explicit I don't think there is a simple way of doing so.
+                    where: (typedVerse, { eq, and }) =>
+                        and(eq(typedVerse.userId, userId)),
+                },
             },
             where,
             orderBy: [desc(typingSessions.createdAt)],
         })
+        console.log(builder.toSQL())
+        return await builder
     }
 }

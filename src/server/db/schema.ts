@@ -148,6 +148,10 @@ export const typedVerses = mysqlTable(
     },
     typedVerse => ({
         userIdIdx: index('userId_idx').on(typedVerse.userId),
+        typingSessionIdUserIdIdx: index('typingSessionId_userId_idx').on(
+            typedVerse.typingSessionId,
+            typedVerse.userId,
+        ),
     }),
 )
 
