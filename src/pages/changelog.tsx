@@ -3,6 +3,7 @@ import Head from 'next/head'
 import { Navigation } from '~/components/navigation'
 import { Footer } from '~/components/footer'
 import { format } from 'date-fns'
+import Image from 'next/image'
 
 function Link({ href, children }: { href: string; children: React.ReactNode }) {
     return (
@@ -52,12 +53,28 @@ export default function Changelog() {
                         <h1 className="m-0">Changelog</h1>
                         <span>
                             (Updated{' '}
-                            <DateComponent date={new Date('2/9/2024')} />)
+                            <DateComponent date={new Date('2/15/2024')} />)
                         </span>
                     </div>
                     <p>New updates and improvements to Type the Word</p>
                     <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
                     <ul>
+                        <li>
+                            <DateComponent date={new Date('2/15/2024')} /> - Add
+                            some much needed database indexes to speed up the
+                            history page.
+                            <Image
+                                src={
+                                    '/assets/adding-indexes-for-history-page.png'
+                                }
+                                alt={
+                                    'Two devtools of the before and after of adding indexes to the history page'
+                                }
+                                width={1505}
+                                height={1548}
+                            />
+                        </li>
+
                         <li>
                             <DateComponent date={new Date('2/9/2024')} /> -{' '}
                             Update the <code>/history</code> page with an
