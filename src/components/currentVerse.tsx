@@ -273,15 +273,25 @@ export function CurrentVerse({
                     typingSession?.data?.id != null &&
                     sessionData?.user?.id != null
                 ) {
-                    void addTypedVerseToSession
-                        .mutateAsync({
-                            book: verse.verse.book,
-                            chapter: verse.verse.chapter,
-                            verse: verse.verse.verse,
-                            translation: verse.verse.translation,
-                            typingSessionId: typingSession.data.id,
-                        })
-                        .then(() => typingSession.refetch())
+                    void addTypedVerseToSession.mutateAsync({
+                        book: verse.verse.book,
+                        chapter: verse.verse.chapter,
+                        verse: verse.verse.verse,
+                        translation: verse.verse.translation,
+                        typingSessionId: typingSession.data.id,
+                    })
+                } else {
+                    const nextVerse = getNextVerse(currentVerse, passage.nodes)
+                    if (nextVerse?.verse.verse) {
+                        setCurrentVerse(nextVerse?.verse.value)
+                        setPosition([])
+                        setKeystrokes([])
+                    } else {
+                        setCurrentVerse('')
+                        inputRef.current?.blur()
+                        setPosition([])
+                        setKeystrokes([])
+                    }
                 }
             } else {
                 setPosition(position)
