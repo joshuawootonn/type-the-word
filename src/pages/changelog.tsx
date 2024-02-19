@@ -53,12 +53,25 @@ export default function Changelog() {
                         <h1 className="m-0">Changelog</h1>
                         <span>
                             (Updated{' '}
-                            <DateComponent date={new Date('2/15/2024')} />)
+                            <DateComponent date={new Date('2/19/2024')} />)
                         </span>
                     </div>
                     <p>New updates and improvements to Type the Word</p>
                     <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
                     <ul>
+                        <li>
+                            <DateComponent date={new Date('2/15/2024')} />
+                            <ul>
+                                <li>
+                                    Fix a bug where you couldn&apos;t complete a
+                                    verse without logging in.
+                                </li>
+                                <li>
+                                    Fix the flicker that could happen when
+                                    completing a verse.
+                                </li>
+                            </ul>
+                        </li>
                         <li>
                             <DateComponent date={new Date('2/15/2024')} /> - Add
                             some much needed database indexes to speed up the
