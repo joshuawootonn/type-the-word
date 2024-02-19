@@ -127,7 +127,9 @@ export function CurrentVerse({
         undefined,
         {
             enabled: sessionData?.user?.id != null,
-            refetchOnMount: query => query.isStale(),
+            refetchOnMount: false,
+            staleTime: 1000 * 60 * 5,
+            cacheTime: Infinity,
         },
     )
     const chapterHistory = api.chapterHistory.getChapterHistory.useQuery(
