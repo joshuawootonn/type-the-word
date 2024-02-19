@@ -35,9 +35,7 @@ export function ReadonlyVerse({
         undefined,
         {
             enabled: sessionData?.user?.id != null,
-            refetchOnMount: false,
-            staleTime: Infinity,
-            cacheTime: Infinity,
+            refetchOnMount: query => query.isStale(),
         },
     )
     const chapterHistory = api.chapterHistory.getChapterHistory.useQuery(
