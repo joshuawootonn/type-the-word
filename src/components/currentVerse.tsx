@@ -160,6 +160,8 @@ export function CurrentVerse({
                     },
                 )
 
+                // This waits to toggle the verse till ^ has gone through.
+                // It prevents a flicker that can happen in this mutation.
                 setTimeout(() => {
                     const nextVerse = getNextVerse(currentVerse, passage.nodes)
 
