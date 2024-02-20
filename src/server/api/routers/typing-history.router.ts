@@ -3,6 +3,10 @@ import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import { z } from 'zod'
 import { booksSchema, chaptersSchema } from '~/server/db/schema'
 
+export type ChapterHistory ={
+    verses: Record<number, TypedVerse[]>
+}
+
 export const chapterHistoryRouter = createTRPCRouter({
     getChapterHistory: protectedProcedure
         .input(
@@ -15,14 +19,14 @@ export const chapterHistoryRouter = createTRPCRouter({
             async ({
                 ctx: { session, repositories },
                 input,
-            }): Promise<{ verses: Record<number, TypedVerse[]> }> => {
+            }): Promise<ChapterHistory> => {
                 const typingSessions = await repositories.typingSession.getMany(
                     {
                         userId: session.user.id,
                     },
                 )
 
-                const verses: Record<number, TypedVerse[]> = {}
+                const verses: ChapterHistory['verses'] = {}
 
                 for (const session of typingSessions) {
                     for (const verse of session.typedVerses) {

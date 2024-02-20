@@ -5,9 +5,11 @@ import { Inline, ParsedPassage } from '~/lib/parseEsv'
 import { Paragraph } from './paragraph'
 import { Keystroke } from '~/lib/keystroke'
 import { Cursor } from '~/components/cursor'
-import { atom, PrimitiveAtom, Provider, useSetAtom } from 'jotai'
+import { atom, PrimitiveAtom, Provider } from 'jotai'
 import { useRect } from '~/lib/hooks/useRect'
 import { useHydrateAtoms } from 'jotai/react/utils'
+import { api } from '~/utils/api'
+import { useSession } from 'next-auth/react'
 
 export const PassageContext = React.createContext<{
     rect: DOMRect | null
@@ -52,6 +54,20 @@ export function Passage({
 
     const passageRef = useRef<HTMLDivElement>(null)
     const passageRect = useRect(passageRef)
+    const { data: sessionData } = useSession()
+
+    const typingSession = api.typingSession.getOrCreateTypingSession.useQuery(
+        undefined,
+        {
+            enabled: sessionData?.user?.id != null,
+        },
+    )
+    const chapterHistory = api.chapterHistory.getChapterHistory.useQuery(
+        { chapter: passage.firstVerse.chapter, book: passage.firstVerse.book },
+        {
+            enabled: sessionData?.user?.id != null,
+        },
+    )
 
     return (
         <Provider>
@@ -83,6 +99,8 @@ export function Passage({
                                             key={pIndex}
                                             node={node}
                                             passage={passage}
+                                            typingSession={typingSession}
+                                            chapterHistory={chapterHistory}
                                         />
                                     )
 

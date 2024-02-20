@@ -6,13 +6,20 @@ import { useAtom } from 'jotai'
 import { CurrentVerse } from '~/components/currentVerse'
 import { ReadonlyVerse } from '~/components/readonlyVerse'
 import { ibmPlexMono } from '~/pages/_app'
+import { TypingSession } from '~/server/repositories/typingSession.repository'
+import { UseQueryResult } from '@tanstack/react-query'
+import { ChapterHistory } from '~/server/api/routers/typing-history.router'
 
 export function Paragraph({
     node,
     passage,
+    typingSession,
+    chapterHistory,
 }: {
     passage: ParsedPassage
     node: Paragraph
+    typingSession: UseQueryResult<TypingSession>
+    chapterHistory: UseQueryResult<ChapterHistory>
 }) {
     const [currentVerse] = useAtom(currentVerseAtom)
     return (
@@ -36,6 +43,8 @@ export function Paragraph({
                         isIndented={node.metadata.blockIndent}
                         isQuote={node.metadata.type === 'quote'}
                         passage={passage}
+                        typingSession={typingSession}
+                        chapterHistory={chapterHistory}
                     />
                 ) : (
                     <ReadonlyVerse
@@ -44,6 +53,8 @@ export function Paragraph({
                         isCurrentVerse={isCurrentVerse}
                         isIndented={node.metadata.blockIndent}
                         isQuote={node.metadata.type === 'quote'}
+                        typingSession={typingSession}
+                        chapterHistory={chapterHistory}
                     />
                 )
             })}

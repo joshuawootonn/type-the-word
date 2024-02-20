@@ -10,19 +10,25 @@ import { useRect } from '~/lib/hooks/useRect'
 import { useAtom, useSetAtom } from 'jotai'
 import clsx from 'clsx'
 import { Verse } from '~/lib/parseEsv'
-import { api } from '~/utils/api'
 import { useSession } from 'next-auth/react'
+import { UseQueryResult } from '@tanstack/react-query'
+import { TypingSession } from '~/server/repositories/typingSession.repository'
+import { ChapterHistory } from '~/server/api/routers/typing-history.router'
 
 export function ReadonlyVerse({
     isCurrentVerse,
     isIndented,
     isQuote,
     verse,
+    typingSession,
+    chapterHistory
 }: {
     isCurrentVerse: boolean
     isIndented: boolean
     isQuote: boolean
     verse: Verse
+    typingSession: UseQueryResult<TypingSession>
+    chapterHistory: UseQueryResult<ChapterHistory>
 }) {
     const { data: sessionData } = useSession()
     const { rect: passageRect } = useContext(PassageContext)
@@ -30,20 +36,6 @@ export function ReadonlyVerse({
 
     const ref = useRef<HTMLSpanElement>(null)
     const rect = useRect(ref)
-    // const passageRect = useRect(passageRef)
-    const typingSession = api.typingSession.getOrCreateTypingSession.useQuery(
-        undefined,
-        {
-            enabled: sessionData?.user?.id != null,
-            refetchOnMount: query => query.isStale(),
-        },
-    )
-    const chapterHistory = api.chapterHistory.getChapterHistory.useQuery(
-        { chapter: verse.verse.chapter, book: verse.verse.book },
-        {
-            enabled: sessionData?.user?.id != null,
-        },
-    )
 
     const isTypedInSession = typingSession.data?.typedVerses.find(
         a =>

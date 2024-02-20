@@ -1,11 +1,5 @@
 import { Block, Inline, ParsedPassage, Verse } from '~/lib/parseEsv'
-import React, {
-    FormEvent,
-    FormEventHandler,
-    useContext,
-    useEffect,
-    useRef,
-} from 'react'
+import React, { FormEvent, useContext, useEffect, useRef } from 'react'
 import { useAtom } from 'jotai'
 import {
     PassageContext,
@@ -26,6 +20,10 @@ import { Word } from '~/components/word'
 import { useRect } from '~/lib/hooks/useRect'
 import { trackEvent } from 'fathom-client'
 import { z } from 'zod'
+import { UseQueryResult } from '@tanstack/react-query'
+import { TypingSession } from '~/server/repositories/typingSession.repository'
+import { ChapterHistory } from '~/server/api/routers/typing-history.router'
+import { flushSync } from 'react-dom'
 
 const nativeInputEventSchema = z.discriminatedUnion('inputType', [
     z.object({
@@ -109,12 +107,16 @@ export function CurrentVerse({
     isQuote,
     isIndented,
     passage,
+    typingSession,
+    chapterHistory,
 }: {
     isCurrentVerse: boolean
     isIndented: boolean
     isQuote: boolean
     verse: Verse
     passage: ParsedPassage
+    typingSession: UseQueryResult<TypingSession>
+    chapterHistory: UseQueryResult<ChapterHistory>
 }) {
     const inputRef = useRef<HTMLInputElement>(null)
     const [position, setPosition] = useAtom(positionAtom)
@@ -122,20 +124,6 @@ export function CurrentVerse({
     const [passageId] = useAtom(passageIdAtom)
     const [autoFocus] = useAtom(autofocusAtom)
     const { data: sessionData } = useSession()
-
-    const typingSession = api.typingSession.getOrCreateTypingSession.useQuery(
-        undefined,
-        {
-            enabled: sessionData?.user?.id != null,
-            refetchOnMount: query => query.isStale(),
-        },
-    )
-    const chapterHistory = api.chapterHistory.getChapterHistory.useQuery(
-        { chapter: verse.verse.chapter, book: verse.verse.book },
-        {
-            enabled: sessionData?.user?.id != null,
-        },
-    )
 
     const utils = api.useContext()
     const addTypedVerseToSession =
@@ -149,40 +137,45 @@ export function CurrentVerse({
                 const prevData =
                     utils.typingSession.getOrCreateTypingSession.getData()
 
-                // Optimistically update the data with our new post
-                utils.typingSession.getOrCreateTypingSession.setData(
-                    undefined,
-                    old => {
-                        if (old == null) {
-                            return undefined
-                        }
+                flushSync(() => {
+                    // Optimistically update the data with our new post
+                    utils.typingSession.getOrCreateTypingSession.setData(
+                        undefined,
+                        old => {
+                            if (old == null) {
+                                return undefined
+                            }
 
-                        return {
-                            ...old,
-                            typedVerses: [
-                                ...old.typedVerses,
-                                {
-                                    ...newPost,
-                                    id: crypto.randomUUID(),
-                                    userId: crypto.randomUUID(),
-                                    createdAt: new Date(),
-                                },
-                            ],
-                        }
-                    },
-                )
-                const nextVerse = getNextVerse(currentVerse, passage.nodes)
+                            return {
+                                ...old,
+                                typedVerses: [
+                                    ...old.typedVerses,
+                                    {
+                                        ...newPost,
+                                        id: crypto.randomUUID(),
+                                        userId: crypto.randomUUID(),
+                                        createdAt: new Date(),
+                                    },
+                                ],
+                            }
+                        },
+                    )
+                })
 
-                if (nextVerse?.verse.verse) {
-                    setCurrentVerse(nextVerse?.verse.value)
-                    setPosition([])
-                    setKeystrokes([])
-                } else {
-                    setCurrentVerse('')
-                    inputRef.current?.blur()
-                    setPosition([])
-                    setKeystrokes([])
-                }
+                flushSync(() => {
+                    const nextVerse = getNextVerse(currentVerse, passage.nodes)
+
+                    if (nextVerse?.verse.verse) {
+                        setCurrentVerse(nextVerse?.verse.value)
+                        setPosition([])
+                        setKeystrokes([])
+                    } else {
+                        setCurrentVerse('')
+                        inputRef.current?.blur()
+                        setPosition([])
+                        setKeystrokes([])
+                    }
+                })
 
                 // Return the previous data so we can revert if something goes wrong
                 return { prevData }
