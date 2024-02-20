@@ -137,32 +137,30 @@ export function CurrentVerse({
                 const prevData =
                     utils.typingSession.getOrCreateTypingSession.getData()
 
-                flushSync(() => {
-                    // Optimistically update the data with our new post
-                    utils.typingSession.getOrCreateTypingSession.setData(
-                        undefined,
-                        old => {
-                            if (old == null) {
-                                return undefined
-                            }
+                // Optimistically update the data with our new post
+                utils.typingSession.getOrCreateTypingSession.setData(
+                    undefined,
+                    old => {
+                        if (old == null) {
+                            return undefined
+                        }
 
-                            return {
-                                ...old,
-                                typedVerses: [
-                                    ...old.typedVerses,
-                                    {
-                                        ...newPost,
-                                        id: crypto.randomUUID(),
-                                        userId: crypto.randomUUID(),
-                                        createdAt: new Date(),
-                                    },
-                                ],
-                            }
-                        },
-                    )
-                })
+                        return {
+                            ...old,
+                            typedVerses: [
+                                ...old.typedVerses,
+                                {
+                                    ...newPost,
+                                    id: crypto.randomUUID(),
+                                    userId: crypto.randomUUID(),
+                                    createdAt: new Date(),
+                                },
+                            ],
+                        }
+                    },
+                )
 
-                flushSync(() => {
+                setTimeout(() => {
                     const nextVerse = getNextVerse(currentVerse, passage.nodes)
 
                     if (nextVerse?.verse.verse) {
