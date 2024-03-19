@@ -10,6 +10,7 @@ import { useRect } from '~/lib/hooks/useRect'
 import { useHydrateAtoms } from 'jotai/react/utils'
 import { api } from '~/utils/api'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
 
 export const PassageContext = React.createContext<{
     rect: DOMRect | null
@@ -68,6 +69,8 @@ export function Passage({
             enabled: sessionData?.user?.id != null,
         },
     )
+    const isRootPath = useRouter().pathname === '/'
+    const H2Component = isRootPath ? 'h2' : 'h1'
 
     return (
         <Provider>
@@ -106,14 +109,17 @@ export function Passage({
 
                                 case 'h2':
                                     return (
-                                        <h2 key={pIndex} className="text-2xl">
+                                        <H2Component
+                                            key={pIndex}
+                                            className="prose-h2 mb-4 mt-2 text-2xl"
+                                        >
                                             {node.text}
-                                        </h2>
+                                        </H2Component>
                                     )
                                 case 'h3':
                                     return (
                                         <h3
-                                            className="text-xl font-semibold tracking-wide"
+                                            className="prose-h3 mt-0 text-xl font-semibold tracking-wide"
                                             key={pIndex}
                                         >
                                             {node.text}
@@ -122,7 +128,7 @@ export function Passage({
                                 case 'h4':
                                     return (
                                         <h4
-                                            className="text-lg font-medium tracking-wide"
+                                            className="prose-h4 text-lg font-medium tracking-wide"
                                             key={pIndex}
                                         >
                                             {node.text}

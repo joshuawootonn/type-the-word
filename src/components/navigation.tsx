@@ -2,9 +2,12 @@ import { signIn, signOut, useSession } from 'next-auth/react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import Link from 'next/link'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 
 export function Navigation() {
     const { data: sessionData } = useSession()
+    const isRootPath = useRouter().pathname === '/'
+    const RootLinkComponent = isRootPath ? 'h1' : 'span'
 
     return (
         <nav className="mx-auto mb-2 flex w-full items-center justify-between pt-4 lg:pt-8">
@@ -50,7 +53,7 @@ export function Navigation() {
                 href={'/'}
                 aria-label={'Type the Word logo'}
             >
-                <span className="text-xl font-semibold">
+                <RootLinkComponent className="text-xl font-semibold">
                     <span className="text-gray-500 dark:text-gray-400">
                         Type th
                     </span>
@@ -60,7 +63,7 @@ export function Navigation() {
                         </span>
                         e Word
                     </span>
-                </span>
+                </RootLinkComponent>
 
                 <div className="icon"></div>
             </Link>
