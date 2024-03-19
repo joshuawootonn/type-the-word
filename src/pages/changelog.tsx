@@ -36,8 +36,7 @@ export default function Changelog() {
                 <title>Type the Word - Changelog</title>
                 <meta
                     name="description"
-                    content="All the product changes happening to Type the Word."
-                />
+                    content="All the product changes happening to Type the Word.  A typing practice tool that tracks your progress through the Bible.">
                 <meta
                     property="og:image"
                     content="https://typetheword.site/api/og?path=changelog"

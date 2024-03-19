@@ -59,7 +59,7 @@ export default function Home(props: { passage?: PassageReference }) {
                 </title>
                 <meta
                     name="description"
-                    content="Practice your typing while meditating on the Bible. Type the word is an easy to "
+                    content="A typing practice tool that tracks your typing progress through the Bible. Improve your typing skills while meditating on God's word."
                 />
                 <meta
                     property="og:image"

@@ -10,7 +10,7 @@ export default function Home() {
                 <title>Type the Word - Copyright</title>
                 <meta
                     name="description"
-                    content="Copyright for Type the Word."
+                    content="The Copyright for Type the Word. A typing practice tool that tracks your typing progress through the Bible. Improve your typing skills while meditating on God's word."
                 />
                 <meta
                     property="og:image"
@@ -20,7 +20,7 @@ export default function Home() {
             </Head>
 
             <Navigation />
-            <main className="prose dark:prose-invert mx-auto mb-8 w-full flex-grow pt-4 text-lg lg:pt-8">
+            <main className="prose mx-auto mb-8 w-full flex-grow pt-4 text-lg dark:prose-invert lg:pt-8">
                 <h1>Copyright</h1>
                 <p>
                     Scripture quotations are from the ESV® Bible (The Holy

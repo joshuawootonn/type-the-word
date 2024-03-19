@@ -56,7 +56,7 @@ export default function Home() {
                 <title>Why I created Type the Word</title>
                 <meta
                     name="description"
-                    content="A typing practice that track you typing through the Bible. Improve your typing skills while exploring biblical passages and verses. Enhance your accuracy and speed as you type through the sacred text."
+                    content="Why did I create Type the Word? Why should we meditate on the Bible?"
                 />
                 <meta
                     property="og:image"

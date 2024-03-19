@@ -11,7 +11,7 @@ export default function Home() {
                 <title>Type the Word - Privacy Policy</title>
                 <meta
                     name="description"
-                    content="A typing practice that track you typing through the Bible. Improve your typing skills while exploring biblical passages and verses. Enhance your accuracy and speed as you type through the sacred text."
+                    content="The Privacy Policy for Type the Word. A typing practice tool that tracks your typing progress through the Bible. Improve your typing skills while meditating on God's word."
                 />
                 <meta
                     property="og:image"
