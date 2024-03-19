@@ -54,7 +54,9 @@ export default function Home(props: { passage?: PassageReference }) {
     return (
         <div className="min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0">
             <Head>
-                <title>Type the Word</title>
+                <title>
+                    Type the Word {router.pathname !== '/' ? `- ${value}` : ''}
+                </title>
                 <meta
                     name="description"
                     content="Practice your typing while meditating on the Bible. Type the word is an easy to "

@@ -53,7 +53,7 @@ export default function Home() {
     return (
         <div className="min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0">
             <Head>
-                <title>Type the Word</title>
+                <title>Why I created Type the Word</title>
                 <meta
                     name="description"
                     content="A typing practice that track you typing through the Bible. Improve your typing skills while exploring biblical passages and verses. Enhance your accuracy and speed as you type through the sacred text."
