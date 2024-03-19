@@ -87,7 +87,7 @@ export function Footer() {
                 email me feedback
             </EmailLink>
             <div>/</div>
-            <Link href={'https://discord.gg/a9eYv4sgWp'}>discord</Link>
+            <Link href={'https://discord.com/invite/a9eYv4sgWp '}>discord</Link>
         </footer>
     )
 }
