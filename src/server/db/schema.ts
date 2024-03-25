@@ -1,19 +1,19 @@
 import { relations, sql } from 'drizzle-orm'
+import { type AdapterAccount } from 'next-auth/adapters'
+import { createSelectSchema } from 'drizzle-zod'
+import { z } from 'zod'
+import { bookSchema } from '~/lib/types/book'
 import {
     index,
-    int,
-    mysqlEnum,
-    mysqlTableCreator,
+    integer,
+    pgEnum,
     primaryKey,
     text,
     timestamp,
     varchar,
     json,
-} from 'drizzle-orm/mysql-core'
-import { type AdapterAccount } from 'next-auth/adapters'
-import { createSelectSchema } from 'drizzle-zod'
-import { z } from 'zod'
-import { bookSchema } from '~/lib/types/book'
+    pgTableCreator,
+} from 'drizzle-orm/pg-core'
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -21,15 +21,17 @@ import { bookSchema } from '~/lib/types/book'
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const mysqlTable = mysqlTableCreator(name => `${name}`)
+export const pgTable = pgTableCreator(name => `${name}`)
 
-export const users = mysqlTable('user', {
+const bookEnum = pgEnum('book', bookSchema.options)
+const translationEnum = pgEnum('translation', ['esv'])
+
+export const users = pgTable('user', {
     id: varchar('id', { length: 255 }).notNull().primaryKey(),
     name: varchar('name', { length: 255 }),
     email: varchar('email', { length: 255 }).notNull(),
     emailVerified: timestamp('emailVerified', {
         mode: 'date',
-        fsp: 3,
     }).default(sql`CURRENT_TIMESTAMP(3)`),
     image: varchar('image', { length: 255 }),
 })
@@ -39,7 +41,7 @@ export const usersRelations = relations(users, ({ many }) => ({
     typingSessions: many(typingSessions),
 }))
 
-export const accounts = mysqlTable(
+export const accounts = pgTable(
     'account',
     {
         userId: varchar('userId', { length: 255 }).notNull(),
@@ -52,7 +54,7 @@ export const accounts = mysqlTable(
         }).notNull(),
         refresh_token: text('refresh_token'),
         access_token: text('access_token'),
-        expires_at: int('expires_at'),
+        expires_at: integer('expires_at'),
         token_type: varchar('token_type', { length: 255 }),
         scope: varchar('scope', { length: 255 }),
         id_token: text('id_token'),
@@ -68,7 +70,7 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
     user: one(users, { fields: [accounts.userId], references: [users.id] }),
 }))
 
-export const sessions = mysqlTable(
+export const sessions = pgTable(
     'session',
     {
         sessionToken: varchar('sessionToken', { length: 255 })
@@ -86,7 +88,7 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
     user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }))
 
-export const verificationTokens = mysqlTable(
+export const verificationTokens = pgTable(
     'verificationToken',
     {
         identifier: varchar('identifier', { length: 255 }).notNull(),
@@ -98,7 +100,7 @@ export const verificationTokens = mysqlTable(
     }),
 )
 
-export const typingSessions = mysqlTable(
+export const typingSessions = pgTable(
     'typingSession',
     {
         id: varchar('id', { length: 255 })
@@ -129,7 +131,7 @@ export const typingSessionRelations = relations(
     }),
 )
 
-export const typedVerses = mysqlTable(
+export const typedVerses = pgTable(
     'typedVerse',
     {
         id: varchar('id', { length: 255 })
@@ -138,10 +140,10 @@ export const typedVerses = mysqlTable(
             .primaryKey(),
         userId: varchar('userId', { length: 255 }).notNull(),
         typingSessionId: varchar('typingSessionId', { length: 255 }).notNull(),
-        translation: mysqlEnum('translation', ['esv']).notNull(),
-        book: mysqlEnum('book', bookSchema.options).notNull(),
-        chapter: int('chapter').notNull(),
-        verse: int('verse').notNull(),
+        translation: translationEnum('translation').notNull(),
+        book: bookEnum('book').notNull(),
+        chapter: integer('chapter').notNull(),
+        verse: integer('verse').notNull(),
         createdAt: timestamp('createdAt', { mode: 'date' })
             .notNull()
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
@@ -171,14 +173,14 @@ export const typedVerseRelations = relations(typedVerses, ({ one }) => ({
     }),
 }))
 
-export const passageResponse = mysqlTable('passageResponse', {
+export const passageResponse = pgTable('passageResponse', {
     id: varchar('id', { length: 255 })
         .notNull()
         .$default(() => crypto.randomUUID())
         .primaryKey(),
-    book: mysqlEnum('book', bookSchema.options).notNull(),
-    chapter: int('chapter').notNull(),
-    translation: mysqlEnum('translation', ['esv']).notNull(),
+    book: bookEnum('book').notNull(),
+    chapter: integer('chapter').notNull(),
+    translation: translationEnum('translation').notNull(),
     response: json('response').notNull(),
     createdAt: timestamp('createdAt', { mode: 'date' })
         .notNull()
