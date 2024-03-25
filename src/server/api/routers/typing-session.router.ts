@@ -6,9 +6,7 @@ import { differenceInMinutes, subMinutes } from 'date-fns'
 import {
     TypedVerse,
     TypingSession,
-    typingSessionSchema,
 } from '~/server/repositories/typingSession.repository'
-import { z } from 'zod'
 import { getBibleMetadata } from '~/server/bibleMetadata'
 import toProperCase from '~/lib/toProperCase'
 import { passageReferenceSchema } from '~/lib/passageReference'
@@ -196,16 +194,23 @@ function getBookOverview(typingSessions: TypingSession[]): BookOverview[] {
     })
 }
 
-const typingSessionSummarySchema = typingSessionSchema.transform(
-    typingSession => ({
+export type TypingSessionLog = {
+    numberOfVersesTyped: number
+    updatedAt: Date
+    createdAt: Date
+    location: string
+}
+
+const getTypingSessionLog = function (
+    typingSession: TypingSession,
+): TypingSessionLog {
+    return {
         numberOfVersesTyped: typingSession.typedVerses.length,
         updatedAt: typingSession.updatedAt,
         createdAt: typingSession.createdAt,
         location: typingSessionToString(typingSession),
-    }),
-)
-
-export type TypingSessionSummary = z.infer<typeof typingSessionSummarySchema>
+    }
+}
 
 export const typingSessionRouter = createTRPCRouter({
     getOrCreateTypingSession: protectedProcedure.query(
@@ -227,11 +232,17 @@ export const typingSessionRouter = createTRPCRouter({
                 return lastTypingSession
             }
 
-            await db.insert(typingSessions).values({ userId: session.user.id })
+            const [nextSession] = await db
+                .insert(typingSessions)
+                .values({ userId: session.user.id })
+                .returning()
+
+            if (!nextSession) {
+                throw new Error('Failed to create a typing session')
+            }
 
             const newTypingSession = await repositories.typingSession.getOne({
-                id: sql`LAST_INSERT_ID
-        ()`,
+                id: nextSession.id,
             })
 
             return newTypingSession
@@ -267,9 +278,7 @@ export const typingSessionRouter = createTRPCRouter({
             },
         ),
     getHistoryOverview: protectedProcedure.query(
-        async ({
-            ctx: { db, session, repositories },
-        }): Promise<BookOverview[]> => {
+        async ({ ctx: { session, repositories } }): Promise<BookOverview[]> => {
             const typingSessions = await repositories.typingSession.getMany({
                 userId: session.user.id,
             })
@@ -279,14 +288,14 @@ export const typingSessionRouter = createTRPCRouter({
     ),
     getLog: protectedProcedure.query(
         async ({
-            ctx: { db, session, repositories },
-        }): Promise<TypingSessionSummary[]> => {
+            ctx: { session, repositories },
+        }): Promise<TypingSessionLog[]> => {
             const typingSessions = await repositories.typingSession.getMany({
                 userId: session.user.id,
             })
 
             return typingSessions
-                .map(a => typingSessionSummarySchema.parse(a))
+                .map(a => getTypingSessionLog(a))
                 .filter(a => a.numberOfVersesTyped > 0)
         },
     ),

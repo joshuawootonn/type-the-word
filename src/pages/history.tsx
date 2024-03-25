@@ -43,10 +43,7 @@ export default function History() {
                         <div>
                             <div className="flex flex-col">
                                 {overview.data.map(book => {
-                                    // const isBookComplete = true
                                     if (book.percentage === 0) return null
-                                    const isBookComplete =
-                                        book.percentage >= 100
                                     return (
                                         <details key={book.book}>
                                             <summary className="svg-outline-stubby relative select-none outline-none">

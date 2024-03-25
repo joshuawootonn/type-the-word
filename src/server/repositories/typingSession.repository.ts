@@ -1,26 +1,22 @@
-import { PlanetScaleDatabase } from 'drizzle-orm/planetscale-serverless'
 import * as schema from '~/server/db/schema'
-import { and, desc, eq, SQL } from 'drizzle-orm'
-import {
-    Book,
-    Chapter,
-    typedVerses,
-    typingSessions,
-    users,
-} from '~/server/db/schema'
+import { desc, eq, SQL } from 'drizzle-orm'
+import { typedVerses, typingSessions } from '~/server/db/schema'
 import { createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
+import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 
 export const typingSessionSchema = createSelectSchema(typingSessions).and(
-    z.object({ typedVerses: z.array(createSelectSchema(typedVerses)) }),
+    z.object({
+        typedVerses: z.array(createSelectSchema(typedVerses)),
+    }),
 )
 
 export type TypingSession = z.infer<typeof typingSessionSchema>
 export type TypedVerse = TypingSession['typedVerses'][number]
 
 export class TypingSessionRepository {
-    db: PlanetScaleDatabase<typeof schema>
-    constructor(db: PlanetScaleDatabase<typeof schema>) {
+    db: PostgresJsDatabase<typeof schema>
+    constructor(db: PostgresJsDatabase<typeof schema>) {
         this.db = db
     }
 
@@ -83,7 +79,6 @@ export class TypingSessionRepository {
             where,
             orderBy: [desc(typingSessions.createdAt)],
         })
-        console.log(builder.toSQL())
         return await builder
     }
 }
