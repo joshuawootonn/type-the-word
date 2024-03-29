@@ -51,12 +51,13 @@ export default function Home(props: { passage?: PassageReference }) {
     })
     const router = useRouter()
 
+    const title =
+        router.pathname === '/' ? 'Type the Word' : `Type the Word - ${value}`
+
     return (
         <div className="min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0">
             <Head>
-                <title>
-                    Type the Word {router.pathname !== '/' ? `- ${value}` : ''}
-                </title>
+                <title>{title}</title>
                 <meta
                     name="description"
                     content="A typing practice tool that tracks your typing progress through the Bible. Improve your typing skills while meditating on God's word."
