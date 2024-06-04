@@ -1,12 +1,5 @@
 import { Inline } from '~/lib/parseEsv'
-import React, { FormEvent } from 'react'
-import {
-    isAtomEqual,
-    isAtomTyped,
-    validEnter,
-    validQuotes,
-    validSingleQuotes,
-} from '~/lib/isEqual'
+import { validEnter, validQuotes, validSingleQuotes } from '~/lib/isEqual'
 
 export type Keystroke = { type: 'backspace' | 'insert'; key: string }
 
@@ -85,29 +78,10 @@ export function isValidKeystroke(
     e:
         | { data: string; inputType: 'insertText' }
         | { data: null; inputType: 'deleteContentBackward' },
-    currentVerse: Inline[],
     prev: Keystroke[],
 ) {
-    const correctAtomNodes = currentVerse.filter(isAtomTyped)
     const prevPosition = getPosition(prev)
-    const prevCurrentCorrect = correctAtomNodes.at(prevPosition.length - 1)
     const prevCurrentTyped = prevPosition.at(-1)
-    const isPrevCurrentCorrect = isAtomEqual(
-        prevCurrentTyped,
-        prevCurrentCorrect,
-    )
-
-    /**
-     * When you complete a correct word you can't undo it.
-     */
-    if (
-        (e.inputType === 'deleteContentBackward' &&
-            prevPosition.length === 0) ||
-        (e.inputType === 'deleteContentBackward' &&
-            isAtomComplete(prevCurrentTyped) &&
-            isPrevCurrentCorrect)
-    )
-        return
 
     if (
         e.inputType === 'insertText' &&

@@ -243,11 +243,7 @@ export function CurrentVerse({
             if (currentVerseNodes == null) {
                 throw new Error('Current ReadonlyVerse is invalid.')
             }
-            const next = isValidKeystroke(
-                nativeInputEvent,
-                currentVerseNodes,
-                keystrokes,
-            )
+            const next = isValidKeystroke(nativeInputEvent, keystrokes)
 
             if (next == null) return keystrokesAtom
             const position = getPosition(next)
