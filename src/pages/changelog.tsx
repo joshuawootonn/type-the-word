@@ -53,12 +53,23 @@ export default function Changelog() {
                         <h1 className="m-0">Changelog</h1>
                         <span>
                             (Updated{' '}
-                            <DateComponent date={new Date('2/19/2024')} />)
+                            <DateComponent date={new Date('7/04/2024')} />)
                         </span>
                     </div>
                     <p>New updates and improvements to Type the Word</p>
                     <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
                     <ul>
+                        <li>
+                            <DateComponent date={new Date('7/04/2024')} />
+                            <ul>
+                                <li>
+                                    Remove restriction preventing you from
+                                    backspacing through correct words. This
+                                    update makes getting 100% accuracy still
+                                    possible when you have a missed typo.
+                                </li>
+                            </ul>
+                        </li>
                         <li>
                             <DateComponent date={new Date('2/15/2024')} />
                             <ul>
