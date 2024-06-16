@@ -8,5 +8,5 @@ export const passageUrlSchema = z
 export type PassageReference = z.infer<typeof passageUrlSchema>
 
 export function toPassageUrl(book: string, chapter: string) {
-    return passageUrlSchema.parse(`${book} ${chapter}`)
+    return passageUrlSchema.parse(`${book}_${chapter}`)
 }
