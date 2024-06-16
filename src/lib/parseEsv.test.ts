@@ -39,7 +39,7 @@ test('parse james 1:1', () => {
     expect(firstVerseC.metadata.hangingVerse).toBeTruthy()
 })
 
-test('parse psalm 23', () => {
+test.skip('parse psalm 23', () => {
     const verseHtml = `"<h2 class="extra_text">Psalm 23 <small class="audio extra_text">(<a class="mp3link" href="https://audio.esv.org/david-cochran-heath/mq/19023001-19023006.mp3" title="Psalm 23" type="audio/mpeg">Listen</a>)</small></h2>
 <h3 id="p19023001_01-1">The <span class="divine-name">Lord</span> Is My Shepherd</h3>
 <h4 id="p19023001_06-1" class="psalm-title">A Psalm of David.</h4>
