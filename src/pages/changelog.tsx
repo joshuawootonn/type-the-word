@@ -53,14 +53,27 @@ export default function Changelog() {
                         <h1 className="m-0">Changelog</h1>
                         <span>
                             (Updated{' '}
-                            <DateComponent date={new Date('7/04/2024')} />)
+                            <DateComponent date={new Date('6/16/2024')} />)
                         </span>
                     </div>
                     <p>New updates and improvements to Type the Word</p>
                     <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
                     <ul>
                         <li>
-                            <DateComponent date={new Date('7/04/2024')} />
+                            <DateComponent date={new Date('6/16/2024')} /> - Add
+                            links for easily navigating to the previous and next
+                            passages.
+                            <Image
+                                src={'/assets/prev-next-links.png'}
+                                alt={
+                                    'The two links at the end of each passage that make navigation easier'
+                                }
+                                width={1438}
+                                height={612}
+                            />
+                        </li>
+                        <li>
+                            <DateComponent date={new Date('6/04/2024')} />
                             <ul>
                                 <li>
                                     Remove restriction preventing you from
