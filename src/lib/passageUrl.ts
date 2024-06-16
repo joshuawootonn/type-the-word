@@ -5,7 +5,7 @@ export const passageUrlSchema = z
     .transform(s => s.split(' ').join('_').toLowerCase())
     .brand('PassageReference')
 
-export type PassageReference = z.infer<typeof passageUrlSchema>
+export type PassageUrl = z.infer<typeof passageUrlSchema>
 
 export function toPassageUrl(book: string, chapter: string) {
     return passageUrlSchema.parse(`${book}_${chapter}`)

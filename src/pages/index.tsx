@@ -17,6 +17,7 @@ import {
 } from '~/lib/passageReference'
 import { useRouter } from 'next/router'
 import { passageUrlSchema } from '~/lib/passageUrl'
+import Link from 'next/link'
 
 export const DEFAULT_PASSAGE_REFERENCE = 'psalm_23'
 
@@ -92,6 +93,28 @@ export default function Home(props: { passage?: PassageReference }) {
                         key={JSON.stringify(passage.data)}
                     />
                 )}
+                <div className="mb-24 mt-8 flex w-full justify-between">
+                    {passage.data?.prevChapter ? (
+                        <Link
+                            href={`/passage/${passage.data.prevChapter.url}`}
+                            className="svg-outline relative border-2 border-black px-3 py-1 font-semibold text-black dark:border-white dark:text-white"
+                        >
+                            {passage.data.prevChapter.label}
+                        </Link>
+                    ) : (
+                        <div />
+                    )}
+                    {passage.data?.nextChapter ? (
+                        <Link
+                            href={`/passage/${passage.data.nextChapter.url}`}
+                            className="svg-outline relative border-2 border-black px-3 py-1 font-semibold text-black dark:border-white dark:text-white"
+                        >
+                            {passage.data.nextChapter.label}
+                        </Link>
+                    ) : (
+                        <div />
+                    )}
+                </div>
             </main>
             <Footer />
         </div>

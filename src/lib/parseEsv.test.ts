@@ -1,6 +1,11 @@
-import { expect, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 
-import { Paragraph, parseChapter } from './parseEsv'
+import {
+    Paragraph,
+    parseChapter,
+    parseNextChapter,
+    parsePrevChapter,
+} from './parseEsv'
 
 export function sum(a: number, b: number): number {
     return a + b
@@ -69,8 +74,7 @@ test.skip('parse psalm 23', () => {
     expect(secondVerse.nodes.length).toBe(23)
 })
 
-test('parse 1 peter 1', () => {
-    const verseHtml = `<h2 class="extra_text">1 Peter 1 <small class="audio extra_text">(<a class="mp3link" href="https://audio.esv.org/david-cochran-heath/mq/60001001-60001025.mp3" title="1 Peter 1" type="audio/mpeg">Listen</a>)</small></h2>
+const verseHtml = `<h2 class="extra_text">1 Peter 1 <small class="audio extra_text">(<a class="mp3link" href="https://audio.esv.org/david-cochran-heath/mq/60001001-60001025.mp3" title="1 Peter 1" type="audio/mpeg">Listen</a>)</small></h2>
 <h3 id="p60001001_01-1">Greeting</h3>
 <p id="p60001001_02-1" class="starts-chapter"><b class="chapter-num" id="v60001001-1">1:1&nbsp;</b>Peter, an apostle of Jesus Christ,</p>
 <p id="p60001001_02-1">To those who are elect exiles of the Dispersion in Pontus, Galatia, Cappadocia, Asia, and Bithynia, <b class="verse-num" id="v60001002-1">2&nbsp;</b>according to the foreknowledge of God the Father, in the sanctification of the Spirit, for obedience to Jesus Christ and for sprinkling with his blood:</p>
@@ -93,6 +97,7 @@ test('parse 1 peter 1', () => {
 </div>
 <p>(<a href="http://www.esv.org" class="copyright">ESV</a>)</p>`
 
+test('parse 1 peter 1', () => {
     const result = parseChapter(verseHtml)
     const firstParagraph = result.nodes.at(2) as Paragraph
     const secondParagraph = result.nodes.at(3) as Paragraph
@@ -112,4 +117,51 @@ test('parse 1 peter 1', () => {
     expect(secondVerseB.nodes.length).toBe(8)
     expect(secondVerseB.metadata.hangingVerse).toBeTruthy()
     expect(secondVerseB.metadata.offset).toBe(25)
+})
+
+describe('parsePrevChapter', () => {
+    test('1 peter 1', () => {
+        const nextChapter = parsePrevChapter('1_peter', 1)
+        expect(nextChapter).toEqual({ url: `james_5`, label: 'James 5' })
+    })
+
+    test('1 peter 5', () => {
+        const nextChapter = parsePrevChapter('1_peter', 5)
+        expect(nextChapter).toEqual({ url: `1_peter_4`, label: '1 Peter 4' })
+    })
+
+    test('revelation 22', () => {
+        const nextChapter = parsePrevChapter('revelation', 22)
+        expect(nextChapter).toEqual({
+            url: `revelation_21`,
+            label: 'Revelation 21',
+        })
+    })
+
+    test('genesis 1', () => {
+        const nextChapter = parsePrevChapter('genesis', 1)
+        expect(nextChapter).toBeNull()
+    })
+})
+
+describe('parseNextChapter', () => {
+    test('1 peter 1', () => {
+        const nextChapter = parseNextChapter('1_peter', 1)
+        expect(nextChapter).toEqual({ url: `1_peter_2`, label: '1 Peter 2' })
+    })
+
+    test('1 peter 5', () => {
+        const nextChapter = parseNextChapter('1_peter', 5)
+        expect(nextChapter).toEqual({ url: `2_peter_1`, label: '2 Peter 1' })
+    })
+
+    test('revelation 22', () => {
+        const nextChapter = parseNextChapter('revelation', 22)
+        expect(nextChapter).toBeNull()
+    })
+
+    test('genesis 1', () => {
+        const nextChapter = parseNextChapter('genesis', 1)
+        expect(nextChapter).toEqual({ url: `genesis_2`, label: 'Genesis 2' })
+    })
 })

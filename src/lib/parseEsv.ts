@@ -5,6 +5,9 @@ import { splitBySpaceOrNewLine } from '~/lib/splitBySpaceOrNewLine'
 import { isAtomComplete } from '~/lib/keystroke'
 import { JSDOM } from 'jsdom'
 import { Book, bookSchema } from '~/lib/types/book'
+import { getBibleMetadata } from '~/server/bibleMetadata'
+import { PassageUrl, toPassageUrl } from './passageUrl'
+import { PassageReference, passageReferenceSchema } from './passageReference'
 
 export type Translation = 'esv'
 
@@ -84,6 +87,82 @@ function inlineToString(inlines: Inline[]): string {
 export type ParsedPassage = {
     nodes: Block[]
     firstVerse: VerseNumber
+    prevChapter: {
+        url: string
+        label: string
+    } | null
+    nextChapter: {
+        url: string
+        label: string
+    } | null
+}
+
+const metadata = getBibleMetadata()
+
+export function parsePrevChapter(
+    book: Book,
+    chapter: number,
+): { url: PassageUrl; label: PassageReference } | null {
+    if (chapter > 1) {
+        const url = toPassageUrl(book, `${chapter - 1}`)
+        return {
+            url,
+            label: passageReferenceSchema.parse(url),
+        }
+    }
+
+    const arrayBookMetadata = Object.entries(metadata)
+    const currentBookIndex = arrayBookMetadata.findIndex(([b]) => b === book)
+
+    if (currentBookIndex === 0) return null
+
+    const prevBookMetadata = arrayBookMetadata.at(currentBookIndex - 1)
+
+    if (prevBookMetadata) {
+        const url = toPassageUrl(
+            prevBookMetadata[0],
+            `${prevBookMetadata[1].chapters.length}`,
+        )
+
+        return {
+            url,
+            label: passageReferenceSchema.parse(url),
+        }
+    }
+
+    return null
+}
+
+export function parseNextChapter(
+    book: Book,
+    chapter: number,
+): { url: PassageUrl; label: PassageReference } | null {
+    const bookMetadata = metadata[book]
+
+    const numberOfBooksInCurrentBook = bookMetadata?.chapters.length ?? 0
+
+    if (chapter + 1 < numberOfBooksInCurrentBook) {
+        const url = toPassageUrl(book, `${chapter + 1}`)
+        return {
+            url,
+            label: passageReferenceSchema.parse(url),
+        }
+    }
+
+    const arrayBookMetadata = Object.entries(metadata)
+    const nextBookMetadata = arrayBookMetadata.at(
+        arrayBookMetadata.findIndex(([b]) => b === book) + 1,
+    )
+
+    if (nextBookMetadata) {
+        const url = toPassageUrl(nextBookMetadata[0], '1')
+        return {
+            url,
+            label: passageReferenceSchema.parse(url),
+        }
+    }
+
+    return null
 }
 
 export function parseChapter(passage: string): ParsedPassage {
@@ -351,10 +430,20 @@ export function parseChapter(passage: string): ParsedPassage {
 
         nodes.push(parsed)
     }
-
+    if (context.book == undefined) {
+        throw new Error('book is undefined')
+    }
+    if (context.chapter == undefined) {
+        throw new Error('chapter is undefined')
+    }
     if (context.firstVerseOfPassage == undefined) {
         throw new Error('firstVerse is undefined')
     }
 
-    return { nodes, firstVerse: context.firstVerseOfPassage }
+    return {
+        nodes,
+        firstVerse: context.firstVerseOfPassage,
+        prevChapter: parsePrevChapter(context.book, context.chapter),
+        nextChapter: parseNextChapter(context.book, context.chapter),
+    }
 }
