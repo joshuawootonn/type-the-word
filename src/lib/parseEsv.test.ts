@@ -121,26 +121,34 @@ test('parse 1 peter 1', () => {
 
 describe('parsePrevChapter', () => {
     test('1 peter 1', () => {
-        const nextChapter = parsePrevChapter('1_peter', 1)
-        expect(nextChapter).toEqual({ url: `james_5`, label: 'James 5' })
+        const prevChapter = parsePrevChapter('1_peter', 1)
+        expect(prevChapter).toEqual({ url: `james_5`, label: 'James 5' })
     })
 
     test('1 peter 5', () => {
-        const nextChapter = parsePrevChapter('1_peter', 5)
-        expect(nextChapter).toEqual({ url: `1_peter_4`, label: '1 Peter 4' })
+        const prevChapter = parsePrevChapter('1_peter', 5)
+        expect(prevChapter).toEqual({ url: `1_peter_4`, label: '1 Peter 4' })
     })
 
     test('revelation 22', () => {
-        const nextChapter = parsePrevChapter('revelation', 22)
-        expect(nextChapter).toEqual({
+        const prevChapter = parsePrevChapter('revelation', 22)
+        expect(prevChapter).toEqual({
             url: `revelation_21`,
             label: 'Revelation 21',
         })
     })
 
     test('genesis 1', () => {
-        const nextChapter = parsePrevChapter('genesis', 1)
-        expect(nextChapter).toBeNull()
+        const prevChapter = parsePrevChapter('genesis', 1)
+        expect(prevChapter).toBeNull()
+    })
+
+    test('titus', () => {
+        const prevChapter = parsePrevChapter('titus', 1)
+        expect(prevChapter).toEqual({
+            url: `2_timothy_4`,
+            label: '2 Timothy 4',
+        })
     })
 })
 
@@ -163,5 +171,13 @@ describe('parseNextChapter', () => {
     test('genesis 1', () => {
         const nextChapter = parseNextChapter('genesis', 1)
         expect(nextChapter).toEqual({ url: `genesis_2`, label: 'Genesis 2' })
+    })
+
+    test('1 timothy 6', () => {
+        const nextChapter = parseNextChapter('1_timothy', 6)
+        expect(nextChapter).toEqual({
+            url: `2_timothy_1`,
+            label: '2 Timothy 1',
+        })
     })
 })
