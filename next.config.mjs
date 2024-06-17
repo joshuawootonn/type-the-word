@@ -1,12 +1,10 @@
 await import('./src/env.mjs')
 
-import { withAxiom } from 'next-axiom'
-
 /** @type {import("next").NextConfig} */
 const config = {
     reactStrictMode: true,
     experimental: {
-        instrumentationHook: true
+        instrumentationHook: true,
     },
     i18n: {
         locales: ['en'],
@@ -14,4 +12,4 @@ const config = {
     },
 }
 
-export default withAxiom(config)
+export default config
