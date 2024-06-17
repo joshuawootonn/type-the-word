@@ -28,6 +28,15 @@ export const stringToPassageObject = z.string().transform(text => {
 
     const textWithoutBook = trimmedText.replace(bookText ?? '', '')
 
+    if (book === undefined) throw new Error(`Could not parse book from ${text}`)
+
+    const bookResult = bookSchema.safeParse(book)
+    if (!bookResult.success) {
+        throw new Error(
+            `Could not parse book from ${text}. Book was found to be ${book} but ${bookResult.error.message}.`,
+        )
+    }
+
     const chapter = parseInt(
         Array.from(textWithoutBook.matchAll(/([0-9])+/g), m => m[0])
             .at(0)
@@ -41,15 +50,6 @@ export const stringToPassageObject = z.string().transform(text => {
     )
         .at(-1)
         ?.trim()
-
-    if (book === undefined) throw new Error(`Could not parse book from ${text}`)
-
-    const bookResult = bookSchema.safeParse(book)
-    if (!bookResult.success) {
-        throw new Error(
-            `Could not parse book from ${text}. Book was found to be ${book} but ${bookResult.error.message}.`,
-        )
-    }
 
     const metadata = getBibleMetadata()
 

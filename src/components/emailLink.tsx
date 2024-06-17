@@ -1,3 +1,5 @@
+'use client'
+
 import clsx from 'clsx'
 
 import * as Popover from '@radix-ui/react-popover'
