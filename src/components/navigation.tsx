@@ -1,12 +1,14 @@
+'use client'
+
 import { signIn, signOut, useSession } from 'next-auth/react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import Link from 'next/link'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 
 export function Navigation() {
     const { data: sessionData } = useSession()
-    const isRootPath = useRouter().pathname === '/'
+    const isRootPath = usePathname() === '/'
     const RootLinkComponent = isRootPath ? 'h1' : 'span'
 
     return (
