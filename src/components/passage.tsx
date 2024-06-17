@@ -1,3 +1,4 @@
+'use client'
 import React, { useId, useRef } from 'react'
 
 import { Inline, ParsedPassage } from '~/lib/parseEsv'

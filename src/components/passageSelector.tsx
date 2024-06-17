@@ -1,4 +1,6 @@
-import { useRouter } from 'next/router'
+'use client'
+
+import { useRouter } from 'next/navigation'
 import React, {
     ComponentPropsWithoutRef,
     forwardRef,
@@ -19,6 +21,7 @@ import {
 import { stringToPassageObject } from '~/lib/passageObject'
 import { Book, bookSchema } from '~/lib/types/book'
 import { toPassageUrl } from '~/lib/passageUrl'
+import { usePathname } from 'next/navigation'
 
 const simpleBibleMetadataSchema = z.record(
     bookSchema,
@@ -64,6 +67,7 @@ export function PassageSelector({ value }: { value: PassageReference }) {
     const [chapterQuery, setChapterQuery] = useState('')
 
     const router = useRouter()
+    const pathname = usePathname()
 
     const chapterRef = useRef<HTMLInputElement>(null)
 
@@ -90,7 +94,7 @@ export function PassageSelector({ value }: { value: PassageReference }) {
     useEffect(() => {
         const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
         // I use `!includes` to prevent passage selector from clearing url specified verses
-        if (!router.pathname.includes(nextValue)) {
+        if (!pathname?.includes(nextValue)) {
             const t = setTimeout(() => {
                 onSubmit({ book, chapter })
             }, 3000)
@@ -99,7 +103,7 @@ export function PassageSelector({ value }: { value: PassageReference }) {
                 clearTimeout(t)
             }
         }
-    }, [book, chapter])
+    }, [book, chapter, pathname])
 
     const filteredChapters =
         chapterQuery === ''
