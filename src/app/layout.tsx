@@ -28,14 +28,15 @@ export default function RootLayout({
         <html lang="en">
             <body
                 className={clsx(
-                    'min-h-[calc(100vh_-_1px)] overflow-hidden font-sans',
-                    'min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 lg:px-0',
+                    'min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 font-sans lg:px-0',
                     poppins.variable,
                     ibmPlexMono.variable,
                 )}
             >
-                <Providers session={session}>{children}</Providers>
-                <Footer />
+                <Providers session={session}>
+                    {children}
+                    <Footer />
+                </Providers>
             </body>
         </html>
     )
