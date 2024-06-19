@@ -106,17 +106,16 @@ export function CurrentVerse({
     isCurrentVerse,
     isQuote,
     isIndented,
-    passage,
-    typingSession,
-    chapterHistory,
-}: {
+    passage, // typingSession,
+} // chapterHistory,
+: {
     isCurrentVerse: boolean
     isIndented: boolean
     isQuote: boolean
     verse: Verse
     passage: ParsedPassage
-    typingSession: UseQueryResult<TypingSession>
-    chapterHistory: UseQueryResult<ChapterHistory>
+    // typingSession: UseQueryResult<TypingSession>
+    // chapterHistory: UseQueryResult<ChapterHistory>
 }) {
     const inputRef = useRef<HTMLInputElement>(null)
     const [position, setPosition] = useAtom(positionAtom)
@@ -124,74 +123,6 @@ export function CurrentVerse({
     const [passageId] = useAtom(passageIdAtom)
     const [autoFocus] = useAtom(autofocusAtom)
     const { data: sessionData } = useSession()
-
-    const utils = api.useContext()
-    const addTypedVerseToSession =
-        api.typingSession.addTypedVerseToSession.useMutation({
-            async onMutate(newPost) {
-                // Cancel outgoing fetches (so they don't overwrite our optimistic update)
-                // await utils.type.list.cancel();
-                await utils.typingSession.getOrCreateTypingSession.cancel()
-
-                // Get the data from the queryCache
-                const prevData =
-                    utils.typingSession.getOrCreateTypingSession.getData()
-
-                // Optimistically update the data with our new post
-                utils.typingSession.getOrCreateTypingSession.setData(
-                    undefined,
-                    old => {
-                        if (old == null) {
-                            return undefined
-                        }
-
-                        return {
-                            ...old,
-                            typedVerses: [
-                                ...old.typedVerses,
-                                {
-                                    ...newPost,
-                                    id: crypto.randomUUID(),
-                                    userId: crypto.randomUUID(),
-                                    createdAt: new Date(),
-                                },
-                            ],
-                        }
-                    },
-                )
-
-                // This waits to toggle the verse till ^ has gone through.
-                // It prevents a flicker that can happen in this mutation.
-                setTimeout(() => {
-                    const nextVerse = getNextVerse(currentVerse, passage.nodes)
-
-                    if (nextVerse?.verse.verse) {
-                        setCurrentVerse(nextVerse?.verse.value)
-                        setPosition([])
-                        setKeystrokes([])
-                    } else {
-                        setCurrentVerse('')
-                        inputRef.current?.blur()
-                        setPosition([])
-                        setKeystrokes([])
-                    }
-                })
-
-                // Return the previous data so we can revert if something goes wrong
-                return { prevData }
-            },
-            onError(err, newPost, ctx) {
-                // If the mutation fails, use the context-value from onMutate
-                utils.typingSession.getOrCreateTypingSession.setData(
-                    undefined,
-                    ctx?.prevData,
-                )
-            },
-            onSettled() {
-                // Sync with server once mutation has settled
-                void utils.typingSession.getOrCreateTypingSession.invalidate()
-            },
-        })
 
     const { rect: passageRect } = useContext(PassageContext)
     const [isPassageActive, setIsPassageActive] = useAtom(isPassageActiveAtom)
@@ -243,7 +174,11 @@ export function CurrentVerse({
             if (currentVerseNodes == null) {
                 throw new Error('Current ReadonlyVerse is invalid.')
             }
-            const next = isValidKeystroke(nativeInputEvent, keystrokes)
+            const next = isValidKeystroke(
+                nativeInputEvent,
+                currentVerseNodes,
+                keystrokes,
+            )
 
             if (next == null) return keystrokesAtom
             const position = getPosition(next)
@@ -257,16 +192,10 @@ export function CurrentVerse({
                 const verse = getVerse(currentVerse, passage.nodes)
                 trackEvent('typed-verse')
                 if (
-                    typingSession?.data?.id != null &&
+                    // typingSession?.data?.id != null &&
                     sessionData?.user?.id != null
                 ) {
-                    void addTypedVerseToSession.mutateAsync({
-                        book: verse.verse.book,
-                        chapter: verse.verse.chapter,
-                        verse: verse.verse.verse,
-                        translation: verse.verse.translation,
-                        typingSessionId: typingSession.data.id,
-                    })
+                    //mutate current session
                 } else {
                     const nextVerse = getNextVerse(currentVerse, passage.nodes)
                     if (nextVerse?.verse.verse) {
@@ -294,15 +223,15 @@ export function CurrentVerse({
           )
         : position
 
-    const isTypedInSession = typingSession.data?.typedVerses.find(
-        a =>
-            a.verse === verse.verse.verse &&
-            a.chapter === verse.verse.chapter &&
-            a.book === verse.verse.book &&
-            a.translation === verse.verse.translation,
-    )
+    const isTypedInSession = false //typingSession.data?.typedVerses.find(
+    //     a =>
+    //         a.verse === verse.verse.verse &&
+    //         a.chapter === verse.verse.chapter &&
+    //         a.book === verse.verse.book &&
+    //         a.translation === verse.verse.translation,
+    // )
 
-    const isTypedInHistory = chapterHistory.data?.verses[verse.verse.verse]
+    const isTypedInHistory = false //chapterHistory.data?.verses[verse.verse.verse]
 
     return (
         <span

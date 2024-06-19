@@ -1,4 +1,5 @@
 'use client'
+
 import React, { useId, useRef } from 'react'
 
 import { Inline, ParsedPassage } from '~/lib/parseEsv'
@@ -12,6 +13,7 @@ import { useHydrateAtoms } from 'jotai/react/utils'
 import { api } from '~/utils/api'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 
 export const PassageContext = React.createContext<{
     rect: DOMRect | null
@@ -58,19 +60,19 @@ export function Passage({
     const passageRect = useRect(passageRef)
     const { data: sessionData } = useSession()
 
-    const typingSession = api.typingSession.getOrCreateTypingSession.useQuery(
-        undefined,
-        {
-            enabled: sessionData?.user?.id != null,
-        },
-    )
-    const chapterHistory = api.chapterHistory.getChapterHistory.useQuery(
-        { chapter: passage.firstVerse.chapter, book: passage.firstVerse.book },
-        {
-            enabled: sessionData?.user?.id != null,
-        },
-    )
-    const isRootPath = useRouter().pathname === '/'
+    // const typingSession = api.typingSession.getOrCreateTypingSession.useQuery(
+    //     undefined,
+    //     {
+    //         enabled: sessionData?.user?.id != null,
+    //     },
+    // )
+    // const chapterHistory = api.chapterHistory.getChapterHistory.useQuery(
+    //     { chapter: passage.firstVerse.chapter, book: passage.firstVerse.book },
+    //     {
+    //         enabled: sessionData?.user?.id != null,
+    //     },
+    // )
+    const isRootPath = usePathname() === '/'
     const H2Component = isRootPath ? 'h2' : 'h1'
 
     return (
@@ -103,8 +105,8 @@ export function Passage({
                                             key={pIndex}
                                             node={node}
                                             passage={passage}
-                                            typingSession={typingSession}
-                                            chapterHistory={chapterHistory}
+                                            // typingSession={typingSession}
+                                            // chapterHistory={chapterHistory}
                                         />
                                     )
 
