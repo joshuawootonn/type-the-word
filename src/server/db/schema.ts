@@ -6,13 +6,12 @@ import { bookSchema } from '~/lib/types/book'
 import {
     index,
     integer,
-    pgEnum,
     primaryKey,
     text,
     timestamp,
     varchar,
     json,
-    pgTableCreator,
+    pgSchema,
 } from 'drizzle-orm/pg-core'
 
 /**
@@ -21,12 +20,26 @@ import {
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const pgTable = pgTableCreator(name => `${name}`)
+const schema = pgSchema('type-the-word')
 
-const bookEnum = pgEnum('book', bookSchema.options)
-const translationEnum = pgEnum('translation', ['esv'])
+/**
+ * This database was originally generated in mysql where there is no enum construct.
+ * So that is why these are defined twice.
+ */
+export const passageResponseBook = schema.enum(
+    'passageResponse_book',
+    bookSchema.options,
+)
+export const passageResponseTranslation = schema.enum(
+    'passageResponse_translation',
+    ['esv'],
+)
+export const typedVerseBook = schema.enum('typedVerse_book', bookSchema.options)
+export const typedVerseTranslation = schema.enum('typedVerse_translation', [
+    'esv',
+])
 
-export const users = pgTable('user', {
+export const users = schema.table('user', {
     id: varchar('id', { length: 255 }).notNull().primaryKey(),
     name: varchar('name', { length: 255 }),
     email: varchar('email', { length: 255 }).notNull(),
@@ -41,7 +54,7 @@ export const usersRelations = relations(users, ({ many }) => ({
     typingSessions: many(typingSessions),
 }))
 
-export const accounts = pgTable(
+export const accounts = schema.table(
     'account',
     {
         userId: varchar('userId', { length: 255 }).notNull(),
@@ -62,7 +75,7 @@ export const accounts = pgTable(
     },
     account => ({
         compoundKey: primaryKey(account.provider, account.providerAccountId),
-        userIdIdx: index('userId_idx').on(account.userId),
+        userIdIdx: index('account_userId_idx').on(account.userId),
     }),
 )
 
@@ -70,7 +83,7 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
     user: one(users, { fields: [accounts.userId], references: [users.id] }),
 }))
 
-export const sessions = pgTable(
+export const sessions = schema.table(
     'session',
     {
         sessionToken: varchar('sessionToken', { length: 255 })
@@ -80,7 +93,7 @@ export const sessions = pgTable(
         expires: timestamp('expires', { mode: 'date' }).notNull(),
     },
     session => ({
-        userIdIdx: index('userId_idx').on(session.userId),
+        userIdIdx: index('session_userId_idx').on(session.userId),
     }),
 )
 
@@ -88,7 +101,7 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
     user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }))
 
-export const verificationTokens = pgTable(
+export const verificationTokens = schema.table(
     'verificationToken',
     {
         identifier: varchar('identifier', { length: 255 }).notNull(),
@@ -100,7 +113,7 @@ export const verificationTokens = pgTable(
     }),
 )
 
-export const typingSessions = pgTable(
+export const typingSessions = schema.table(
     'typingSession',
     {
         id: varchar('id', { length: 255 })
@@ -116,7 +129,7 @@ export const typingSessions = pgTable(
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
     },
     typingSession => ({
-        userIdIdx: index('userId_idx').on(typingSession.userId),
+        userIdIdx: index('typingSession_userId_idx').on(typingSession.userId),
     }),
 )
 
@@ -131,7 +144,7 @@ export const typingSessionRelations = relations(
     }),
 )
 
-export const typedVerses = pgTable(
+export const typedVerses = schema.table(
     'typedVerse',
     {
         id: varchar('id', { length: 255 })
@@ -140,8 +153,8 @@ export const typedVerses = pgTable(
             .primaryKey(),
         userId: varchar('userId', { length: 255 }).notNull(),
         typingSessionId: varchar('typingSessionId', { length: 255 }).notNull(),
-        translation: translationEnum('translation').notNull(),
-        book: bookEnum('book').notNull(),
+        translation: typedVerseTranslation('translation').notNull(),
+        book: typedVerseBook('book').notNull(),
         chapter: integer('chapter').notNull(),
         verse: integer('verse').notNull(),
         createdAt: timestamp('createdAt', { mode: 'date' })
@@ -149,7 +162,7 @@ export const typedVerses = pgTable(
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
     },
     typedVerse => ({
-        userIdIdx: index('userId_idx').on(typedVerse.userId),
+        userIdIdx: index('typedVerse_userId_idx').on(typedVerse.userId),
         typingSessionIdUserIdIdx: index('typingSessionId_userId_idx').on(
             typedVerse.typingSessionId,
             typedVerse.userId,
@@ -173,14 +186,14 @@ export const typedVerseRelations = relations(typedVerses, ({ one }) => ({
     }),
 }))
 
-export const passageResponse = pgTable('passageResponse', {
+export const passageResponse = schema.table('passageResponse', {
     id: varchar('id', { length: 255 })
         .notNull()
         .$default(() => crypto.randomUUID())
         .primaryKey(),
-    book: bookEnum('book').notNull(),
+    book: passageResponseBook('book').notNull(),
     chapter: integer('chapter').notNull(),
-    translation: translationEnum('translation').notNull(),
+    translation: passageResponseTranslation('translation').notNull(),
     response: json('response').notNull(),
     createdAt: timestamp('createdAt', { mode: 'date' })
         .notNull()

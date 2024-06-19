@@ -48,3 +48,5 @@ yarn-error.log*
 /public/sitemap-0.xml
 
 /config.load  
+
+/docker/.data*
