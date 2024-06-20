@@ -1,9 +1,9 @@
-import { PassageReference } from '~/lib/passageReference'
 import { Metadata } from 'next'
-import { ParsedPassage } from '~/lib/parseEsv'
 import { Passage } from '~/components/passage'
-import { DEFAULT_PASSAGE_REFERENCE } from './default-passage'
+import { DEFAULT_PASSAGE_SEGMENT } from './default-passage'
 import Link from 'next/link'
+import { fetchPassage } from '~/lib/api'
+import { PassageSegment } from '~/lib/passageSegment'
 
 export const metadata: Metadata = {
     title: 'Type the Word',
@@ -11,39 +11,33 @@ export const metadata: Metadata = {
         "A typing practice tool that tracks your typing progress through the Bible. Improve your typing skills while meditating on God's word.",
 }
 
-type Body<T> = { data: T }
-
 export default async function PassagePage(props: {
-    params: { passage?: PassageReference }
+    params: { passage?: PassageSegment }
 }) {
-    const value = props.params.passage ?? DEFAULT_PASSAGE_REFERENCE
+    const value = props.params.passage ?? DEFAULT_PASSAGE_SEGMENT
 
-    const response = await fetch(
-        `http://localhost:3000/api/passage/?reference=${value}`,
-    )
-
-    const body: Body<ParsedPassage> = await response.json()
+    const passage = await fetchPassage(value)
 
     return (
         <>
-            <Passage autofocus={true} passage={body.data} />
+            <Passage autofocus={true} passage={passage} />
             <div className="mb-24 mt-8 flex w-full justify-between">
-                {body.data?.prevChapter ? (
+                {passage?.prevChapter ? (
                     <Link
-                        href={`/passage/${body.data.prevChapter.url}`}
+                        href={`/passage/${passage.prevChapter.url}`}
                         className="svg-outline relative border-2 border-black px-3 py-1 font-semibold text-black dark:border-white dark:text-white"
                     >
-                        {body.data.prevChapter.label}
+                        {passage.prevChapter.label}
                     </Link>
                 ) : (
                     <div />
                 )}
-                {body.data?.nextChapter ? (
+                {passage?.nextChapter ? (
                     <Link
-                        href={`/passage/${body.data.nextChapter.url}`}
+                        href={`/passage/${passage.nextChapter.url}`}
                         className="svg-outline relative border-2 border-black px-3 py-1 font-semibold text-black dark:border-white dark:text-white"
                     >
-                        {body.data.nextChapter.label}
+                        {passage.nextChapter.label}
                     </Link>
                 ) : (
                     <div />
