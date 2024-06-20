@@ -6,7 +6,7 @@ import { isAtomComplete } from '~/lib/keystroke'
 import { JSDOM } from 'jsdom'
 import { Book, bookSchema } from '~/lib/types/book'
 import { getBibleMetadata } from '~/server/bibleMetadata'
-import { PassageUrl, toPassageUrl } from './passageUrl'
+import { PassageSegment, toPassageSegment } from './passageSegment'
 import { PassageReference, passageReferenceSchema } from './passageReference'
 
 export type Translation = 'esv'
@@ -102,9 +102,9 @@ const metadata = getBibleMetadata()
 export function parsePrevChapter(
     book: Book,
     chapter: number,
-): { url: PassageUrl; label: PassageReference } | null {
+): { url: PassageSegment; label: PassageReference } | null {
     if (chapter > 1) {
-        const url = toPassageUrl(book, `${chapter - 1}`)
+        const url = toPassageSegment(book, `${chapter - 1}`)
         return {
             url,
             label: passageReferenceSchema.parse(url),
@@ -119,7 +119,7 @@ export function parsePrevChapter(
     const prevBookMetadata = arrayBookMetadata.at(currentBookIndex - 1)
 
     if (prevBookMetadata) {
-        const url = toPassageUrl(
+        const url = toPassageSegment(
             prevBookMetadata[0],
             `${prevBookMetadata[1].chapters.length}`,
         )
@@ -136,13 +136,13 @@ export function parsePrevChapter(
 export function parseNextChapter(
     book: Book,
     chapter: number,
-): { url: PassageUrl; label: PassageReference } | null {
+): { url: PassageSegment; label: PassageReference } | null {
     const bookMetadata = metadata[book]
 
     const numberOfBooksInCurrentBook = bookMetadata?.chapters.length ?? 0
 
     if (chapter + 1 < numberOfBooksInCurrentBook) {
-        const url = toPassageUrl(book, `${chapter + 1}`)
+        const url = toPassageSegment(book, `${chapter + 1}`)
         return {
             url,
             label: passageReferenceSchema.parse(url),
@@ -155,7 +155,7 @@ export function parseNextChapter(
     )
 
     if (nextBookMetadata) {
-        const url = toPassageUrl(nextBookMetadata[0], '1')
+        const url = toPassageSegment(nextBookMetadata[0], '1')
         return {
             url,
             label: passageReferenceSchema.parse(url),

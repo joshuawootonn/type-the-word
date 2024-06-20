@@ -107,8 +107,8 @@ export function CurrentVerse({
     isQuote,
     isIndented,
     passage, // typingSession,
-} // chapterHistory,
-: {
+    // chapterHistory,
+}: {
     isCurrentVerse: boolean
     isIndented: boolean
     isQuote: boolean
@@ -156,6 +156,8 @@ export function CurrentVerse({
         return () => clearTimeout(isActiveTimer.current)
     }, [keystrokes.length])
 
+    console.log({ keystrokes })
+
     function handleInput(event: FormEvent<HTMLInputElement>) {
         const result = nativeInputEventSchema.safeParse(event.nativeEvent)
 
@@ -174,11 +176,7 @@ export function CurrentVerse({
             if (currentVerseNodes == null) {
                 throw new Error('Current ReadonlyVerse is invalid.')
             }
-            const next = isValidKeystroke(
-                nativeInputEvent,
-                currentVerseNodes,
-                keystrokes,
-            )
+            const next = isValidKeystroke(nativeInputEvent, keystrokes)
 
             if (next == null) return keystrokesAtom
             const position = getPosition(next)

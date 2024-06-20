@@ -10,10 +10,12 @@ import { Cursor } from '~/components/cursor'
 import { atom, PrimitiveAtom, Provider } from 'jotai'
 import { useRect } from '~/lib/hooks/useRect'
 import { useHydrateAtoms } from 'jotai/react/utils'
-import { api } from '~/utils/api'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/router'
-import { usePathname } from 'next/navigation'
+import { useParams, usePathname } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
+import { PassageSegment } from '~/lib/passageSegment'
+import { fetchPassage } from '~/lib/api'
+import { DEFAULT_PASSAGE_SEGMENT } from '~/app/(passage)/passage/[passage]/default-passage'
 
 export const PassageContext = React.createContext<{
     rect: DOMRect | null
@@ -45,11 +47,7 @@ function HydrateAtoms({
     return children
 }
 
-export function Passage({
-    passage,
-    autofocus = true,
-    autoSelect = true,
-}: {
+export function Passage(props: {
     passage: ParsedPassage
     autofocus?: boolean
     autoSelect?: boolean
@@ -58,7 +56,13 @@ export function Passage({
 
     const passageRef = useRef<HTMLDivElement>(null)
     const passageRect = useRect(passageRef)
-    const { data: sessionData } = useSession()
+    // const { data: sessionData } = useSession()
+    const params = useParams<{ passage: PassageSegment }>()
+    const { data: passage } = useQuery({
+        queryKey: ['passage', params?.passage],
+        queryFn: () => fetchPassage(params?.passage ?? DEFAULT_PASSAGE_SEGMENT),
+        initialData: props.passage,
+    })
 
     // const typingSession = api.typingSession.getOrCreateTypingSession.useQuery(
     //     undefined,
@@ -81,9 +85,9 @@ export function Passage({
                 initialValues={[
                     [
                         currentVerseAtom,
-                        autoSelect ? passage.firstVerse.value : '',
+                        props.autoSelect ? passage.firstVerse.value : '',
                     ],
-                    [autofocusAtom, autofocus],
+                    [autofocusAtom, props.autofocus],
                     [passageIdAtom, passageId],
                 ]}
             >

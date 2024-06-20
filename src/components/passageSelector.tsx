@@ -20,7 +20,7 @@ import {
 } from '~/lib/passageReference'
 import { stringToPassageObject } from '~/lib/passageObject'
 import { Book, bookSchema } from '~/lib/types/book'
-import { toPassageUrl } from '~/lib/passageUrl'
+import { toPassageSegment } from '~/lib/passageSegment'
 import { usePathname } from 'next/navigation'
 
 const simpleBibleMetadataSchema = z.record(
@@ -117,7 +117,7 @@ export function PassageSelector({ value }: { value: PassageReference }) {
     function onSubmit({ book, chapter }: { book: Book; chapter: string }) {
         setBook(book)
         setChapter(chapter)
-        const nextUrl = toPassageUrl(book, chapter)
+        const nextUrl = toPassageSegment(book, chapter)
 
         void router.push(`/passage/${nextUrl}`, undefined, { scroll: false })
     }
