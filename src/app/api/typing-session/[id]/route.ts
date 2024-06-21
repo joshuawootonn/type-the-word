@@ -14,6 +14,7 @@ const addTypedVerseBodySchema = createInsertSchema(typedVerses).omit({
     userId: true,
     id: true,
 })
+export type AddTypedVerseBody = z.infer<typeof addTypedVerseBodySchema>
 
 const uuidSchema = z.string().uuid()
 
@@ -27,12 +28,11 @@ export const POST = async function POST(
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    console.log('params', params)
     if (uuidSchema.safeParse(params.id).success === false) {
         return Response.json({ error: 'Invalid id' }, { status: 400 })
     }
 
-    let body: z.infer<typeof addTypedVerseBodySchema>
+    let body: AddTypedVerseBody
     try {
         body = addTypedVerseBodySchema.parse(await request.json())
     } catch (e) {

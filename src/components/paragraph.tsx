@@ -13,13 +13,13 @@ import { ChapterHistory } from '~/server/api/routers/typing-history.router'
 export function Paragraph({
     node,
     passage,
-} // typingSession,
-// chapterHistory,
-: {
+    typingSession,
+    chapterHistory,
+}: {
     passage: ParsedPassage
     node: Paragraph
-    // typingSession: UseQueryResult<TypingSession>
-    // chapterHistory: UseQueryResult<ChapterHistory>
+    typingSession: UseQueryResult<TypingSession>
+    chapterHistory: UseQueryResult<ChapterHistory>
 }) {
     const [currentVerse] = useAtom(currentVerseAtom)
     return (
@@ -43,8 +43,8 @@ export function Paragraph({
                         isIndented={node.metadata.blockIndent}
                         isQuote={node.metadata.type === 'quote'}
                         passage={passage}
-                        // typingSession={typingSession}
-                        // chapterHistory={chapterHistory}
+                        typingSession={typingSession}
+                        chapterHistory={chapterHistory}
                     />
                 ) : (
                     <ReadonlyVerse
@@ -53,8 +53,8 @@ export function Paragraph({
                         isCurrentVerse={isCurrentVerse}
                         isIndented={node.metadata.blockIndent}
                         isQuote={node.metadata.type === 'quote'}
-                        // typingSession={typingSession}
-                        // chapterHistory={chapterHistory}
+                        typingSession={typingSession}
+                        chapterHistory={chapterHistory}
                     />
                 )
             })}

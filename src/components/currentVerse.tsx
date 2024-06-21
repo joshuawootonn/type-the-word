@@ -20,10 +20,11 @@ import { Word } from '~/components/word'
 import { useRect } from '~/lib/hooks/useRect'
 import { trackEvent } from 'fathom-client'
 import { z } from 'zod'
-import { UseQueryResult } from '@tanstack/react-query'
+import { UseQueryResult, useMutation } from '@tanstack/react-query'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
 import { ChapterHistory } from '~/server/api/routers/typing-history.router'
-import { flushSync } from 'react-dom'
+import { fetchAddVerseToTypingSession } from '~/lib/api'
+import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
 
 const nativeInputEventSchema = z.discriminatedUnion('inputType', [
     z.object({
@@ -106,16 +107,17 @@ export function CurrentVerse({
     isCurrentVerse,
     isQuote,
     isIndented,
-    passage, // typingSession,
-    // chapterHistory,
+    passage,
+    typingSession,
+    chapterHistory,
 }: {
     isCurrentVerse: boolean
     isIndented: boolean
     isQuote: boolean
     verse: Verse
     passage: ParsedPassage
-    // typingSession: UseQueryResult<TypingSession>
-    // chapterHistory: UseQueryResult<ChapterHistory>
+    typingSession: UseQueryResult<TypingSession>
+    chapterHistory: UseQueryResult<ChapterHistory>
 }) {
     const inputRef = useRef<HTMLInputElement>(null)
     const [position, setPosition] = useAtom(positionAtom)
@@ -128,6 +130,16 @@ export function CurrentVerse({
     const [isPassageActive, setIsPassageActive] = useAtom(isPassageActiveAtom)
     const [isPassageFocused, setIsPassageFocused] =
         useAtom(isPassageFocusedAtom)
+
+    const addTypedVerseToSession = useMutation({
+        mutationFn: ({
+            typingSessionId,
+            data,
+        }: {
+            typingSessionId: string
+            data: AddTypedVerseBody
+        }) => fetchAddVerseToTypingSession(typingSessionId, data),
+    })
 
     const ref = useRef<HTMLSpanElement>(null)
     const rect = useRect(ref)
@@ -155,8 +167,6 @@ export function CurrentVerse({
 
         return () => clearTimeout(isActiveTimer.current)
     }, [keystrokes.length])
-
-    console.log({ keystrokes })
 
     function handleInput(event: FormEvent<HTMLInputElement>) {
         const result = nativeInputEventSchema.safeParse(event.nativeEvent)
@@ -190,10 +200,19 @@ export function CurrentVerse({
                 const verse = getVerse(currentVerse, passage.nodes)
                 trackEvent('typed-verse')
                 if (
-                    // typingSession?.data?.id != null &&
+                    typingSession?.data?.id != null &&
                     sessionData?.user?.id != null
                 ) {
-                    //mutate current session
+                    void addTypedVerseToSession.mutateAsync({
+                        data: {
+                            book: verse.verse.book,
+                            chapter: verse.verse.chapter,
+                            verse: verse.verse.verse,
+                            translation: verse.verse.translation,
+                            typingSessionId: typingSession.data.id,
+                        },
+                        typingSessionId: typingSession.data.id,
+                    })
                 } else {
                     const nextVerse = getNextVerse(currentVerse, passage.nodes)
                     if (nextVerse?.verse.verse) {
@@ -221,15 +240,15 @@ export function CurrentVerse({
           )
         : position
 
-    const isTypedInSession = false //typingSession.data?.typedVerses.find(
-    //     a =>
-    //         a.verse === verse.verse.verse &&
-    //         a.chapter === verse.verse.chapter &&
-    //         a.book === verse.verse.book &&
-    //         a.translation === verse.verse.translation,
-    // )
+    const isTypedInSession = typingSession.data?.typedVerses.find(
+        a =>
+            a.verse === verse.verse.verse &&
+            a.chapter === verse.verse.chapter &&
+            a.book === verse.verse.book &&
+            a.translation === verse.verse.translation,
+    )
 
-    const isTypedInHistory = false //chapterHistory.data?.verses[verse.verse.verse]
+    const isTypedInHistory = chapterHistory.data?.verses[verse.verse.verse]
 
     return (
         <span
