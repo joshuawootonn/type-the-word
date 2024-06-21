@@ -10,6 +10,7 @@ import { passageResponse } from '~/server/db/schema'
 import { and, eq, sql } from 'drizzle-orm'
 import { isAfter, isBefore, subDays } from 'date-fns'
 import { db } from '~/server/db'
+import { PassageSegment, passageSegmentSchema } from '~/lib/passageSegment'
 
 const passageSchema = z.object({
     query: z.string(),
@@ -36,23 +37,28 @@ function getErrorMessage(error: unknown) {
     return String(error)
 }
 
-export async function GET(request: Request) {
-    const { searchParams } = new URL(request.url)
-    const reference = searchParams.get('reference')
+export async function GET(
+    request: Request,
+    { params }: { params: { passage?: string } },
+) {
+    let reference: PassageSegment
 
-    if (!reference) {
+    try {
+        reference = passageSegmentSchema.parse(params?.passage)
+    } catch (e: unknown) {
         return Response.json(
             {
-                error: 'Missing reference query parameter',
+                error: getErrorMessage(e),
             },
-            { status: 400 },
+            {
+                status: 400,
+            },
         )
     }
-
     let passageData: PassageObject
 
     try {
-        passageData = stringToPassageObject.parse(reference)
+        passageData = stringToPassageObject.parse(params?.passage)
     } catch (e: unknown) {
         return Response.json(
             {
