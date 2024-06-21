@@ -14,7 +14,11 @@ import { useSession } from 'next-auth/react'
 import { useParams, usePathname } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { PassageSegment } from '~/lib/passageSegment'
-import { fetchPassage } from '~/lib/api'
+import {
+    fetchChapterHistory,
+    fetchPassage,
+    fetchTypingSessionUpsert,
+} from '~/lib/api'
 import { DEFAULT_PASSAGE_SEGMENT } from '~/app/(passage)/passage/[passage]/default-passage'
 
 export const PassageContext = React.createContext<{
@@ -56,26 +60,25 @@ export function Passage(props: {
 
     const passageRef = useRef<HTMLDivElement>(null)
     const passageRect = useRect(passageRef)
-    // const { data: sessionData } = useSession()
+    const { data: sessionData } = useSession()
     const params = useParams<{ passage: PassageSegment }>()
     const { data: passage } = useQuery({
         queryKey: ['passage', params?.passage],
         queryFn: () => fetchPassage(params?.passage ?? DEFAULT_PASSAGE_SEGMENT),
         initialData: props.passage,
     })
+    const typingSession = useQuery({
+        queryKey: ['typing-session'],
+        queryFn: fetchTypingSessionUpsert,
+        enabled: sessionData?.user?.id != null,
+    })
+    const chapterHistory = useQuery({
+        queryKey: ['chapter-history', params?.passage],
+        queryFn: () =>
+            fetchChapterHistory(params?.passage ?? DEFAULT_PASSAGE_SEGMENT),
+        enabled: sessionData?.user?.id != null,
+    })
 
-    // const typingSession = api.typingSession.getOrCreateTypingSession.useQuery(
-    //     undefined,
-    //     {
-    //         enabled: sessionData?.user?.id != null,
-    //     },
-    // )
-    // const chapterHistory = api.chapterHistory.getChapterHistory.useQuery(
-    //     { chapter: passage.firstVerse.chapter, book: passage.firstVerse.book },
-    //     {
-    //         enabled: sessionData?.user?.id != null,
-    //     },
-    // )
     const isRootPath = usePathname() === '/'
     const H2Component = isRootPath ? 'h2' : 'h1'
 
@@ -109,8 +112,8 @@ export function Passage(props: {
                                             key={pIndex}
                                             node={node}
                                             passage={passage}
-                                            // typingSession={typingSession}
-                                            // chapterHistory={chapterHistory}
+                                            typingSession={typingSession}
+                                            chapterHistory={chapterHistory}
                                         />
                                     )
 

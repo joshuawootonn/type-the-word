@@ -20,15 +20,15 @@ export function ReadonlyVerse({
     isIndented,
     isQuote,
     verse,
-} // typingSession,
-// chapterHistory
-: {
+    typingSession,
+    chapterHistory,
+}: {
     isCurrentVerse: boolean
     isIndented: boolean
     isQuote: boolean
     verse: Verse
-    // typingSession: UseQueryResult<TypingSession>
-    // chapterHistory: UseQueryResult<ChapterHistory>
+    typingSession: UseQueryResult<TypingSession>
+    chapterHistory: UseQueryResult<ChapterHistory>
 }) {
     const { data: sessionData } = useSession()
     const { rect: passageRect } = useContext(PassageContext)
@@ -37,15 +37,15 @@ export function ReadonlyVerse({
     const ref = useRef<HTMLSpanElement>(null)
     const rect = useRect(ref)
 
-    const isTypedInSession = false // typingSession.data?.typedVerses.find(
-    //     a =>
-    //         a.verse === verse.verse.verse &&
-    //         a.chapter === verse.verse.chapter &&
-    //         a.book === verse.verse.book &&
-    //         a.translation === verse.verse.translation,
-    // )
+    const isTypedInSession = typingSession.data?.typedVerses.find(
+        a =>
+            a.verse === verse.verse.verse &&
+            a.chapter === verse.verse.chapter &&
+            a.book === verse.verse.book &&
+            a.translation === verse.verse.translation,
+    )
 
-    const isTypedInHistory = false //chapterHistory.data?.verses[verse.verse.verse]
+    const isTypedInHistory = chapterHistory.data?.verses[verse.verse.verse]
 
     const [currentVerse, setCurrentVerse] = useAtom(currentVerseAtom)
     const setPosition = useSetAtom(positionAtom)
