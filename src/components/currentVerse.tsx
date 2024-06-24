@@ -12,7 +12,6 @@ import {
     positionAtom,
 } from '~/components/passage'
 import { useSession } from 'next-auth/react'
-import { api } from '~/utils/api'
 import { getPosition, isAtomComplete, isValidKeystroke } from '~/lib/keystroke'
 import { isAtomTyped, isVerseSameShape } from '~/lib/isEqual'
 import clsx from 'clsx'
@@ -20,7 +19,11 @@ import { Word } from '~/components/word'
 import { useRect } from '~/lib/hooks/useRect'
 import { trackEvent } from 'fathom-client'
 import { z } from 'zod'
-import { UseQueryResult, useMutation } from '@tanstack/react-query'
+import {
+    UseQueryResult,
+    useMutation,
+    useQueryClient,
+} from '@tanstack/react-query'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
 import { ChapterHistory } from '~/server/api/routers/typing-history.router'
 import { fetchAddVerseToTypingSession } from '~/lib/api'
@@ -130,15 +133,79 @@ export function CurrentVerse({
     const [isPassageActive, setIsPassageActive] = useAtom(isPassageActiveAtom)
     const [isPassageFocused, setIsPassageFocused] =
         useAtom(isPassageFocusedAtom)
+    const queryClient = useQueryClient()
 
     const addTypedVerseToSession = useMutation({
-        mutationFn: ({
-            typingSessionId,
-            data,
-        }: {
-            typingSessionId: string
-            data: AddTypedVerseBody
-        }) => fetchAddVerseToTypingSession(typingSessionId, data),
+        mutationFn: (verse: AddTypedVerseBody) =>
+            fetchAddVerseToTypingSession(verse.typingSessionId, verse),
+        // When mutate is called:
+        onMutate: async verse => {
+            // Cancel any outgoing refetches
+            // (so they don't overwrite our optimistic update)
+            await queryClient.cancelQueries({ queryKey: ['typing-session'] })
+
+            // Snapshot the previous value
+            const previousTypingSession = queryClient.getQueryData([
+                'typing-session',
+            ])
+
+            // Optimistically update to the new value
+            queryClient.setQueryData<TypingSession>(
+                ['typing-session'],
+                prevTypingSession => {
+                    if (prevTypingSession == null) {
+                        return undefined
+                    }
+
+                    return {
+                        ...prevTypingSession,
+                        typedVerses: [
+                            ...prevTypingSession.typedVerses,
+                            {
+                                ...verse,
+                                id: crypto.randomUUID(),
+                                userId: crypto.randomUUID(),
+                                createdAt: new Date(),
+                            },
+                        ],
+                    }
+                },
+            )
+
+            // This waits to toggle the verse till ^ has gone through.
+            // It prevents a flicker that can happen in this mutation.
+            setTimeout(() => {
+                const nextVerse = getNextVerse(currentVerse, passage.nodes)
+
+                if (nextVerse?.verse.verse) {
+                    setCurrentVerse(nextVerse?.verse.value)
+                    setPosition([])
+                    setKeystrokes([])
+                } else {
+                    setCurrentVerse('')
+                    inputRef.current?.blur()
+                    setPosition([])
+                    setKeystrokes([])
+                }
+            })
+
+            // Return a context object with the snapshotted value
+            return { previousTypingSession }
+        },
+        // If the mutation fails,
+        // use the context returned from onMutate to roll back
+        onError: (err, newTodo, context) => {
+            queryClient.setQueryData(
+                ['typing-session'],
+                context?.previousTypingSession,
+            )
+        },
+        // Always refetch after error or success:
+        onSettled: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ['typing-session'],
+            })
+        },
     })
 
     const ref = useRef<HTMLSpanElement>(null)
@@ -204,13 +271,10 @@ export function CurrentVerse({
                     sessionData?.user?.id != null
                 ) {
                     void addTypedVerseToSession.mutateAsync({
-                        data: {
-                            book: verse.verse.book,
-                            chapter: verse.verse.chapter,
-                            verse: verse.verse.verse,
-                            translation: verse.verse.translation,
-                            typingSessionId: typingSession.data.id,
-                        },
+                        book: verse.verse.book,
+                        chapter: verse.verse.chapter,
+                        verse: verse.verse.verse,
+                        translation: verse.verse.translation,
                         typingSessionId: typingSession.data.id,
                     })
                 } else {

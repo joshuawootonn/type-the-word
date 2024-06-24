@@ -39,7 +39,7 @@ export async function fetchChapterHistory(
 export async function fetchAddVerseToTypingSession(
     //todo: make this a UUID
     typingSessionId: string,
-    data: AddTypedVerseBody,
+    verse: AddTypedVerseBody,
 ): Promise<TypingSession> {
     const response = await fetch(
         `http://localhost:3000/api/typing-session/${typingSessionId}`,
@@ -48,7 +48,7 @@ export async function fetchAddVerseToTypingSession(
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(verse),
         },
     )
 
