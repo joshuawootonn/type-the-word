@@ -96,7 +96,7 @@ export function Navigation() {
                             </DropdownMenu.Item>
                             <DropdownMenu.Item
                                 className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
-                                onClick={() => void signOut()}
+                                onClick={() => void signOut({ redirect: true })}
                             >
                                 Sign out
                             </DropdownMenu.Item>

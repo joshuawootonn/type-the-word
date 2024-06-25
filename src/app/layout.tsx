@@ -1,30 +1,19 @@
-import { Session } from 'next-auth'
+import { getServerSession } from 'next-auth'
 import { Providers } from './providers'
-import { IBM_Plex_Mono, Poppins } from 'next/font/google'
 import clsx from 'clsx'
 import '~/styles/globals.css'
 import { Footer } from '~/components/footer'
 import { Navigation } from '~/components/navigation'
+import { poppins, ibmPlexMono } from './fonts'
+import { authOptions } from '~/server/auth'
 
-export const ibmPlexMono = IBM_Plex_Mono({
-    weight: ['400', '500', '600', '700'],
-    subsets: ['latin'],
-    variable: '--font-ibm-plex',
-})
-
-const poppins = Poppins({
-    weight: ['400', '500', '600', '700'],
-    subsets: ['latin'],
-    variable: '--font-poppins',
-})
-
-export default function RootLayout({
+export default async function RootLayout({
     children,
-    session,
 }: {
     children: React.ReactNode
-    session: Session | null
 }) {
+    const session = await getServerSession(authOptions)
+
     return (
         <html lang="en">
             <body

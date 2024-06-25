@@ -2,6 +2,9 @@ import { fetchHistory } from '~/lib/server-only-api'
 import { HistoryOverview } from './history-overview'
 import { Metadata } from 'next'
 import { HistoryLog } from './history-log'
+import { getServerSession } from 'next-auth'
+import { redirect } from 'next/navigation'
+import { authOptions } from '~/server/auth'
 {
     /*     <meta */
 }
@@ -21,6 +24,12 @@ export const metadata: Metadata = {
 }
 
 export default async function History() {
+    const session = await getServerSession(authOptions)
+
+    if (session == null) {
+        redirect('/')
+    }
+
     const history = await fetchHistory()
 
     return (

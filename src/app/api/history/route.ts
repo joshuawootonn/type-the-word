@@ -1,16 +1,10 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '~/server/auth'
 import { db } from '~/server/db'
-import {
-    TypedVerse,
-    TypingSessionRepository,
-} from '~/server/repositories/typingSession.repository'
+import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
 import { getTypingSessionLog } from './log'
 import { getBookOverview } from './overview'
-
-export type ChapterHistory = {
-    verses: Record<number, TypedVerse[]>
-}
+import { NextRequest } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 
