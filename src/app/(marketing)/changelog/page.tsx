@@ -32,8 +32,6 @@ export const metadata: Metadata = {
         'All the product changes happening to Type the Word. A typing practice tool that tracks your progress through the Bible.',
 }
 
-// property="og:image"
-// content="https://typetheword.site/api/og?path=changelog"
 export default function Changelog() {
     return (
         <div className={'prose-h2:text-3xl prose-p:text-xl'}>
