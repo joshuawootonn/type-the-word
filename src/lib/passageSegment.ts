@@ -7,6 +7,6 @@ export const passageSegmentSchema = z
 
 export type PassageSegment = z.infer<typeof passageSegmentSchema>
 
-export function toPassageSegment(book: string, chapter: string) {
+export function toPassageSegment(book: string, chapter: string | number) {
     return passageSegmentSchema.parse(`${book}_${chapter}`)
 }
