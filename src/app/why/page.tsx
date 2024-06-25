@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 }
 
 // property="og:image"
-// content="https://typetheword.site/api/og?path=why"
+// content="https://typetheword.site/api/og?"
 
 export default async function Home() {
     const passages: [
