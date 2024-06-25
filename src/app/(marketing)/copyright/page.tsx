@@ -6,8 +6,6 @@ export const metadata: Metadata = {
         "The Copyright for Type the Word. A typing practice tool that tracks your typing progress through the Bible. Improve your typing skills while meditating on God's word.",
 }
 
-// property="og:image"
-// content="https://typetheword.site/api/og"
 export default function Home() {
     return (
         <>
