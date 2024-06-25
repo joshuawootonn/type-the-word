@@ -6,6 +6,7 @@ import { Footer } from '~/components/footer'
 import { Navigation } from '~/components/navigation'
 import { poppins, ibmPlexMono } from './fonts'
 import { authOptions } from '~/server/auth'
+import Fathom from './fathom'
 
 export default async function RootLayout({
     children,
@@ -28,6 +29,7 @@ export default async function RootLayout({
                     {children}
                     <Footer />
                 </Providers>
+                <Fathom />
             </body>
         </html>
     )
