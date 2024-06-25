@@ -5,10 +5,10 @@ import { currentVerseAtom } from '~/components/passage'
 import { useAtom } from 'jotai'
 import { CurrentVerse } from '~/components/currentVerse'
 import { ReadonlyVerse } from '~/components/readonlyVerse'
-import { ibmPlexMono } from '~/pages/_app'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
 import { UseQueryResult } from '@tanstack/react-query'
-import { ChapterHistory } from '~/server/api/routers/typing-history.router'
+import { ibmPlexMono } from '~/app/fonts'
+import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 
 export function Paragraph({
     node,

@@ -25,9 +25,9 @@ import {
     useQueryClient,
 } from '@tanstack/react-query'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
-import { ChapterHistory } from '~/server/api/routers/typing-history.router'
 import { fetchAddVerseToTypingSession } from '~/lib/api'
 import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
+import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 
 const nativeInputEventSchema = z.discriminatedUnion('inputType', [
     z.object({
