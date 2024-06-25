@@ -10,10 +10,9 @@ import { useRect } from '~/lib/hooks/useRect'
 import { useAtom, useSetAtom } from 'jotai'
 import clsx from 'clsx'
 import { Verse } from '~/lib/parseEsv'
-import { useSession } from 'next-auth/react'
 import { UseQueryResult } from '@tanstack/react-query'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
-import { ChapterHistory } from '~/server/api/routers/typing-history.router'
+import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 
 export function ReadonlyVerse({
     isCurrentVerse,
@@ -30,7 +29,6 @@ export function ReadonlyVerse({
     typingSession: UseQueryResult<TypingSession>
     chapterHistory: UseQueryResult<ChapterHistory>
 }) {
-    const { data: sessionData } = useSession()
     const { rect: passageRect } = useContext(PassageContext)
     const [isPassageActive] = useAtom(isPassageActiveAtom)
 

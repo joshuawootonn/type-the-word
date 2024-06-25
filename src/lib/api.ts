@@ -1,8 +1,8 @@
-import { ChapterHistory } from '~/server/api/routers/typing-history.router'
 import { ParsedPassage } from './parseEsv'
 import { PassageSegment } from './passageSegment'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
 import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
+import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 
 export type Body<T> = { data: T }
 

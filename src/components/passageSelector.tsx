@@ -119,7 +119,7 @@ export function PassageSelector({ value }: { value: PassageReference }) {
         setChapter(chapter)
         const nextUrl = toPassageSegment(book, chapter)
 
-        void router.push(`/passage/${nextUrl}`, undefined, { scroll: false })
+        void router.push(`/passage/${nextUrl}`, { scroll: false })
     }
 
     return (

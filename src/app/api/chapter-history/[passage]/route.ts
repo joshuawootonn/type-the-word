@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth'
 import { NextRequest } from 'next/server'
-import { passageObjectSchema, stringToPassageObject } from '~/lib/passageObject'
+import { stringToPassageObject } from '~/lib/passageObject'
 import { passageSegmentSchema } from '~/lib/passageSegment'
 import { authOptions } from '~/server/auth'
 import { db } from '~/server/db'
