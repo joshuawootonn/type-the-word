@@ -11,15 +11,10 @@ import { atom, PrimitiveAtom, Provider } from 'jotai'
 import { useRect } from '~/lib/hooks/useRect'
 import { useHydrateAtoms } from 'jotai/react/utils'
 import { useSession } from 'next-auth/react'
-import { useParams, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { PassageSegment } from '~/lib/passageSegment'
-import {
-    fetchChapterHistory,
-    fetchPassage,
-    fetchTypingSessionUpsert,
-} from '~/lib/api'
-import { DEFAULT_PASSAGE_SEGMENT } from '~/app/(passage)/passage/[passage]/default-passage'
+import { toPassageSegment } from '~/lib/passageSegment'
+import { fetchChapterHistory, fetchTypingSessionUpsert } from '~/lib/api'
 
 export const PassageContext = React.createContext<{
     rect: DOMRect | null
@@ -51,7 +46,10 @@ function HydrateAtoms({
     return children
 }
 
-export function Passage(props: {
+export function Passage({
+    passage,
+    ...props
+}: {
     passage: ParsedPassage
     autofocus?: boolean
     autoSelect?: boolean
@@ -61,21 +59,20 @@ export function Passage(props: {
     const passageRef = useRef<HTMLDivElement>(null)
     const passageRect = useRect(passageRef)
     const { data: sessionData } = useSession()
-    const params = useParams<{ passage: PassageSegment }>()
-    const { data: passage } = useQuery({
-        queryKey: ['passage', params?.passage],
-        queryFn: () => fetchPassage(params?.passage ?? DEFAULT_PASSAGE_SEGMENT),
-        initialData: props.passage,
-    })
     const typingSession = useQuery({
         queryKey: ['typing-session'],
         queryFn: fetchTypingSessionUpsert,
         enabled: sessionData?.user?.id != null,
     })
     const chapterHistory = useQuery({
-        queryKey: ['chapter-history', params?.passage],
+        queryKey: ['chapter-history'],
         queryFn: () =>
-            fetchChapterHistory(params?.passage ?? DEFAULT_PASSAGE_SEGMENT),
+            fetchChapterHistory(
+                toPassageSegment(
+                    passage.firstVerse.book,
+                    passage.firstVerse.chapter,
+                ),
+            ),
         enabled: sessionData?.user?.id != null,
     })
 

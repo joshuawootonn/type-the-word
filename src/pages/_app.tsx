@@ -8,7 +8,6 @@ import { useEffect } from 'react'
 
 import { env } from '~/env.mjs'
 import '~/styles/globals.css'
-import { api } from '~/utils/api'
 import clsx from 'clsx'
 
 export const ibmPlexMono = IBM_Plex_Mono({
@@ -58,4 +57,4 @@ const MyApp: AppType<{ session: Session | null }> = ({
     )
 }
 
-export default api.withTRPC(MyApp)
+export default MyApp
