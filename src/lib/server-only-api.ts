@@ -16,5 +16,7 @@ export async function fetchHistory(): Promise<{
         overview: BookOverview[]
     }> = await response.json()
 
+    if (!response.ok) console.error(body)
+
     return body.data
 }
