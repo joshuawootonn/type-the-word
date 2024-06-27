@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth'
 import { NextRequest } from 'next/server'
 import { stringToPassageObject } from '~/lib/passageObject'
+import { passageReferenceSchema } from '~/lib/passageReference'
 import { passageSegmentSchema } from '~/lib/passageSegment'
 import { authOptions } from '~/server/auth'
 import { db } from '~/server/db'
@@ -29,7 +30,9 @@ export async function GET(
 
     try {
         passageObject = stringToPassageObject.parse(
-            passageSegmentSchema.parse(params?.passage),
+            passageReferenceSchema.parse(
+                passageSegmentSchema.parse(params?.passage),
+            ),
         )
     } catch (e) {
         return Response.json(
