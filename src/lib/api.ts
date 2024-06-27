@@ -6,10 +6,16 @@ import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 
 export type Body<T> = { data: T }
 
+function getBaseUrl() {
+    if (typeof window !== 'undefined') return ''
+    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+    return `http://localhost:${process.env.PORT ?? 3000}` //
+}
+
 export async function fetchPassage(
     value: PassageSegment,
 ): Promise<ParsedPassage> {
-    const response = await fetch(`http://localhost:3000/api/passage/${value}`)
+    const response = await fetch(`${getBaseUrl()}/api/passage/${value}`)
 
     const body: Body<ParsedPassage> = await response.json()
 
@@ -17,7 +23,7 @@ export async function fetchPassage(
 }
 
 export async function fetchTypingSessionUpsert(): Promise<TypingSession> {
-    const response = await fetch(`http://localhost:3000/api/typing-session`)
+    const response = await fetch(`${getBaseUrl()}/api/typing-session`)
 
     const body: Body<TypingSession> = await response.json()
 
@@ -27,9 +33,7 @@ export async function fetchTypingSessionUpsert(): Promise<TypingSession> {
 export async function fetchChapterHistory(
     value: PassageSegment,
 ): Promise<ChapterHistory> {
-    const response = await fetch(
-        `http://localhost:3000/api/chapter-history/${value}`,
-    )
+    const response = await fetch(`${getBaseUrl()}/api/chapter-history/${value}`)
 
     const body: Body<ChapterHistory> = await response.json()
 
@@ -37,12 +41,11 @@ export async function fetchChapterHistory(
 }
 
 export async function fetchAddVerseToTypingSession(
-    //todo: make this a UUID
     typingSessionId: string,
     verse: AddTypedVerseBody,
 ): Promise<TypingSession> {
     const response = await fetch(
-        `http://localhost:3000/api/typing-session/${typingSessionId}`,
+        `${getBaseUrl()}/api/typing-session/${typingSessionId}`,
         {
             method: 'POST',
             headers: {
