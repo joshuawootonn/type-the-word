@@ -4,7 +4,6 @@
     "private": true,
     "scripts": {
         "build": "next build",
-        "postbuild": "next-sitemap",
         "dev": "next dev",
         "lint": "next lint",
         "format": "prettier ./src/**/* --write",
@@ -46,7 +45,6 @@
         "motion": "^10.16.4",
         "next": "^14.2.4",
         "next-auth": "^4.23.0",
-        "next-sitemap": "^4.2.3",
         "parse5": "^7.1.2",
         "postgres": "^3.4.4",
         "react": "18.3.1",
