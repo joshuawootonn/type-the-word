@@ -5,18 +5,6 @@ import { HistoryLog } from './history-log'
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { authOptions } from '~/server/auth'
-{
-    /*     <meta */
-}
-{
-    /*         property="og:image" */
-}
-{
-    /*         content="https://typetheword.site/api/og?path=history" */
-}
-{
-    /*     /> */
-}
 
 export const metadata: Metadata = {
     title: 'Type the Word - History',
