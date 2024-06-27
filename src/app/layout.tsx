@@ -7,6 +7,7 @@ import { Navigation } from '~/components/navigation'
 import { poppins, ibmPlexMono } from './fonts'
 import { authOptions } from '~/server/auth'
 import Fathom from './fathom'
+import { Update } from './update'
 
 export default async function RootLayout({
     children,
@@ -27,6 +28,7 @@ export default async function RootLayout({
                 <Providers session={session}>
                     <Navigation />
                     {children}
+                    <Update className="hazard mb-8 border-2 px-3 py-1" />
                     <Footer />
                 </Providers>
                 <Fathom />
