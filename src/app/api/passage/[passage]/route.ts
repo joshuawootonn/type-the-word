@@ -11,6 +11,7 @@ import { and, eq, sql } from 'drizzle-orm'
 import { isAfter, isBefore, subDays } from 'date-fns'
 import { db } from '~/server/db'
 import { PassageSegment, passageSegmentSchema } from '~/lib/passageSegment'
+import { passageReferenceSchema } from '~/lib/passageReference'
 
 const passageSchema = z.object({
     query: z.string(),
@@ -58,7 +59,9 @@ export async function GET(
     let passageData: PassageObject
 
     try {
-        passageData = stringToPassageObject.parse(params?.passage)
+        passageData = stringToPassageObject.parse(
+            passageReferenceSchema.parse(params?.passage),
+        )
     } catch (e: unknown) {
         return Response.json(
             {

@@ -17,7 +17,7 @@ export default async function PassagePage(props: {
     const value = props.params.passage ?? DEFAULT_PASSAGE_SEGMENT
 
     const passage = await fetchPassage(value)
-
+    
     return (
         <>
             <Passage autofocus={true} passage={passage} />
