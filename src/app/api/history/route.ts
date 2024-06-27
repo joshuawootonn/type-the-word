@@ -4,11 +4,10 @@ import { db } from '~/server/db'
 import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
 import { getTypingSessionLog } from './log'
 import { getBookOverview } from './overview'
-import { NextRequest } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     const session = await getServerSession(authOptions)
 
     if (session === null) {

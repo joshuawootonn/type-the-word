@@ -8,7 +8,7 @@ import { TypingSessionRepository } from '~/server/repositories/typingSession.rep
 
 export const dynamic = 'force-dynamic' // defaults to auto
 
-export async function GET(request: NextRequest) {
+export async function GET(_: NextRequest) {
     const session = await getServerSession(authOptions)
 
     if (session === null) {
