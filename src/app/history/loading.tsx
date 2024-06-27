@@ -6,7 +6,7 @@ export default function PassageLoading() {
             <h2>Overview</h2>
             <Loading />
             <h2>Log</h2>
-            <Loading />
+            <Loading initialDots={3} />
         </>
     )
 }
