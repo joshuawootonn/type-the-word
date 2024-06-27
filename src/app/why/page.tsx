@@ -12,9 +12,6 @@ export const metadata: Metadata = {
         'Why did I create Type the Word? Why should we meditate on the Bible?',
 }
 
-// property="og:image"
-// content="https://typetheword.site/api/og?"
-
 export default async function Home() {
     const passages: [
         ParsedPassage,
