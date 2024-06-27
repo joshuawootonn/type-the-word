@@ -38,7 +38,7 @@ function getErrorMessage(error: unknown) {
 }
 
 export async function GET(
-    request: Request,
+    _: Request,
     { params }: { params: { passage?: string } },
 ) {
     let reference: PassageSegment

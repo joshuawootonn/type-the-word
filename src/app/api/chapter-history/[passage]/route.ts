@@ -16,7 +16,7 @@ export type ChapterHistory = {
 export const dynamic = 'force-dynamic'
 
 export async function GET(
-    request: NextRequest,
+    _: NextRequest,
     { params }: { params: { passage?: string } },
 ) {
     const session = await getServerSession(authOptions)
