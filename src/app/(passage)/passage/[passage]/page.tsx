@@ -4,6 +4,7 @@ import { DEFAULT_PASSAGE_SEGMENT } from './default-passage'
 import Link from 'next/link'
 import { fetchPassage } from '~/lib/api'
 import { PassageSegment } from '~/lib/passageSegment'
+import { Update } from '../../update'
 
 export const metadata: Metadata = {
     title: 'Type the Word',
@@ -17,7 +18,7 @@ export default async function PassagePage(props: {
     const value = props.params.passage ?? DEFAULT_PASSAGE_SEGMENT
 
     const passage = await fetchPassage(value)
-    
+
     return (
         <>
             <Passage autofocus={true} passage={passage} />
@@ -43,6 +44,7 @@ export default async function PassagePage(props: {
                     <div />
                 )}
             </div>
+            <Update className="hazard mb-8 border-2 px-3 py-1" />
         </>
     )
 }

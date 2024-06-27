@@ -46,6 +46,10 @@ body[style] {
 }
 
 
+.hazard{
+    border-image: repeating-linear-gradient( -80deg, white, white 10px, black 10px, black 20px) 20;
+}
+
 
 .min-h-screen-1px {
     @apply min-h-[calc(100vh_-_1px)];
