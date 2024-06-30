@@ -26,7 +26,9 @@ export async function fetchPassage(
 }
 
 export async function fetchTypingSessionUpsert(): Promise<TypingSession> {
-    const response = await fetch(`${getBaseUrl()}/api/typing-session`)
+    const response = await fetch(`${getBaseUrl()}/api/typing-session`, {
+        cache: 'no-store',
+    })
 
     const body: Body<TypingSession> = await response.json()
 
@@ -36,7 +38,10 @@ export async function fetchTypingSessionUpsert(): Promise<TypingSession> {
 export async function fetchChapterHistory(
     value: PassageSegment,
 ): Promise<ChapterHistory> {
-    const response = await fetch(`${getBaseUrl()}/api/chapter-history/${value}`)
+    const response = await fetch(
+        `${getBaseUrl()}/api/chapter-history/${value}`,
+        { cache: 'no-store' },
+    )
 
     const body: Body<ChapterHistory> = await response.json()
 
