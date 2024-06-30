@@ -82,43 +82,36 @@ export default async function Home() {
             <div className={'prose-h2:text-2xl'}>
                 <Passage
                     autofocus={false}
-                    autoSelect={false}
                     passage={passages[0]}
                     key={JSON.stringify(passages[0])}
                 />
                 <Passage
                     autofocus={false}
-                    autoSelect={false}
                     passage={passages[1]}
                     key={JSON.stringify(passages[1])}
                 />
                 <Passage
                     autofocus={false}
-                    autoSelect={false}
                     passage={passages[2]}
                     key={JSON.stringify(passages[2])}
                 />
                 <Passage
                     autofocus={false}
-                    autoSelect={false}
                     passage={passages[3]}
                     key={JSON.stringify(passages[3])}
                 />
                 <Passage
                     autofocus={false}
-                    autoSelect={false}
                     passage={passages[4]}
                     key={JSON.stringify(passages[4])}
                 />
                 <Passage
                     autofocus={false}
-                    autoSelect={false}
                     passage={passages[5]}
                     key={JSON.stringify(passages[5])}
                 />
                 <Passage
                     autofocus={false}
-                    autoSelect={false}
                     passage={passages[6]}
                     key={JSON.stringify(passages[6])}
                 />
