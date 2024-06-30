@@ -4,7 +4,7 @@ import { DEFAULT_PASSAGE_SEGMENT } from './default-passage'
 import Link from 'next/link'
 import { fetchPassage } from '~/lib/api'
 import { PassageSegment } from '~/lib/passageSegment'
-
+import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
     title: 'Type the Word',
@@ -15,7 +15,11 @@ export const metadata: Metadata = {
 export default async function PassagePage(props: {
     params: { passage?: PassageSegment }
 }) {
-    const value = props.params.passage ?? DEFAULT_PASSAGE_SEGMENT
+    if (props.params.passage == null) {
+        redirect(`/passage/${DEFAULT_PASSAGE_SEGMENT}`)
+    }
+
+    const value = props.params.passage
 
     const passage = await fetchPassage(value)
 
@@ -44,7 +48,6 @@ export default async function PassagePage(props: {
                     <div />
                 )}
             </div>
-            
         </>
     )
 }
