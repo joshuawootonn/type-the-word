@@ -8,6 +8,11 @@ import { poppins, ibmPlexMono } from './fonts'
 import { authOptions } from '~/server/auth'
 import Fathom from './fathom'
 import { Update } from './update'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+    metadataBase: new URL('https://typetheword.site'),
+}
 
 export default async function RootLayout({
     children,
