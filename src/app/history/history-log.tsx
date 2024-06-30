@@ -1,6 +1,6 @@
 'use client'
 
-import { TypingSessionLog } from '../api/history/log'
+import { TypingSessionLog } from './log'
 import { Fragment } from 'react'
 import { format } from 'date-fns'
 
