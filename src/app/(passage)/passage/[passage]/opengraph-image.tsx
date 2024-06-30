@@ -13,5 +13,11 @@ export default async function Image({
     if (params.passage) {
         search.set('passage', passageSegmentSchema.parse(params.passage))
     }
-    return await fetch(`https://typetheword.site/api/og?${search.toString()}`)
+
+    return await fetch(
+        new URL(
+            `/api/og?${search.toString()}`,
+            process.env.VERCEL_URL ?? 'https://typetheword.site',
+        ),
+    )
 }
