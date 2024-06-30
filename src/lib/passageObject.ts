@@ -3,6 +3,8 @@
 import { z } from 'zod'
 import { getBibleMetadata } from '~/server/bibleMetadata'
 import { bookSchema } from '~/lib/types/book'
+import { passageReferenceSchema } from './passageReference'
+import { passageSegmentSchema } from './passageSegment'
 
 export const passageObjectSchema = z.object({
     book: bookSchema,
@@ -12,6 +14,11 @@ export const passageObjectSchema = z.object({
 })
 
 export type PassageObject = z.infer<typeof passageObjectSchema>
+
+export const segmentToPassageObject = (segment?: string) =>
+    stringToPassageObject.parse(
+        passageReferenceSchema.parse(passageSegmentSchema.parse(segment)),
+    )
 
 export const stringToPassageObject = z.string().transform(text => {
     const trimmedText = text.trim().toLowerCase()

@@ -19,11 +19,7 @@ import { Word } from '~/components/word'
 import { useRect } from '~/lib/hooks/useRect'
 import { trackEvent } from 'fathom-client'
 import { z } from 'zod'
-import {
-    UseQueryResult,
-    useMutation,
-    useQueryClient,
-} from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
 import { fetchAddVerseToTypingSession } from '~/lib/api'
 import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
@@ -119,8 +115,8 @@ export function CurrentVerse({
     isQuote: boolean
     verse: Verse
     passage: ParsedPassage
-    typingSession: UseQueryResult<TypingSession>
-    chapterHistory: UseQueryResult<ChapterHistory>
+    typingSession?: TypingSession
+    chapterHistory?: ChapterHistory
 }) {
     const inputRef = useRef<HTMLInputElement>(null)
     const [position, setPosition] = useAtom(positionAtom)
@@ -267,7 +263,7 @@ export function CurrentVerse({
                 const verse = getVerse(currentVerse, passage.nodes)
                 trackEvent('typed-verse')
                 if (
-                    typingSession?.data?.id != null &&
+                    typingSession?.id != null &&
                     sessionData?.user?.id != null
                 ) {
                     void addTypedVerseToSession.mutateAsync({
@@ -275,7 +271,7 @@ export function CurrentVerse({
                         chapter: verse.verse.chapter,
                         verse: verse.verse.verse,
                         translation: verse.verse.translation,
-                        typingSessionId: typingSession.data.id,
+                        typingSessionId: typingSession.id,
                     })
                 } else {
                     const nextVerse = getNextVerse(currentVerse, passage.nodes)
@@ -304,7 +300,7 @@ export function CurrentVerse({
           )
         : position
 
-    const isTypedInSession = typingSession.data?.typedVerses.find(
+    const isTypedInSession = typingSession?.typedVerses.find(
         a =>
             a.verse === verse.verse.verse &&
             a.chapter === verse.verse.chapter &&
@@ -312,7 +308,7 @@ export function CurrentVerse({
             a.translation === verse.verse.translation,
     )
 
-    const isTypedInHistory = chapterHistory.data?.verses[verse.verse.verse]
+    const isTypedInHistory = chapterHistory?.verses[verse.verse.verse]
 
     return (
         <span

@@ -15,6 +15,8 @@ import { usePathname } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { toPassageSegment } from '~/lib/passageSegment'
 import { fetchChapterHistory, fetchTypingSessionUpsert } from '~/lib/api'
+import { TypingSession } from '~/server/repositories/typingSession.repository'
+import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 
 export const PassageContext = React.createContext<{
     rect: DOMRect | null
@@ -52,6 +54,8 @@ export function Passage({
 }: {
     passage: ParsedPassage
     autofocus?: boolean
+    typingSession?: TypingSession
+    chapterHistory?: ChapterHistory
 }) {
     const passageId = useId()
 
@@ -62,6 +66,7 @@ export function Passage({
         queryKey: ['typing-session'],
         queryFn: fetchTypingSessionUpsert,
         enabled: sessionData?.user?.id != null,
+        initialData: props.typingSession,
     })
     const chapterHistory = useQuery({
         queryKey: ['chapter-history'],
@@ -73,6 +78,7 @@ export function Passage({
                 ),
             ),
         enabled: sessionData?.user?.id != null,
+        initialData: props.chapterHistory,
     })
 
     const isRootPath = usePathname() === '/'
@@ -108,8 +114,8 @@ export function Passage({
                                             key={pIndex}
                                             node={node}
                                             passage={passage}
-                                            typingSession={typingSession}
-                                            chapterHistory={chapterHistory}
+                                            typingSession={typingSession.data}
+                                            chapterHistory={chapterHistory.data}
                                         />
                                     )
 
