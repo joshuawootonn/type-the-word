@@ -52,7 +52,6 @@ export function Passage({
 }: {
     passage: ParsedPassage
     autofocus?: boolean
-    autoSelect?: boolean
 }) {
     const passageId = useId()
 
@@ -85,7 +84,7 @@ export function Passage({
                 initialValues={[
                     [
                         currentVerseAtom,
-                        props.autoSelect ? passage.firstVerse.value : '',
+                        props.autofocus ? passage.firstVerse.value : '',
                     ],
                     [autofocusAtom, props.autofocus],
                     [passageIdAtom, passageId],

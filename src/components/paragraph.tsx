@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Paragraph, ParsedPassage } from '~/lib/parseEsv'
+import { type Paragraph, ParsedPassage } from '~/lib/parseEsv'
 import React from 'react'
 import { currentVerseAtom } from '~/components/passage'
 import { useAtom } from 'jotai'
