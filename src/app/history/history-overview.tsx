@@ -3,7 +3,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import clsx from 'clsx'
 import Link from 'next/link'
-import { BookOverview } from '../api/history/overview'
+import { BookOverview } from './overview'
 
 export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
     return (

@@ -4,8 +4,7 @@ import { HistoryLog } from './history-log'
 import { getServerSession } from 'next-auth/next'
 import { redirect } from 'next/navigation'
 import { authOptions } from '~/server/auth'
-import { fetchHistory } from '~/lib/api'
-
+import { getHistory } from './getHistory'
 export const metadata: Metadata = {
     title: 'Type the Word - History',
     description: 'History of all the passages you have typed.',
@@ -18,15 +17,15 @@ export default async function History() {
         redirect('/')
     }
 
-    const history = await fetchHistory()
+    const { overview, log } = await getHistory(session.user.id)
 
     return (
         <>
             <h2>Overview</h2>
-            <HistoryOverview overview={history.overview} />
+            <HistoryOverview overview={overview} />
             <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
             <h2>Log</h2>
-            <HistoryLog log={history.log} />
+            <HistoryLog log={log} />
         </>
     )
 }

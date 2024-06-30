@@ -3,9 +3,6 @@ import { PassageSegment } from './passageSegment'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
 import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
-import { TypingSessionLog } from '~/app/api/history/log'
-import { BookOverview } from '~/app/api/history/overview'
-import { headers } from 'next/headers'
 
 export type Body<T> = { data: T }
 
@@ -62,25 +59,6 @@ export async function fetchAddVerseToTypingSession(
     )
 
     const body: Body<TypingSession> = await response.json()
-
-    return body.data
-}
-
-export async function fetchHistory(): Promise<{
-    log: TypingSessionLog[]
-    overview: BookOverview[]
-}> {
-    const response = await fetch(`${getBaseUrl()}/api/history`, {
-        method: 'POST',
-        headers: headers(),
-    })
-
-    const body: Body<{
-        log: TypingSessionLog[]
-        overview: BookOverview[]
-    }> = await response.json()
-
-    if (!response.ok) console.error(body)
 
     return body.data
 }
