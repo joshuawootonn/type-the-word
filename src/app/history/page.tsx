@@ -1,10 +1,10 @@
-import { fetchHistory } from '~/lib/server-only-api'
 import { HistoryOverview } from './history-overview'
 import { Metadata } from 'next'
 import { HistoryLog } from './history-log'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { redirect } from 'next/navigation'
 import { authOptions } from '~/server/auth'
+import { fetchHistory } from '~/lib/api'
 
 export const metadata: Metadata = {
     title: 'Type the Word - History',
