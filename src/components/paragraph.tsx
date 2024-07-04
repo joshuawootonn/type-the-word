@@ -6,6 +6,7 @@ import { useAtom } from 'jotai'
 import { CurrentVerse } from '~/components/currentVerse'
 import { ReadonlyVerse } from '~/components/readonlyVerse'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
+import { UseQueryResult } from '@tanstack/react-query'
 import { ibmPlexMono } from '~/app/fonts'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 
@@ -17,8 +18,8 @@ export function Paragraph({
 }: {
     passage: ParsedPassage
     node: Paragraph
-    typingSession?: TypingSession
-    chapterHistory?: ChapterHistory
+    typingSession: UseQueryResult<TypingSession>
+    chapterHistory: UseQueryResult<ChapterHistory>
 }) {
     const [currentVerse] = useAtom(currentVerseAtom)
     return (

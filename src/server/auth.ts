@@ -8,7 +8,6 @@ import {
 import GoogleProvider from 'next-auth/providers/google'
 
 import { env } from '~/env.mjs'
-import { createSubscription } from '~/lib/convert-kit.service'
 import { db } from '~/server/db'
 
 /**
@@ -47,19 +46,6 @@ export const authOptions: NextAuthOptions = {
                     id: user.id,
                 },
             }
-        },
-    },
-    events: {
-        createUser: async ({ user }) => {
-            if (user.email == null || user.name == null) {
-                console.warn(
-                    `Did not create subscription for user ${user.id} because email: ${user.email} / name: ${user.name} was nullish.`,
-                )
-
-                return
-            }
-
-            await createSubscription({ email: user.email, name: user.name })
         },
     },
     adapter: DrizzleAdapter(db),

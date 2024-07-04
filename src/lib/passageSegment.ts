@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const passageSegmentSchema = z
     .string()
     .transform(s => s.split(' ').join('_').toLowerCase())
-    .brand('PassagSegment')
+    .brand('PassagUrl')
 
 export type PassageSegment = z.infer<typeof passageSegmentSchema>
 

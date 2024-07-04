@@ -35,9 +35,6 @@ export const env = createEnv({
         GOOGLE_CLIENT_ID: z.string(),
         GOOGLE_CLIENT_SECRET: z.string(),
         SENTRY_AUTH_TOKEN: z.string(),
-
-        CONVERTKIT_API_KEY: z.string(),
-        CONVERTKIT_SUBSCRIBE_FORM_ID: z.string(),
     },
 
     /**
@@ -66,8 +63,6 @@ export const env = createEnv({
         // DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
         NEXT_PUBLIC_FATHOM_ID: process.env.NEXT_PUBLIC_FATHOM_ID,
         SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
-        CONVERTKIT_API_KEY: process.env.CONVERTKIT_API_KEY,
-        CONVERTKIT_SUBSCRIBE_FORM_ID: process.env.CONVERTKIT_SUBSCRIBE_FORM_ID,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

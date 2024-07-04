@@ -10,6 +10,7 @@ import { useRect } from '~/lib/hooks/useRect'
 import { useAtom, useSetAtom } from 'jotai'
 import clsx from 'clsx'
 import { Verse } from '~/lib/parseEsv'
+import { UseQueryResult } from '@tanstack/react-query'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 
@@ -25,8 +26,8 @@ export function ReadonlyVerse({
     isIndented: boolean
     isQuote: boolean
     verse: Verse
-    typingSession?: TypingSession
-    chapterHistory?: ChapterHistory
+    typingSession: UseQueryResult<TypingSession>
+    chapterHistory: UseQueryResult<ChapterHistory>
 }) {
     const { rect: passageRect } = useContext(PassageContext)
     const [isPassageActive] = useAtom(isPassageActiveAtom)
@@ -34,7 +35,7 @@ export function ReadonlyVerse({
     const ref = useRef<HTMLSpanElement>(null)
     const rect = useRect(ref)
 
-    const isTypedInSession = typingSession?.typedVerses.find(
+    const isTypedInSession = typingSession.data?.typedVerses.find(
         a =>
             a.verse === verse.verse.verse &&
             a.chapter === verse.verse.chapter &&
@@ -42,7 +43,7 @@ export function ReadonlyVerse({
             a.translation === verse.verse.translation,
     )
 
-    const isTypedInHistory = chapterHistory?.verses[verse.verse.verse]
+    const isTypedInHistory = chapterHistory.data?.verses[verse.verse.verse]
 
     const [currentVerse, setCurrentVerse] = useAtom(currentVerseAtom)
     const setPosition = useSetAtom(positionAtom)
