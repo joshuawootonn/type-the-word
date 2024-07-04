@@ -5,6 +5,11 @@ import Link from 'next/link'
 import { fetchPassage } from '~/lib/api'
 import { PassageSegment } from '~/lib/passageSegment'
 import { redirect } from 'next/navigation'
+import { getOrCreateTypingSession } from '~/app/api/typing-session/getOrCreateTypingSession'
+import { getChapterHistory } from '~/app/api/chapter-history/[passage]/getChapterHistory'
+import { segmentToPassageObject } from '~/lib/passageObject'
+import { authOptions } from '~/server/auth'
+import { getServerSession } from 'next-auth'
 
 export const metadata: Metadata = {
     title: 'Type the Word',
@@ -19,13 +24,26 @@ export default async function PassagePage(props: {
         redirect(`/passage/${DEFAULT_PASSAGE_SEGMENT}`)
     }
 
+    const session = await getServerSession(authOptions)
+
     const value = props.params.passage
 
-    const passage = await fetchPassage(value)
+    const [passage, typingSession, chapterHistory] = await Promise.all([
+        fetchPassage(value),
+        session == null ? undefined : getOrCreateTypingSession(session.user.id),
+        session == null
+            ? undefined
+            : getChapterHistory(session.user.id, segmentToPassageObject(value)),
+    ])
 
     return (
         <>
-            <Passage autofocus={true} passage={passage} />
+            <Passage
+                autofocus={true}
+                passage={passage}
+                typingSession={typingSession}
+                chapterHistory={chapterHistory}
+            />
             <div className="mb-24 mt-8 flex w-full justify-between">
                 {passage?.prevChapter ? (
                     <Link

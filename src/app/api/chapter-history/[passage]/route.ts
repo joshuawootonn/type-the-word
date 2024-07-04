@@ -1,14 +1,9 @@
 import { getServerSession } from 'next-auth'
 import { NextRequest } from 'next/server'
-import { stringToPassageObject } from '~/lib/passageObject'
-import { passageReferenceSchema } from '~/lib/passageReference'
-import { passageSegmentSchema } from '~/lib/passageSegment'
+import { segmentToPassageObject } from '~/lib/passageObject'
 import { authOptions } from '~/server/auth'
-import { db } from '~/server/db'
-import {
-    TypedVerse,
-    TypingSessionRepository,
-} from '~/server/repositories/typingSession.repository'
+import { TypedVerse } from '~/server/repositories/typingSession.repository'
+import { getChapterHistory } from './getChapterHistory'
 
 export type ChapterHistory = {
     verses: Record<number, TypedVerse[]>
@@ -29,11 +24,7 @@ export async function GET(
     let passageObject
 
     try {
-        passageObject = stringToPassageObject.parse(
-            passageReferenceSchema.parse(
-                passageSegmentSchema.parse(params?.passage),
-            ),
-        )
+        passageObject = segmentToPassageObject(params.passage)
     } catch (e) {
         return Response.json(
             {
@@ -43,27 +34,6 @@ export async function GET(
         )
     }
 
-    const typingSessionRepository = new TypingSessionRepository(db)
-
-    const typingSessions = await typingSessionRepository.getMany({
-        userId: session.user.id,
-    })
-
-    const verses: ChapterHistory['verses'] = {}
-
-    for (const session of typingSessions) {
-        for (const verse of session.typedVerses) {
-            if (
-                verse.book !== passageObject.book ||
-                verse.chapter !== passageObject.chapter
-            ) {
-                continue
-            }
-
-            const acc = verses[verse.verse] ?? []
-            verses[verse.verse] = [...acc, verse]
-        }
-    }
-
-    return Response.json({ data: { verses } }, { status: 200 })
+    const data = await getChapterHistory(session.user.id, passageObject)
+    return Response.json({ data }, { status: 200 })
 }
