@@ -24,9 +24,9 @@ export default async function Home() {
                 <h1>Welcome</h1>
                 <p>
                     I&apos;m glad you are joining me and the {userCount} other
-                    people who have together typed {typedVerseCount}. I hope
-                    this project can be a blessing to your walk with God like it
-                    has been to mine.
+                    people who have together typed {typedVerseCount} verses. I
+                    hope this project can be a blessing to your walk with God
+                    like it has been to mine.
                 </p>
 
                 <p>
