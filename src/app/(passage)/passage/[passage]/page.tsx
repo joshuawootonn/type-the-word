@@ -32,9 +32,10 @@ export default async function PassagePage(props: {
         fetchPassage(value),
         // session == null ? undefined : getOrCreateTypingSession(session.user.id),
         undefined,
-        session == null
-            ? undefined
-            : getChapterHistory(session.user.id, segmentToPassageObject(value)),
+        undefined,
+        // session == null
+        //     ? undefined
+        //     : getChapterHistory(session.user.id, segmentToPassageObject(value)),
     ])
 
     return (
