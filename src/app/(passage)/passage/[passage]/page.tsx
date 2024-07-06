@@ -30,12 +30,10 @@ export default async function PassagePage(props: {
 
     const [passage, typingSession, chapterHistory] = await Promise.all([
         fetchPassage(value),
-        // session == null ? undefined : getOrCreateTypingSession(session.user.id),
-        undefined,
-        undefined,
-        // session == null
-        //     ? undefined
-        //     : getChapterHistory(session.user.id, segmentToPassageObject(value)),
+        session == null ? undefined : getOrCreateTypingSession(session.user.id),
+        session == null
+            ? undefined
+            : getChapterHistory(session.user.id, segmentToPassageObject(value)),
     ])
 
     return (
