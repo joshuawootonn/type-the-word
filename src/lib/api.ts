@@ -18,7 +18,16 @@ export function getBaseUrl() {
 export async function fetchPassage(
     value: PassageSegment,
 ): Promise<ParsedPassage> {
-    const response = await fetch(`${getBaseUrl()}/api/passage/${value}`)
+    const url = `${getBaseUrl()}/api/passage/${value}`
+    console.log({
+        baseUrl: getBaseUrl(),
+        url,
+        VERCEL_URL: process.env.VERCEL_URL,
+        VERCEL_ENV: process.env.VERCEL_ENV,
+        PORT: process.env.PORT,
+    })
+
+    const response = await fetch(url)
 
     const body: Body<ParsedPassage> = await response.json()
 
