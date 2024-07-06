@@ -7,12 +7,6 @@ import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 export type Body<T> = { data: T }
 
 export function getBaseUrl() {
-    console.log({
-        VERCEL_URL: process.env.VERCEL_URL,
-        VERCEL_ENV: process.env.VERCEL_ENV,
-        PORT: process.env.PORT,
-        window: typeof window,
-    })
     if (typeof window !== 'undefined') return ''
 
     if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
