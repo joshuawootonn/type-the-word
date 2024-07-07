@@ -122,10 +122,10 @@ export function PassageSelector({ value }: { value: PassageReference }) {
         void router.push(`/passage/${nextUrl}`, { scroll: false })
     }
 
-    const isFirstRender = useRef(true)
+    const [isFirstRender, setIsFirstRender] = useState(true)
 
     useEffect(() => {
-        isFirstRender.current = false
+        setIsFirstRender(false)
     }, [])
 
     return (
