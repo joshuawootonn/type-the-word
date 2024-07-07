@@ -1,14 +1,16 @@
-'use client'
-
-import { useParams } from 'next/navigation'
 import { ReactNode } from 'react'
 import { passageReferenceSchema } from '~/lib/passageReference'
 import { PassageSelector } from '~/components/passageSelector'
 
 const DEFAULT_PASSAGE_REFERENCE = 'psalm_23'
 
-export default function PassageLayout({ children }: { children: ReactNode }) {
-    const params = useParams<{ passage: string }>()
+export default function PassageLayout({
+    children,
+    params,
+}: {
+    children: ReactNode
+    params: { passage?: string }
+}) {
     const value = passageReferenceSchema.parse(
         params?.passage ?? DEFAULT_PASSAGE_REFERENCE,
     )
