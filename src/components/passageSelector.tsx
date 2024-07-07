@@ -165,6 +165,8 @@ export function PassageSelector({ value }: { value: PassageReference }) {
                         className={
                             'w-40 rounded-none border-2 border-black p-1 font-medium outline-none dark:border-white dark:bg-black dark:text-white'
                         }
+                        autoComplete="false"
+                        data-1p-ignore={true}
                     />
                     {/* `ComboBox` from headlessui has to be in a client component, which is why I have to fake the SSR to prevent flickering.*/}
                     {isFirstRender && (
@@ -251,6 +253,8 @@ export function PassageSelector({ value }: { value: PassageReference }) {
                         className={
                             'w-16 -translate-x-0.5 rounded-none border-2 border-black  p-1 font-medium outline-none dark:border-white dark:bg-black dark:text-white'
                         }
+                        autoComplete="false"
+                        data-1p-ignore={true}
                     />
                     {/* `ComboBox` from headlessui has to be in a client component, which is why I have to fake the SSR to prevent flickering.*/}
                     {isFirstRender && (
