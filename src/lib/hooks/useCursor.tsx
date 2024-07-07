@@ -73,7 +73,7 @@ export function useCursor(passageId: string): void {
                     {
                         easing: [0.25, 0.46, 0.45, 0.94],
                         duration:
-                            distance > 100 ||
+                            distance > 80 ||
                             Math.abs(nextTop - prev.current.top) > 2
                                 ? 0
                                 : 0.085,
