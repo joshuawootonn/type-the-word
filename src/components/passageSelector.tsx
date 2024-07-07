@@ -1,5 +1,4 @@
 'use client'
-// `ComboBox` from headlessui has to be in a client component, which is why this flickers
 
 import { useRouter } from 'next/navigation'
 import React, {
@@ -123,6 +122,12 @@ export function PassageSelector({ value }: { value: PassageReference }) {
         void router.push(`/passage/${nextUrl}`, { scroll: false })
     }
 
+    const isFirstRender = useRef(true)
+
+    useEffect(() => {
+        isFirstRender.current = false
+    }, [])
+
     return (
         <>
             <label
@@ -161,6 +166,12 @@ export function PassageSelector({ value }: { value: PassageReference }) {
                             'w-40 rounded-none border-2 border-black p-1 font-medium outline-none dark:border-white dark:bg-black dark:text-white'
                         }
                     />
+                    {/* `ComboBox` from headlessui has to be in a client component, which is why I have to fake the SSR to prevent flickering.*/}
+                    {isFirstRender && (
+                        <div className="absolute left-1 top-1 translate-x-0.5 translate-y-0.5 font-medium">
+                            {simpleBibleMetadata[book]?.name ?? ''}
+                        </div>
+                    )}
                     <ScrollArea.Root>
                         <ScrollArea.Viewport>
                             <Combobox.Options
@@ -238,9 +249,15 @@ export function PassageSelector({ value }: { value: PassageReference }) {
                             }
                         }}
                         className={
-                            'w-16 -translate-x-0.5 rounded-none border-2 border-black p-1 font-medium outline-none dark:border-white dark:bg-black dark:text-white'
+                            'w-16 -translate-x-0.5 rounded-none border-2 border-black  p-1 font-medium outline-none dark:border-white dark:bg-black dark:text-white'
                         }
                     />
+                    {/* `ComboBox` from headlessui has to be in a client component, which is why I have to fake the SSR to prevent flickering.*/}
+                    {isFirstRender && (
+                        <div className="absolute left-1 top-1 translate-y-0.5 font-medium">
+                            {chapter}
+                        </div>
+                    )}
                     <ScrollArea.Root>
                         <ScrollArea.Viewport>
                             <Combobox.Options
