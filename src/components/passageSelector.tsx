@@ -1,4 +1,5 @@
 'use client'
+// `ComboBox` from headlessui has to be in a client component, which is why this flickers
 
 import { useRouter } from 'next/navigation'
 import React, {
