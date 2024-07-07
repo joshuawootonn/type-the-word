@@ -83,7 +83,7 @@ export function Navigation() {
                     height="33"
                     viewBox="0 0 39 33"
                     fill="none"
-                    className="icon translate-y-[1px]"
+                    className="icon translate-y-[1px] dark:invert"
                     xmlns="http://www.w3.org/2000/svg"
                 >
                     <path
