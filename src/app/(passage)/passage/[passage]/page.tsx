@@ -3,13 +3,15 @@ import { Passage } from '~/components/passage'
 import { DEFAULT_PASSAGE_SEGMENT } from './default-passage'
 import Link from 'next/link'
 import { fetchPassage } from '~/lib/api'
-import { PassageSegment } from '~/lib/passageSegment'
+import { PassageSegment, toPassageSegment } from '~/lib/passageSegment'
 import { redirect } from 'next/navigation'
 import { getOrCreateTypingSession } from '~/app/api/typing-session/getOrCreateTypingSession'
 import { getChapterHistory } from '~/app/api/chapter-history/[passage]/getChapterHistory'
 import { segmentToPassageObject } from '~/lib/passageObject'
 import { authOptions } from '~/server/auth'
 import { getServerSession } from 'next-auth'
+import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
+import { db } from '~/server/db'
 
 export const metadata: Metadata = {
     title: 'Type the Word',
@@ -20,11 +22,22 @@ export const metadata: Metadata = {
 export default async function PassagePage(props: {
     params: { passage?: PassageSegment }
 }) {
-    if (props.params.passage == null) {
-        redirect(`/passage/${DEFAULT_PASSAGE_SEGMENT}`)
-    }
-
     const session = await getServerSession(authOptions)
+
+    if (props.params.passage == null) {
+        if (session == null) redirect(`/passage/${DEFAULT_PASSAGE_SEGMENT}`)
+        else {
+            const typedVerseRepository = new TypedVerseRepository(db)
+            const verse = await typedVerseRepository.getOneOrNull({
+                userId: session.user.id,
+            })
+
+            if (verse == null) {
+                redirect(`/passage/${DEFAULT_PASSAGE_SEGMENT}`)
+            }
+            redirect(`/passage/${toPassageSegment(verse.book, verse.chapter)}`)
+        }
+    }
 
     const value = props.params.passage
 

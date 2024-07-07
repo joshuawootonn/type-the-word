@@ -201,6 +201,9 @@ export function CurrentVerse({
             await queryClient.invalidateQueries({
                 queryKey: ['typing-session'],
             })
+            await queryClient.invalidateQueries({
+                queryKey: ['last-verse'],
+            })
         },
     })
 

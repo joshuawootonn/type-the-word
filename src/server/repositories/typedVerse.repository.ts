@@ -1,6 +1,7 @@
 import * as schema from '~/server/db/schema'
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
-import { count as sqlCount } from 'drizzle-orm'
+import { desc, eq, count as sqlCount } from 'drizzle-orm'
+import { TypedVerse } from './typingSession.repository'
 
 export class TypedVerseRepository {
     db: PostgresJsDatabase<typeof schema>
@@ -14,5 +15,18 @@ export class TypedVerseRepository {
             .from(schema.typedVerses)
 
         return result.at(0)?.count ?? 0
+    }
+
+    async getOneOrNull({
+        userId,
+    }: {
+        userId: string
+    }): Promise<TypedVerse | null> {
+        const typedVerse = await this.db.query.typedVerses.findFirst({
+            where: eq(schema.typedVerses.userId, userId),
+            orderBy: [desc(schema.typedVerses.createdAt)],
+        })
+
+        return typedVerse ?? null
     }
 }

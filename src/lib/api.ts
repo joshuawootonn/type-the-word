@@ -1,6 +1,9 @@
 import { ParsedPassage } from './parseEsv'
 import { PassageSegment } from './passageSegment'
-import { TypingSession } from '~/server/repositories/typingSession.repository'
+import {
+    TypedVerse,
+    TypingSession,
+} from '~/server/repositories/typingSession.repository'
 import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 
@@ -63,6 +66,18 @@ export async function fetchAddVerseToTypingSession(
     )
 
     const body: Body<TypingSession> = await response.json()
+
+    return body.data
+}
+
+export async function fetchLastVerse(): Promise<TypedVerse> {
+    const response = await fetch(`${getBaseUrl()}/api/last-verse`, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+
+    const body: Body<TypedVerse> = await response.json()
 
     return body.data
 }

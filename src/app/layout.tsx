@@ -8,6 +8,9 @@ import { poppins, ibmPlexMono } from './fonts'
 import { authOptions } from '~/server/auth'
 import Fathom from './fathom'
 import { Metadata } from 'next'
+import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
+import { db } from '~/server/db'
+import { TypedVerse } from '~/server/repositories/typingSession.repository'
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://typetheword.site'),
@@ -20,6 +23,15 @@ export default async function RootLayout({
 }) {
     const session = await getServerSession(authOptions)
 
+    let lastTypedVerse: TypedVerse | null = null
+
+    if (session != null) {
+        const typedVerseRepository = new TypedVerseRepository(db)
+        lastTypedVerse = await typedVerseRepository.getOneOrNull({
+            userId: session.user.id,
+        })
+    }
+
     return (
         <html lang="en">
             <body
@@ -30,7 +42,7 @@ export default async function RootLayout({
                 )}
             >
                 <Providers session={session}>
-                    <Navigation />
+                    <Navigation lastTypedVerse={lastTypedVerse} />
                     {children}
                     <Footer />
                 </Providers>

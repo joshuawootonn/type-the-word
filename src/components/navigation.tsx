@@ -5,11 +5,30 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import Link from 'next/link'
 import Head from 'next/head'
 import { usePathname } from 'next/navigation'
+import { fetchLastVerse } from '~/lib/api'
+import { useQuery } from '@tanstack/react-query'
+import { toPassageSegment } from '~/lib/passageSegment'
+import { TypedVerse } from '~/server/repositories/typingSession.repository'
+import { DEFAULT_PASSAGE_SEGMENT } from '~/app/(passage)/passage/[passage]/default-passage'
 
-export function Navigation() {
+export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
     const { data: sessionData } = useSession()
     const isRootPath = usePathname() === '/'
     const RootLinkComponent = isRootPath ? 'h1' : 'span'
+
+    const { data: lastTypedVerse } = useQuery({
+        queryKey: ['last-verse'],
+        queryFn: fetchLastVerse,
+        enabled: sessionData?.user?.id != null,
+        initialData: props.lastTypedVerse,
+    })
+
+    const rootPathname = lastTypedVerse
+        ? `/passage/${toPassageSegment(
+              lastTypedVerse.book,
+              lastTypedVerse.chapter,
+          )}`
+        : `/passage/${DEFAULT_PASSAGE_SEGMENT}`
 
     return (
         <nav className="mx-auto mb-2 flex w-full items-center justify-between pt-4 lg:pt-8">
@@ -63,7 +82,7 @@ export function Navigation() {
                 className={
                     'link svg-outline relative flex items-center space-x-1'
                 }
-                href={'/'}
+                href={rootPathname}
                 aria-label={'Type the Word logo'}
             >
                 <RootLinkComponent className="text-xl font-semibold">
