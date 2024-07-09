@@ -49,6 +49,16 @@ module.exports = {
             screens: {
                 sm: '540px',
             },
+            animation: {
+                'spin-every-once-in-a-while':
+                    'spin-every-once-in-a-while 7s ease-in-out infinite',
+            },
+            keyframes: {
+                'spin-every-once-in-a-while': {
+                    '0%': { transform: 'rotate(0deg)' },
+                    '100%': { transform: 'rotate(90deg)' },
+                },
+            },
         },
     },
     plugins: [require('@tailwindcss/typography')],

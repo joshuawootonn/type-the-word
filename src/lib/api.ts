@@ -6,6 +6,8 @@ import {
 } from '~/server/repositories/typingSession.repository'
 import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
+import { UserChangelogRecord } from '~/server/repositories/userChangelog.repository'
+import { z } from 'zod'
 
 export type Body<T> = { data: T }
 
@@ -80,4 +82,21 @@ export async function fetchLastVerse(): Promise<TypedVerse> {
     const body: Body<TypedVerse> = await response.json()
 
     return body.data
+}
+
+const userChangelogClientSchema = z.object({ lastVisitedAt: z.string() })
+export type UserChangelogClientSchema = z.infer<
+    typeof userChangelogClientSchema
+>
+
+export async function fetchUserChangelog(): Promise<UserChangelogClientSchema> {
+    const response = await fetch(`${getBaseUrl()}/api/user-changelog`, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+
+    const body: Body<UserChangelogRecord> = await response.json()
+
+    return userChangelogClientSchema.parse(body.data)
 }

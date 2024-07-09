@@ -8,6 +8,13 @@
       "when": 1718806450243,
       "tag": "0000_easy_hercules",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1720523196438,
+      "tag": "0001_robust_bullseye",
+      "breakpoints": true
     }
   ]
 }

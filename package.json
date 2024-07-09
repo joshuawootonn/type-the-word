@@ -10,8 +10,8 @@
         "start": "next start",
         "test": "vitest",
         "test:watch": "vitest --watch --reporter=verbose",
-        "db:generate": "dotenv drizzle-kit generate",
-        "db:migrate": "dotenv drizzle-kit migrate",
+        "db:generate-migration": "dotenv drizzle-kit generate",
+        "db:run-migrations": "dotenv drizzle-kit migrate",
         "db:up": "docker compose --project-directory ./docker up -d",
         "db:seed": "// todo make a script that connects and runs seed.sql"
     },

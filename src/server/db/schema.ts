@@ -49,10 +49,21 @@ export const users = schema.table('user', {
     image: varchar('image', { length: 255 }),
 })
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
     accounts: many(accounts),
     typingSessions: many(typingSessions),
+    userChangelog: one(userChangelog),
 }))
+
+export const userChangelog = schema.table('userChangelog', {
+    userId: varchar('userId', { length: 255 })
+        .notNull()
+        .$default(() => crypto.randomUUID())
+        .primaryKey(),
+    lastVisitedAt: timestamp('lastVisitedAt', { mode: 'date' })
+        .notNull()
+        .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+})
 
 export const accounts = schema.table(
     'account',

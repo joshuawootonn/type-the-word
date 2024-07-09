@@ -3,8 +3,30 @@
 import Link from 'next/link'
 import { EmailLink } from '~/components/emailLink'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import { useQuery } from '@tanstack/react-query'
+import { fetchUserChangelog, UserChangelogClientSchema } from '~/lib/api'
+import { useSession } from 'next-auth/react'
+import { isBefore, parseISO } from 'date-fns'
+import { changelogUpdatedAt } from '~/app/(marketing)/changelog/updated-at'
 
-export function Footer() {
+export function Footer(props: {
+    userChangelog: UserChangelogClientSchema | null
+}) {
+    const { data: sessionData } = useSession()
+    const { data } = useQuery({
+        queryKey: ['user-changelog'],
+        queryFn: fetchUserChangelog,
+        enabled: sessionData?.user?.id != null,
+        initialData: props.userChangelog,
+    })
+
+    const hasSeenChangelog = data != null
+    const hasSeenEveryChangelog =
+        hasSeenChangelog &&
+        isBefore(changelogUpdatedAt, parseISO(data.lastVisitedAt))
+    const hasUnreadChangelog =
+        !hasSeenChangelog || (hasSeenChangelog && !hasSeenEveryChangelog)
+
     return (
         <footer className="flex w-full items-center justify-between space-x-3 py-2 text-sm dark:text-white">
             <a
@@ -81,6 +103,24 @@ export function Footer() {
                 href={'/changelog'}
             >
                 changelog
+                {hasUnreadChangelog && (
+                    <svg
+                        width="10"
+                        height="10"
+                        viewBox="0 0 10 10"
+                        fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="animate-spin-every-once-in-a-while absolute -right-1.5 -top-1.5 origin-center text-black dark:text-white"
+                    >
+                        <rect
+                            x="4.65704"
+                            y="0.798828"
+                            width="6"
+                            height="6"
+                            transform="rotate(40.232 4.65704 0.798828)"
+                        />
+                    </svg>
+                )}
             </Link>
             <div className="hidden md:block">/</div>
             <EmailLink

@@ -1,6 +1,8 @@
 import { format } from 'date-fns'
 import { Metadata } from 'next'
 import Image from 'next/image'
+import { UpdateLastVisitedChangelog } from './update-last-visited-changelog'
+import { changelogUpdatedAt } from './updated-at'
 
 function Link({ href, children }: { href: string; children: React.ReactNode }) {
     return (
@@ -38,9 +40,10 @@ export default function Changelog() {
             <div className="mb-10 flex items-center justify-between">
                 <h1 className="m-0">Changelog</h1>
                 <span>
-                    (Updated <DateComponent date={new Date('6/17/2024')} />)
+                    (Updated <DateComponent date={changelogUpdatedAt} />)
                 </span>
             </div>
+            <UpdateLastVisitedChangelog />
             <p>New updates and improvements to Type the Word</p>
             <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
             <ul>
