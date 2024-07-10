@@ -9,15 +9,12 @@ import { useSession } from 'next-auth/react'
 import { isBefore, parseISO } from 'date-fns'
 import { changelogUpdatedAt } from '~/app/(marketing)/changelog/updated-at'
 
-export function Footer(props: {
-    userChangelog: UserChangelogClientSchema | null
-}) {
+export function Footer() {
     const { data: sessionData } = useSession()
     const { data } = useQuery({
         queryKey: ['user-changelog'],
         queryFn: fetchUserChangelog,
         enabled: sessionData?.user?.id != null,
-        initialData: props.userChangelog,
     })
 
     const hasSeenChangelog = data != null

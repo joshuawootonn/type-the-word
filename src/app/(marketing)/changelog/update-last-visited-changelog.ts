@@ -17,13 +17,12 @@ export function UpdateLastVisitedChangelog() {
             return response.json()
         },
         {
-            onSuccess: () => {
-                queryClient.invalidateQueries(['user-changelog'])
-            },
+            onSuccess: () =>
+                void queryClient.invalidateQueries(['user-changelog']),
         },
     )
 
-    useEffect(() => mutate(), [])
+    useEffect(() => void mutate(), [mutate])
 
     return null
 }
