@@ -48,6 +48,105 @@ export default function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('7/11/2024')} /> - Added a
+                    twinkle animation to notify users when there are new updates
+                    in the changelog.
+                    <Image
+                        src={'/assets/changelog-twinkle.png'}
+                        alt={
+                            'Small animation in the footer notifying the user that there have been updates to Type the Word.'
+                        }
+                        className="mt-1"
+                        width={2232}
+                        height={402}
+                    />
+                    The changelog is one of the ways I communicate with you all
+                    as things change. This twinkle animation will be present
+                    therenotifying you that there are new updates to read.
+                    Visiting the <code>/changelog</code> page dismisses this
+                    notification.
+                </li>
+                <li>
+                    <DateComponent date={new Date('7/07/2024')} /> - Updated
+                    Type the Word to remember where you last typed.
+                    <div className="px-8 pb-8 pt-4">
+                        <video
+                            className="m-0 rounded-lg"
+                            autoPlay={true}
+                            playsInline
+                            muted
+                            loop
+                            style={{
+                                maxWidth: '100%',
+                            }}
+                        >
+                            <source src={'/assets/remember-last-chapter.mp4'} />
+                        </video>
+                    </div>
+                    <ul>
+                        <li>
+                            When you are logged in and load the{' '}
+                            <Link href="/">home page</Link> (<code>/</code>) TTW
+                            redirects you to the last location you typed.{' '}
+                        </li>
+                        <li>
+                            You can also navigate to your last typing location
+                            by clicking the TTW logo in the header.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <DateComponent date={new Date('7/7/2024')} /> - Started
+                    managing an email list.
+                    <br />
+                    <br />
+                    I&apos;ve had the privilege of emailing many of you individually,
+                    but I want to make sure everyone who wants to be is kept up
+                    to date with the project. So in addition to having an email
+                    in the footer, I&apos;m starting a newsletter that will round up
+                    changes in small batches each month. New users are able to
+                    join by confirming their email after sign up (which lands
+                    them on this <Link href={'/welcome'}>snazzy new page</Link>
+                    .)
+                    <br />
+                    <br />
+                    All current users were opted into the newsletter, but the
+                    first issue will have a big unsubscribe button. The last
+                    thing I want to be is another leech on your attention.
+                </li>
+                <li>
+                    <DateComponent date={new Date('7/5/2024')} /> - Migrated
+                    Type the Word to{' '}
+                    <Link href="https://nextjs.org/docs/app">App Router</Link>{' '}
+                    and REST.
+                    <br />
+                    <br />
+                    This was a programming update to how Type the Word works.
+                    Originally, I built Type the Word on some new tech so that I
+                    could try TRPC and Axiom. Now that it&apos;s growing, I have
+                    migrated to more stable platforms to lower the maintenance
+                    burden. I am using REST for network communication and Sentry
+                    for debugging.
+                    <ul>
+                        <li>
+                            You may have noticed some short outages around this
+                            time! Sorry for the disruption. I don&apos;t think there
+                            will be{' '}
+                            <Link href="https://github.com/joshuawootonn/type-the-word/pull/7">
+                                this big
+                            </Link>{' '}
+                            of an architectural change again.
+                        </li>
+                        <li>
+                            Type the Word is open source. If you are ever
+                            curious to see how it works, check out the{' '}
+                            <Link href=" https://github.com/joshuawootonn/type-the-word">
+                                Github repo here.
+                            </Link>
+                        </li>
+                    </ul>
+                </li>
+                <li>
                     <DateComponent date={new Date('6/17/2024')} /> - Fix: At
                     some point I broke the ability to access 2 Timothy 😅. 2
                     Timothy is now accessible!{' '}
