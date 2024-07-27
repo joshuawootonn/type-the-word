@@ -1,1 +1,1 @@
-export const changelogUpdatedAt = new Date('7/10/2024')
+export const changelogUpdatedAt = new Date('7/27/2024')

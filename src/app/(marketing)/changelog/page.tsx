@@ -48,6 +48,13 @@ export default function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('7/27/2024')} /> - Fixed bug
+                    in next chapter button when on the second from last chapter
+                    of a book. The next chapter button was linking the next book
+                    rather than the last chapter. This link now points to the
+                    last chapter.
+                </li>
+                <li>
                     <DateComponent date={new Date('7/11/2024')} /> - Added a
                     twinkle animation to notify users when there are new updates
                     in the changelog.
@@ -100,13 +107,14 @@ export default function Changelog() {
                     managing an email list.
                     <br />
                     <br />
-                    I&apos;ve had the privilege of emailing many of you individually,
-                    but I want to make sure everyone who wants to be is kept up
-                    to date with the project. So in addition to having an email
-                    in the footer, I&apos;m starting a newsletter that will round up
-                    changes in small batches each month. New users are able to
-                    join by confirming their email after sign up (which lands
-                    them on this <Link href={'/welcome'}>snazzy new page</Link>
+                    I&apos;ve had the privilege of emailing many of you
+                    individually, but I want to make sure everyone who wants to
+                    be is kept up to date with the project. So in addition to
+                    having an email in the footer, I&apos;m starting a
+                    newsletter that will round up changes in small batches each
+                    month. New users are able to join by confirming their email
+                    after sign up (which lands them on this{' '}
+                    <Link href={'/welcome'}>snazzy new page</Link>
                     .)
                     <br />
                     <br />
@@ -130,8 +138,8 @@ export default function Changelog() {
                     <ul>
                         <li>
                             You may have noticed some short outages around this
-                            time! Sorry for the disruption. I don&apos;t think there
-                            will be{' '}
+                            time! Sorry for the disruption. I don&apos;t think
+                            there will be{' '}
                             <Link href="https://github.com/joshuawootonn/type-the-word/pull/7">
                                 this big
                             </Link>{' '}
