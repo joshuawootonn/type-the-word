@@ -141,7 +141,7 @@ export function parseNextChapter(
 
     const numberOfBooksInCurrentBook = bookMetadata?.chapters.length ?? 0
 
-    if (chapter + 1 < numberOfBooksInCurrentBook) {
+    if (chapter < numberOfBooksInCurrentBook) {
         const url = toPassageSegment(book, `${chapter + 1}`)
         return {
             url,

@@ -180,4 +180,11 @@ describe('parseNextChapter', () => {
             label: '2 Timothy 1',
         })
     })
+    test('1 thessalonians 4', () => {
+        const nextChapter = parseNextChapter('1_thessalonians', 4)
+        expect(nextChapter).toEqual({
+            url: `1_thessalonians_5`,
+            label: '1 Thessalonians 5',
+        })
+    })
 })
