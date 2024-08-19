@@ -4,10 +4,11 @@ import Link from 'next/link'
 import { EmailLink } from '~/components/emailLink'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { useQuery } from '@tanstack/react-query'
-import { fetchUserChangelog, UserChangelogClientSchema } from '~/lib/api'
+import { fetchUserChangelog } from '~/lib/api'
 import { useSession } from 'next-auth/react'
 import { isBefore, parseISO } from 'date-fns'
 import { changelogUpdatedAt } from '~/app/(marketing)/changelog/updated-at'
+import clsx from 'clsx'
 
 export function Footer() {
     const { data: sessionData } = useSession()
@@ -25,7 +26,7 @@ export function Footer() {
         !hasSeenChangelog || (hasSeenChangelog && !hasSeenEveryChangelog)
 
     return (
-        <footer className="flex w-full items-center justify-between space-x-3 py-2 text-sm dark:text-white">
+        <footer className="m-8 flex w-full items-center justify-between space-x-3 py-2 text-sm dark:text-white">
             <a
                 className="svg-outline relative no-underline"
                 href="https://www.esv.org/"
@@ -95,25 +96,26 @@ export function Footer() {
             </Link>
 
             <div>/</div>
-            <Link
-                className="svg-outline relative no-underline"
-                href={'/changelog'}
-            >
+            <Link className={clsx(`svg-outline relative`)} href={'/changelog'}>
                 changelog
                 {hasUnreadChangelog && (
                     <svg
                         width="10"
                         height="10"
-                        viewBox="0 0 10 10"
+                        viewBox="0 0 8 8"
                         fill="currentColor"
+                        className="absolute -right-1.5 -top-1.5 origin-center animate-spin-every-once-in-a-while text-black dark:text-white"
                         xmlns="http://www.w3.org/2000/svg"
                     >
-                        <rect
-                            x="4.65704"
-                            y="0.798828"
-                            width="6"
-                            height="6"
-                            transform="rotate(40.232 4.65704 0.798828)"
+                        <path
+                            d="M6.45795 2.71729L1.03912 5.25967"
+                            stroke="black"
+                            stroke-width="1.5"
+                        />
+                        <path
+                            d="M2.48865 1.3031L5.00845 6.67379"
+                            stroke="black"
+                            stroke-width="1.5"
                         />
                     </svg>
                 )}
