@@ -107,7 +107,6 @@ export function Footer() {
                         viewBox="0 0 10 10"
                         fill="currentColor"
                         xmlns="http://www.w3.org/2000/svg"
-                        className="animate-spin-every-once-in-a-while absolute -right-1.5 -top-1.5 origin-center text-black dark:text-white"
                     >
                         <rect
                             x="4.65704"

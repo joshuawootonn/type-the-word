@@ -48,6 +48,36 @@ export default function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('8/19/2024')} /> - Added
+                    keyboard shortcuts for deleting the previous word and
+                    restarting the verse.
+                    <ul>
+                        <li>
+                            <kbd>option/alt + backspace</kbd> deletes the
+                            previous word
+                        </li>
+                        <li>
+                            <kbd>cmd/ctrl + backspace</kbd> restarts the verse
+                        </li>
+                    </ul>
+                    <div className="px-8 pb-8 pt-4">
+                        <video
+                            className="m-0 rounded-lg"
+                            autoPlay={true}
+                            playsInline
+                            muted
+                            loop
+                            style={{
+                                maxWidth: '100%',
+                            }}
+                        >
+                            <source
+                                src={'/assets/command-option-backspace.mp4'}
+                            />
+                        </video>
+                    </div>
+                </li>
+                <li>
                     <DateComponent date={new Date('7/27/2024')} /> - Fixed bug
                     in next chapter button when on the second from last chapter
                     of a book. The next chapter button was linking the next book
