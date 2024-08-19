@@ -45,21 +45,31 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                                         xmlns="http://www.w3.org/2000/svg"
                                                         viewBox="0 0 16 16"
                                                         className={clsx(
-                                                            'h-full w-full border-2 border-black dark:border-white',
+                                                            'h-full w-full',
                                                         )}
                                                     >
                                                         <rect
-                                                            height="18"
+                                                            height="14"
+                                                            width="14"
+                                                            strokeWidth="2"
+                                                            className="stroke-black dark:stroke-white"
+                                                            fill="none"
+                                                            x="1"
+                                                            y="1"
+                                                        />
+                                                        <rect
+                                                            height="16"
                                                             width={
                                                                 isComplete
-                                                                    ? 18
+                                                                    ? 14
                                                                     : (chapterOverview.percentage *
-                                                                          18) /
+                                                                          14) /
                                                                       100
                                                             }
-                                                            className="fill-black dark:fill-white"
-                                                            x="-1"
-                                                            y="-1"
+                                                            strokeWidth="2"
+                                                            className="fill-black stroke-black dark:fill-white dark:stroke-white"
+                                                            x="1"
+                                                            y="1"
                                                         />
                                                         {isComplete && (
                                                             <path
