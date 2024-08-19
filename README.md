@@ -20,7 +20,7 @@ Bible. Typing it over and over made me realize that
 Jesus wept because he loved Lazarus. He died for us
 because he loves us with the same love.
 <br />
-<br />
+<br />s
 My hope is that by typing the word you will also see the
 Bible in a deeper way.
 
@@ -39,6 +39,6 @@ Here are some features that others have requested:
 -   [x] Dark mode - Thanks @IsaacHatton
 -   [ ] Typing Speed / WPM (Hard)
     -   This will mainly be hard because I will have lots of opinions. If you want to implements it though we can chat.
--   [ ] Keyboard shortcuts (Medium)
-    -   `ctrl + backspace` to delete the last word
-    -   `command + backspace` to restart the verse
+-   [x] Keyboard shortcuts (Medium)
+    -   [x] `ctrl + backspace` to delete the last word
+    -   [x] `command + backspace` to restart the verse
