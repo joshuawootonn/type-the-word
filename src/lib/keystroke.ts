@@ -1,7 +1,14 @@
 import { Inline } from '~/lib/parseEsv'
 import { validEnter, validQuotes, validSingleQuotes } from '~/lib/isEqual'
 
-export type Keystroke = { type: 'backspace' | 'insert'; key: string }
+export type Keystroke = {
+    type:
+        | 'deleteContentBackward'
+        | 'deleteSoftLineBackward'
+        | 'deleteWordBackward'
+        | 'insertText'
+    key: string
+}
 
 export function cleanInputKey(key: string): string {
     if (validQuotes.includes(key)) {
@@ -21,7 +28,7 @@ export function cleanInputKey(key: string): string {
 export function getPosition(keystrokes: Keystroke[] = []): Inline[] {
     return keystrokes.reduce((acc, keystroke) => {
         const last = acc.at(-1)
-        if (keystroke.type === 'insert' && keystroke.key) {
+        if (keystroke.type === 'insertText' && keystroke.key) {
             if (last && last.type === 'word' && !isAtomComplete(last)) {
                 return [
                     ...acc.slice(0, -1),
@@ -36,7 +43,7 @@ export function getPosition(keystrokes: Keystroke[] = []): Inline[] {
             }
 
             return [...acc, { type: 'word', letters: [keystroke.key] }]
-        } else if (keystroke.type === 'backspace') {
+        } else if (keystroke.type === 'deleteContentBackward') {
             if (last?.type === 'word' && last.letters.length > 1) {
                 return [
                     ...acc.slice(0, -1),
@@ -45,6 +52,10 @@ export function getPosition(keystrokes: Keystroke[] = []): Inline[] {
             }
 
             return acc.slice(0, -1)
+        } else if (keystroke.type === 'deleteWordBackward') {
+            return acc.slice(0, -1)
+        } else if (keystroke.type === 'deleteSoftLineBackward') {
+            return []
         }
         return [...acc]
     }, [] as Inline[])
@@ -77,7 +88,9 @@ export function isAtomComplete(atom: Inline | undefined): boolean {
 export function isValidKeystroke(
     e:
         | { data: string; inputType: 'insertText' }
-        | { data: null; inputType: 'deleteContentBackward' },
+        | { data: null; inputType: 'deleteContentBackward' }
+        | { data: null; inputType: 'deleteWordBackward' }
+        | { data: null; inputType: 'deleteSoftLineBackward' },
     prev: Keystroke[],
 ) {
     const prevPosition = getPosition(prev)
@@ -92,7 +105,7 @@ export function isValidKeystroke(
         return
 
     return prev.concat({
-        type: e.inputType === 'deleteContentBackward' ? 'backspace' : 'insert',
+        type: e.inputType,
         key: e.data ?? '',
     })
 }

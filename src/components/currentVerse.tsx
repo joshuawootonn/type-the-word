@@ -34,6 +34,14 @@ const nativeInputEventSchema = z.discriminatedUnion('inputType', [
         data: z.null(),
         inputType: z.literal('deleteContentBackward'),
     }),
+    z.object({
+        data: z.null(),
+        inputType: z.literal('deleteWordBackward'),
+    }),
+    z.object({
+        data: z.null(),
+        inputType: z.literal('deleteSoftLineBackward'),
+    }),
 ])
 
 function getWords(verse: string, blocks: Block[]): Inline[] {
@@ -235,6 +243,7 @@ export function CurrentVerse({
     }, [keystrokes.length])
 
     function handleInput(event: FormEvent<HTMLInputElement>) {
+        console.log(event, inputRef.current?.value)
         const result = nativeInputEventSchema.safeParse(event.nativeEvent)
 
         if (result.success) {
@@ -252,9 +261,10 @@ export function CurrentVerse({
             if (currentVerseNodes == null) {
                 throw new Error('Current ReadonlyVerse is invalid.')
             }
+
             const next = isValidKeystroke(nativeInputEvent, keystrokes)
 
-            if (next == null) return keystrokesAtom
+            if (next == null) return
             const position = getPosition(next)
 
             isVerseComplete = isVerseSameShape(
