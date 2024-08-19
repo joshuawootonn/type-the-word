@@ -26,7 +26,7 @@ export function Footer() {
         !hasSeenChangelog || (hasSeenChangelog && !hasSeenEveryChangelog)
 
     return (
-        <footer className="m-8 flex w-full items-center justify-between space-x-3 py-2 text-sm dark:text-white">
+        <footer className="flex w-full items-center justify-between space-x-3 py-2 text-sm dark:text-white">
             <a
                 className="svg-outline relative no-underline"
                 href="https://www.esv.org/"
