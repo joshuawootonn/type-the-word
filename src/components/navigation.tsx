@@ -178,7 +178,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                         htmlFor="theme-selector"
                                         className="px-2"
                                     >
-                                        Theme:
+                                        Theme
                                     </label>
 
                                     <Select.Root
@@ -187,7 +187,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                     >
                                         <Select.Trigger
                                             id="theme-selector"
-                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
+                                            className="h-full cursor-pointer border-l-2 border-black px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:border-white dark:focus:bg-white dark:focus:text-black"
                                         >
                                             <Select.Value />
                                         </Select.Trigger>
@@ -221,6 +221,15 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                         </Select.ItemText>
                                                         <Select.ItemIndicator />
                                                     </Select.Item>
+                                                    <Select.Item
+                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
+                                                        value="system"
+                                                    >
+                                                        <Select.ItemText>
+                                                            System
+                                                        </Select.ItemText>
+                                                        <Select.ItemIndicator />
+                                                    </Select.Item>
                                                 </Select.Viewport>
                                             </Select.Content>
                                         </Select.Portal>
@@ -240,8 +249,4 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
             </div>
         </nav>
     )
-}
-
-const ThemeChanger = () => {
-    return <div></div>
 }

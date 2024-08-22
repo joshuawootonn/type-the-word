@@ -7,7 +7,7 @@
   We want to use `margin-left` to prevent layout shift, so that it matches between overflow on 119 and no overflow on 1.
   So we need to override the margin-right with and set margin-left to 100vw (screen - gutter) - 100% (content width).
  */
-html{
+html {
     margin-left: calc(100vw - 100%);
 }
 body[style] {
@@ -15,65 +15,91 @@ body[style] {
 }
 
 /* focus-within is required because inputs have no content, and `:before` is prepended to content.*/
-.svg-outline:focus-within *,.svg-outline:focus, .svg-outline-sm:focus-within *,.svg-outline-sm:focus {
+.svg-outline:focus-within *,
+.svg-outline:focus,
+.svg-outline-sm:focus-within *,
+.svg-outline-sm:focus {
     @apply outline-none;
 }
 
-.svg-outline:focus:before, .svg-outline:focus-within:before,.svg-outline-sm:focus:before, .svg-outline-sm:focus-within:before,.svg-outline-xs:focus:before, .svg-outline-xs:focus-within:before,  .svg-outline-stubby:focus:before, .svg-outline-stubby:focus-within:before{
+.svg-outline:focus:before,
+.svg-outline:focus-within:before,
+.svg-outline-sm:focus:before,
+.svg-outline-sm:focus-within:before,
+.svg-outline-xs:focus:before,
+.svg-outline-xs:focus-within:before,
+.svg-outline-stubby:focus:before,
+.svg-outline-stubby:focus-within:before {
     @apply -inset-2;
     content: ' ';
     background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     position: absolute;
 }
 
-.svg-outline-sm:focus:before, .svg-outline-sm:focus-within:before {
+.svg-outline-sm:focus:before,
+.svg-outline-sm:focus-within:before {
     @apply -inset-1;
 }
 
-.svg-outline-xs:focus:before, .svg-outline-xs:focus-within:before {
+.svg-outline-xs:focus:before,
+.svg-outline-xs:focus-within:before {
     @apply inset-0;
 }
 
-.svg-outline-stubby:focus:before, .svg-outline-stubby:focus-within:before {
-    @apply -top-0.5 -right-3 -bottom-0.5 -left-3;
+.svg-outline-stubby:focus:before,
+.svg-outline-stubby:focus-within:before {
+    @apply -bottom-0.5 -left-3 -right-3 -top-0.5;
     background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
 }
 
 @media (prefers-color-scheme: dark) {
-    .svg-outline:focus:before, .svg-outline:focus-within:before,.svg-outline-sm:focus:before, .svg-outline-sm:focus-within:before, .svg-outline-xs:focus:before, .svg-outline-xs:focus-within:before, .svg-outline-stubby:focus:before, .svg-outline-stubby:focus-within:before {
+    .svg-outline:focus:before,
+    .svg-outline:focus-within:before,
+    .svg-outline-sm:focus:before,
+    .svg-outline-sm:focus-within:before,
+    .svg-outline-xs:focus:before,
+    .svg-outline-xs:focus-within:before,
+    .svg-outline-stubby:focus:before,
+    .svg-outline-stubby:focus-within:before {
         background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="white" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     }
 }
 
-
-.hazard{
-    border-image: repeating-linear-gradient( -80deg, white, white 10px, black 10px, black 20px) 20;
+.hazard {
+    border-image: repeating-linear-gradient(
+            -80deg,
+            white,
+            white 10px,
+            black 10px,
+            black 20px
+        )
+        20;
 }
-
 
 .min-h-screen-1px {
     @apply min-h-[calc(100vh_-_1px)];
 }
 
-body{
+body {
     @apply dark:bg-black;
 }
 
 /* if dark mode make scrollbar dark */
 @media (prefers-color-scheme: dark) {
-    :root{
+    :root {
         color-scheme: dark;
     }
 }
 
-.correct{
+.correct {
     @apply text-emerald-500;
 }
 
-.incorrect{
+.incorrect {
     @apply text-rose-700;
 }
 
-.extra{
+.extra {
     @apply text-rose-900;
 }
+
