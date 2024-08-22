@@ -44,7 +44,7 @@ export function EmailLink({
                         document.body.removeChild(el)
                     }}
                 >
-                    {children ?? 'joshuawootonn@gmail.com'}
+                    {children ?? 'josh@typetheword.site'}
                 </button>
             </Popover.Trigger>
             <Popover.Content
