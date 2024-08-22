@@ -32,8 +32,9 @@ export default async function RootLayout({
         })
     }
 
+    // added suppressHydrationWarning for next-themes within `<Providers />`
     return (
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning>
             <body
                 className={clsx(
                     'min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 font-sans lg:px-0',

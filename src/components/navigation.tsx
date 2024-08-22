@@ -1,7 +1,10 @@
 'use client'
 
+import { useTheme } from 'next-themes'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import * as Popover from '@radix-ui/react-popover'
+import * as Select from '@radix-ui/react-select'
 import Link from 'next/link'
 import Head from 'next/head'
 import { usePathname } from 'next/navigation'
@@ -10,11 +13,14 @@ import { useQuery } from '@tanstack/react-query'
 import { toPassageSegment } from '~/lib/passageSegment'
 import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import { DEFAULT_PASSAGE_SEGMENT } from '~/app/(passage)/passage/[passage]/default-passage'
+import { useRef } from 'react'
 
 export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
     const { data: sessionData } = useSession()
     const isRootPath = usePathname() === '/'
     const RootLinkComponent = isRootPath ? 'h1' : 'span'
+    const dropDownTriggerRef = useRef<HTMLButtonElement>(null)
+    const { theme, setTheme } = useTheme()
 
     const { data: lastTypedVerse } = useQuery({
         queryKey: ['last-verse'],
@@ -121,37 +127,108 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
             </Link>
             <div className="flex flex-col gap-4">
                 {sessionData ? (
-                    <DropdownMenu.Root>
-                        <DropdownMenu.Trigger asChild>
-                            <button
-                                className="svg-outline relative border-2 border-black px-3 py-1 font-medium text-black dark:border-white dark:text-white"
-                                aria-label="Customise options"
-                            >
-                                {sessionData.user.name}
-                            </button>
-                        </DropdownMenu.Trigger>
+                    <Popover.Root>
+                        <DropdownMenu.Root modal={false}>
+                            <Popover.PopoverAnchor asChild>
+                                <DropdownMenu.Trigger asChild>
+                                    <button
+                                        ref={dropDownTriggerRef}
+                                        className="svg-outline relative border-2 border-black px-3 py-1 font-medium text-black dark:border-white dark:text-white"
+                                        aria-label="Customise options"
+                                    >
+                                        {sessionData.user.name}
+                                    </button>
+                                </DropdownMenu.Trigger>
+                            </Popover.PopoverAnchor>
 
-                        <DropdownMenu.Content
-                            className="z-50 border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white"
-                            sideOffset={-2}
-                            align="end"
-                        >
-                            <DropdownMenu.Item asChild={true}>
-                                <Link
-                                    className="text-medium block cursor-pointer px-3 py-1 no-underline outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
-                                    href={'/history'}
-                                >
-                                    History
-                                </Link>
-                            </DropdownMenu.Item>
-                            <DropdownMenu.Item
-                                className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
-                                onClick={() => void signOut({ redirect: true })}
+                            <DropdownMenu.Content
+                                className="z-50 border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white"
+                                sideOffset={-2}
+                                align="end"
                             >
-                                Sign out
-                            </DropdownMenu.Item>
-                        </DropdownMenu.Content>
-                    </DropdownMenu.Root>
+                                <Popover.PopoverTrigger asChild>
+                                    <DropdownMenu.Item className="text-medium block cursor-pointer px-3 py-1 no-underline outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black">
+                                        Settings
+                                    </DropdownMenu.Item>
+                                </Popover.PopoverTrigger>
+                                <DropdownMenu.Item asChild={true}>
+                                    <Link
+                                        className="text-medium block cursor-pointer px-3 py-1 no-underline outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
+                                        href={'/history'}
+                                    >
+                                        History
+                                    </Link>
+                                </DropdownMenu.Item>
+                                <DropdownMenu.Item
+                                    className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
+                                    onClick={() =>
+                                        void signOut({ redirect: true })
+                                    }
+                                >
+                                    Sign out
+                                </DropdownMenu.Item>
+                            </DropdownMenu.Content>
+                            <Popover.PopoverContent
+                                className="z-50 border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white"
+                                sideOffset={-2}
+                                align="end"
+                            >
+                                <div className="flex flex-row items-center justify-center">
+                                    <label
+                                        htmlFor="theme-selector"
+                                        className="px-2"
+                                    >
+                                        Theme:
+                                    </label>
+
+                                    <Select.Root
+                                        value={theme}
+                                        onValueChange={next => setTheme(next)}
+                                    >
+                                        <Select.Trigger
+                                            id="theme-selector"
+                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
+                                        >
+                                            <Select.Value />
+                                        </Select.Trigger>
+
+                                        <Select.Portal>
+                                            <Select.Content
+                                                side="bottom"
+                                                position="popper"
+                                                avoidCollisions={false}
+                                                className="z-50 border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white"
+                                                align="end"
+                                                alignOffset={-2}
+                                            >
+                                                <Select.ScrollUpButton />
+                                                <Select.Viewport>
+                                                    <Select.Item
+                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
+                                                        value="dark"
+                                                    >
+                                                        <Select.ItemText>
+                                                            Dark
+                                                        </Select.ItemText>
+                                                        <Select.ItemIndicator />
+                                                    </Select.Item>
+                                                    <Select.Item
+                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
+                                                        value="light"
+                                                    >
+                                                        <Select.ItemText>
+                                                            Light
+                                                        </Select.ItemText>
+                                                        <Select.ItemIndicator />
+                                                    </Select.Item>
+                                                </Select.Viewport>
+                                            </Select.Content>
+                                        </Select.Portal>
+                                    </Select.Root>
+                                </div>
+                            </Popover.PopoverContent>
+                        </DropdownMenu.Root>
+                    </Popover.Root>
                 ) : (
                     <button
                         className="svg-outline relative border-2 border-black px-3 py-1 font-semibold text-black dark:border-white dark:text-white"
@@ -163,4 +240,8 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
             </div>
         </nav>
     )
+}
+
+const ThemeChanger = () => {
+    return <div></div>
 }

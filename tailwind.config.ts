@@ -2,7 +2,7 @@ import { type Config } from 'tailwindcss'
 import defaultTheme from 'tailwindcss/defaultTheme'
 
 module.exports = {
-    darkMode: 'media',
+    darkMode: 'selector',
     content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
     theme: {
         fontFamily: {
