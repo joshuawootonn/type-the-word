@@ -164,7 +164,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                         <HotkeyLabel
                                             className="ml-auto pl-5 text-sm text-primary/80 group-focus:text-secondary/80"
                                             mac="⌘+⇧+,"
-                                            nonMac="ctrl+shift+,"
+                                            nonMac="^+⇧+,"
                                         />
                                     </DropdownMenu.Item>
                                 </Popover.PopoverTrigger>
@@ -177,7 +177,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                         <HotkeyLabel
                                             className="ml-auto pl-5 text-sm text-primary/80 group-focus:text-secondary/80"
                                             mac="⌘+⇧+Y"
-                                            nonMac="ctrl+shift+Y"
+                                            nonMac="^+⇧+Y"
                                         />
                                     </Link>
                                 </DropdownMenu.Item>

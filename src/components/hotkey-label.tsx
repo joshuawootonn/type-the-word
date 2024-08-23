@@ -1,3 +1,5 @@
+'use client'
+
 import clsx from 'clsx'
 import { getOS } from '~/app/global-hotkeys'
 
@@ -18,8 +20,7 @@ export default function HotkeyLabel({
         <kbd
             suppressHydrationWarning
             className={clsx(className, {
-                ['font-sans tracking-widest']: os === 'MacOS',
-                ['font-mono']: os === 'Linux' || os === 'Windows',
+                ['font-sans tracking-[0.2em]']: !isMobile,
             })}
         >
             {isMobile && mobile ? mobile : os === 'MacOS' ? mac : nonMac}
