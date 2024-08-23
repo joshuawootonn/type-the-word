@@ -243,7 +243,6 @@ export function CurrentVerse({
     }, [keystrokes.length])
 
     function handleInput(event: FormEvent<HTMLInputElement>) {
-        console.log(event, inputRef.current?.value)
         const result = nativeInputEventSchema.safeParse(event.nativeEvent)
 
         if (result.success) {
