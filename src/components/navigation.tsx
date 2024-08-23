@@ -13,7 +13,9 @@ import { useQuery } from '@tanstack/react-query'
 import { toPassageSegment } from '~/lib/passageSegment'
 import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import { DEFAULT_PASSAGE_SEGMENT } from '~/app/(passage)/passage/[passage]/default-passage'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
+import { useHotkeys } from 'react-hotkeys-hook'
+import HotkeyLabel from './hotkey-label'
 
 export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
     const { data: sessionData } = useSession()
@@ -21,6 +23,14 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
     const RootLinkComponent = isRootPath ? 'h1' : 'span'
     const dropDownTriggerRef = useRef<HTMLButtonElement>(null)
     const { theme, setTheme } = useTheme()
+    const [isSettingsOpen, setSettingsOpen] = useState(false)
+
+    useHotkeys(
+        'mod+shift+comma',
+        () => setSettingsOpen(prev => !prev),
+        { enableOnFormTags: true },
+        [setSettingsOpen],
+    )
 
     const { data: lastTypedVerse } = useQuery({
         queryKey: ['last-verse'],
@@ -127,7 +137,10 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
             </Link>
             <div className="flex flex-col gap-4">
                 {sessionData ? (
-                    <Popover.Root>
+                    <Popover.Root
+                        onOpenChange={setSettingsOpen}
+                        open={isSettingsOpen}
+                    >
                         <DropdownMenu.Root modal={false}>
                             <Popover.PopoverAnchor asChild>
                                 <DropdownMenu.Trigger asChild>
@@ -141,21 +154,31 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                             </Popover.PopoverAnchor>
 
                             <DropdownMenu.Content
-                                className="z-50 border-2 border-primary bg-secondary text-primary "
+                                className="z-50  border-2 border-primary bg-secondary text-primary "
                                 sideOffset={-2}
                                 align="end"
                             >
                                 <Popover.PopoverTrigger asChild>
-                                    <DropdownMenu.Item className="text-medium block cursor-pointer px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary ">
+                                    <DropdownMenu.Item className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary ">
                                         Settings
+                                        <HotkeyLabel
+                                            className="ml-auto pl-5 text-sm text-primary/80 group-focus:text-secondary/80"
+                                            mac="⌘+⇧+,"
+                                            nonMac="ctrl+shift+,"
+                                        />
                                     </DropdownMenu.Item>
                                 </Popover.PopoverTrigger>
                                 <DropdownMenu.Item asChild={true}>
                                     <Link
-                                        className="text-medium block cursor-pointer px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary "
+                                        className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
                                         href={'/history'}
                                     >
                                         History
+                                        <HotkeyLabel
+                                            className="ml-auto pl-5 text-sm text-primary/80 group-focus:text-secondary/80"
+                                            mac="⌘+⇧+Y"
+                                            nonMac="ctrl+shift+Y"
+                                        />
                                     </Link>
                                 </DropdownMenu.Item>
                                 <DropdownMenu.Item
@@ -168,7 +191,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                 </DropdownMenu.Item>
                             </DropdownMenu.Content>
                             <Popover.PopoverContent
-                                className="z-50 border-2 border-primary bg-secondary px-2 py-3 text-primary "
+                                className="z-50 w-52 border-2 border-primary bg-secondary px-3 py-3 text-primary"
                                 sideOffset={-2}
                                 align="end"
                                 onCloseAutoFocus={e => {
@@ -176,12 +199,13 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                     dropDownTriggerRef.current?.focus()
                                 }}
                             >
-                                <div className="flex flex-row items-center justify-center">
+                                <h2 className="mb-2 text-xl">Settings</h2>
+                                <div className="flex flex-row items-center justify-between">
                                     <label
                                         htmlFor="theme-selector"
-                                        className="px-2"
+                                        className="pr-4"
                                     >
-                                        Theme
+                                        Theme:
                                     </label>
 
                                     <Select.Root
@@ -190,7 +214,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                     >
                                         <Select.Trigger
                                             id="theme-selector"
-                                            className="h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                            className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
                                         >
                                             <Select.Value />
                                         </Select.Trigger>

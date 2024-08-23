@@ -11,6 +11,7 @@ import { Metadata } from 'next'
 import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
 import { db } from '~/server/db'
 import { TypedVerse } from '~/server/repositories/typingSession.repository'
+import { GlobalHotkeys } from './global-hotkeys'
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://typetheword.site'),
@@ -48,6 +49,7 @@ export default async function RootLayout({
                     <Footer />
                 </Providers>
                 <Fathom />
+                <GlobalHotkeys />
             </body>
         </html>
     )
