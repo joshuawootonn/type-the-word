@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    .light {
+        --color-primary: 0 0 0;
+        --color-secondary: 255 255 255;
+        --color-success: 16 185 129;
+        --color-incorrect: 190 18 60;
+        --color-error: 136 19 55;
+    }
+    .dark {
+        --color-primary: 255 255 255;
+        --color-secondary: 0 0 0;
+        --color-success: 16 185 129;
+        --color-incorrect: 190 18 60;
+        --color-extra: 136 19 55;
+    }
+}
 /*
   Radix ui popups use `margin-right` to prevent overflow hidden from causing layout shift when popups come up.
   We want to use `margin-left` to prevent layout shift, so that it matches between overflow on 119 and no overflow on 1.
@@ -32,7 +48,9 @@ body[style] {
 .svg-outline-stubby:focus-within:before {
     @apply -inset-2;
     content: ' ';
-    background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
+    background-color: rgb(var(--color-primary));
+    -webkit-mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
+    mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     position: absolute;
 }
 
@@ -49,7 +67,10 @@ body[style] {
 .svg-outline-stubby:focus:before,
 .svg-outline-stubby:focus-within:before {
     @apply -bottom-0.5 -left-3 -right-3 -top-0.5;
-    background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
+
+    background-color: rgb(var(--color-primary));
+    -webkit-mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="var(--color-primary)" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
+    mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
 }
 
 @media (prefers-color-scheme: dark) {
@@ -61,7 +82,9 @@ body[style] {
     .svg-outline-xs:focus-within:before,
     .svg-outline-stubby:focus:before,
     .svg-outline-stubby:focus-within:before {
-        background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="white" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
+        background-color: rgb(var(--color-primary));
+        -webkit-mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
+        mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     }
 }
 
@@ -81,7 +104,7 @@ body[style] {
 }
 
 body {
-    @apply dark:bg-black;
+    @apply bg-secondary;
 }
 
 /* if dark mode make scrollbar dark */
@@ -92,14 +115,13 @@ body {
 }
 
 .correct {
-    @apply text-emerald-500;
+    @apply text-success;
 }
 
 .incorrect {
-    @apply text-rose-700;
+    @apply text-incorrect;
 }
 
 .extra {
-    @apply text-rose-900;
+    @apply text-extra;
 }
-

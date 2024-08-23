@@ -44,10 +44,10 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
             <style jsx global>{`
                 @keyframes bibleAnimation {
                     from {
-                        background-position: 0px 0;
+                        mask-position: 0px 0;
                     }
                     to {
-                        background-position: -741px 0;
+                        mask-position: -741px 0;
                     }
                 }
 
@@ -62,9 +62,11 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                     transform: translateY(1px);
                     width: 39px;
                     height: 33px;
-                    background-image: url('/bible.svg');
-                    background-repeat: no-repeat;
-                    background-position: -741px 0;
+                    background-color: rgb(var(--color-secondary));
+                    -webkit-mask-image: url('/bible.svg');
+                    mask-image: url('/bible.svg');
+                    mask-repeat: no-repeat;
+                    mask-position: -741px 0;
                 }
 
                 .link:hover .icon,
@@ -92,10 +94,8 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                 aria-label={'Type the Word logo'}
             >
                 <RootLinkComponent className="text-xl font-semibold">
-                    <span className="text-gray-500 dark:text-gray-400">
-                        Type th
-                    </span>
-                    <span className="relative text-black dark:text-white">
+                    <span className="text-primary/50">Type th</span>
+                    <span className="relative text-primary">
                         <span className="absolute -left-[3px] scale-y-125 font-normal">
                             |
                         </span>
@@ -113,17 +113,17 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                 >
                     <path
                         d="M19.7754 5.04895V31.7156M23.6464 6.59934H33.3238M23.6464 10.6303L31.6577 10.6303M23.6464 14.6614H33.3238M23.6464 18.6924L29.8873 18.6924M23.6464 22.4133H33.3238M6.22705 6.59934L13.7748 6.59934M6.22705 10.6303H15.9045M6.22705 14.6614L14.8396 14.6614M6.22705 18.6924H15.9045M6.22705 22.4133L12.5399 22.4133"
-                        stroke="black"
+                        className="stroke-secondary"
                         stroke-width="2"
                     />
                     <path
                         d="M2.11353 27.5747V1.94971H15.9209C18.2328 1.94971 19.7741 2.88721 19.7741 5.07471C19.7741 2.88721 21.0585 1.94971 23.6273 1.94971H37.1135V27.5747H23.6273C20.7374 27.5747 19.7741 30.3872 19.7741 31.9497C19.7741 30.3872 18.4897 27.5747 15.2787 27.5747H2.11353Z"
-                        stroke="black"
+                        className="stroke-secondary"
                         stroke-width="2"
                     />
                 </svg>
 
-                <div className="animated-icon"></div>
+                <div className="animated-icon stroke-secondary"></div>
             </Link>
             <div className="flex flex-col gap-4">
                 {sessionData ? (
@@ -133,8 +133,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                 <DropdownMenu.Trigger asChild>
                                     <button
                                         ref={dropDownTriggerRef}
-                                        className="svg-outline relative border-2 border-black px-3 py-1 font-medium text-black dark:border-white dark:text-white"
-                                        aria-label="Customise options"
+                                        className="svg-outline relative border-2 border-primary px-3 py-1 font-medium text-primary"
                                     >
                                         {sessionData.user.name}
                                     </button>
@@ -142,25 +141,25 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                             </Popover.PopoverAnchor>
 
                             <DropdownMenu.Content
-                                className="z-50 border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white"
+                                className="z-50 border-2 border-primary bg-secondary text-primary "
                                 sideOffset={-2}
                                 align="end"
                             >
                                 <Popover.PopoverTrigger asChild>
-                                    <DropdownMenu.Item className="text-medium block cursor-pointer px-3 py-1 no-underline outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black">
+                                    <DropdownMenu.Item className="text-medium block cursor-pointer px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary ">
                                         Settings
                                     </DropdownMenu.Item>
                                 </Popover.PopoverTrigger>
                                 <DropdownMenu.Item asChild={true}>
                                     <Link
-                                        className="text-medium block cursor-pointer px-3 py-1 no-underline outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
+                                        className="text-medium block cursor-pointer px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary "
                                         href={'/history'}
                                     >
                                         History
                                     </Link>
                                 </DropdownMenu.Item>
                                 <DropdownMenu.Item
-                                    className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
+                                    className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
                                     onClick={() =>
                                         void signOut({ redirect: true })
                                     }
@@ -169,9 +168,13 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                 </DropdownMenu.Item>
                             </DropdownMenu.Content>
                             <Popover.PopoverContent
-                                className="z-50 border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white"
+                                className="z-50 border-2 border-primary bg-secondary px-2 py-3 text-primary "
                                 sideOffset={-2}
                                 align="end"
+                                onCloseAutoFocus={e => {
+                                    e.preventDefault()
+                                    dropDownTriggerRef.current?.focus()
+                                }}
                             >
                                 <div className="flex flex-row items-center justify-center">
                                     <label
@@ -187,7 +190,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                     >
                                         <Select.Trigger
                                             id="theme-selector"
-                                            className="h-full cursor-pointer border-l-2 border-black px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:border-white dark:focus:bg-white dark:focus:text-black"
+                                            className="h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
                                         >
                                             <Select.Value />
                                         </Select.Trigger>
@@ -197,14 +200,14 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                 side="bottom"
                                                 position="popper"
                                                 avoidCollisions={false}
-                                                className="z-50 border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white"
+                                                className="z-50 border-2 border-primary bg-secondary text-primary "
                                                 align="end"
-                                                alignOffset={-2}
+                                                sideOffset={-2}
                                             >
                                                 <Select.ScrollUpButton />
                                                 <Select.Viewport>
                                                     <Select.Item
-                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
+                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
                                                         value="dark"
                                                     >
                                                         <Select.ItemText>
@@ -213,7 +216,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                         <Select.ItemIndicator />
                                                     </Select.Item>
                                                     <Select.Item
-                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
+                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
                                                         value="light"
                                                     >
                                                         <Select.ItemText>
@@ -222,7 +225,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                         <Select.ItemIndicator />
                                                     </Select.Item>
                                                     <Select.Item
-                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
+                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
                                                         value="system"
                                                     >
                                                         <Select.ItemText>
@@ -240,7 +243,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                     </Popover.Root>
                 ) : (
                     <button
-                        className="svg-outline relative border-2 border-black px-3 py-1 font-semibold text-black dark:border-white dark:text-white"
+                        className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary "
                         onClick={() => void signIn()}
                     >
                         Sign in

@@ -16,7 +16,7 @@ export function Providers({
     session: Session | null
 }) {
     return (
-        <ThemeProvider attribute="class">
+        <ThemeProvider themes={['light', 'dark']} attribute="class">
             <QueryClientProvider client={queryClient}>
                 <SessionProvider session={session}>{children}</SessionProvider>
             </QueryClientProvider>

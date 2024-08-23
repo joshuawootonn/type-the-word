@@ -12,14 +12,14 @@ export function HistoryLog({ log }: { log: TypingSessionLog[] }) {
                 return (
                     <Fragment key={i}>
                         <div className="hidden w-full grow flex-row items-center justify-between text-xl md:flex">
-                            <span className="shrink-0">{entry.location}</span>
+                            <p className="shrink-0">{entry.location}</p>
                             <svg
                                 height={2}
                                 className={'mx-4 inline grow'}
                                 xmlns="http://www.w3.org/2000/svg"
                             >
                                 <line
-                                    stroke="black"
+                                    className="stroke-primary"
                                     strokeWidth="4"
                                     fill="transparent"
                                     strokeDasharray="6 5"
@@ -30,10 +30,10 @@ export function HistoryLog({ log }: { log: TypingSessionLog[] }) {
                                 />
                             </svg>
 
-                            <span className="shrink-0">
+                            <p className="shrink-0">
                                 {format(date, 'haaa')} {'- '}
                                 {format(date, 'MM/dd')}
-                            </span>
+                            </p>
                         </div>
 
                         <div
@@ -41,9 +41,9 @@ export function HistoryLog({ log }: { log: TypingSessionLog[] }) {
                             key={entry.createdAt.toString()}
                         >
                             <div className="flex items-center">
-                                <span className="max-w-full shrink-0 whitespace-pre-wrap">
+                                <p className="max-w-full shrink-0 whitespace-pre-wrap">
                                     {entry.location}
-                                </span>
+                                </p>
                             </div>
                             <div className="flex items-center justify-between">
                                 <svg
@@ -52,7 +52,7 @@ export function HistoryLog({ log }: { log: TypingSessionLog[] }) {
                                     xmlns="http://www.w3.org/2000/svg"
                                 >
                                     <line
-                                        stroke="black"
+                                        className="stroke-primary"
                                         strokeWidth="4"
                                         fill="transparent"
                                         strokeDasharray="6 5"
@@ -62,10 +62,10 @@ export function HistoryLog({ log }: { log: TypingSessionLog[] }) {
                                         y2="0"
                                     />
                                 </svg>
-                                <div className="shrink-0">
+                                <p className="shrink-0">
                                     {format(date, 'haaa')} {'- '}
                                     {format(date, 'MM/dd')}
-                                </div>
+                                </p>
                             </div>
                         </div>
                     </Fragment>

@@ -132,15 +132,11 @@ export function PassageSelector({ value }: { value: PassageReference }) {
         <>
             <label
                 htmlFor="passage"
-                className="text-lg font-medium text-black dark:text-white"
+                className="text-lg font-medium text-primary"
             >
                 Passage:
             </label>
-            <div
-                className={
-                    'not-prose svg-outline relative flex flex-row dark:bg-black dark:text-white'
-                }
-            >
+            <div className={'not-prose svg-outline relative flex flex-row'}>
                 <Combobox
                     className="relative"
                     as="div"
@@ -163,14 +159,14 @@ export function PassageSelector({ value }: { value: PassageReference }) {
                             simpleBibleMetadata[book]?.name ?? ''
                         }
                         className={
-                            'w-40 rounded-none border-2 border-black p-1 font-medium outline-none dark:border-white dark:bg-black dark:text-white'
+                            'w-40 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none'
                         }
                         autoComplete="false"
                         data-1p-ignore={true}
                     />
                     {/* `ComboBox` from headlessui has to be in a client component, which is why I have to fake the SSR to prevent flickering.*/}
                     {isFirstRender && (
-                        <div className="absolute left-1 top-1 translate-x-0.5 translate-y-0.5 font-medium">
+                        <div className="absolute left-1 top-1 translate-x-0.5 translate-y-0.5 font-medium text-primary">
                             {simpleBibleMetadata[book]?.name ?? ''}
                         </div>
                     )}
@@ -178,7 +174,7 @@ export function PassageSelector({ value }: { value: PassageReference }) {
                         <ScrollArea.Viewport>
                             <Combobox.Options
                                 className={
-                                    'absolute z-50 max-h-60 w-full -translate-y-0.5 overflow-auto border-2 border-black bg-white dark:border-white dark:bg-black dark:text-white'
+                                    'absolute z-50 max-h-60 w-full -translate-y-0.5 overflow-auto border-2 border-primary bg-secondary '
                                 }
                             >
                                 {filteredBooks.map(book => (
@@ -192,8 +188,8 @@ export function PassageSelector({ value }: { value: PassageReference }) {
                                                 className={clsx(
                                                     'cursor-pointer px-2 py-1',
                                                     active
-                                                        ? 'bg-black text-white dark:bg-white dark:text-black'
-                                                        : 'bg-white text-black dark:bg-black dark:text-white',
+                                                        ? 'bg-primary text-secondary '
+                                                        : 'bg-secondary text-primary ',
                                                 )}
                                                 onClick={e => {
                                                     setTimeout(
@@ -221,7 +217,7 @@ export function PassageSelector({ value }: { value: PassageReference }) {
                             viewBox="0 0 20 20"
                             fill="currentColor"
                             aria-hidden="true"
-                            className="h-5 w-5 text-black dark:text-white"
+                            className="h-5 w-5 text-primary "
                         >
                             <path
                                 fillRule="evenodd"
@@ -251,14 +247,14 @@ export function PassageSelector({ value }: { value: PassageReference }) {
                             }
                         }}
                         className={
-                            'w-16 -translate-x-0.5 rounded-none border-2 border-black  p-1 font-medium outline-none dark:border-white dark:bg-black dark:text-white'
+                            'w-16 -translate-x-0.5 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none '
                         }
                         autoComplete="false"
                         data-1p-ignore={true}
                     />
                     {/* `ComboBox` from headlessui has to be in a client component, which is why I have to fake the SSR to prevent flickering.*/}
                     {isFirstRender && (
-                        <div className="absolute left-1 top-1 translate-y-0.5 font-medium">
+                        <div className="absolute left-1 top-1 translate-y-0.5 font-medium text-primary">
                             {chapter}
                         </div>
                     )}
@@ -266,7 +262,7 @@ export function PassageSelector({ value }: { value: PassageReference }) {
                         <ScrollArea.Viewport>
                             <Combobox.Options
                                 className={
-                                    'absolute z-50 max-h-60 w-full -translate-x-0.5 -translate-y-0.5 overflow-auto border-2 border-black bg-white dark:border-white dark:bg-black dark:text-white'
+                                    'absolute z-50 max-h-60 w-full -translate-x-0.5 -translate-y-0.5 overflow-auto border-2 border-primary bg-secondary '
                                 }
                             >
                                 {filteredChapters.map((number, i) => (
@@ -280,8 +276,8 @@ export function PassageSelector({ value }: { value: PassageReference }) {
                                                 className={clsx(
                                                     'cursor-pointer px-2 py-1',
                                                     active
-                                                        ? 'bg-black text-white dark:bg-white dark:text-black'
-                                                        : 'bg-white text-black dark:bg-black dark:text-white',
+                                                        ? 'bg-primary text-secondary '
+                                                        : 'bg-secondary text-primary ',
                                                 )}
                                             >
                                                 {number}
@@ -302,7 +298,7 @@ export function PassageSelector({ value }: { value: PassageReference }) {
                             viewBox="0 0 20 20"
                             fill="currentColor"
                             aria-hidden="true"
-                            className="h-5 w-5 text-black dark:bg-black dark:text-white"
+                            className="h-5 w-5 text-primary "
                         >
                             <path
                                 fillRule="evenodd"

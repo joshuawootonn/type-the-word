@@ -16,6 +16,11 @@ module.exports = {
                 white: {
                     DEFAULT: '#ffffff',
                 },
+                primary: 'rgb(var(--color-primary) / <alpha-value>)',
+                secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
+                success: 'rgb(var(--color-success) / <alpha-value>)',
+                incorrect: 'rgb(var(--color-incorrect) / <alpha-value>)',
+                extra: 'rgb(var(--color-extra) / <alpha-value>)',
             },
             borderWidth: {
                 DEFAULT: '1px',

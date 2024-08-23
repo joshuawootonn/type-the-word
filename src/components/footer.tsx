@@ -26,7 +26,7 @@ export function Footer() {
         !hasSeenChangelog || (hasSeenChangelog && !hasSeenEveryChangelog)
 
     return (
-        <footer className="flex w-full flex-col items-center justify-between py-2 text-sm dark:text-white sm:flex-row">
+        <footer className="flex w-full flex-col items-center justify-between py-2 text-sm text-primary sm:flex-row">
             <div className="mb-3 flex items-center justify-between space-x-3 sm:mb-0">
                 <a
                     className="svg-outline relative no-underline"
@@ -48,14 +48,14 @@ export function Footer() {
                     </DropdownMenu.Trigger>
 
                     <DropdownMenu.Content
-                        className="flex flex-col border-2 border-black bg-white dark:border-white dark:bg-black"
+                        className="flex flex-col border-2 border-primary bg-secondary "
                         sideOffset={4}
                         align="center"
                         side="top"
                     >
                         <DropdownMenu.Item asChild={true}>
                             <Link
-                                className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
+                                className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary "
                                 href={'/copyright'}
                             >
                                 copyright
@@ -63,7 +63,7 @@ export function Footer() {
                         </DropdownMenu.Item>
                         <DropdownMenu.Item asChild={true}>
                             <Link
-                                className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
+                                className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary "
                                 href={'/privacy-policy'}
                             >
                                 privacy
@@ -71,7 +71,7 @@ export function Footer() {
                         </DropdownMenu.Item>
                         <DropdownMenu.Item asChild={true}>
                             <Link
-                                className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black"
+                                className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary "
                                 href={'/terms-of-service'}
                             >
                                 terms
@@ -112,17 +112,17 @@ export function Footer() {
                             height="10"
                             viewBox="0 0 8 8"
                             fill="currentColor"
-                            className="absolute -right-1.5 -top-1.5 origin-center animate-spin-every-once-in-a-while text-black dark:text-white"
+                            className="absolute -right-1.5 -top-1.5 origin-center animate-spin-every-once-in-a-while text-primary "
                             xmlns="http://www.w3.org/2000/svg"
                         >
                             <path
                                 d="M6.45795 2.71729L1.03912 5.25967"
-                                stroke="black"
+                                className="stroke-primary"
                                 stroke-width="1.5"
                             />
                             <path
                                 d="M2.48865 1.3031L5.00845 6.67379"
-                                stroke="black"
+                                className="stroke-primary"
                                 stroke-width="1.5"
                             />
                         </svg>

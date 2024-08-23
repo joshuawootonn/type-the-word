@@ -8,7 +8,7 @@ import { BookOverview } from './overview'
 export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
     return (
         <Tooltip.Provider>
-            <div className="flex flex-col">
+            <div className="flex flex-col text-primary">
                 {overview.map(book => {
                     if (book.percentage === 0) return null
                     return (
@@ -20,7 +20,7 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                         className={clsx(
                                             ' font-bold',
                                             // {
-                                            //     [` bg-black px-3 py-1 text-white dark:bg-white dark:text-black`]:
+                                            //     [` bg-primary px-3 py-1 text-secondary `]:
                                             //         isBookComplete,
                                             // },
                                         )}
@@ -52,7 +52,7 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                                             height="14"
                                                             width="14"
                                                             strokeWidth="2"
-                                                            className="stroke-black dark:stroke-white"
+                                                            className="stroke-primary "
                                                             fill="none"
                                                             x="1"
                                                             y="1"
@@ -67,7 +67,7 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                                                       100
                                                             }
                                                             strokeWidth="2"
-                                                            className="fill-black stroke-black dark:fill-white dark:stroke-white"
+                                                            className="fill-primary stroke-primary "
                                                             x="1"
                                                             y="1"
                                                         />
@@ -76,14 +76,14 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                                                 fillRule="evenodd"
                                                                 d="M12.416 3.376a.75.75 0 0 1 .208 1.04l-5 7.5a.75.75 0 0 1-1.154.114l-3-3a.75.75 0 0 1 1.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 0 1 1.04-.207Z"
                                                                 clipRule="evenodd"
-                                                                className="fill-white dark:fill-black"
+                                                                className="fill-secondary "
                                                             />
                                                         )}
                                                     </svg>
                                                 </Link>
                                             </Tooltip.Trigger>
                                             <Tooltip.Content
-                                                className="prose grid select-none grid-cols-[1fr_minmax(30px,min-content)] gap-x-3 gap-y-1 border-2 border-black bg-white px-3 py-2 font-sans leading-none text-black dark:border-white dark:bg-black dark:text-white"
+                                                className="prose grid select-none grid-cols-[1fr_minmax(30px,min-content)] gap-x-3 gap-y-1 border-2 border-primary bg-secondary px-3 py-2 font-sans leading-none text-primary "
                                                 sideOffset={2}
                                             >
                                                 <div>Chapter: </div>

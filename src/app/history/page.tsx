@@ -23,7 +23,7 @@ export default async function History() {
         <>
             <h2>Overview</h2>
             <HistoryOverview overview={overview} />
-            <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
+            <hr className="mx-0 w-full border-t-2 border-primary" />
             <h2>Log</h2>
             <HistoryLog log={log} />
         </>

@@ -61,7 +61,7 @@ export default async function PassagePage(props: {
                 {passage?.prevChapter ? (
                     <Link
                         href={`/passage/${passage.prevChapter.url}`}
-                        className="svg-outline relative border-2 border-black px-3 py-1 font-semibold text-black dark:border-white dark:text-white"
+                        className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary"
                     >
                         {passage.prevChapter.label}
                     </Link>
@@ -71,7 +71,7 @@ export default async function PassagePage(props: {
                 {passage?.nextChapter ? (
                     <Link
                         href={`/passage/${passage.nextChapter.url}`}
-                        className="svg-outline relative border-2 border-black px-3 py-1 font-semibold text-black dark:border-white dark:text-white"
+                        className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary"
                     >
                         {passage.nextChapter.label}
                     </Link>

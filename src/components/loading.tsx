@@ -28,7 +28,7 @@ export function Loading(
     }, [])
 
     return (
-        <div className={'text-xl font-normal'} ref={ref}>
+        <div className={'text-xl font-normal text-primary'} ref={ref}>
             {initialText.current}
         </div>
     )

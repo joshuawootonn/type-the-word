@@ -51,11 +51,11 @@ export function ReadonlyVerse({
     return (
         <span
             className={clsx(
-                'verse break-spaces text-balance group inline h-3 hover:cursor-pointer',
+                'verse break-spaces group inline h-3 text-balance hover:cursor-pointer',
                 isCurrentVerse && 'active-verse',
                 isTypedInSession ?? isTypedInHistory
-                    ? 'text-gray-400 dark:text-gray-500'
-                    : 'text-black dark:text-white',
+                    ? 'text-primary/50'
+                    : 'text-primary',
             )}
             ref={ref}
             onClick={() => {
@@ -122,7 +122,7 @@ export function ReadonlyVerse({
                     xmlns="http://www.w3.org/2000/svg"
                 >
                     <line
-                        className={'stroke-black dark:stroke-white'}
+                        className={'stroke-primary'}
                         strokeWidth={'2'}
                         strokeLinejoin={'round'}
                         strokeLinecap={'round'}
@@ -137,7 +137,7 @@ export function ReadonlyVerse({
             {rect && passageRect ? (
                 <button
                     className={clsx(
-                        'svg-outline absolute z-10 border-2 border-black bg-white/80 text-black opacity-0 backdrop-blur-sm transition-opacity duration-100 dark:border-white dark:bg-black/80 dark:text-white',
+                        'svg-outline absolute z-10 border-2 border-primary bg-secondary/80 text-primary opacity-0 backdrop-blur-sm transition-opacity duration-100',
                         !isPassageActive && 'hover:opacity-100',
                         'focus:opacity-100',
                     )}

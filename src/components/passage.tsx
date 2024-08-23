@@ -123,7 +123,7 @@ export function Passage({
                                     return (
                                         <H2Component
                                             key={pIndex}
-                                            className="prose-h2 mb-4 mt-2 text-2xl"
+                                            className="prose-h2 mb-4 mt-2 text-2xl text-primary"
                                         >
                                             {node.text}
                                         </H2Component>
@@ -131,7 +131,7 @@ export function Passage({
                                 case 'h3':
                                     return (
                                         <h3
-                                            className="prose-h3 mt-0 text-xl font-semibold tracking-wide"
+                                            className="prose-h3 mt-0 text-xl font-semibold tracking-wide text-primary"
                                             key={pIndex}
                                         >
                                             {node.text}
@@ -140,7 +140,7 @@ export function Passage({
                                 case 'h4':
                                     return (
                                         <h4
-                                            className="prose-h4 text-lg font-medium tracking-wide"
+                                            className="prose-h4 text-lg font-medium tracking-wide text-primary"
                                             key={pIndex}
                                         >
                                             {node.text}

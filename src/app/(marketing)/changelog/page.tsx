@@ -20,7 +20,7 @@ function Link({ href, children }: { href: string; children: React.ReactNode }) {
 function DateComponent({ date }: { date: Date }) {
     return (
         <time
-            className={'font-bold text-black dark:text-white'}
+            className={'font-bold text-primary '}
             dateTime={format(date, 'yyyy-MM-dd')}
         >
             {format(date, 'LLLL do')}
@@ -36,10 +36,14 @@ export const metadata: Metadata = {
 
 export default function Changelog() {
     return (
-        <div className={'prose-h2:text-3xl prose-p:text-xl'}>
+        <div
+            className={
+                'marker:text-primary prose-h2:text-3xl prose-p:text-xl prose-a:text-primary prose-kbd:text-primary prose-code:text-primary prose-ul:text-primary prose-li:text-primary'
+            }
+        >
             <div className="mb-10 flex items-center justify-between">
                 <h1 className="m-0">Changelog</h1>
-                <span>
+                <span className="text-primary">
                     (Updated <DateComponent date={changelogUpdatedAt} />)
                 </span>
             </div>
