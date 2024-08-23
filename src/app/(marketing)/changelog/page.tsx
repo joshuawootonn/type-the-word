@@ -3,6 +3,7 @@ import { Metadata } from 'next'
 import Image from 'next/image'
 import { UpdateLastVisitedChangelog } from './update-last-visited-changelog'
 import { changelogUpdatedAt } from './updated-at'
+import HotkeyLabel from '~/components/hotkey-label'
 
 function Link({ href, children }: { href: string; children: React.ReactNode }) {
     return (
@@ -52,16 +53,63 @@ export default function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('8/23/2024')} /> - Added
+                    global shortcuts for opening settings and going to{' '}
+                    <code>/history</code>
+                    <ul>
+                        <li>
+                            <HotkeyLabel
+                                mac="⌘+⇧+Y"
+                                mobile="⌘+⇧+Y"
+                                nonMac="^+⇧+Y"
+                            />{' '}
+                            navigates to history
+                        </li>
+                        <li>
+                            <HotkeyLabel
+                                mac="⌘+⇧+,"
+                                mobile="⌘+⇧+,"
+                                nonMac="^+⇧+,"
+                            />{' '}
+                            opens settings
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <DateComponent date={new Date('8/22/2024')} /> - Created
+                    &quot;Settings&quot; section so you can manually change the
+                    color scheme
+                    <div className="px-8 pb-8 pt-4">
+                        <video
+                            className="m-0 rounded-lg"
+                            autoPlay={true}
+                            playsInline
+                            muted
+                            loop
+                            style={{
+                                maxWidth: '100%',
+                            }}
+                        >
+                            <source src={'/assets/theme-toggle.mp4'} />
+                        </video>
+                    </div>
+                </li>
+                <li>
                     <DateComponent date={new Date('8/19/2024')} /> - Added
                     keyboard shortcuts for deleting the previous word and
                     restarting the verse.
                     <ul>
                         <li>
-                            <kbd>option/alt + backspace</kbd> deletes the
-                            previous word
+                            <HotkeyLabel
+                                mac="⌥+⇦"
+                                mobile="⌥+⇦"
+                                nonMac="alt+⇦"
+                            />{' '}
+                            deletes the previous word
                         </li>
                         <li>
-                            <kbd>cmd/ctrl + backspace</kbd> restarts the verse
+                            <HotkeyLabel mac="⌘+⇦" mobile="⌘+⇦" nonMac="^+⇦" />{' '}
+                            restarts the verse
                         </li>
                     </ul>
                     <div className="px-8 pb-8 pt-4">
