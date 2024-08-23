@@ -118,12 +118,12 @@ export function Footer() {
                             <path
                                 d="M6.45795 2.71729L1.03912 5.25967"
                                 className="stroke-primary"
-                                stroke-width="1.5"
+                                strokeWidth="1.5"
                             />
                             <path
                                 d="M2.48865 1.3031L5.00845 6.67379"
                                 className="stroke-primary"
-                                stroke-width="1.5"
+                                strokeWidth="1.5"
                             />
                         </svg>
                     )}
