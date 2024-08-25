@@ -22,10 +22,25 @@ export default async function History() {
     return (
         <>
             <h2>Overview</h2>
-            <HistoryOverview overview={overview} />
+            {overview.length === 0 ? (
+                <p>
+                    Once you have typed more verses this section will include
+                    details on what books of the bible you have typed through.
+                </p>
+            ) : (
+                <HistoryOverview overview={overview} />
+            )}
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <h2>Log</h2>
-            <HistoryLogV2 monthLogs={log2} />
+            {log2.length === 0 ? (
+                <p>
+                    Once you have typed more verses this section will include
+                    details on how often you have typed over the past few
+                    months.
+                </p>
+            ) : (
+                <HistoryLogV2 monthLogs={log2} />
+            )}
         </>
     )
 }

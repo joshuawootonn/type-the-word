@@ -25,6 +25,7 @@ export type BookOverview = {
     book: string
     label: string
     percentage: number
+    alt: number
     chapters: ChapterOverview[]
 }
 
@@ -60,41 +61,47 @@ export function getBookOverview(
         }
     }
 
-    return Object.entries(bibleMetadata).map(([book, content]) => {
-        const validatedBook = bookSchema.parse(book)
-        let totalVersesCount = 0
-        let typedVersesCount = 0
-        return {
-            book,
-            chapters: content.chapters.map(
-                ({ length: chapterLength }, chapterIndex) => {
-                    const typedVerses =
-                        bookVerses[validatedBook]?.[chapterIndex + 1]
-                    const numberOfTypedVerses = Object.keys(
-                        typedVerses ?? {},
-                    ).length
-                    totalVersesCount += chapterLength
-                    typedVersesCount += numberOfTypedVerses
-                    return {
-                        chapter: chapterIndex + 1,
-                        verses: chapterLength,
-                        typedVerses: numberOfTypedVerses,
-                        percentage: Math.round(
-                            (numberOfTypedVerses / chapterLength) * 100,
-                        ),
-                        alt:
-                            Math.floor(
-                                (numberOfTypedVerses / chapterLength) * 10000,
-                            ) / 100,
-                    }
-                },
-            ),
-            label: passageReferenceSchema.parse(
-                toPluralBookForm(validatedBook),
-            ),
-            percentage: Math.round((typedVersesCount / totalVersesCount) * 100),
-            alt:
-                Math.floor((typedVersesCount / totalVersesCount) * 10000) / 100,
-        }
-    })
+    return Object.entries(bibleMetadata)
+        .map(([book, content]) => {
+            const validatedBook = bookSchema.parse(book)
+            let totalVersesCount = 0
+            let typedVersesCount = 0
+            return {
+                book,
+                chapters: content.chapters.map(
+                    ({ length: chapterLength }, chapterIndex) => {
+                        const typedVerses =
+                            bookVerses[validatedBook]?.[chapterIndex + 1]
+                        const numberOfTypedVerses = Object.keys(
+                            typedVerses ?? {},
+                        ).length
+                        totalVersesCount += chapterLength
+                        typedVersesCount += numberOfTypedVerses
+                        return {
+                            chapter: chapterIndex + 1,
+                            verses: chapterLength,
+                            typedVerses: numberOfTypedVerses,
+                            percentage: Math.round(
+                                (numberOfTypedVerses / chapterLength) * 100,
+                            ),
+                            alt:
+                                Math.floor(
+                                    (numberOfTypedVerses / chapterLength) *
+                                        10000,
+                                ) / 100,
+                        }
+                    },
+                ),
+                label: passageReferenceSchema.parse(
+                    toPluralBookForm(validatedBook),
+                ),
+                percentage: Math.round(
+                    (typedVersesCount / totalVersesCount) * 100,
+                ),
+                alt:
+                    Math.floor((typedVersesCount / totalVersesCount) * 10000) /
+                    100,
+            }
+        })
+        .filter(book => book.alt !== 0)
 }

@@ -10,7 +10,7 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
         <Tooltip.Provider delayDuration={0}>
             <div className="flex flex-col text-primary">
                 {overview.map(book => {
-                    if (book.percentage === 0) return null
+                    if (book.alt === 0) return null
                     return (
                         <details key={book.book}>
                             <summary className="svg-outline-stubby relative select-none outline-none">
@@ -25,7 +25,7 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                             // },
                                         )}
                                     >
-                                        {book.percentage}%
+                                        {book.alt}%
                                     </div>
                                 </div>
                             </summary>
