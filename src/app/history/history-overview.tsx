@@ -7,7 +7,7 @@ import { BookOverview } from './overview'
 
 export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
     return (
-        <Tooltip.Provider>
+        <Tooltip.Provider delayDuration={0}>
             <div className="flex flex-col text-primary">
                 {overview.map(book => {
                     if (book.percentage === 0) return null
