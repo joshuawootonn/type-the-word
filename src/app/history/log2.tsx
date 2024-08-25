@@ -3,8 +3,7 @@ import {
     TypingSession,
 } from '~/server/repositories/typingSession.repository'
 import { typingSessionToString } from './typingSessionToString'
-import { format, isAfter } from 'date-fns'
-import { typedVerses } from '~/server/db/schema'
+import { format, startOfMonth } from 'date-fns'
 
 type DayLog = {
     typedVerses: TypedVerse[]
@@ -26,12 +25,17 @@ type DayLogDTO = {
 
 export type MonthlyLogDTO = {
     days: Record<string, DayLogDTO>
-    month: Date
+    // todo(josh): when I have more time I should switch this to be a date and figure out how UTC works
+    // I made it two numbers because I was passing the beginning of the month as the data for which month this is
+    // but with the server being in a different time zone things were getting off by a month
+    month: number
+    year: number
     numberOfVersesTyped: number
 }
 
 export function getLog2(typingSessions: TypingSession[]): MonthlyLogDTO[] {
     const monthLogs: Record<string, MonthlyLog> = {}
+
     for (const typingSession of typingSessions) {
         if (typingSession.typedVerses.length === 0) continue
         const monthString = format(typingSession.createdAt, 'yyyy-MM')
@@ -40,10 +44,7 @@ export function getLog2(typingSessions: TypingSession[]): MonthlyLogDTO[] {
         const currentDayLog = currentMonthLog?.days[dayString]
         if (currentMonthLog == null) {
             monthLogs[monthString] = {
-                month: new Date(
-                    typingSession.createdAt.getFullYear(),
-                    typingSession.createdAt.getMonth(),
-                ),
+                month: startOfMonth(typingSession.createdAt),
                 numberOfVersesTyped: typingSession.typedVerses.length,
                 days: {
                     [dayString]: {
@@ -93,7 +94,8 @@ export function getLog2(typingSessions: TypingSession[]): MonthlyLogDTO[] {
 
             return {
                 numberOfVersesTyped: monthlyLog.numberOfVersesTyped,
-                month: monthlyLog.month,
+                month: monthlyLog.month.getMonth(),
+                year: monthlyLog.month.getFullYear(),
                 days,
             }
         })

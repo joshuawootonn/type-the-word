@@ -30,9 +30,10 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
     return (
         <Tooltip.Provider delayDuration={0}>
             {monthLogs.map((monthLog, i) => {
+                const month = new Date(monthLog.year, monthLog.month)
                 const monthInterval = interval(
-                    startOfMonth(monthLog.month),
-                    endOfMonth(monthLog.month),
+                    startOfMonth(month),
+                    endOfMonth(month),
                 )
                 const sundays = eachWeekOfInterval(monthInterval).reverse()
 
@@ -48,11 +49,11 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                     <div key={i} className="flex items-start justify-between">
                         <div>
                             <h3 className="mt-0">
-                                {isThisMonth(monthLog.month)
+                                {isThisMonth(month)
                                     ? 'This Month'
-                                    : isInThisYear(monthLog.month)
-                                    ? format(monthLog.month, 'MMMM')
-                                    : format(monthLog.month, 'MMMM, yyyy')}
+                                    : isInThisYear(month)
+                                    ? format(month, 'MMMM')
+                                    : format(month, 'MMMM, yyyy')}
                             </h3>
                             <p>Verses: {monthLog.numberOfVersesTyped}</p>
                         </div>
@@ -65,23 +66,26 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                                             monthInterval,
                                         )
                                         if (!isInMonth)
-                                            return <div className="size-12" />
+                                            return <div className="size-14" />
 
                                         const dayLog =
-                                            monthLog.days[day.getDate()]
+                                            monthLog.days[format(day, 'dd')]
 
                                         return (
                                             <Tooltip.Root key={k}>
                                                 <Tooltip.Trigger asChild>
                                                     <div
                                                         className={clsx(
-                                                            'flex size-12 items-center justify-center border-2 border-primary',
+                                                            'relative flex size-14 items-center justify-center border-2 border-primary',
                                                             !isInMonth &&
                                                                 'opacity-0',
                                                             dayLog &&
                                                                 'border-primary bg-primary text-secondary',
                                                         )}
                                                     >
+                                                        <div className="absolute left-0 top-0 px-[1px] text-xs">
+                                                            {format(day, 'd')}
+                                                        </div>
                                                         {
                                                             dayLog?.numberOfVersesTyped
                                                         }
