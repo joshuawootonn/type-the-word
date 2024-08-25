@@ -4,6 +4,7 @@ import {
 } from '~/server/repositories/typingSession.repository'
 import { typingSessionToString } from './typingSessionToString'
 import { format, startOfMonth } from 'date-fns'
+import { typedVerses } from '~/server/db/schema'
 
 type DayLog = {
     typedVerses: TypedVerse[]
@@ -66,7 +67,10 @@ export function getLog2(typingSessions: TypingSession[]): MonthlyLogDTO[] {
             currentMonthLog.numberOfVersesTyped +=
                 typingSession.typedVerses.length
             currentMonthLog.days[dayString] = {
-                typedVerses: typingSession.typedVerses,
+                typedVerses: [
+                    ...(currentMonthLog.days[dayString]?.typedVerses ?? []),
+                    ...typingSession.typedVerses,
+                ],
                 numberOfVersesTyped:
                     currentDayLog.numberOfVersesTyped +
                     typingSession.typedVerses.length,
