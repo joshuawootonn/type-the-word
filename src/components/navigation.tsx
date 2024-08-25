@@ -158,16 +158,6 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                 sideOffset={-2}
                                 align="end"
                             >
-                                <Popover.PopoverTrigger asChild>
-                                    <DropdownMenu.Item className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary ">
-                                        Settings
-                                        <HotkeyLabel
-                                            className="ml-auto pl-5 text-sm text-primary/80 group-focus:text-secondary/80"
-                                            mac="⌘+⇧+,"
-                                            nonMac="^+⇧+,"
-                                        />
-                                    </DropdownMenu.Item>
-                                </Popover.PopoverTrigger>
                                 <DropdownMenu.Item asChild={true}>
                                     <Link
                                         className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
@@ -181,6 +171,16 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                         />
                                     </Link>
                                 </DropdownMenu.Item>
+                                <Popover.PopoverTrigger asChild>
+                                    <DropdownMenu.Item className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary ">
+                                        Settings
+                                        <HotkeyLabel
+                                            className="ml-auto pl-5 text-sm text-primary/80 group-focus:text-secondary/80"
+                                            mac="⌘+⇧+,"
+                                            nonMac="^+⇧+,"
+                                        />
+                                    </DropdownMenu.Item>
+                                </Popover.PopoverTrigger>
                                 <DropdownMenu.Item
                                     className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
                                     onClick={() =>

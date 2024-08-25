@@ -53,6 +53,28 @@ export default function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('8/25/2024')} />{' '}
+                    <ul>
+                        <li>
+                            Updated the &quot;Log&quot; section{' '}
+                            <code>/history</code> so you can more visual see how
+                            consistenly you are typing. If there is any summary
+                            information you are dying to know. Let me know!
+                            <Image
+                                src={'/assets/updated-log-v2.png'}
+                                alt={'Screen shot of the new "Log" section'}
+                                className="mt-3 border-2 border-primary"
+                                width={2590}
+                                height={3122}
+                            />
+                        </li>
+                        <li>
+                            Switched the position of the &quot;History&quot; and
+                            &quot;Settings&quot; links in the authed dropdown.
+                        </li>
+                    </ul>
+                </li>
+                <li>
                     <DateComponent date={new Date('8/23/2024')} /> - Added
                     global shortcuts for opening settings and going to{' '}
                     <code>/history</code>
