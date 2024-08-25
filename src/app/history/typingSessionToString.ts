@@ -1,13 +1,14 @@
 import toProperCase from '~/lib/toProperCase'
 import { getBibleMetadata } from '~/server/bibleMetadata'
-import { TypingSession } from '~/server/repositories/typingSession.repository'
+import { TypedVerse } from '~/server/repositories/typingSession.repository'
 
-function typingSessionToString(typingSession: TypingSession) {
+export function typingSessionToString(
+    typedVerses: TypedVerse[],
+    { seperator }: { seperator?: string } = { seperator: ',' },
+) {
     const bibleMetadata = getBibleMetadata()
 
-    const books = Array.from(
-        new Set(typingSession.typedVerses.map(verse => verse.book)),
-    )
+    const books = Array.from(new Set(typedVerses.map(verse => verse.book)))
         .sort(function (a, b) {
             const biblicalOrder = Object.keys(bibleMetadata)
 
@@ -21,7 +22,7 @@ function typingSessionToString(typingSession: TypingSession) {
             return aIndex - bIndex
         })
         .map(book => {
-            const typedVersesInThisBook = typingSession.typedVerses.filter(
+            const typedVersesInThisBook = typedVerses.filter(
                 verse => verse.book === book,
             )
 
@@ -76,32 +77,14 @@ function typingSessionToString(typingSession: TypingSession) {
                             }
                             return `${segment[0]}-${segment.at(-1)}`
                         })
-                        .join(',')}`
+                        .join(`, `)}`
                 })
-                .join(', ')
+                .join(`, `)
 
             return `${toProperCase(
                 book.split('_').join(' '),
             )} ${chaptersString}`
         })
 
-    return `${books.join(', ')} `
-}
-
-export type TypingSessionLog = {
-    numberOfVersesTyped: number
-    updatedAt: Date
-    createdAt: Date
-    location: string
-}
-
-export const getTypingSessionLog = function (
-    typingSession: TypingSession,
-): TypingSessionLog {
-    return {
-        numberOfVersesTyped: typingSession.typedVerses.length,
-        updatedAt: typingSession.updatedAt,
-        createdAt: typingSession.createdAt,
-        location: typingSessionToString(typingSession),
-    }
+    return `${books.join(`${seperator} `)} `
 }
