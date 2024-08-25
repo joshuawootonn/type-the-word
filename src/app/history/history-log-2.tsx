@@ -13,6 +13,7 @@ import {
     endOfWeek,
     eachDayOfInterval,
     isWithinInterval,
+    startOfToday,
 } from 'date-fns'
 import { MonthlyLogDTO } from './log2'
 import clsx from 'clsx'
@@ -22,8 +23,13 @@ function isThisMonth(date: Date) {
     const beginningOfTheMonth = startOfMonth(new Date())
     return isEqual(date, beginningOfTheMonth)
 }
+
 function isInThisYear(date: Date) {
     return isAfter(date, startOfYear(new Date()))
+}
+
+function isInTheFuture(date: Date) {
+    return isAfter(date, startOfToday())
 }
 
 export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
@@ -65,6 +71,8 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                                             day,
                                             monthInterval,
                                         )
+                                        const isFuture = isInTheFuture(day)
+
                                         if (!isInMonth)
                                             return <div className="size-14" />
 
@@ -81,6 +89,8 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                                                                 'opacity-0',
                                                             dayLog &&
                                                                 'border-primary bg-primary text-secondary',
+                                                            isFuture &&
+                                                                'opacity-20',
                                                         )}
                                                     >
                                                         <div className="absolute left-0 top-0 px-[1px] text-xs">
