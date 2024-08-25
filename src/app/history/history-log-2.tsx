@@ -82,7 +82,9 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                                                                 'border-primary bg-primary text-secondary',
                                                         )}
                                                     >
-                                                        {format(day, 'd')}
+                                                        {
+                                                            dayLog?.numberOfVersesTyped
+                                                        }
                                                     </div>
                                                 </Tooltip.Trigger>
                                                 {dayLog && (
@@ -90,6 +92,15 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                                                         sideOffset={8}
                                                         className="prose grid select-none grid-cols-[1fr_minmax(30px,min-content)] gap-x-3 gap-y-2 border-2 border-primary bg-secondary px-3 py-2 font-sans leading-none text-primary"
                                                     >
+                                                        <div className="font-medium">
+                                                            Date:{' '}
+                                                        </div>
+                                                        <div className="space-y-2 whitespace-nowrap">
+                                                            {format(
+                                                                day,
+                                                                'MMMM do',
+                                                            )}
+                                                        </div>
                                                         <div className="font-medium">
                                                             Location:{' '}
                                                         </div>
@@ -104,14 +115,6 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                                                                     </div>
                                                                 ),
                                                             )}
-                                                        </div>
-                                                        <div className="font-medium">
-                                                            Verses:
-                                                        </div>
-                                                        <div>
-                                                            {
-                                                                dayLog.numberOfVersesTyped
-                                                            }
                                                         </div>
                                                     </Tooltip.Content>
                                                 )}

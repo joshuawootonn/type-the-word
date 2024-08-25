@@ -29,7 +29,7 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                     </div>
                                 </div>
                             </summary>
-                            <div className="grid grid-cols-[repeat(auto-fill,_minmax(max(28px),_1fr))] p-4">
+                            <div className="grid grid-cols-[repeat(auto-fill,_minmax(max(36px),_1fr))] py-4">
                                 {book.chapters.map((chapterOverview, j) => {
                                     const isComplete =
                                         chapterOverview.percentage >= 100
@@ -51,14 +51,14 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                                         <rect
                                                             height="14"
                                                             width="14"
-                                                            strokeWidth="2"
+                                                            strokeWidth="1"
                                                             className="stroke-primary "
                                                             fill="none"
                                                             x="1"
                                                             y="1"
                                                         />
                                                         <rect
-                                                            height="16"
+                                                            height="14"
                                                             width={
                                                                 isComplete
                                                                     ? 14
@@ -66,8 +66,8 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                                                           14) /
                                                                       100
                                                             }
-                                                            strokeWidth="2"
-                                                            className="fill-primary stroke-primary "
+                                                            strokeWidth="1"
+                                                            className="fill-primary stroke-primary"
                                                             x="1"
                                                             y="1"
                                                         />
@@ -76,7 +76,7 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                                                 fillRule="evenodd"
                                                                 d="M12.416 3.376a.75.75 0 0 1 .208 1.04l-5 7.5a.75.75 0 0 1-1.154.114l-3-3a.75.75 0 0 1 1.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 0 1 1.04-.207Z"
                                                                 clipRule="evenodd"
-                                                                className="fill-secondary "
+                                                                className="fill-secondary"
                                                             />
                                                         )}
                                                     </svg>
