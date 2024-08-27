@@ -64,8 +64,8 @@ export default function Changelog() {
                                 src={'/assets/updated-log-v2.png'}
                                 alt={'Screen shot of the new "Log" section'}
                                 className="mt-3 border-2 border-primary"
-                                width={2590}
-                                height={3122}
+                                width={2684}
+                                height={3410}
                             />
                         </li>
                         <li>
