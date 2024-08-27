@@ -8,7 +8,7 @@
         --color-secondary: 255 255 255;
         --color-success: 16 185 129;
         --color-incorrect: 190 18 60;
-        --color-error: 136 19 55;
+        --color-extra: 136 19 55;
     }
     .dark {
         --color-primary: 255 255 255;
