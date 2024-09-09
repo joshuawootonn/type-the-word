@@ -122,16 +122,16 @@ export default function Changelog() {
                     restarting the verse.
                     <ul>
                         <li>
-                            <HotkeyLabel
-                                mac="⌥+⇦"
-                                mobile="⌥+⇦"
-                                nonMac="alt+⇦"
-                            />{' '}
+                            <HotkeyLabel mac="⌥+⇦" mobile="⌥+⇦" nonMac="^+⇦" />{' '}
                             deletes the previous word
                         </li>
                         <li>
-                            <HotkeyLabel mac="⌘+⇦" mobile="⌘+⇦" nonMac="^+⇦" />{' '}
-                            restarts the verse
+                            <HotkeyLabel
+                                mac="⌘+⇦"
+                                mobile="⌘+⇦"
+                                nonMac="^+⇧+⇦"
+                            />{' '}
+                            restarts the current verse
                         </li>
                     </ul>
                     <div className="px-8 pb-8 pt-4">
@@ -311,7 +311,6 @@ export default function Changelog() {
                         height={1548}
                     />
                 </li>
-
                 <li>
                     <DateComponent date={new Date('2/9/2024')} /> - Update the{' '}
                     <code>/history</code> page with an overview section to see

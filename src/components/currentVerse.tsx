@@ -1,5 +1,11 @@
 import { Block, Inline, ParsedPassage, Verse } from '~/lib/parseEsv'
-import React, { FormEvent, useContext, useEffect, useRef } from 'react'
+import React, {
+    FormEvent,
+    KeyboardEvent,
+    useContext,
+    useEffect,
+    useRef,
+} from 'react'
 import { useAtom } from 'jotai'
 import {
     PassageContext,
@@ -24,8 +30,9 @@ import { TypingSession } from '~/server/repositories/typingSession.repository'
 import { fetchAddVerseToTypingSession } from '~/lib/api'
 import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
+import { getOS } from '~/app/global-hotkeys'
 
-const nativeInputEventSchema = z.discriminatedUnion('inputType', [
+const knownInputEventSchema = z.discriminatedUnion('inputType', [
     z.object({
         data: z.string(),
         inputType: z.literal('insertText'),
@@ -43,6 +50,8 @@ const nativeInputEventSchema = z.discriminatedUnion('inputType', [
         inputType: z.literal('deleteSoftLineBackward'),
     }),
 ])
+
+export type KnownNativeInputEvent = z.infer<typeof knownInputEventSchema>
 
 function getWords(verse: string, blocks: Block[]): Inline[] {
     return blocks.flatMap(block => {
@@ -242,66 +251,86 @@ export function CurrentVerse({
         return () => clearTimeout(isActiveTimer.current)
     }, [keystrokes.length])
 
-    function handleInput(event: FormEvent<HTMLInputElement>) {
-        const result = nativeInputEventSchema.safeParse(event.nativeEvent)
+    function handleKnownEvents(event: KnownNativeInputEvent) {
+        let isVerseComplete = false
 
-        if (result.success) {
-            const nativeInputEvent = result.data
+        setIsPassageActive(true)
+        const currentVerseNodes = getWords(currentVerse, passage.nodes)
+        if (currentVerseNodes == null) {
+            throw new Error('Current ReadonlyVerse is invalid.')
+        }
+
+        const next = isValidKeystroke(event, keystrokes)
+
+        if (next == null) return
+        const position = getPosition(next)
+
+        isVerseComplete = isVerseSameShape(
+            currentVerseNodes?.filter(isAtomTyped) ?? [],
+            position,
+        )
+
+        if (isVerseComplete) {
+            const verse = getVerse(currentVerse, passage.nodes)
+            trackEvent('typed-verse')
+            if (typingSession?.id != null && sessionData?.user?.id != null) {
+                void addTypedVerseToSession.mutateAsync({
+                    book: verse.verse.book,
+                    chapter: verse.verse.chapter,
+                    verse: verse.verse.verse,
+                    translation: verse.verse.translation,
+                    typingSessionId: typingSession.id,
+                })
+            } else {
+                const nextVerse = getNextVerse(currentVerse, passage.nodes)
+                if (nextVerse?.verse.verse) {
+                    setCurrentVerse(nextVerse?.verse.value)
+                    setPosition([])
+                    setKeystrokes([])
+                } else {
+                    setCurrentVerse('')
+                    inputRef.current?.blur()
+                    setPosition([])
+                    setKeystrokes([])
+                }
+            }
+        } else {
+            setPosition(position)
+            setKeystrokes(next)
+        }
+    }
+
+    function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+        const { os } = getOS()
+
+        // Windows doesn't have a "delete the current line" shortcut.
+        // So I am faking the 'deleteSoftLineBackward' from this `onKeyDown` given the right situation.
+        if (
+            (os === 'Windows' || os === 'Linux') &&
+            event.shiftKey &&
+            event.ctrlKey &&
+            event.key === 'Backspace'
+        ) {
+            event.preventDefault()
+            handleKnownEvents({
+                data: null,
+                inputType: 'deleteSoftLineBackward',
+            })
+        }
+    }
+
+    function handleInput(event: FormEvent<HTMLInputElement>) {
+        const knownEvent = knownInputEventSchema.safeParse(event.nativeEvent)
+
+        if (knownEvent.success) {
             if (
-                nativeInputEvent.inputType === 'insertText' &&
-                nativeInputEvent.data === ' '
+                knownEvent.data.inputType === 'insertText' &&
+                knownEvent.data.data === ' '
             ) {
                 event.preventDefault()
             }
-            let isVerseComplete = false
 
-            setIsPassageActive(true)
-            const currentVerseNodes = getWords(currentVerse, passage.nodes)
-            if (currentVerseNodes == null) {
-                throw new Error('Current ReadonlyVerse is invalid.')
-            }
-
-            const next = isValidKeystroke(nativeInputEvent, keystrokes)
-
-            if (next == null) return
-            const position = getPosition(next)
-
-            isVerseComplete = isVerseSameShape(
-                currentVerseNodes?.filter(isAtomTyped) ?? [],
-                position,
-            )
-
-            if (isVerseComplete) {
-                const verse = getVerse(currentVerse, passage.nodes)
-                trackEvent('typed-verse')
-                if (
-                    typingSession?.id != null &&
-                    sessionData?.user?.id != null
-                ) {
-                    void addTypedVerseToSession.mutateAsync({
-                        book: verse.verse.book,
-                        chapter: verse.verse.chapter,
-                        verse: verse.verse.verse,
-                        translation: verse.verse.translation,
-                        typingSessionId: typingSession.id,
-                    })
-                } else {
-                    const nextVerse = getNextVerse(currentVerse, passage.nodes)
-                    if (nextVerse?.verse.verse) {
-                        setCurrentVerse(nextVerse?.verse.value)
-                        setPosition([])
-                        setKeystrokes([])
-                    } else {
-                        setCurrentVerse('')
-                        inputRef.current?.blur()
-                        setPosition([])
-                        setKeystrokes([])
-                    }
-                }
-            } else {
-                setPosition(position)
-                setKeystrokes(next)
-            }
+            handleKnownEvents(knownEvent.data)
         }
     }
 
@@ -461,6 +490,7 @@ export function CurrentVerse({
                 type="text"
                 className="peer fixed h-0 max-h-0 opacity-0"
                 onInput={handleInput}
+                onKeyDown={handleKeyDown}
                 tabIndex={-1}
                 onFocus={() => {
                     document

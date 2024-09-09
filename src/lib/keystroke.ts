@@ -1,5 +1,6 @@
 import { Inline } from '~/lib/parseEsv'
 import { validEnter, validQuotes, validSingleQuotes } from '~/lib/isEqual'
+import { KnownNativeInputEvent } from '~/components/currentVerse'
 
 export type Keystroke = {
     type:
@@ -85,14 +86,7 @@ export function isAtomComplete(atom: Inline | undefined): boolean {
         : false
 }
 
-export function isValidKeystroke(
-    e:
-        | { data: string; inputType: 'insertText' }
-        | { data: null; inputType: 'deleteContentBackward' }
-        | { data: null; inputType: 'deleteWordBackward' }
-        | { data: null; inputType: 'deleteSoftLineBackward' },
-    prev: Keystroke[],
-) {
+export function isValidKeystroke(e: KnownNativeInputEvent, prev: Keystroke[]) {
     const prevPosition = getPosition(prev)
     const prevCurrentTyped = prevPosition.at(-1)
 
