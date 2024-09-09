@@ -3,27 +3,41 @@
 import clsx from 'clsx'
 import { getOS } from '~/app/global-hotkeys'
 
-export default function HotkeyLabel({
-    mac,
-    nonMac,
-    mobile,
-    className,
-}: {
-    mac: string
-    nonMac: string
-    mobile?: string
-    className?: string
-}) {
+export default function HotkeyLabel(
+    props:
+        | {
+              mac: string
+              nonMac: string
+              mobile?: string
+              className?: string
+          }
+        | { value: string; className?: string },
+) {
+    if ('value' in props) {
+        return (
+            <kbd
+                suppressHydrationWarning
+                className={clsx(props.className, 'font-sans tracking-[0.2em]')}
+            >
+                {props.value}
+            </kbd>
+        )
+    }
+
     const { os, isMobile } = getOS()
 
     return (
         <kbd
             suppressHydrationWarning
-            className={clsx(className, {
+            className={clsx(props.className, {
                 ['font-sans tracking-[0.2em]']: !isMobile,
             })}
         >
-            {isMobile && mobile ? mobile : os === 'MacOS' ? mac : nonMac}
+            {isMobile && props.mobile
+                ? props.mobile
+                : os === 'MacOS'
+                ? props.mac
+                : props.nonMac}
         </kbd>
     )
 }
