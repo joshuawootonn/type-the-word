@@ -72,7 +72,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                     transform: translateY(1px);
                     width: 39px;
                     height: 33px;
-                    background-color: rgb(var(--color-secondary));
+                    background-color: rgb(var(--color-primary));
                     -webkit-mask-image: url('/bible.svg');
                     mask-image: url('/bible.svg');
                     mask-repeat: no-repeat;
@@ -87,13 +87,6 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                 .link:focus-visible .animated-icon {
                     display: block;
                     animation: bibleAnimation 0.6s steps(20, jump-none) forwards;
-                }
-
-                @media (prefers-color-scheme: dark) {
-                    .icon,
-                    .animated-icon {
-                        filter: invert(100%);
-                    }
                 }
             `}</style>
             <Link
@@ -118,22 +111,20 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                     height="33"
                     viewBox="0 0 39 33"
                     fill="none"
-                    className="icon translate-y-[1px] dark:invert"
+                    className="icon translate-y-[1px] stroke-primary"
                     xmlns="http://www.w3.org/2000/svg"
                 >
                     <path
                         d="M19.7754 5.04895V31.7156M23.6464 6.59934H33.3238M23.6464 10.6303L31.6577 10.6303M23.6464 14.6614H33.3238M23.6464 18.6924L29.8873 18.6924M23.6464 22.4133H33.3238M6.22705 6.59934L13.7748 6.59934M6.22705 10.6303H15.9045M6.22705 14.6614L14.8396 14.6614M6.22705 18.6924H15.9045M6.22705 22.4133L12.5399 22.4133"
-                        className="stroke-secondary"
                         strokeWidth="2"
                     />
                     <path
                         d="M2.11353 27.5747V1.94971H15.9209C18.2328 1.94971 19.7741 2.88721 19.7741 5.07471C19.7741 2.88721 21.0585 1.94971 23.6273 1.94971H37.1135V27.5747H23.6273C20.7374 27.5747 19.7741 30.3872 19.7741 31.9497C19.7741 30.3872 18.4897 27.5747 15.2787 27.5747H2.11353Z"
-                        className="stroke-secondary"
                         strokeWidth="2"
                     />
                 </svg>
 
-                <div className="animated-icon stroke-secondary"></div>
+                <div className="animated-icon stroke-primary"></div>
             </Link>
             <div className="flex flex-col gap-4">
                 {sessionData ? (
