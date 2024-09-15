@@ -53,6 +53,11 @@ export default function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('9/15/2024')} /> - I updated
+                    the <Link href="/">home</Link> page with details about how
+                    TTW works to improve SEO.
+                </li>{' '}
+                <li>
                     <DateComponent date={new Date('9/9/2024')} /> - On Windows,
                     the &apos;restart the current verse&apos; keyboard shortcut
                     never actually worked. Thanks for{' '}
