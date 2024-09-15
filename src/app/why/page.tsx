@@ -33,7 +33,11 @@ export default async function Home() {
 
     return (
         <>
-            <div className={'prose-h2:text-3xl prose-p:text-xl'}>
+            <div
+                className={
+                    'prose-h2:text-3xl prose-p:text-xl prose-code:before:content-none prose-code:after:content-none'
+                }
+            >
                 <h1>Why?</h1>
                 <hr className="mx-0 w-full border-t-2  border-primary" />
                 <h2>Why did I make typetheword.site?</h2>

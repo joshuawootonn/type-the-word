@@ -12,7 +12,6 @@ import { fetchLastVerse } from '~/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import { toPassageSegment } from '~/lib/passageSegment'
 import { TypedVerse } from '~/server/repositories/typingSession.repository'
-import { DEFAULT_PASSAGE_SEGMENT } from '~/app/(passage)/passage/[passage]/default-passage'
 import { useRef, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import HotkeyLabel from './hotkey-label'
@@ -44,7 +43,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
               lastTypedVerse.book,
               lastTypedVerse.chapter,
           )}`
-        : `/passage/${DEFAULT_PASSAGE_SEGMENT}`
+        : `/`
 
     return (
         <nav className="mx-auto mb-2 flex w-full items-center justify-between pt-4 lg:pt-8">

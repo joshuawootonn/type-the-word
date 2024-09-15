@@ -39,7 +39,7 @@ export default function Changelog() {
     return (
         <div
             className={
-                'marker:text-primary prose-h2:text-3xl prose-p:text-xl prose-a:text-primary prose-kbd:text-primary prose-code:text-primary prose-ul:text-primary prose-li:text-primary'
+                'marker:text-primary prose-h2:text-3xl prose-p:text-xl prose-a:text-primary prose-kbd:text-primary prose-code:text-primary prose-code:before:content-none prose-code:after:content-none prose-ul:text-primary prose-li:text-primary'
             }
         >
             <div className="mb-10 flex items-center justify-between">

@@ -42,7 +42,7 @@ const ForwardedRefInput = forwardRef(function InnerForwardedRefInput(
     return <input {...props} ref={ref} />
 })
 
-function getValues(text: PassageReference): {
+function getValues(text: PassageReference | undefined): {
     book: Book
     chapter: string
 } {
@@ -58,7 +58,15 @@ function getValues(text: PassageReference): {
     return { book: 'genesis', chapter: '1' }
 }
 
-export function PassageSelector({ value }: { value: PassageReference }) {
+export function PassageSelector({
+    value,
+    label,
+    labelClassName,
+}: {
+    label?: string
+    value?: PassageReference
+    labelClassName?: string
+}) {
     const values = getValues(value)
     const [book, setBook] = useState<Book>(values.book)
     const [chapter, setChapter] = useState<string>(values.chapter)
@@ -94,7 +102,8 @@ export function PassageSelector({ value }: { value: PassageReference }) {
     useEffect(() => {
         const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
         // I use `!includes` to prevent passage selector from clearing url specified verses
-        if (!pathname?.includes(nextValue)) {
+        console.log(pathname)
+        if (!pathname?.includes(nextValue) && pathname !== '/') {
             const t = setTimeout(() => {
                 onSubmit({ book, chapter })
             }, 3000)
@@ -130,11 +139,8 @@ export function PassageSelector({ value }: { value: PassageReference }) {
 
     return (
         <>
-            <label
-                htmlFor="passage"
-                className="text-lg font-medium text-primary"
-            >
-                Passage:
+            <label htmlFor="passage" className={clsx(labelClassName)}>
+                {label ?? 'Passage:'}
             </label>
             <div className={'not-prose svg-outline relative flex flex-row'}>
                 <Combobox

@@ -17,7 +17,10 @@ export default function PassageLayout({
     return (
         <>
             <div className="prose mx-auto mb-8 flex w-full items-center justify-start space-x-3 pt-4 lg:pt-8">
-                <PassageSelector value={value} />
+                <PassageSelector
+                    value={value}
+                    labelClassName="text-lg font-medium text-primary"
+                />
             </div>
             <main className="relative mx-auto w-full flex-grow">
                 {children}
