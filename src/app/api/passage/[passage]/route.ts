@@ -80,17 +80,29 @@ export async function GET(
                 : `:${passageData.firstVerse}-${passageData.lastVerse}`
             : ''
 
-    if (passageData.book === 'psalm' && passageData.chapter === 23) {
+    if (
+        passageData.book === 'psalm' &&
+        passageData.chapter === 23 &&
+        passageData.firstVerse == null
+    ) {
         return Response.json(
             { data: parseChapter(psalm23.passages.at(0) ?? '') },
             { status: 200 },
         )
-    } else if (passageData.book === 'james' && passageData.chapter === 1) {
+    } else if (
+        passageData.book === 'james' &&
+        passageData.chapter === 1 &&
+        passageData.firstVerse == null
+    ) {
         return Response.json(
             { data: parseChapter(james1.passages.at(0) ?? '') },
             { status: 200 },
         )
-    } else if (passageData.book === 'genesis' && passageData.chapter === 1) {
+    } else if (
+        passageData.book === 'genesis' &&
+        passageData.chapter === 1 &&
+        passageData.firstVerse == null
+    ) {
         return Response.json(
             { data: parseChapter(genesis1.passages.at(0) ?? '') },
             { status: 200 },
