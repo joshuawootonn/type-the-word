@@ -32,7 +32,7 @@ export default async function PassagePage() {
     return (
         <div
             className={
-                'prose-h2:text-3xl prose-p:text-xl prose-code:before:content-none prose-code:after:content-none'
+                'prose-h2:text-3xl prose-p:text-xl prose-code:before:content-none prose-code:after:content-none prose-li:text-xl'
             }
         >
             <h1>Welcome to Type the Word</h1>
@@ -46,23 +46,25 @@ export default async function PassagePage() {
                 As you type, TTW highlights correct letters in green and
                 incorrect letters in red. Here is an example from Psalm 23:
             </p>
-            <div className="border-2 px-4 pt-1">
+            <div className="relative z-0 flex flex-col items-end justify-end border-2 border-primary px-4 pb-5 pt-1">
                 <Passage
                     autofocus={true}
                     passage={passage}
                     typingSession={typingSession}
                     chapterHistory={chapterHistory}
                 />
+                <div className="absolute bottom-0 right-0 translate-x-0.5 translate-y-0.5 border-2 border-primary px-3">
+                    Example of typing experience with Psalm 23
+                </div>
             </div>
 
             <p>
                 {session == null ? 'Once you create an account, your' : 'Your'}{' '}
-                typing{' '}
                 <a
                     className="svg-outline-sm relative text-primary"
                     href="/history"
                 >
-                    <code>history</code>
+                    typing history
                 </a>{' '}
                 will be saved automatically so that you can see statistics about
                 how much of each book you have typed and how many verses you
@@ -75,7 +77,7 @@ export default async function PassagePage() {
             </p>
 
             <ol>
-                <li>Create an account so your type</li>
+                <li>Create an account so your typing history is saved</li>
                 <li>
                     <div className="flex flex-col items-start justify-start space-y-2 md:flex-row md:items-center md:space-x-2 md:space-y-0">
                         <PassageSelector label="Find your favorite scripture: " />
