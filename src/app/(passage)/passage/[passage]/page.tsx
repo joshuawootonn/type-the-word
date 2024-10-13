@@ -57,7 +57,7 @@ export default async function PassagePage(props: {
                 typingSession={typingSession}
                 chapterHistory={chapterHistory}
             />
-            <div className="mb-24 mt-8 flex w-full justify-between">
+            <div className="not-prose mb-24 mt-8 flex w-full justify-between">
                 {passage?.prevChapter ? (
                     <Link
                         href={`/passage/${passage.prevChapter.url}`}
