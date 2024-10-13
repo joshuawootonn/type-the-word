@@ -53,6 +53,11 @@ export default function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('10/13/2024')} /> - Fixed a
+                    long time bug where the line indicating what verses you have
+                    completed would flicker on verse completion.{' '}
+                </li>{' '}
+                <li>
                     <DateComponent date={new Date('9/15/2024')} /> - I updated
                     the <Link href="/">home</Link> page with details about how
                     TTW works to improve SEO.
