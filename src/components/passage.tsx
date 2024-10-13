@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useId, useRef } from 'react'
+import React, { useCallback, useId, useRef, useState } from 'react'
 
 import { Inline, ParsedPassage } from '~/lib/parseEsv'
 
@@ -8,7 +8,7 @@ import { Paragraph } from './paragraph'
 import { Keystroke } from '~/lib/keystroke'
 import { Cursor } from '~/components/cursor'
 import { atom, PrimitiveAtom, Provider } from 'jotai'
-import { useRect } from '~/lib/hooks/useRect'
+import { useRect, PassageRectContext } from '~/lib/hooks/passageRectContext'
 import { useHydrateAtoms } from 'jotai/react/utils'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
@@ -17,12 +17,6 @@ import { toPassageSegment } from '~/lib/passageSegment'
 import { fetchChapterHistory, fetchTypingSessionUpsert } from '~/lib/api'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
-
-export const PassageContext = React.createContext<{
-    rect: DOMRect | null
-}>({
-    rect: null,
-})
 
 export const positionAtom = atom<Inline[]>([])
 export const keystrokesAtom = atom<Keystroke[]>([])
@@ -61,6 +55,15 @@ export function Passage({
 
     const passageRef = useRef<HTMLDivElement>(null)
     const passageRect = useRect(passageRef)
+    const [verseRects, setVerseRects] = useState<
+        PassageRectContext['verseRects']
+    >({})
+
+    const updateVerseRect = useCallback(
+        (verse: string, rect: DOMRect) =>
+            setVerseRects(prev => ({ ...prev, [verse]: rect })),
+        [],
+    )
     const { data: sessionData } = useSession()
     const typingSession = useQuery({
         queryKey: ['typing-session'],
@@ -101,9 +104,11 @@ export function Passage({
                     id={passageId}
                     className="passage prose relative z-0 w-full dark:prose-invert"
                 >
-                    <PassageContext.Provider
+                    <PassageRectContext.Provider
                         value={{
+                            verseRects,
                             rect: passageRect,
+                            updateVerseRect,
                         }}
                     >
                         {passage.nodes.map((node, pIndex) => {
@@ -151,7 +156,7 @@ export function Passage({
                                     break
                             }
                         })}
-                    </PassageContext.Provider>
+                    </PassageRectContext.Provider>
                     <Cursor passageId={passageId} />
                 </div>
             </HydrateAtoms>

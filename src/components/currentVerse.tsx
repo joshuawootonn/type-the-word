@@ -1,14 +1,7 @@
 import { Block, Inline, ParsedPassage, Verse } from '~/lib/parseEsv'
-import React, {
-    FormEvent,
-    KeyboardEvent,
-    useContext,
-    useEffect,
-    useRef,
-} from 'react'
+import React, { FormEvent, KeyboardEvent, useEffect, useRef } from 'react'
 import { useAtom } from 'jotai'
 import {
-    PassageContext,
     passageIdAtom,
     autofocusAtom,
     currentVerseAtom,
@@ -22,7 +15,7 @@ import { getPosition, isAtomComplete, isValidKeystroke } from '~/lib/keystroke'
 import { isAtomTyped, isVerseSameShape } from '~/lib/isEqual'
 import clsx from 'clsx'
 import { Word } from '~/components/word'
-import { useRect } from '~/lib/hooks/useRect'
+import { usePassageRect, useVerseRect } from '~/lib/hooks/passageRectContext'
 import { trackEvent } from 'fathom-client'
 import { z } from 'zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -142,7 +135,7 @@ export function CurrentVerse({
     const [autoFocus] = useAtom(autofocusAtom)
     const { data: sessionData } = useSession()
 
-    const { rect: passageRect } = useContext(PassageContext)
+    const passageRect = usePassageRect()
     const [isPassageActive, setIsPassageActive] = useAtom(isPassageActiveAtom)
     const [isPassageFocused, setIsPassageFocused] =
         useAtom(isPassageFocusedAtom)
@@ -225,7 +218,7 @@ export function CurrentVerse({
     })
 
     const ref = useRef<HTMLSpanElement>(null)
-    const rect = useRect(ref)
+    const rect = useVerseRect(ref, verse.verse.text)
 
     const [currentVerse, setCurrentVerse] = useAtom(currentVerseAtom)
 

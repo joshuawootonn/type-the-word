@@ -1,12 +1,11 @@
-import React, { useContext, useRef } from 'react'
+import React, { useRef } from 'react'
 import {
-    PassageContext,
     currentVerseAtom,
     isPassageActiveAtom,
     keystrokesAtom,
     positionAtom,
 } from '~/components/passage'
-import { useRect } from '~/lib/hooks/useRect'
+import { usePassageRect, useVerseRect } from '~/lib/hooks/passageRectContext'
 import { useAtom, useSetAtom } from 'jotai'
 import clsx from 'clsx'
 import { Verse } from '~/lib/parseEsv'
@@ -28,11 +27,11 @@ export function ReadonlyVerse({
     typingSession?: TypingSession
     chapterHistory?: ChapterHistory
 }) {
-    const { rect: passageRect } = useContext(PassageContext)
+    const passageRect = usePassageRect()
     const [isPassageActive] = useAtom(isPassageActiveAtom)
 
     const ref = useRef<HTMLSpanElement>(null)
-    const rect = useRect(ref)
+    const rect = useVerseRect(ref, verse.verse.text)
 
     const isTypedInSession = typingSession?.typedVerses.find(
         a =>
