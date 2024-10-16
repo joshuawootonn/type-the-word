@@ -218,7 +218,7 @@ export function CurrentVerse({
     })
 
     const ref = useRef<HTMLSpanElement>(null)
-    const rect = useVerseRect(ref, verse.verse.text)
+    const rect = useVerseRect(ref, verse.verse.text + verse.metadata.offset)
 
     const [currentVerse, setCurrentVerse] = useAtom(currentVerseAtom)
 

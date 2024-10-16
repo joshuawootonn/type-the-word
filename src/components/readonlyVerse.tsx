@@ -31,7 +31,7 @@ export function ReadonlyVerse({
     const [isPassageActive] = useAtom(isPassageActiveAtom)
 
     const ref = useRef<HTMLSpanElement>(null)
-    const rect = useVerseRect(ref, verse.verse.text)
+    const rect = useVerseRect(ref, verse.verse.text + verse.metadata.offset)
 
     const isTypedInSession = typingSession?.typedVerses.find(
         a =>
