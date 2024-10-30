@@ -15,6 +15,14 @@ import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import { useRef, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import HotkeyLabel from './hotkey-label'
+import clsx from 'clsx'
+import dynamic from 'next/dynamic'
+
+const HuePicker = dynamic(() => import('simple-hue-picker/react'), {
+    ssr: false,
+})
+
+const SELECTION_KEYS = [' ', 'Enter']
 
 export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
     const { data: sessionData } = useSession()
@@ -23,6 +31,11 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
     const dropDownTriggerRef = useRef<HTMLButtonElement>(null)
     const { theme, setTheme } = useTheme()
     const [isSettingsOpen, setSettingsOpen] = useState(false)
+    const [settingsState, setSettingsState] = useState<
+        | { state: 'initial' }
+        | { state: 'create-theme'; value: string; primaryHue: number }
+        | { state: 'edit-theme' }
+    >({ state: 'initial' })
 
     useHotkeys(
         'mod+shift+comma',
@@ -128,7 +141,12 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
             <div className="flex flex-col gap-4">
                 {sessionData ? (
                     <Popover.Root
-                        onOpenChange={setSettingsOpen}
+                        onOpenChange={next => {
+                            if (next == false) {
+                                setSettingsState({ state: 'initial' })
+                            }
+                            setSettingsOpen(next)
+                        }}
                         open={isSettingsOpen}
                     >
                         <DropdownMenu.Root modal={false}>
@@ -181,77 +199,217 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                 </DropdownMenu.Item>
                             </DropdownMenu.Content>
                             <Popover.PopoverContent
-                                className="z-50 w-52 border-2 border-primary bg-secondary px-3 py-3 text-primary"
+                                className={clsx(
+                                    settingsState.state === 'create-theme'
+                                        ? 'w-100'
+                                        : 'w-52',
+                                    'z-50  border-2 border-primary bg-secondary px-3 py-3 text-primary',
+                                )}
                                 sideOffset={-2}
                                 align="end"
                                 onCloseAutoFocus={e => {
+                                    setSettingsState({ state: 'initial' })
                                     e.preventDefault()
                                     dropDownTriggerRef.current?.focus()
                                 }}
                             >
-                                <h2 className="mb-2 text-xl">Settings</h2>
-                                <div className="flex flex-row items-center justify-between">
-                                    <label
-                                        htmlFor="theme-selector"
-                                        className="pr-4"
-                                    >
-                                        Theme:
-                                    </label>
-
-                                    <Select.Root
-                                        value={theme}
-                                        onValueChange={next => setTheme(next)}
-                                    >
-                                        <Select.Trigger
-                                            id="theme-selector"
-                                            className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                        >
-                                            <Select.Value />
-                                        </Select.Trigger>
-
-                                        <Select.Portal>
-                                            <Select.Content
-                                                side="bottom"
-                                                position="popper"
-                                                avoidCollisions={false}
-                                                className="z-50 border-2 border-primary bg-secondary text-primary "
-                                                align="end"
-                                                sideOffset={-2}
+                                {settingsState.state === 'initial' ? (
+                                    <>
+                                        <h2 className="mb-2 text-xl">
+                                            Settings
+                                        </h2>
+                                        <div className="flex flex-row items-center justify-between">
+                                            <label
+                                                htmlFor="theme-selector"
+                                                className="pr-4"
                                             >
-                                                <Select.ScrollUpButton />
-                                                <Select.Viewport>
-                                                    <Select.Item
-                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                        value="dark"
+                                                Theme:
+                                            </label>
+
+                                            <Select.Root
+                                                value={theme}
+                                                onValueChange={next =>
+                                                    setTheme(next)
+                                                }
+                                            >
+                                                <Select.Trigger
+                                                    id="theme-selector"
+                                                    className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                                >
+                                                    <Select.Value />
+                                                </Select.Trigger>
+
+                                                <Select.Portal>
+                                                    <Select.Content
+                                                        side="bottom"
+                                                        position="popper"
+                                                        avoidCollisions={false}
+                                                        className="z-50 border-2 border-primary bg-secondary text-primary "
+                                                        align="end"
+                                                        sideOffset={-2}
                                                     >
-                                                        <Select.ItemText>
-                                                            Dark
-                                                        </Select.ItemText>
-                                                        <Select.ItemIndicator />
-                                                    </Select.Item>
-                                                    <Select.Item
-                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                        value="light"
-                                                    >
-                                                        <Select.ItemText>
-                                                            Light
-                                                        </Select.ItemText>
-                                                        <Select.ItemIndicator />
-                                                    </Select.Item>
-                                                    <Select.Item
-                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                        value="system"
-                                                    >
-                                                        <Select.ItemText>
-                                                            System
-                                                        </Select.ItemText>
-                                                        <Select.ItemIndicator />
-                                                    </Select.Item>
-                                                </Select.Viewport>
-                                            </Select.Content>
-                                        </Select.Portal>
-                                    </Select.Root>
-                                </div>
+                                                        <Select.ScrollUpButton />
+                                                        <Select.Viewport>
+                                                            <Select.Item
+                                                                className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                                                value="dark"
+                                                            >
+                                                                <Select.ItemText>
+                                                                    Dark
+                                                                </Select.ItemText>
+                                                                <Select.ItemIndicator />
+                                                            </Select.Item>
+                                                            <Select.Item
+                                                                className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                                                value="light"
+                                                            >
+                                                                <Select.ItemText>
+                                                                    Light
+                                                                </Select.ItemText>
+                                                                <Select.ItemIndicator />
+                                                            </Select.Item>
+                                                            <Select.Item
+                                                                className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                                                value="system"
+                                                            >
+                                                                <Select.ItemText>
+                                                                    System
+                                                                </Select.ItemText>
+                                                                <Select.ItemIndicator />
+                                                            </Select.Item>
+                                                            <Select.Item
+                                                                className="flex cursor-pointer flex-row items-center justify-between space-x-2 px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                                                value="create-theme"
+                                                                onKeyDown={e => {
+                                                                    if (
+                                                                        SELECTION_KEYS.includes(
+                                                                            e.key,
+                                                                        )
+                                                                    ) {
+                                                                        e.preventDefault()
+                                                                        setSettingsState(
+                                                                            {
+                                                                                state: 'create-theme',
+                                                                                value: '',
+                                                                                primaryHue: 0,
+                                                                            },
+                                                                        )
+                                                                    }
+                                                                }}
+                                                                onPointerUp={e => {
+                                                                    e.preventDefault()
+                                                                    setSettingsState(
+                                                                        {
+                                                                            state: 'create-theme',
+                                                                            value: '',
+                                                                            primaryHue: 0,
+                                                                        },
+                                                                    )
+                                                                }}
+                                                            >
+                                                                <Select.ItemText>
+                                                                    New theme
+                                                                </Select.ItemText>
+                                                                <div>
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        fill="none"
+                                                                        viewBox="0 0 24 24"
+                                                                        strokeWidth={
+                                                                            3
+                                                                        }
+                                                                        stroke="currentColor"
+                                                                        className="size-4"
+                                                                    >
+                                                                        <path
+                                                                            strokeLinecap="round"
+                                                                            strokeLinejoin="round"
+                                                                            d="M12 4.5v15m7.5-7.5h-15"
+                                                                        />
+                                                                    </svg>
+                                                                </div>
+                                                                <Select.ItemIndicator />
+                                                            </Select.Item>
+                                                        </Select.Viewport>
+                                                    </Select.Content>
+                                                </Select.Portal>
+                                            </Select.Root>
+                                        </div>
+                                    </>
+                                ) : settingsState.state === 'create-theme' ? (
+                                    <>
+                                        <h2 className="mb-2 text-xl">
+                                            Theme Creator
+                                        </h2>
+                                        <div className="col-2 grid grid-cols-2 items-center gap-x-2 gap-y-4 [&>*:nth-child(even)]:justify-self-end">
+                                            <label
+                                                htmlFor="theme-name"
+                                                className="pr-4"
+                                            >
+                                                Theme name:
+                                            </label>
+                                            <div className="svg-outline relative">
+                                                <input
+                                                    value={settingsState.value}
+                                                    onChange={event =>
+                                                        setSettingsState(
+                                                            prev =>
+                                                                prev.state ===
+                                                                'create-theme'
+                                                                    ? {
+                                                                          ...prev,
+                                                                          value:
+                                                                              event
+                                                                                  .currentTarget
+                                                                                  ?.value ??
+                                                                              '',
+                                                                      }
+                                                                    : prev,
+                                                        )
+                                                    }
+                                                    placeholder="Untitled theme"
+                                                    autoFocus={true}
+                                                    onFocus={e =>
+                                                        e.currentTarget.select()
+                                                    }
+                                                    className={
+                                                        ' w-40 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none'
+                                                    }
+                                                    id="theme-name"
+                                                    autoComplete="false"
+                                                    data-1p-ignore={true}
+                                                />
+                                            </div>
+                                            <label
+                                                htmlFor="primary-hue"
+                                                className="pr-4"
+                                            >
+                                                Primary hue:
+                                            </label>
+                                            <div className="svg-outline relative">
+                                                <HuePicker
+                                                    id="primary-hue"
+                                                    step={10}
+                                                    value={
+                                                        settingsState.primaryHue
+                                                    }
+                                                    onInput={(e: unknown) =>
+                                                        setSettingsState(
+                                                            prev =>
+                                                                prev.state ===
+                                                                'create-theme'
+                                                                    ? {
+                                                                          ...prev,
+                                                                          value: e.detail,
+                                                                      }
+                                                                    : prev,
+                                                        )
+                                                    }
+                                                />
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : null}
                             </Popover.PopoverContent>
                         </DropdownMenu.Root>
                     </Popover.Root>
