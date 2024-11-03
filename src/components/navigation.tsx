@@ -16,13 +16,21 @@ import { useRef, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import HotkeyLabel from './hotkey-label'
 import clsx from 'clsx'
-import dynamic from 'next/dynamic'
-
-const HuePicker = dynamic(() => import('simple-hue-picker/react'), {
-    ssr: false,
-})
+import Color from 'colorjs.io'
 
 const SELECTION_KEYS = [' ', 'Enter']
+
+type SettingsState =
+    | { state: 'initial' }
+    | {
+          state: 'create-theme'
+          name: string
+          primary: string
+          secondary: string
+          success: string
+          error: string
+      }
+    | { state: 'edit-theme' }
 
 export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
     const { data: sessionData } = useSession()
@@ -31,11 +39,32 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
     const dropDownTriggerRef = useRef<HTMLButtonElement>(null)
     const { theme, setTheme } = useTheme()
     const [isSettingsOpen, setSettingsOpen] = useState(false)
-    const [settingsState, setSettingsState] = useState<
-        | { state: 'initial' }
-        | { state: 'create-theme'; value: string; primaryHue: number }
-        | { state: 'edit-theme' }
-    >({ state: 'initial' })
+    const [settingsState, _setSettingsState] = useState<SettingsState>({
+        state: 'initial',
+    })
+
+    function setSettingsState(value: SettingsState) {
+        _setSettingsState(value)
+
+        if (value.state === 'create-theme') {
+            document.documentElement.style.setProperty(
+                '--color-primary',
+                value.primary,
+            )
+            document.documentElement.style.setProperty(
+                '--color-secondary',
+                value.secondary,
+            )
+            document.documentElement.style.setProperty(
+                '--color-success',
+                value.success,
+            )
+            document.documentElement.style.setProperty(
+                '--color-error',
+                value.error,
+            )
+        }
+    }
 
     useHotkeys(
         'mod+shift+comma',
@@ -290,8 +319,22 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                                         setSettingsState(
                                                                             {
                                                                                 state: 'create-theme',
-                                                                                value: '',
-                                                                                primaryHue: 0,
+                                                                                name: '',
+                                                                                primary:
+                                                                                    document.documentElement.style.getPropertyValue(
+                                                                                        '--color-primary',
+                                                                                    ),
+                                                                                secondary:
+                                                                                    document.documentElement.style.getPropertyValue(
+                                                                                        '--color-secondary',
+                                                                                    ),
+                                                                                success:
+                                                                                    document.documentElement.style.getPropertyValue(
+                                                                                        '--color-success',
+                                                                                    ),
+                                                                                error: document.documentElement.style.getPropertyValue(
+                                                                                    '--color-error',
+                                                                                ),
                                                                             },
                                                                         )
                                                                     }
@@ -301,8 +344,22 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                                     setSettingsState(
                                                                         {
                                                                             state: 'create-theme',
-                                                                            value: '',
-                                                                            primaryHue: 0,
+                                                                            name: '',
+                                                                            primary:
+                                                                                document.documentElement.style.getPropertyValue(
+                                                                                    '--color-primary',
+                                                                                ),
+                                                                            secondary:
+                                                                                document.documentElement.style.getPropertyValue(
+                                                                                    '--color-secondary',
+                                                                                ),
+                                                                            success:
+                                                                                document.documentElement.style.getPropertyValue(
+                                                                                    '--color-success',
+                                                                                ),
+                                                                            error: document.documentElement.style.getPropertyValue(
+                                                                                '--color-error',
+                                                                            ),
                                                                         },
                                                                     )
                                                                 }}
@@ -350,21 +407,20 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                             </label>
                                             <div className="svg-outline relative">
                                                 <input
-                                                    value={settingsState.value}
+                                                    value={settingsState.name}
                                                     onChange={event =>
                                                         setSettingsState(
-                                                            prev =>
-                                                                prev.state ===
+                                                            settingsState.state ===
                                                                 'create-theme'
-                                                                    ? {
-                                                                          ...prev,
-                                                                          value:
-                                                                              event
-                                                                                  .currentTarget
-                                                                                  ?.value ??
-                                                                              '',
-                                                                      }
-                                                                    : prev,
+                                                                ? {
+                                                                      ...settingsState,
+                                                                      name:
+                                                                          event
+                                                                              .currentTarget
+                                                                              ?.value ??
+                                                                          '',
+                                                                  }
+                                                                : settingsState,
                                                         )
                                                     }
                                                     placeholder="Untitled theme"
@@ -380,33 +436,46 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                     data-1p-ignore={true}
                                                 />
                                             </div>
-                                            <label
-                                                htmlFor="primary-hue"
-                                                className="pr-4"
-                                            >
-                                                Primary hue:
-                                            </label>
-                                            <div className="svg-outline relative">
-                                                <HuePicker
-                                                    id="primary-hue"
-                                                    step={10}
-                                                    value={
-                                                        settingsState.primaryHue
-                                                    }
-                                                    onInput={(e: unknown) =>
-                                                        setSettingsState(
-                                                            prev =>
-                                                                prev.state ===
-                                                                'create-theme'
-                                                                    ? {
-                                                                          ...prev,
-                                                                          value: e.detail,
-                                                                      }
-                                                                    : prev,
-                                                        )
-                                                    }
-                                                />
-                                            </div>
+                                            <ColorInput
+                                                label="Primary Hue"
+                                                value={settingsState.primary}
+                                                onChange={value =>
+                                                    setSettingsState({
+                                                        ...settingsState,
+                                                        primary: value,
+                                                    })
+                                                }
+                                            />
+                                            <ColorInput
+                                                label="Secondary Hue"
+                                                value={settingsState.secondary}
+                                                onChange={value =>
+                                                    setSettingsState({
+                                                        ...settingsState,
+                                                        secondary: value,
+                                                    })
+                                                }
+                                            />
+                                            <ColorInput
+                                                label="Success Hue"
+                                                value={settingsState.success}
+                                                onChange={value =>
+                                                    setSettingsState({
+                                                        ...settingsState,
+                                                        success: value,
+                                                    })
+                                                }
+                                            />
+                                            <ColorInput
+                                                label="Error Hue"
+                                                value={settingsState.error}
+                                                onChange={value =>
+                                                    setSettingsState({
+                                                        ...settingsState,
+                                                        error: value,
+                                                    })
+                                                }
+                                            />
                                         </div>
                                     </>
                                 ) : null}
@@ -423,5 +492,51 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                 )}
             </div>
         </nav>
+    )
+}
+
+function ColorInput(props: {
+    value: string
+    label: string
+    onChange: (number: string) => void
+}) {
+    return (
+        <>
+            <label htmlFor="primary-hue" className="pr-4">
+                {props.label}
+            </label>
+
+            <div className="relative h-8 w-8">
+                <input
+                    type="color"
+                    className="border-2 border-primary outline-none"
+                    onChange={e => {
+                        const color = new Color(e.currentTarget.value).to(
+                            'oklch',
+                        )
+
+                        props.onChange(
+                            color
+                                .toString({ precision: 4 })
+                                .replace(')', '')
+                                .replace('oklch(', ''),
+                        )
+                    }}
+                />
+            </div>
+            <style jsx>{`
+                input[type='color'] {
+                    -webkit-appearance: none;
+                    width: 32px;
+                    height: 32px;
+                }
+                input[type='color']::-webkit-color-swatch-wrapper {
+                    padding: 0;
+                }
+                input[type='color']::-webkit-color-swatch {
+                    border: none;
+                }
+            `}</style>
+        </>
     )
 }
