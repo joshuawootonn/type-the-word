@@ -12,7 +12,7 @@ export default function Home() {
         <>
             <div className={'prose-h2:text-3xl prose-p:text-xl'}>
                 <h1>Privacy Policy</h1>
-                <hr className="mx-0 w-full border-t-2  border-black dark:border-white" />
+                <hr className="mx-0 w-full border-t-2 border-primary" />
 
                 <h2>What data does Type the Word collect?</h2>
                 <p>
