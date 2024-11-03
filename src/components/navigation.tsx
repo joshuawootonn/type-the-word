@@ -43,6 +43,8 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
         state: 'initial',
     })
 
+    const [themes, setThemes] = useState(['Light', 'Dark'])
+
     function setSettingsState(value: SettingsState) {
         _setSettingsState(value)
 
@@ -298,24 +300,22 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                     >
                                                         <Select.ScrollUpButton />
                                                         <Select.Viewport>
-                                                            <Select.Item
-                                                                className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                                value="dark"
-                                                            >
-                                                                <Select.ItemText>
-                                                                    Dark
-                                                                </Select.ItemText>
-                                                                <Select.ItemIndicator />
-                                                            </Select.Item>
-                                                            <Select.Item
-                                                                className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                                value="light"
-                                                            >
-                                                                <Select.ItemText>
-                                                                    Light
-                                                                </Select.ItemText>
-                                                                <Select.ItemIndicator />
-                                                            </Select.Item>
+                                                            {themes.map(
+                                                                (theme, i) => (
+                                                                    <Select.Item
+                                                                        key={i}
+                                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                                                        value={theme.toLowerCase()}
+                                                                    >
+                                                                        <Select.ItemText>
+                                                                            {
+                                                                                theme
+                                                                            }
+                                                                        </Select.ItemText>
+                                                                        <Select.ItemIndicator />
+                                                                    </Select.Item>
+                                                                ),
+                                                            )}
                                                             <Select.Item
                                                                 className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
                                                                 value="system"
@@ -377,7 +377,20 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                         <h2 className="mb-2 text-xl">
                                             Theme Creator
                                         </h2>
-                                        <div className="col-2 grid grid-cols-2 items-center gap-x-2 gap-y-4 [&>*:nth-child(even)]:justify-self-end">
+                                        <form
+                                            onSubmit={() => {
+                                                setThemes(prev =>
+                                                    prev.concat(
+                                                        settingsState.name,
+                                                    ),
+                                                )
+
+                                                setSettingsState({
+                                                    state: 'initial',
+                                                })
+                                            }}
+                                            className="col-2 grid grid-cols-2 items-center gap-x-2 gap-y-4 [&>*:nth-child(even)]:justify-self-end"
+                                        >
                                             <label
                                                 htmlFor="theme-name"
                                                 className="pr-4"
@@ -408,10 +421,10 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                         e.currentTarget.select()
                                                     }
                                                     className={
-                                                        ' w-40 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none'
+                                                        'w-40 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none placeholder:text-primary/50'
                                                     }
                                                     id="theme-name"
-                                                    autoComplete="false"
+                                                    autoComplete="off"
                                                     data-1p-ignore={true}
                                                 />
                                             </div>
@@ -455,7 +468,17 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                     })
                                                 }
                                             />
-                                        </div>
+                                            <button
+                                                type="submit"
+                                                className="svg-outline relative col-span-2 border-2 border-primary px-3 py-1 font-semibold text-primary"
+                                            >
+                                                Save{' '}
+                                            </button>
+                                            <input
+                                                className="hidden"
+                                                type="submit"
+                                            />
+                                        </form>
                                     </>
                                 ) : null}
                             </Popover.PopoverContent>
