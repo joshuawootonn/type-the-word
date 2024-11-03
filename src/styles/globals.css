@@ -4,18 +4,18 @@
 
 @layer base {
     .light {
-        --color-primary: 0 0 0;
-        --color-secondary: 255 255 255;
-        --color-success: 16 185 129;
-        --color-incorrect: 190 18 60;
-        --color-extra: 136 19 55;
+        --color-primary: 0% 0 0;
+        --color-secondary: 100% 0 0;
+        --color-success: 56.53% 0.1293 157.54;
+        --color-incorrect: 51.43% 0.1923 6.1;
+        --color-extra: 46.77% 0.1878 5.32;
     }
     .dark {
-        --color-primary: 255 255 255;
-        --color-secondary: 0 0 0;
-        --color-success: 16 185 129;
-        --color-incorrect: 190 18 60;
-        --color-extra: 136 19 55;
+        --color-primary: 100% 0 0;
+        --color-secondary: 0% 0 0;
+        --color-success: 56.53% 0.1293 157.54;
+        --color-incorrect: 51.43% 0.1923 6.1;
+        --color-extra: 46.77% 0.1878 5.32;
     }
 }
 /*
@@ -48,7 +48,7 @@ body[style] {
 .svg-outline-stubby:focus-within:before {
     @apply -inset-2;
     content: ' ';
-    background-color: rgb(var(--color-primary));
+    background-color: oklch(var(--color-primary));
     -webkit-mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     position: absolute;
@@ -68,7 +68,7 @@ body[style] {
 .svg-outline-stubby:focus-within:before {
     @apply -bottom-0.5 -left-3 -right-3 -top-0.5;
 
-    background-color: rgb(var(--color-primary));
+    background-color: oklch(var(--color-primary));
     -webkit-mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="var(--color-primary)" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
 }
@@ -82,7 +82,7 @@ body[style] {
     .svg-outline-xs:focus-within:before,
     .svg-outline-stubby:focus:before,
     .svg-outline-stubby:focus-within:before {
-        background-color: rgb(var(--color-primary));
+        background-color: oklch(var(--color-primary));
         -webkit-mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
         mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     }
