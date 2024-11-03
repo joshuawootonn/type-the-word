@@ -132,7 +132,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                     transform: translateY(1px);
                     width: 39px;
                     height: 33px;
-                    background-color: rgb(var(--color-primary));
+                    background-color: oklch(var(--color-primary));
                     -webkit-mask-image: url('/bible.svg');
                     mask-image: url('/bible.svg');
                     mask-repeat: no-repeat;
