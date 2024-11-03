@@ -60,10 +60,29 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                 value.success,
             )
             document.documentElement.style.setProperty(
-                '--color-error',
+                '--color-incorrect',
                 value.error,
             )
         }
+    }
+
+    function createTheme() {
+        setSettingsState({
+            state: 'create-theme',
+            name: '',
+            primary: window
+                .getComputedStyle(document.documentElement)
+                .getPropertyValue('--color-primary'),
+            secondary: window
+                .getComputedStyle(document.documentElement)
+                .getPropertyValue('--color-secondary'),
+            success: window
+                .getComputedStyle(document.documentElement)
+                .getPropertyValue('--color-success'),
+            error: window
+                .getComputedStyle(document.documentElement)
+                .getPropertyValue('--color-incorrect'),
+        })
     }
 
     useHotkeys(
@@ -316,52 +335,12 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                                         )
                                                                     ) {
                                                                         e.preventDefault()
-                                                                        setSettingsState(
-                                                                            {
-                                                                                state: 'create-theme',
-                                                                                name: '',
-                                                                                primary:
-                                                                                    document.documentElement.style.getPropertyValue(
-                                                                                        '--color-primary',
-                                                                                    ),
-                                                                                secondary:
-                                                                                    document.documentElement.style.getPropertyValue(
-                                                                                        '--color-secondary',
-                                                                                    ),
-                                                                                success:
-                                                                                    document.documentElement.style.getPropertyValue(
-                                                                                        '--color-success',
-                                                                                    ),
-                                                                                error: document.documentElement.style.getPropertyValue(
-                                                                                    '--color-error',
-                                                                                ),
-                                                                            },
-                                                                        )
+                                                                        createTheme()
                                                                     }
                                                                 }}
                                                                 onPointerUp={e => {
                                                                     e.preventDefault()
-                                                                    setSettingsState(
-                                                                        {
-                                                                            state: 'create-theme',
-                                                                            name: '',
-                                                                            primary:
-                                                                                document.documentElement.style.getPropertyValue(
-                                                                                    '--color-primary',
-                                                                                ),
-                                                                            secondary:
-                                                                                document.documentElement.style.getPropertyValue(
-                                                                                    '--color-secondary',
-                                                                                ),
-                                                                            success:
-                                                                                document.documentElement.style.getPropertyValue(
-                                                                                    '--color-success',
-                                                                                ),
-                                                                            error: document.documentElement.style.getPropertyValue(
-                                                                                '--color-error',
-                                                                            ),
-                                                                        },
-                                                                    )
+                                                                    createTheme()
                                                                 }}
                                                             >
                                                                 <Select.ItemText>
@@ -500,6 +479,10 @@ function ColorInput(props: {
     label: string
     onChange: (number: string) => void
 }) {
+    const rgbValue = new Color(`oklch(${props.value})`).to('srgb').toString({
+        format: 'hex',
+        collapse: false,
+    })
     return (
         <>
             <label htmlFor="primary-hue" className="pr-4">
@@ -510,6 +493,7 @@ function ColorInput(props: {
                 <input
                     type="color"
                     className="border-2 border-primary outline-none"
+                    value={rgbValue}
                     onChange={e => {
                         const color = new Color(e.currentTarget.value).to(
                             'oklch',
