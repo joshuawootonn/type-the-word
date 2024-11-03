@@ -38,6 +38,7 @@ body[style] {
     @apply outline-none;
 }
 
+.svg-outline-override,
 .svg-outline:focus:before,
 .svg-outline:focus-within:before,
 .svg-outline-sm:focus:before,

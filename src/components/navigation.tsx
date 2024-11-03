@@ -489,7 +489,8 @@ function ColorInput(props: {
                 {props.label}
             </label>
 
-            <div className="relative h-8 w-8">
+            <div className="group relative z-0 h-8 w-8">
+                <div className="svg-outline-override absolute -z-10 hidden group-focus-within:block" />
                 <input
                     type="color"
                     className="border-2 border-primary outline-none"
