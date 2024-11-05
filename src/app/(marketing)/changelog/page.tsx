@@ -8,7 +8,7 @@ import HotkeyLabel from '~/components/hotkey-label'
 function Link({ href, children }: { href: string; children: React.ReactNode }) {
     return (
         <a
-            className="svg-outline-sm relative cursor-pointer no-underline outline-none"
+            className="svg-outline-sm relative cursor-pointer whitespace-nowrap no-underline outline-none"
             href={href}
             target="_blank"
             rel="noopener noreferrer"
@@ -52,6 +52,13 @@ export default function Changelog() {
             <p>New updates and improvements to Type the Word</p>
             <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
             <ul>
+                <li>
+                    <DateComponent date={new Date('11/5/2024')} /> - Fixed a
+                    long time bug that prevented access to{' '}
+                    <Link href="/passage/song_of_solomon_4">
+                        Song of Solomon 4-6{' '}
+                    </Link>
+                </li>{' '}
                 <li>
                     <DateComponent date={new Date('10/13/2024')} /> - Fixed a
                     long time bug where the line indicating what verses you have
