@@ -165,7 +165,7 @@ export function PassageSelector({
                             simpleBibleMetadata[book]?.name ?? ''
                         }
                         className={
-                            'w-40 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none'
+                            'w-44 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none'
                         }
                         autoComplete="false"
                         data-1p-ignore={true}
@@ -197,7 +197,7 @@ export function PassageSelector({
                                                         ? 'bg-primary text-secondary '
                                                         : 'bg-secondary text-primary ',
                                                 )}
-                                                onClick={e => {
+                                                onClick={() => {
                                                     setTimeout(
                                                         () =>
                                                             chapterRef.current?.focus(),
