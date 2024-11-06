@@ -24,6 +24,7 @@ const config = {
         // this is broken right now. find another solution or update when there is something available.
         // '@trivago/prettier-plugin-sort-imports',
     ],
+    
 }
 
 export default config

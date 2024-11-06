@@ -2,15 +2,18 @@ import { z } from 'zod'
 import { env } from '~/env.mjs'
 import { parseChapter } from '~/lib/parseEsv'
 import { PassageObject, stringToPassageObject } from '~/lib/passageObject'
+import fs from 'fs'
+import path from 'path'
 
-import psalm23 from '~/server/psalm-23.json'
-import james1 from '~/server/james-1.json'
-import genesis1 from '~/server/genesis-1.json'
 import { passageResponse } from '~/server/db/schema'
 import { and, eq, sql } from 'drizzle-orm'
 import { isAfter, isBefore, subDays } from 'date-fns'
 import { db } from '~/server/db'
-import { PassageSegment, passageSegmentSchema } from '~/lib/passageSegment'
+import {
+    PassageSegment,
+    passageSegmentSchema,
+    toPassageSegment,
+} from '~/lib/passageSegment'
 import { passageReferenceSchema } from '~/lib/passageReference'
 
 const passageSchema = z.object({
@@ -79,37 +82,45 @@ export async function GET(
                 ? `:${passageData.firstVerse}`
                 : `:${passageData.firstVerse}-${passageData.lastVerse}`
             : ''
+    const referenceIncludesVerses = reference.includes(':')
 
     if (
-        passageData.book === 'psalm' &&
-        passageData.chapter === 23 &&
-        passageData.firstVerse == null
+        !referenceIncludesVerses &&
+        [
+            'genesis_1',
+            'psalm_23',
+            'james_1',
+            'song_of_solomon_1',
+            'song_of_solomon_2',
+            'song_of_solomon_3',
+            'song_of_solomon_4',
+            'song_of_solomon_5',
+            'song_of_solomon_6',
+            'song_of_solomon_7',
+            'song_of_solomon_8',
+        ].includes(toPassageSegment(passageData.book, passageData.chapter))
     ) {
-        return Response.json(
-            { data: parseChapter(psalm23.passages.at(0) ?? '') },
-            { status: 200 },
+        const filePath = path.join(
+            process.cwd(),
+            '/src/server',
+            `${toPassageSegment(passageData.book, passageData.chapter)}.html`,
         )
-    } else if (
-        passageData.book === 'james' &&
-        passageData.chapter === 1 &&
-        passageData.firstVerse == null
-    ) {
-        return Response.json(
-            { data: parseChapter(james1.passages.at(0) ?? '') },
-            { status: 200 },
-        )
-    } else if (
-        passageData.book === 'genesis' &&
-        passageData.chapter === 1 &&
-        passageData.firstVerse == null
-    ) {
-        return Response.json(
-            { data: parseChapter(genesis1.passages.at(0) ?? '') },
-            { status: 200 },
-        )
+        try {
+            const content = fs.readFileSync(filePath, {
+                encoding: 'utf8',
+            })
+            return Response.json(
+                { data: parseChapter(content) },
+                { status: 200 },
+            )
+        } catch (error) {
+            console.warn(
+                `Tried to read passage: (${filePath}) and failed with error:`,
+                error,
+            )
+        }
     }
 
-    const referenceIncludesVerses = reference.includes(':')
     // Only optimize whole chapter fetches
     if (passageData.chapter != null && referenceIncludesVerses) {
         console.log(
