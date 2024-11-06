@@ -165,13 +165,94 @@ export function parseNextChapter(
     return null
 }
 
+function isHeading(node: Element) {
+    const headingTags = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6']
+    return headingTags.includes(node.tagName)
+}
+
 export function parseChapter(passage: string): ParsedPassage {
     const dom = new JSDOM(passage)
     dom.window.document.querySelectorAll('sup.footnote').forEach(node => {
         node.parentNode?.removeChild(node)
     })
-    const cleanPassage = dom.serialize()
-    const html = parseFragment(cleanPassage)
+
+    /*
+    This is a fix for invalid HTML that I was receiving for Song of Solomon 4 - 6.
+    I used this codepen to debug: https://codepen.io/joshuawootonn/pen/yLmxVgv
+    I think they might be using Parse5 on their BE because this HTML structure is the default behavior of Parse5 when you try to nest things inside a `p`.
+
+    From: 
+    ```
+    <p id="block-indent"></p>
+    <span>one</span>
+    <span>two</span>
+    <span>three</span>
+    <h1>Heading</h1>
+    <span>four</span>
+    <span>five</span>
+    <span>six</span>
+    <p></p>
+    ```
+    To:
+    ```
+    <p class="block-indent">
+        <span>one</span>
+        <span>two</span>
+        <span>three</span>
+    </p>
+    <h1>Heading</h1>
+    <p class="block-indent">
+        <span>four</span>
+        <span>five</span>
+        <span>six</span>
+    </p>
+    ```
+    */
+    dom.window.document.querySelectorAll('p.block-indent').forEach(node => {
+        let temp: Element[] = []
+        let anchorP: Element
+        let current: Element
+
+        if (node.childNodes.length === 0) {
+            anchorP = node
+            current = node
+            while (current.nextElementSibling != null) {
+                const next = current.nextElementSibling
+                if (next.nodeName === 'P' && next.childNodes.length === 0) {
+                    next.remove()
+                    temp.forEach(newChild => {
+                        anchorP.appendChild(newChild)
+                    })
+                    temp = []
+                    break
+                } else if (isHeading(next)) {
+                    temp.forEach(newChild => {
+                        anchorP.appendChild(newChild)
+                    })
+                    temp = []
+                    const clonedP = anchorP.cloneNode()
+
+                    if (!(clonedP instanceof Element)) {
+                        throw new Error(
+                            'cloned element and it became a non element',
+                        )
+                    }
+                    anchorP = clonedP
+
+                    next.parentElement?.insertBefore(
+                        anchorP,
+                        next.nextElementSibling,
+                    )
+                    current = anchorP
+                } else {
+                    temp.push(next)
+                    current = next
+                }
+            }
+        }
+    })
+
+    const html = parseFragment(dom.serialize())
 
     const context: {
         lastVerse?: Verse
@@ -313,10 +394,7 @@ export function parseChapter(passage: string): ParsedPassage {
                     .join(''),
             }
         }
-        // todo: this was a hack to get song of solomon working....
-        // a heading is within a p element there so it kinda breaks the parsing.
-        // ideally this would not include span and it would handle ^
-        if (node.nodeName === 'p' || node.nodeName === 'span') {
+        if (node.nodeName === 'p' && node.childNodes.length > 0) {
             const nodes: Inline[] = node.childNodes.flatMap(parseInline)
 
             if (inlineToString(nodes) === '( ) ') {
