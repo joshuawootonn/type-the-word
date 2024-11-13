@@ -53,6 +53,28 @@ export default function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('11/12/2024')} />
+                    <ul>
+                        <li>
+                            Fixed a bug with backspace (
+                            <HotkeyLabel mac="⇦" mobile="⇦" nonMac="⇦" />) where
+                            it would delete an entire word. This was a bug in
+                            Chrome that would happen after the shortcut for
+                            deleting the previous word was used (
+                            <HotkeyLabel mac="⌥+⇦" mobile="⌥+⇦" nonMac="^+⇦" />)
+                            despite the{' '}
+                            <HotkeyLabel mac="⌥" mobile="⌥" nonMac="^" /> being
+                            unpressed.{' '}
+                        </li>
+                        <li>
+                            Fixed some incorrect spacing in the quote within{' '}
+                            <Link href="/passage/matthew_6">
+                                Matthew 6:10-13
+                            </Link>
+                        </li>
+                    </ul>
+                </li>{' '}
+                <li>
                     <DateComponent date={new Date('11/5/2024')} /> - Fixed a
                     long time bug that prevented access to{' '}
                     <Link href="/passage/song_of_solomon_4">
