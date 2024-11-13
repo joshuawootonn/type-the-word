@@ -245,6 +245,7 @@ export function CurrentVerse({
     }, [keystrokes.length])
 
     function handleKnownEvents(event: KnownNativeInputEvent) {
+        console.log(event.inputType)
         let isVerseComplete = false
 
         setIsPassageActive(true)
@@ -296,19 +297,44 @@ export function CurrentVerse({
     function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
         const { os } = getOS()
 
-        // Windows doesn't have a "delete the current line" shortcut.
-        // So I am faking the 'deleteSoftLineBackward' from this `onKeyDown` given the right situation.
-        if (
-            (os === 'Windows' || os === 'Linux') &&
-            event.shiftKey &&
-            event.ctrlKey &&
-            event.key === 'Backspace'
-        ) {
-            event.preventDefault()
-            handleKnownEvents({
-                data: null,
-                inputType: 'deleteSoftLineBackward',
-            })
+        if (os === 'Windows' || os === 'Linux') {
+            // Windows doesn't have a "delete the current line" shortcut.
+            // So I am faking the 'deleteSoftLineBackward' from this `onKeyDown` given the right situation.
+            if (event.shiftKey && event.ctrlKey && event.key === 'Backspace') {
+                event.preventDefault()
+                handleKnownEvents({
+                    data: null,
+                    inputType: 'deleteSoftLineBackward',
+                })
+            } else if (event.ctrlKey && event.key === 'Backspace') {
+                event.preventDefault()
+                handleKnownEvents({
+                    data: null,
+                    inputType: 'deleteWordBackward',
+                })
+            } else if (event.key === 'Backspace') {
+                event.preventDefault()
+                handleKnownEvents({
+                    data: null,
+                    inputType: 'deleteContentBackward',
+                })
+            }
+        }
+
+        if (os === 'MacOS') {
+            if (event.altKey && event.key === 'Backspace') {
+                event.preventDefault()
+                handleKnownEvents({
+                    data: null,
+                    inputType: 'deleteWordBackward',
+                })
+            } else if (event.key === 'Backspace') {
+                event.preventDefault()
+                handleKnownEvents({
+                    data: null,
+                    inputType: 'deleteContentBackward',
+                })
+            }
         }
     }
 
