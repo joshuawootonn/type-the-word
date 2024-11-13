@@ -165,11 +165,6 @@ export function parseNextChapter(
     return null
 }
 
-function isHeading(node: Element) {
-    const headingTags = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6']
-    return headingTags.includes(node.tagName)
-}
-
 export function parseChapter(passage: string): ParsedPassage {
     const dom = new JSDOM(passage)
     dom.window.document.querySelectorAll('sup.footnote').forEach(node => {
@@ -189,17 +184,21 @@ export function parseChapter(passage: string): ParsedPassage {
         if (node.nodeName === '#text' && 'value' in node) {
             const leadingSpaces =
                 node.value.length - node.value.trimStart().length
+            if (node.value === '\n') {
+                return []
+            }
             const words = node.value
                 .trimStart()
                 .split(splitBySpaceOrNewLine)
                 .filter(word => word !== '' && word !== ' ' && word !== '\n')
 
-            if (words.length === 0) {
-                return []
-            }
             const leading = new Array<{ type: 'space' }>(leadingSpaces).fill({
                 type: 'space',
             })
+
+            if (words.length === 0) {
+                return [...leading]
+            }
 
             return [
                 ...leading,
