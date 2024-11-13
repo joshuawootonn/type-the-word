@@ -102,7 +102,6 @@ export function PassageSelector({
     useEffect(() => {
         const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
         // I use `!includes` to prevent passage selector from clearing url specified verses
-        console.log(pathname)
         if (!pathname?.includes(nextValue) && pathname !== '/') {
             const t = setTimeout(() => {
                 onSubmit({ book, chapter })
@@ -112,7 +111,7 @@ export function PassageSelector({
                 clearTimeout(t)
             }
         }
-    }, [book, chapter, pathname])
+    }, [book, chapter, onSubmit, pathname])
 
     const filteredChapters =
         chapterQuery === ''
