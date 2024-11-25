@@ -340,12 +340,14 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                     )
                                                 }}
                                             >
-                                                <Select.Trigger
-                                                    id="theme-selector"
-                                                    className="svg-outline relative h-full cursor-pointer truncate border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                >
-                                                    <Select.Value />
-                                                </Select.Trigger>
+                                                <div className="svg-outline relative">
+                                                    <Select.Trigger
+                                                        id="theme-selector"
+                                                        className="h-full cursor-pointer truncate border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                                    >
+                                                        <Select.Value />
+                                                    </Select.Trigger>
+                                                </div>
 
                                                 <Select.Portal>
                                                     <Select.Content
