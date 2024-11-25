@@ -4,7 +4,6 @@ import { useTheme } from 'next-themes'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import * as Popover from '@radix-ui/react-popover'
-import * as Select from '@radix-ui/react-select'
 import Link from 'next/link'
 import Head from 'next/head'
 import { usePathname } from 'next/navigation'
@@ -17,7 +16,6 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import HotkeyLabel from './hotkey-label'
 import clsx from 'clsx'
 import Color from 'colorjs.io'
-import { ne } from 'drizzle-orm'
 
 const SELECTION_KEYS = [' ', 'Enter']
 
@@ -120,6 +118,29 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
         })
     }
 
+    function selectTheme(next: string) {
+        setTheme(next)
+        const nextTheme = themes.find(theme => theme.value === next)
+        if (nextTheme == null) return
+
+        document.documentElement.style.setProperty(
+            '--color-primary',
+            nextTheme.primary,
+        )
+        document.documentElement.style.setProperty(
+            '--color-secondary',
+            nextTheme.secondary,
+        )
+        document.documentElement.style.setProperty(
+            '--color-success',
+            nextTheme.success,
+        )
+        document.documentElement.style.setProperty(
+            '--color-incorrect',
+            nextTheme.error,
+        )
+    }
+
     useHotkeys(
         'mod+shift+comma',
         () => setSettingsOpen(prev => !prev),
@@ -140,6 +161,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
               lastTypedVerse.chapter,
           )}`
         : `/`
+    console.log(themes.find(t => t.value === theme)?.label)
 
     return (
         <nav className="mx-auto mb-2 flex w-full items-center justify-between pt-4 lg:pt-8">
@@ -284,8 +306,8 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                             <Popover.PopoverContent
                                 className={clsx(
                                     settingsState.state === 'create-theme'
-                                        ? 'w-100'
-                                        : 'w-52',
+                                        ? 'min-w-100'
+                                        : 'min-w-52',
                                     'z-50  border-2 border-primary bg-secondary px-3 py-3 text-primary',
                                 )}
                                 sideOffset={-2}
@@ -309,129 +331,173 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                 Theme:
                                             </label>
 
-                                            <Select.Root
-                                                value={theme}
-                                                onValueChange={next => {
-                                                    setTheme(next)
-                                                    const nextTheme =
-                                                        themes.find(
-                                                            theme =>
-                                                                theme.value ===
-                                                                next,
-                                                        )
-                                                    if (nextTheme == null)
-                                                        return
+                                            <DropdownMenu.Root>
+                                                <DropdownMenu.Trigger
+                                                    id="theme-selector"
+                                                    className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                                >
+                                                    {theme === 'system'
+                                                        ? 'System'
+                                                        : themes.find(
+                                                              t =>
+                                                                  t.value ===
+                                                                  theme,
+                                                          )?.label}
+                                                </DropdownMenu.Trigger>
 
-                                                    document.documentElement.style.setProperty(
-                                                        '--color-primary',
-                                                        nextTheme.primary,
-                                                    )
-                                                    document.documentElement.style.setProperty(
-                                                        '--color-secondary',
-                                                        nextTheme.secondary,
-                                                    )
-                                                    document.documentElement.style.setProperty(
-                                                        '--color-success',
-                                                        nextTheme.success,
-                                                    )
-                                                    document.documentElement.style.setProperty(
-                                                        '--color-incorrect',
-                                                        nextTheme.error,
-                                                    )
-                                                }}
-                                            >
-                                                <div className="svg-outline relative">
-                                                    <Select.Trigger
-                                                        id="theme-selector"
-                                                        className="h-full cursor-pointer truncate border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                    >
-                                                        <Select.Value />
-                                                    </Select.Trigger>
-                                                </div>
-
-                                                <Select.Portal>
-                                                    <Select.Content
+                                                <DropdownMenu.Portal>
+                                                    <DropdownMenu.Content
                                                         side="bottom"
-                                                        position="popper"
                                                         avoidCollisions={false}
-                                                        className="z-50 border-2 border-primary bg-secondary text-primary "
+                                                        className="z-50 w-40 border-2 border-primary bg-secondary text-primary "
                                                         align="end"
                                                         sideOffset={-2}
                                                     >
-                                                        <Select.ScrollUpButton />
-                                                        <Select.Viewport>
-                                                            {themes.map(
-                                                                (theme, i) => (
-                                                                    <Select.Item
-                                                                        key={i}
-                                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                                        value={
-                                                                            theme.value
-                                                                        }
-                                                                    >
-                                                                        <Select.ItemText>
+                                                        {themes.map(
+                                                            (theme, i) => {
+                                                                if (
+                                                                    theme.value ===
+                                                                        'light' ||
+                                                                    theme.value ===
+                                                                        'dark'
+                                                                ) {
+                                                                    return (
+                                                                        <DropdownMenu.Item
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                            onSelect={() =>
+                                                                                selectTheme(
+                                                                                    theme.value,
+                                                                                )
+                                                                            }
+                                                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                                                        >
                                                                             {
                                                                                 theme.label
                                                                             }
-                                                                        </Select.ItemText>
-                                                                        <Select.ItemIndicator />
-                                                                    </Select.Item>
-                                                                ),
-                                                            )}
-                                                            <Select.Item
-                                                                className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                                value="system"
-                                                            >
-                                                                <Select.ItemText>
-                                                                    System
-                                                                </Select.ItemText>
-                                                                <Select.ItemIndicator />
-                                                            </Select.Item>
-                                                            <Select.Item
-                                                                className="flex cursor-pointer flex-row items-center justify-between space-x-2 px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                                value="create-theme"
-                                                                onKeyDown={e => {
-                                                                    if (
-                                                                        SELECTION_KEYS.includes(
-                                                                            e.key,
-                                                                        )
-                                                                    ) {
-                                                                        e.preventDefault()
-                                                                        createTheme()
-                                                                    }
-                                                                }}
-                                                                onPointerUp={e => {
+                                                                        </DropdownMenu.Item>
+                                                                    )
+                                                                }
+                                                                return (
+                                                                    <DropdownMenu.Sub
+                                                                        key={i}
+                                                                    >
+                                                                        <DropdownMenu.SubTrigger className="flex cursor-pointer flex-row items-center px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary ">
+                                                                            <span className="flex-grow truncate">
+                                                                                {
+                                                                                    theme.label
+                                                                                }
+                                                                            </span>
+                                                                            <svg
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                fill="none"
+                                                                                viewBox="0 0 24 24"
+                                                                                strokeWidth={
+                                                                                    3
+                                                                                }
+                                                                                stroke="currentColor"
+                                                                                className="size-4 shrink-0"
+                                                                            >
+                                                                                <path
+                                                                                    strokeLinecap="round"
+                                                                                    strokeLinejoin="round"
+                                                                                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                                                                                />
+                                                                            </svg>
+                                                                        </DropdownMenu.SubTrigger>
+                                                                        <DropdownMenu.Portal>
+                                                                            <DropdownMenu.SubContent className="border-2 border-primary bg-secondary text-primary">
+                                                                                <DropdownMenu.Item
+                                                                                    onSelect={() =>
+                                                                                        selectTheme(
+                                                                                            theme.value,
+                                                                                        )
+                                                                                    }
+                                                                                    className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                                                                >
+                                                                                    Select
+                                                                                </DropdownMenu.Item>
+                                                                                <DropdownMenu.Item
+                                                                                    onSelect={() => {
+                                                                                        const prefersDark =
+                                                                                            window.matchMedia(
+                                                                                                '(prefers-color-scheme: dark)',
+                                                                                            ).matches
+                                                                                        selectTheme(
+                                                                                            prefersDark
+                                                                                                ? 'dark'
+                                                                                                : 'light',
+                                                                                        )
+                                                                                        setThemes(
+                                                                                            prev =>
+                                                                                                prev.filter(
+                                                                                                    t =>
+                                                                                                        t.value !==
+                                                                                                        theme.value,
+                                                                                                ),
+                                                                                        )
+                                                                                    }}
+                                                                                    className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                                                                >
+                                                                                    Delete
+                                                                                </DropdownMenu.Item>
+                                                                            </DropdownMenu.SubContent>
+                                                                        </DropdownMenu.Portal>
+                                                                    </DropdownMenu.Sub>
+                                                                )
+                                                            },
+                                                        )}
+                                                        <DropdownMenu.Item
+                                                            onSelect={() =>
+                                                                selectTheme(
+                                                                    'system',
+                                                                )
+                                                            }
+                                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                                        >
+                                                            System
+                                                        </DropdownMenu.Item>
+                                                        <DropdownMenu.Item
+                                                            className="flex cursor-pointer flex-row items-center justify-between space-x-2 px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                                            onKeyDown={e => {
+                                                                if (
+                                                                    SELECTION_KEYS.includes(
+                                                                        e.key,
+                                                                    )
+                                                                ) {
                                                                     e.preventDefault()
                                                                     createTheme()
-                                                                }}
-                                                            >
-                                                                <Select.ItemText>
-                                                                    New theme
-                                                                </Select.ItemText>
-                                                                <div>
-                                                                    <svg
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        fill="none"
-                                                                        viewBox="0 0 24 24"
-                                                                        strokeWidth={
-                                                                            3
-                                                                        }
-                                                                        stroke="currentColor"
-                                                                        className="size-4"
-                                                                    >
-                                                                        <path
-                                                                            strokeLinecap="round"
-                                                                            strokeLinejoin="round"
-                                                                            d="M12 4.5v15m7.5-7.5h-15"
-                                                                        />
-                                                                    </svg>
-                                                                </div>
-                                                                <Select.ItemIndicator />
-                                                            </Select.Item>
-                                                        </Select.Viewport>
-                                                    </Select.Content>
-                                                </Select.Portal>
-                                            </Select.Root>
+                                                                }
+                                                            }}
+                                                            onPointerUp={e => {
+                                                                e.preventDefault()
+                                                                createTheme()
+                                                            }}
+                                                        >
+                                                            New theme
+                                                            <div>
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    fill="none"
+                                                                    viewBox="0 0 24 24"
+                                                                    strokeWidth={
+                                                                        3
+                                                                    }
+                                                                    stroke="currentColor"
+                                                                    className="size-4"
+                                                                >
+                                                                    <path
+                                                                        strokeLinecap="round"
+                                                                        strokeLinejoin="round"
+                                                                        d="M12 4.5v15m7.5-7.5h-15"
+                                                                    />
+                                                                </svg>
+                                                            </div>
+                                                        </DropdownMenu.Item>
+                                                    </DropdownMenu.Content>
+                                                </DropdownMenu.Portal>
+                                            </DropdownMenu.Root>
                                         </div>
                                     </>
                                 ) : settingsState.state === 'create-theme' ? (
