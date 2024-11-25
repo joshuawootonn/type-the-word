@@ -17,18 +17,24 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import HotkeyLabel from './hotkey-label'
 import clsx from 'clsx'
 import Color from 'colorjs.io'
+import { ne } from 'drizzle-orm'
 
 const SELECTION_KEYS = [' ', 'Enter']
+
+type Theme = {
+    label: string
+    value: string
+    primary: string
+    secondary: string
+    success: string
+    error: string
+}
 
 type SettingsState =
     | { state: 'initial' }
     | {
           state: 'create-theme'
-          name: string
-          primary: string
-          secondary: string
-          success: string
-          error: string
+          theme: Theme
       }
     | { state: 'edit-theme' }
 
@@ -43,47 +49,74 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
         state: 'initial',
     })
 
-    const [themes, setThemes] = useState(['Light', 'Dark'])
+    const [themes, setThemes] = useState<Theme[]>([
+        {
+            label: 'Light',
+            value: 'light',
+            primary: '0% 0 0',
+            secondary: '100% 0 0',
+            success: '56.53% 0.1293 157.54',
+            error: '46.77% 0.1878 5.32',
+        },
+        {
+            label: 'Dark',
+            value: 'dark',
+            primary: '100% 0 0',
+            secondary: '0% 0 0',
+            success: '56.53% 0.1293 157.54',
+            error: '46.77% 0.1878 5.32',
+        },
+    ])
 
     function setSettingsState(value: SettingsState) {
-        _setSettingsState(value)
-
         if (value.state === 'create-theme') {
+            _setSettingsState({
+                ...value,
+                theme: {
+                    ...value.theme,
+                    value: value.theme.label.split(' ').join('-').toLowerCase(),
+                },
+            })
             document.documentElement.style.setProperty(
                 '--color-primary',
-                value.primary,
+                value.theme.primary,
             )
             document.documentElement.style.setProperty(
                 '--color-secondary',
-                value.secondary,
+                value.theme.secondary,
             )
             document.documentElement.style.setProperty(
                 '--color-success',
-                value.success,
+                value.theme.success,
             )
             document.documentElement.style.setProperty(
                 '--color-incorrect',
-                value.error,
+                value.theme.error,
             )
+        } else {
+            _setSettingsState(value)
         }
     }
 
     function createTheme() {
         setSettingsState({
             state: 'create-theme',
-            name: '',
-            primary: window
-                .getComputedStyle(document.documentElement)
-                .getPropertyValue('--color-primary'),
-            secondary: window
-                .getComputedStyle(document.documentElement)
-                .getPropertyValue('--color-secondary'),
-            success: window
-                .getComputedStyle(document.documentElement)
-                .getPropertyValue('--color-success'),
-            error: window
-                .getComputedStyle(document.documentElement)
-                .getPropertyValue('--color-incorrect'),
+            theme: {
+                label: '',
+                value: '',
+                primary: window
+                    .getComputedStyle(document.documentElement)
+                    .getPropertyValue('--color-primary'),
+                secondary: window
+                    .getComputedStyle(document.documentElement)
+                    .getPropertyValue('--color-secondary'),
+                success: window
+                    .getComputedStyle(document.documentElement)
+                    .getPropertyValue('--color-success'),
+                error: window
+                    .getComputedStyle(document.documentElement)
+                    .getPropertyValue('--color-incorrect'),
+            },
         })
     }
 
@@ -278,13 +311,38 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
 
                                             <Select.Root
                                                 value={theme}
-                                                onValueChange={next =>
+                                                onValueChange={next => {
                                                     setTheme(next)
-                                                }
+                                                    const nextTheme =
+                                                        themes.find(
+                                                            theme =>
+                                                                theme.value ===
+                                                                next,
+                                                        )
+                                                    if (nextTheme == null)
+                                                        return
+
+                                                    document.documentElement.style.setProperty(
+                                                        '--color-primary',
+                                                        nextTheme.primary,
+                                                    )
+                                                    document.documentElement.style.setProperty(
+                                                        '--color-secondary',
+                                                        nextTheme.secondary,
+                                                    )
+                                                    document.documentElement.style.setProperty(
+                                                        '--color-success',
+                                                        nextTheme.success,
+                                                    )
+                                                    document.documentElement.style.setProperty(
+                                                        '--color-incorrect',
+                                                        nextTheme.error,
+                                                    )
+                                                }}
                                             >
                                                 <Select.Trigger
                                                     id="theme-selector"
-                                                    className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                                    className="svg-outline relative h-full cursor-pointer truncate border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
                                                 >
                                                     <Select.Value />
                                                 </Select.Trigger>
@@ -305,11 +363,13 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                                     <Select.Item
                                                                         key={i}
                                                                         className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                                        value={theme.toLowerCase()}
+                                                                        value={
+                                                                            theme.value
+                                                                        }
                                                                     >
                                                                         <Select.ItemText>
                                                                             {
-                                                                                theme
+                                                                                theme.label
                                                                             }
                                                                         </Select.ItemText>
                                                                         <Select.ItemIndicator />
@@ -380,11 +440,44 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                         <form
                                             onSubmit={() => {
                                                 setThemes(prev =>
-                                                    prev.concat(
-                                                        settingsState.name,
-                                                    ),
+                                                    prev.concat({
+                                                        label: settingsState
+                                                            .theme.label,
+                                                        value: settingsState
+                                                            .theme.value,
+                                                        primary: window
+                                                            .getComputedStyle(
+                                                                document.documentElement,
+                                                            )
+                                                            .getPropertyValue(
+                                                                '--color-primary',
+                                                            ),
+                                                        secondary: window
+                                                            .getComputedStyle(
+                                                                document.documentElement,
+                                                            )
+                                                            .getPropertyValue(
+                                                                '--color-secondary',
+                                                            ),
+                                                        success: window
+                                                            .getComputedStyle(
+                                                                document.documentElement,
+                                                            )
+                                                            .getPropertyValue(
+                                                                '--color-success',
+                                                            ),
+                                                        error: window
+                                                            .getComputedStyle(
+                                                                document.documentElement,
+                                                            )
+                                                            .getPropertyValue(
+                                                                '--color-incorrect',
+                                                            ),
+                                                    }),
                                                 )
-
+                                                setTheme(
+                                                    settingsState.theme.value,
+                                                )
                                                 setSettingsState({
                                                     state: 'initial',
                                                 })
@@ -399,18 +492,24 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                             </label>
                                             <div className="svg-outline relative">
                                                 <input
-                                                    value={settingsState.name}
+                                                    value={
+                                                        settingsState.theme
+                                                            .label
+                                                    }
                                                     onChange={event =>
                                                         setSettingsState(
                                                             settingsState.state ===
                                                                 'create-theme'
                                                                 ? {
                                                                       ...settingsState,
-                                                                      name:
-                                                                          event
-                                                                              .currentTarget
-                                                                              ?.value ??
-                                                                          '',
+                                                                      theme: {
+                                                                          ...settingsState.theme,
+                                                                          label:
+                                                                              event
+                                                                                  .currentTarget
+                                                                                  ?.value ??
+                                                                              '',
+                                                                      },
                                                                   }
                                                                 : settingsState,
                                                         )
@@ -430,41 +529,62 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                             </div>
                                             <ColorInput
                                                 label="Primary Hue"
-                                                value={settingsState.primary}
+                                                value={
+                                                    settingsState.theme.primary
+                                                }
                                                 onChange={value =>
                                                     setSettingsState({
                                                         ...settingsState,
-                                                        primary: value,
+                                                        theme: {
+                                                            ...settingsState.theme,
+                                                            primary: value,
+                                                        },
                                                     })
                                                 }
                                             />
                                             <ColorInput
                                                 label="Secondary Hue"
-                                                value={settingsState.secondary}
+                                                value={
+                                                    settingsState.theme
+                                                        .secondary
+                                                }
                                                 onChange={value =>
                                                     setSettingsState({
                                                         ...settingsState,
-                                                        secondary: value,
+                                                        theme: {
+                                                            ...settingsState.theme,
+                                                            secondary: value,
+                                                        },
                                                     })
                                                 }
                                             />
                                             <ColorInput
                                                 label="Success Hue"
-                                                value={settingsState.success}
+                                                value={
+                                                    settingsState.theme.success
+                                                }
                                                 onChange={value =>
                                                     setSettingsState({
                                                         ...settingsState,
-                                                        success: value,
+                                                        theme: {
+                                                            ...settingsState.theme,
+                                                            success: value,
+                                                        },
                                                     })
                                                 }
                                             />
                                             <ColorInput
                                                 label="Error Hue"
-                                                value={settingsState.error}
+                                                value={
+                                                    settingsState.theme.error
+                                                }
                                                 onChange={value =>
                                                     setSettingsState({
                                                         ...settingsState,
-                                                        error: value,
+                                                        theme: {
+                                                            ...settingsState.theme,
+                                                            error: value,
+                                                        },
                                                     })
                                                 }
                                             />
