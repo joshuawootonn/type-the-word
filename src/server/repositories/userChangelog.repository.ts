@@ -1,6 +1,6 @@
 import * as schema from '~/server/db/schema'
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
-import { eq, count as sqlCount } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 

@@ -7,8 +7,15 @@ import * as Popover from '@radix-ui/react-popover'
 import Link from 'next/link'
 import Head from 'next/head'
 import { usePathname } from 'next/navigation'
-import { fetchLastVerse } from '~/lib/api'
-import { useQuery } from '@tanstack/react-query'
+import {
+    fetchCreateTheme,
+    fetchCurrentTheme,
+    fetchDeleteTheme,
+    fetchLastVerse,
+    fetchSetCurrentTheme,
+    fetchThemes,
+} from '~/lib/api'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toPassageSegment } from '~/lib/passageSegment'
 import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import { useRef, useState } from 'react'
@@ -16,6 +23,8 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import HotkeyLabel from './hotkey-label'
 import clsx from 'clsx'
 import Color from 'colorjs.io'
+import { ThemeRecord } from '~/server/repositories/theme.repository'
+import { BuiltinTheme } from '~/app/layout'
 
 const SELECTION_KEYS = [' ', 'Enter']
 
@@ -36,7 +45,25 @@ type SettingsState =
       }
     | { state: 'edit-theme' }
 
-export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
+function stringToLCH(myString: string): {
+    lightness: number
+    chroma: number
+    hue: number
+} {
+    const a = myString.split(' ')
+
+    return {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+        lightness: parseFloat(a.at(0)?.replace('%', '')!),
+        chroma: parseFloat(a.at(1)!),
+        hue: parseFloat(a.at(2)!),
+    }
+}
+
+export function Navigation(props: {
+    themes: ThemeRecord[]
+    lastTypedVerse: TypedVerse | null
+}) {
     const { data: sessionData } = useSession()
     const isRootPath = usePathname() === '/'
     const RootLinkComponent = isRootPath ? 'h1' : 'span'
@@ -47,27 +74,151 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
         state: 'initial',
     })
 
-    const [themes, setThemes] = useState<Theme[]>([
+    const currentTheme = useQuery({
+        queryKey: ['currentTheme'],
+        queryFn: fetchCurrentTheme,
+        enabled: sessionData?.user?.id != null,
+        initialData: null,
+    })
+
+    const queryClient = useQueryClient()
+
+    const setCurrentTheme = useMutation({
+        mutationFn: fetchSetCurrentTheme,
+        // When mutate is called:
+        onMutate: async nextCurrentTheme => {
+            // Cancel any outgoing refetches
+            // (so they don't overwrite our optimistic update)
+            await queryClient.cancelQueries({ queryKey: ['currentTheme'] })
+
+            // Snapshot the previous value
+            const prevCurrentTheme = queryClient.getQueryData(['currentTheme'])
+
+            // Optimistically update to the new value
+            queryClient.setQueryData(['currentTheme'], nextCurrentTheme)
+
+            // Return a context with the previous and new todo
+            return { prevCurrentTheme, nextCurrentTheme }
+        },
+        // If the mutation fails, use the context we returned above
+        onError: (err, newTodo, context) => {
+            queryClient.setQueryData(
+                ['currentTheme'],
+                context?.prevCurrentTheme,
+            )
+        },
+        // Always refetch after error or success:
+        onSettled: () =>
+            queryClient.invalidateQueries({ queryKey: ['currentTheme'] }),
+    })
+
+    const _createTheme = useMutation({
+        mutationFn: fetchCreateTheme,
+        // When mutate is called:
+        onMutate: async nextTheme => {
+            // Cancel any outgoing refetches
+            // (so they don't overwrite our optimistic update)
+            await queryClient.cancelQueries({ queryKey: ['themes'] })
+
+            // Snapshot the previous value
+            const prevThemes = queryClient.getQueryData(['themes'])
+
+            // Optimistically update to the new value
+            queryClient.setQueryData(
+                ['themes'],
+                (prev: ThemeRecord[] | undefined) =>
+                    prev
+                        ? [...prev, { id: '', ...nextTheme }]
+                        : [{ id: '', ...nextTheme }],
+            )
+
+            // Return a context with the previous and new todo
+            return { prevThemes }
+        },
+        // If the mutation fails, use the context we returned above
+        onError: (err, theme, context) => {
+            queryClient.setQueryData(['themes'], context?.prevThemes ?? [])
+        },
+        // Always refetch after error or success:
+        onSettled: () =>
+            queryClient.invalidateQueries({ queryKey: ['themes'] }),
+    })
+
+    const deleteTheme = useMutation({
+        mutationFn: fetchDeleteTheme,
+        // When mutate is called:
+        onMutate: async id => {
+            // Cancel any outgoing refetches
+            // (so they don't overwrite our optimistic update)
+            await queryClient.cancelQueries({ queryKey: ['themes'] })
+
+            // Snapshot the previous value
+            const prevThemes = queryClient.getQueryData(['themes'])
+
+            // Optimistically update to the new value
+            queryClient.setQueryData(
+                ['themes'],
+                (prev: ThemeRecord[] | undefined) =>
+                    prev?.filter(theme => theme.id !== id),
+            )
+
+            // Return a context with the previous and new todo
+            return { prevThemes }
+        },
+        // If the mutation fails, use the context we returned above
+        onError: (err, theme, context) => {
+            queryClient.setQueryData(['themes'], context?.prevThemes ?? [])
+        },
+        // Always refetch after error or success:
+        onSettled: () =>
+            queryClient.invalidateQueries({ queryKey: ['themes'] }),
+    })
+
+    const themes = useQuery({
+        queryKey: ['themes'],
+        queryFn: fetchThemes,
+        enabled: sessionData?.user?.id != null,
+        initialData: props.themes,
+    })
+
+    const builtinThemes: BuiltinTheme[] = [
         {
             label: 'Light',
             value: 'light',
-            primary: '0% 0 0',
-            secondary: '100% 0 0',
-            success: '56.53% 0.1293 157.54',
-            error: '46.77% 0.1878 5.32',
+            primaryLightness: 0,
+            primaryHue: 0,
+            primaryChroma: 0,
+            secondaryLightness: 100,
+            secondaryHue: 0,
+            secondaryChroma: 0,
+            successLightness: 56.53,
+            successHue: 0.1293,
+            successChroma: 157.54,
+            errorLightness: 46.77,
+            errorHue: 0.1878,
+            errorChroma: 5.32,
         },
         {
             label: 'Dark',
             value: 'dark',
-            primary: '100% 0 0',
-            secondary: '0% 0 0',
-            success: '56.53% 0.1293 157.54',
-            error: '46.77% 0.1878 5.32',
+            primaryLightness: 100,
+            primaryHue: 0,
+            primaryChroma: 0,
+            secondaryLightness: 0,
+            secondaryHue: 0,
+            secondaryChroma: 0,
+            successLightness: 56.53,
+            successHue: 0.1293,
+            successChroma: 157.54,
+            errorLightness: 46.77,
+            errorHue: 0.1878,
+            errorChroma: 5.32,
         },
-    ])
+    ]
 
     function setSettingsState(value: SettingsState) {
         if (value.state === 'create-theme') {
+            setTheme('create-theme')
             _setSettingsState({
                 ...value,
                 theme: {
@@ -75,6 +226,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                     value: value.theme.label.split(' ').join('-').toLowerCase(),
                 },
             })
+
             document.documentElement.style.setProperty(
                 '--color-primary',
                 value.theme.primary,
@@ -119,27 +271,59 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
     }
 
     function selectTheme(next: string) {
+        const nextTheme: ThemeRecord | BuiltinTheme | null =
+            [...builtinThemes, ...(themes.data ?? [])].find(
+                theme => theme.value === next,
+            ) ?? null
         setTheme(next)
-        const nextTheme = themes.find(theme => theme.value === next)
         if (nextTheme == null) return
+        console.log(nextTheme, next)
+
+        if ('id' in nextTheme) {
+            void setCurrentTheme.mutateAsync({
+                currentThemeValue: nextTheme.value,
+                currentDarkThemeId: nextTheme.id as string,
+                currentLightThemeId: nextTheme.id as string,
+            })
+        } else {
+            void setCurrentTheme.mutateAsync({
+                currentThemeValue: nextTheme.value,
+                currentDarkThemeId: null,
+                currentLightThemeId: null,
+            })
+        }
 
         document.documentElement.style.setProperty(
             '--color-primary',
-            nextTheme.primary,
+            `${nextTheme.primaryLightness}% ${nextTheme.primaryChroma} ${nextTheme.primaryHue}`,
         )
         document.documentElement.style.setProperty(
             '--color-secondary',
-            nextTheme.secondary,
+            `${nextTheme.secondaryLightness}% ${nextTheme.secondaryChroma} ${nextTheme.secondaryHue}`,
         )
         document.documentElement.style.setProperty(
             '--color-success',
-            nextTheme.success,
+            `${nextTheme.successLightness}% ${nextTheme.successChroma} ${nextTheme.successHue}`,
         )
         document.documentElement.style.setProperty(
             '--color-incorrect',
-            nextTheme.error,
+            `${nextTheme.errorLightness}% ${nextTheme.errorChroma} ${nextTheme.errorHue}`,
         )
     }
+
+    console.log(
+        'current Value',
+        currentTheme?.data?.label ?? theme === 'system'
+            ? 'System'
+            : theme
+            ? themes.data.find(t => t.value === theme)?.label
+            : 'System',
+        currentTheme?.data?.label,
+        theme === 'system',
+        theme,
+        themes.data.find(t => t.value === theme)?.label,
+        themes.data,
+    )
 
     useHotkeys(
         'mod+shift+comma',
@@ -161,7 +345,6 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
               lastTypedVerse.chapter,
           )}`
         : `/`
-    console.log(themes.find(t => t.value === theme)?.label)
 
     return (
         <nav className="mx-auto mb-2 flex w-full items-center justify-between pt-4 lg:pt-8">
@@ -336,13 +519,17 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                     id="theme-selector"
                                                     className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
                                                 >
-                                                    {theme === 'system'
+                                                    {currentTheme?.data
+                                                        ?.label ??
+                                                    theme === 'system'
                                                         ? 'System'
-                                                        : themes.find(
+                                                        : theme
+                                                        ? builtinThemes.find(
                                                               t =>
                                                                   t.value ===
                                                                   theme,
-                                                          )?.label}
+                                                          )?.label
+                                                        : 'System'}
                                                 </DropdownMenu.Trigger>
 
                                                 <DropdownMenu.Portal>
@@ -353,101 +540,6 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                         align="end"
                                                         sideOffset={-2}
                                                     >
-                                                        {themes.map(
-                                                            (theme, i) => {
-                                                                if (
-                                                                    theme.value ===
-                                                                        'light' ||
-                                                                    theme.value ===
-                                                                        'dark'
-                                                                ) {
-                                                                    return (
-                                                                        <DropdownMenu.Item
-                                                                            key={
-                                                                                i
-                                                                            }
-                                                                            onSelect={() =>
-                                                                                selectTheme(
-                                                                                    theme.value,
-                                                                                )
-                                                                            }
-                                                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                                        >
-                                                                            {
-                                                                                theme.label
-                                                                            }
-                                                                        </DropdownMenu.Item>
-                                                                    )
-                                                                }
-                                                                return (
-                                                                    <DropdownMenu.Sub
-                                                                        key={i}
-                                                                    >
-                                                                        <DropdownMenu.SubTrigger className="flex cursor-pointer flex-row items-center px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary ">
-                                                                            <span className="flex-grow truncate">
-                                                                                {
-                                                                                    theme.label
-                                                                                }
-                                                                            </span>
-                                                                            <svg
-                                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                                fill="none"
-                                                                                viewBox="0 0 24 24"
-                                                                                strokeWidth={
-                                                                                    3
-                                                                                }
-                                                                                stroke="currentColor"
-                                                                                className="size-4 shrink-0"
-                                                                            >
-                                                                                <path
-                                                                                    strokeLinecap="round"
-                                                                                    strokeLinejoin="round"
-                                                                                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                                                                                />
-                                                                            </svg>
-                                                                        </DropdownMenu.SubTrigger>
-                                                                        <DropdownMenu.Portal>
-                                                                            <DropdownMenu.SubContent className="border-2 border-primary bg-secondary text-primary">
-                                                                                <DropdownMenu.Item
-                                                                                    onSelect={() =>
-                                                                                        selectTheme(
-                                                                                            theme.value,
-                                                                                        )
-                                                                                    }
-                                                                                    className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
-                                                                                >
-                                                                                    Select
-                                                                                </DropdownMenu.Item>
-                                                                                <DropdownMenu.Item
-                                                                                    onSelect={() => {
-                                                                                        const prefersDark =
-                                                                                            window.matchMedia(
-                                                                                                '(prefers-color-scheme: dark)',
-                                                                                            ).matches
-                                                                                        selectTheme(
-                                                                                            prefersDark
-                                                                                                ? 'dark'
-                                                                                                : 'light',
-                                                                                        )
-                                                                                        setThemes(
-                                                                                            prev =>
-                                                                                                prev.filter(
-                                                                                                    t =>
-                                                                                                        t.value !==
-                                                                                                        theme.value,
-                                                                                                ),
-                                                                                        )
-                                                                                    }}
-                                                                                    className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
-                                                                                >
-                                                                                    Delete
-                                                                                </DropdownMenu.Item>
-                                                                            </DropdownMenu.SubContent>
-                                                                        </DropdownMenu.Portal>
-                                                                    </DropdownMenu.Sub>
-                                                                )
-                                                            },
-                                                        )}
                                                         <DropdownMenu.Item
                                                             onSelect={() =>
                                                                 selectTheme(
@@ -458,6 +550,106 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                                         >
                                                             System
                                                         </DropdownMenu.Item>
+                                                        {builtinThemes.map(
+                                                            theme => (
+                                                                <DropdownMenu.Item
+                                                                    key={
+                                                                        theme.value
+                                                                    }
+                                                                    onSelect={() =>
+                                                                        selectTheme(
+                                                                            theme.value,
+                                                                        )
+                                                                    }
+                                                                    className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                                                >
+                                                                    {
+                                                                        theme.label
+                                                                    }
+                                                                </DropdownMenu.Item>
+                                                            ),
+                                                        )}
+                                                        {themes.data.map(t => (
+                                                            <DropdownMenu.Sub
+                                                                key={t.value}
+                                                            >
+                                                                <DropdownMenu.SubTrigger className="flex cursor-pointer flex-row items-center px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary ">
+                                                                    <span className="flex-grow truncate">
+                                                                        {
+                                                                            t.label
+                                                                        }
+                                                                    </span>
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        fill="none"
+                                                                        viewBox="0 0 24 24"
+                                                                        strokeWidth={
+                                                                            3
+                                                                        }
+                                                                        stroke="currentColor"
+                                                                        className="size-4 shrink-0"
+                                                                    >
+                                                                        <path
+                                                                            strokeLinecap="round"
+                                                                            strokeLinejoin="round"
+                                                                            d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                                                                        />
+                                                                    </svg>
+                                                                </DropdownMenu.SubTrigger>
+                                                                <DropdownMenu.Portal>
+                                                                    <DropdownMenu.SubContent className="border-2 border-primary bg-secondary text-primary">
+                                                                        <DropdownMenu.Item
+                                                                            onSelect={() =>
+                                                                                selectTheme(
+                                                                                    t.value,
+                                                                                )
+                                                                            }
+                                                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                                                        >
+                                                                            Select
+                                                                        </DropdownMenu.Item>
+                                                                        <DropdownMenu.Item
+                                                                            onSelect={() => {
+                                                                                if (
+                                                                                    theme ===
+                                                                                    t.value
+                                                                                ) {
+                                                                                    const prefersDark =
+                                                                                        window.matchMedia(
+                                                                                            '(prefers-color-scheme: dark)',
+                                                                                        ).matches
+                                                                                    selectTheme(
+                                                                                        prefersDark
+                                                                                            ? 'dark'
+                                                                                            : 'light',
+                                                                                    )
+
+                                                                                    document.documentElement.style.removeProperty(
+                                                                                        '--color-primary',
+                                                                                    )
+                                                                                    document.documentElement.style.removeProperty(
+                                                                                        '--color-secondary',
+                                                                                    )
+                                                                                    document.documentElement.style.removeProperty(
+                                                                                        '--color-success',
+                                                                                    )
+                                                                                    document.documentElement.style.removeProperty(
+                                                                                        '--color-incorrect',
+                                                                                    )
+                                                                                }
+
+                                                                                void deleteTheme.mutateAsync(
+                                                                                    t.id,
+                                                                                )
+                                                                            }}
+                                                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                                                        >
+                                                                            Delete
+                                                                        </DropdownMenu.Item>
+                                                                    </DropdownMenu.SubContent>
+                                                                </DropdownMenu.Portal>
+                                                            </DropdownMenu.Sub>
+                                                        ))}
                                                         <DropdownMenu.Item
                                                             className="flex cursor-pointer flex-row items-center justify-between space-x-2 px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
                                                             onKeyDown={e => {
@@ -507,42 +699,68 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                         </h2>
                                         <form
                                             onSubmit={() => {
-                                                setThemes(prev =>
-                                                    prev.concat({
-                                                        label: settingsState
-                                                            .theme.label,
-                                                        value: settingsState
-                                                            .theme.value,
-                                                        primary: window
-                                                            .getComputedStyle(
-                                                                document.documentElement,
-                                                            )
-                                                            .getPropertyValue(
-                                                                '--color-primary',
-                                                            ),
-                                                        secondary: window
-                                                            .getComputedStyle(
-                                                                document.documentElement,
-                                                            )
-                                                            .getPropertyValue(
-                                                                '--color-secondary',
-                                                            ),
-                                                        success: window
-                                                            .getComputedStyle(
-                                                                document.documentElement,
-                                                            )
-                                                            .getPropertyValue(
-                                                                '--color-success',
-                                                            ),
-                                                        error: window
-                                                            .getComputedStyle(
-                                                                document.documentElement,
-                                                            )
-                                                            .getPropertyValue(
-                                                                '--color-incorrect',
-                                                            ),
-                                                    }),
+                                                const primary = stringToLCH(
+                                                    window
+                                                        .getComputedStyle(
+                                                            document.documentElement,
+                                                        )
+                                                        .getPropertyValue(
+                                                            '--color-primary',
+                                                        ),
                                                 )
+                                                const secondary = stringToLCH(
+                                                    window
+                                                        .getComputedStyle(
+                                                            document.documentElement,
+                                                        )
+                                                        .getPropertyValue(
+                                                            '--color-secondary',
+                                                        ),
+                                                )
+                                                const success = stringToLCH(
+                                                    window
+                                                        .getComputedStyle(
+                                                            document.documentElement,
+                                                        )
+                                                        .getPropertyValue(
+                                                            '--color-success',
+                                                        ),
+                                                )
+                                                const error = stringToLCH(
+                                                    window
+                                                        .getComputedStyle(
+                                                            document.documentElement,
+                                                        )
+                                                        .getPropertyValue(
+                                                            '--color-incorrect',
+                                                        ),
+                                                )
+
+                                                void _createTheme.mutateAsync({
+                                                    label: settingsState.theme
+                                                        .label,
+                                                    value: settingsState.theme
+                                                        .value,
+                                                    primaryLightness:
+                                                        primary.lightness,
+                                                    primaryChroma:
+                                                        primary.chroma,
+                                                    primaryHue: primary.hue,
+                                                    secondaryLightness:
+                                                        secondary.lightness,
+                                                    secondaryChroma:
+                                                        secondary.chroma,
+                                                    secondaryHue: secondary.hue,
+                                                    successLightness:
+                                                        success.lightness,
+                                                    successChroma:
+                                                        success.chroma,
+                                                    successHue: success.hue,
+                                                    errorLightness:
+                                                        error.lightness,
+                                                    errorChroma: error.chroma,
+                                                    errorHue: error.hue,
+                                                })
                                                 setTheme(
                                                     settingsState.theme.value,
                                                 )

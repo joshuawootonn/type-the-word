@@ -8,6 +8,11 @@ import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 import { UserChangelogRecord } from '~/server/repositories/userChangelog.repository'
 import { z } from 'zod'
+import {
+    CurrentThemeRecord,
+    ThemeRecord,
+} from '~/server/repositories/theme.repository'
+import { BuiltinTheme } from '~/app/layout'
 
 export type Body<T> = { data: T }
 
@@ -99,4 +104,76 @@ export async function fetchUserChangelog(): Promise<UserChangelogClientSchema> {
     const body: Body<UserChangelogRecord> = await response.json()
 
     return userChangelogClientSchema.parse(body.data)
+}
+
+export async function fetchCurrentTheme(): Promise<ThemeRecord | null> {
+    const response = await fetch(`${getBaseUrl()}/api/user-theme`, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+
+    if (!response.ok) {
+        return null
+    }
+
+    const body: Body<ThemeRecord> = await response.json()
+
+    return body.data
+}
+
+export async function fetchSetCurrentTheme(
+    theme: Omit<CurrentThemeRecord, 'userId'>,
+): Promise<CurrentThemeRecord> {
+    const response = await fetch(`${getBaseUrl()}/api/user-theme`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(theme),
+    })
+
+    const body: Body<CurrentThemeRecord> = await response.json()
+
+    return body.data
+}
+
+export async function fetchThemes(): Promise<ThemeRecord[]> {
+    const response = await fetch(`${getBaseUrl()}/api/theme`, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+
+    if (!response.ok) {
+        return []
+    }
+
+    const body: Body<ThemeRecord[]> = await response.json()
+
+    return body.data
+}
+
+export async function fetchCreateTheme(
+    theme: Omit<ThemeRecord, 'id' | 'userId'>,
+): Promise<ThemeRecord[]> {
+    const response = await fetch(`${getBaseUrl()}/api/theme`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(theme),
+    })
+
+    const body: Body<ThemeRecord[]> = await response.json()
+
+    return body.data
+}
+
+export async function fetchDeleteTheme(id: string): Promise<null> {
+    await fetch(`${getBaseUrl()}/api/theme/${id}`, {
+        method: 'DELETE',
+    })
+
+    return
 }
