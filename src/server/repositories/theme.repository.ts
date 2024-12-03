@@ -4,11 +4,18 @@ import { eq } from 'drizzle-orm'
 import { createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
-export const themeRecordSchema = createSelectSchema(schema.theme)
+export const themeRecordSchema = createSelectSchema(schema.theme).merge(
+    z.object({
+        label: z.string().min(1),
+        value: z.string().min(1),
+    }),
+)
 
 export type ThemeRecord = z.infer<typeof themeRecordSchema>
 
-export const currentThemeRecordSchema = createSelectSchema(schema.userTheme)
+export const currentThemeRecordSchema = createSelectSchema(
+    schema.userTheme,
+).merge(z.object({ value: z.string().length(1).nullish() }))
 
 export type CurrentThemeRecord = z.infer<typeof currentThemeRecordSchema>
 

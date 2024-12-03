@@ -18,12 +18,10 @@ export async function POST(request: NextRequest) {
 
     const rawBody = await request.json()
 
-    //todo(josh):?????
     const body = currentThemeRecordSchema.parse({
         userId: session.user.id,
         ...rawBody,
     })
-    console.log({ rawBody, body })
 
     const themeRepository = new ThemeRepository(db)
     const currentTheme = await themeRepository.setCurrentTheme(body)

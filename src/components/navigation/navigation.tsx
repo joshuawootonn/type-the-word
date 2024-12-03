@@ -8,7 +8,6 @@ import Link from 'next/link'
 import Head from 'next/head'
 import { usePathname } from 'next/navigation'
 import {
-    fetchCreateTheme,
     fetchCurrentTheme,
     fetchDeleteTheme,
     fetchLastVerse,
@@ -20,11 +19,12 @@ import { toPassageSegment } from '~/lib/passageSegment'
 import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import { useRef, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
-import HotkeyLabel from './hotkey-label'
+import HotkeyLabel from '../hotkey-label'
 import clsx from 'clsx'
-import Color from 'colorjs.io'
 import { ThemeRecord } from '~/server/repositories/theme.repository'
 import { BuiltinTheme } from '~/app/layout'
+import { CreateThemeForm } from './create-theme-form'
+import Color from 'colorjs.io'
 
 const SELECTION_KEYS = [' ', 'Enter']
 
@@ -44,21 +44,6 @@ type SettingsState =
           theme: Theme
       }
     | { state: 'edit-theme' }
-
-function stringToLCH(myString: string): {
-    lightness: number
-    chroma: number
-    hue: number
-} {
-    const a = myString.split(' ')
-
-    return {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-        lightness: parseFloat(a.at(0)?.replace('%', '')!),
-        chroma: parseFloat(a.at(1)!),
-        hue: parseFloat(a.at(2)!),
-    }
-}
 
 export function Navigation(props: {
     themes: ThemeRecord[]
@@ -110,38 +95,6 @@ export function Navigation(props: {
         // Always refetch after error or success:
         onSettled: () =>
             queryClient.invalidateQueries({ queryKey: ['currentTheme'] }),
-    })
-
-    const _createTheme = useMutation({
-        mutationFn: fetchCreateTheme,
-        // When mutate is called:
-        onMutate: async nextTheme => {
-            // Cancel any outgoing refetches
-            // (so they don't overwrite our optimistic update)
-            await queryClient.cancelQueries({ queryKey: ['themes'] })
-
-            // Snapshot the previous value
-            const prevThemes = queryClient.getQueryData(['themes'])
-
-            // Optimistically update to the new value
-            queryClient.setQueryData(
-                ['themes'],
-                (prev: ThemeRecord[] | undefined) =>
-                    prev
-                        ? [...prev, { id: '', ...nextTheme }]
-                        : [{ id: '', ...nextTheme }],
-            )
-
-            // Return a context with the previous and new todo
-            return { prevThemes }
-        },
-        // If the mutation fails, use the context we returned above
-        onError: (err, theme, context) => {
-            queryClient.setQueryData(['themes'], context?.prevThemes ?? [])
-        },
-        // Always refetch after error or success:
-        onSettled: () =>
-            queryClient.invalidateQueries({ queryKey: ['themes'] }),
     })
 
     const deleteTheme = useMutation({
@@ -240,7 +193,7 @@ export function Navigation(props: {
                 value.theme.success,
             )
             document.documentElement.style.setProperty(
-                '--color-incorrect',
+                '--color-error',
                 value.theme.error,
             )
         } else {
@@ -265,7 +218,7 @@ export function Navigation(props: {
                     .getPropertyValue('--color-success'),
                 error: window
                     .getComputedStyle(document.documentElement)
-                    .getPropertyValue('--color-incorrect'),
+                    .getPropertyValue('--color-error'),
             },
         })
     }
@@ -306,24 +259,10 @@ export function Navigation(props: {
             `${nextTheme.successLightness}% ${nextTheme.successChroma} ${nextTheme.successHue}`,
         )
         document.documentElement.style.setProperty(
-            '--color-incorrect',
+            '--color-error',
             `${nextTheme.errorLightness}% ${nextTheme.errorChroma} ${nextTheme.errorHue}`,
         )
     }
-
-    console.log(
-        'current Value',
-        currentTheme?.data?.label ?? theme === 'system'
-            ? 'System'
-            : theme
-            ? themes.data.find(t => t.value === theme)?.label
-            : 'System',
-        currentTheme?.data?.label,
-        theme === 'system',
-        theme,
-        themes.data.find(t => t.value === theme)?.label,
-        themes.data,
-    )
 
     useHotkeys(
         'mod+shift+comma',
@@ -634,7 +573,7 @@ export function Navigation(props: {
                                                                                         '--color-success',
                                                                                     )
                                                                                     document.documentElement.style.removeProperty(
-                                                                                        '--color-incorrect',
+                                                                                        '--color-error',
                                                                                     )
                                                                                 }
 
@@ -697,194 +636,9 @@ export function Navigation(props: {
                                         <h2 className="mb-2 text-xl">
                                             Theme Creator
                                         </h2>
-                                        <form
-                                            onSubmit={() => {
-                                                const primary = stringToLCH(
-                                                    window
-                                                        .getComputedStyle(
-                                                            document.documentElement,
-                                                        )
-                                                        .getPropertyValue(
-                                                            '--color-primary',
-                                                        ),
-                                                )
-                                                const secondary = stringToLCH(
-                                                    window
-                                                        .getComputedStyle(
-                                                            document.documentElement,
-                                                        )
-                                                        .getPropertyValue(
-                                                            '--color-secondary',
-                                                        ),
-                                                )
-                                                const success = stringToLCH(
-                                                    window
-                                                        .getComputedStyle(
-                                                            document.documentElement,
-                                                        )
-                                                        .getPropertyValue(
-                                                            '--color-success',
-                                                        ),
-                                                )
-                                                const error = stringToLCH(
-                                                    window
-                                                        .getComputedStyle(
-                                                            document.documentElement,
-                                                        )
-                                                        .getPropertyValue(
-                                                            '--color-incorrect',
-                                                        ),
-                                                )
-
-                                                void _createTheme.mutateAsync({
-                                                    label: settingsState.theme
-                                                        .label,
-                                                    value: settingsState.theme
-                                                        .value,
-                                                    primaryLightness:
-                                                        primary.lightness,
-                                                    primaryChroma:
-                                                        primary.chroma,
-                                                    primaryHue: primary.hue,
-                                                    secondaryLightness:
-                                                        secondary.lightness,
-                                                    secondaryChroma:
-                                                        secondary.chroma,
-                                                    secondaryHue: secondary.hue,
-                                                    successLightness:
-                                                        success.lightness,
-                                                    successChroma:
-                                                        success.chroma,
-                                                    successHue: success.hue,
-                                                    errorLightness:
-                                                        error.lightness,
-                                                    errorChroma: error.chroma,
-                                                    errorHue: error.hue,
-                                                })
-                                                setTheme(
-                                                    settingsState.theme.value,
-                                                )
-                                                setSettingsState({
-                                                    state: 'initial',
-                                                })
-                                            }}
-                                            className="col-2 grid grid-cols-2 items-center gap-x-2 gap-y-4 [&>*:nth-child(even)]:justify-self-end"
-                                        >
-                                            <label
-                                                htmlFor="theme-name"
-                                                className="pr-4"
-                                            >
-                                                Theme name:
-                                            </label>
-                                            <div className="svg-outline relative">
-                                                <input
-                                                    value={
-                                                        settingsState.theme
-                                                            .label
-                                                    }
-                                                    onChange={event =>
-                                                        setSettingsState(
-                                                            settingsState.state ===
-                                                                'create-theme'
-                                                                ? {
-                                                                      ...settingsState,
-                                                                      theme: {
-                                                                          ...settingsState.theme,
-                                                                          label:
-                                                                              event
-                                                                                  .currentTarget
-                                                                                  ?.value ??
-                                                                              '',
-                                                                      },
-                                                                  }
-                                                                : settingsState,
-                                                        )
-                                                    }
-                                                    placeholder="Untitled theme"
-                                                    autoFocus={true}
-                                                    onFocus={e =>
-                                                        e.currentTarget.select()
-                                                    }
-                                                    className={
-                                                        'w-40 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none placeholder:text-primary/50'
-                                                    }
-                                                    id="theme-name"
-                                                    autoComplete="off"
-                                                    data-1p-ignore={true}
-                                                />
-                                            </div>
-                                            <ColorInput
-                                                label="Primary Hue"
-                                                value={
-                                                    settingsState.theme.primary
-                                                }
-                                                onChange={value =>
-                                                    setSettingsState({
-                                                        ...settingsState,
-                                                        theme: {
-                                                            ...settingsState.theme,
-                                                            primary: value,
-                                                        },
-                                                    })
-                                                }
-                                            />
-                                            <ColorInput
-                                                label="Secondary Hue"
-                                                value={
-                                                    settingsState.theme
-                                                        .secondary
-                                                }
-                                                onChange={value =>
-                                                    setSettingsState({
-                                                        ...settingsState,
-                                                        theme: {
-                                                            ...settingsState.theme,
-                                                            secondary: value,
-                                                        },
-                                                    })
-                                                }
-                                            />
-                                            <ColorInput
-                                                label="Success Hue"
-                                                value={
-                                                    settingsState.theme.success
-                                                }
-                                                onChange={value =>
-                                                    setSettingsState({
-                                                        ...settingsState,
-                                                        theme: {
-                                                            ...settingsState.theme,
-                                                            success: value,
-                                                        },
-                                                    })
-                                                }
-                                            />
-                                            <ColorInput
-                                                label="Error Hue"
-                                                value={
-                                                    settingsState.theme.error
-                                                }
-                                                onChange={value =>
-                                                    setSettingsState({
-                                                        ...settingsState,
-                                                        theme: {
-                                                            ...settingsState.theme,
-                                                            error: value,
-                                                        },
-                                                    })
-                                                }
-                                            />
-                                            <button
-                                                type="submit"
-                                                className="svg-outline relative col-span-2 border-2 border-primary px-3 py-1 font-semibold text-primary"
-                                            >
-                                                Save{' '}
-                                            </button>
-                                            <input
-                                                className="hidden"
-                                                type="submit"
-                                            />
-                                        </form>
+                                        <CreateThemeForm
+                                            selectTheme={selectTheme}
+                                        />
                                     </>
                                 ) : null}
                             </Popover.PopoverContent>
@@ -900,57 +654,5 @@ export function Navigation(props: {
                 )}
             </div>
         </nav>
-    )
-}
-
-function ColorInput(props: {
-    value: string
-    label: string
-    onChange: (number: string) => void
-}) {
-    const rgbValue = new Color(`oklch(${props.value})`).to('srgb').toString({
-        format: 'hex',
-        collapse: false,
-    })
-    return (
-        <>
-            <label htmlFor="primary-hue" className="pr-4">
-                {props.label}
-            </label>
-
-            <div className="group relative z-0 h-8 w-8">
-                <div className="svg-outline-override absolute -z-10 hidden group-focus-within:block" />
-                <input
-                    type="color"
-                    className="border-2 border-primary outline-none"
-                    value={rgbValue}
-                    onChange={e => {
-                        const color = new Color(e.currentTarget.value).to(
-                            'oklch',
-                        )
-
-                        props.onChange(
-                            color
-                                .toString({ precision: 4 })
-                                .replace(')', '')
-                                .replace('oklch(', ''),
-                        )
-                    }}
-                />
-            </div>
-            <style jsx>{`
-                input[type='color'] {
-                    -webkit-appearance: none;
-                    width: 32px;
-                    height: 32px;
-                }
-                input[type='color']::-webkit-color-swatch-wrapper {
-                    padding: 0;
-                }
-                input[type='color']::-webkit-color-swatch {
-                    border: none;
-                }
-            `}</style>
-        </>
     )
 }

@@ -3,7 +3,7 @@ import { Providers } from './providers'
 import clsx from 'clsx'
 import '~/styles/globals.css'
 import { Footer } from '~/components/footer'
-import { Navigation } from '~/components/navigation'
+import { Navigation } from '~/components/navigation/navigation'
 import { poppins, ibmPlexMono } from './fonts'
 import { authOptions } from '~/server/auth'
 import Fathom from './fathom'
@@ -49,26 +49,28 @@ export default async function RootLayout({
         currentTheme = await themeRepository.getCurrentTheme({
             userId: session.user.id,
         })
-        curr = themes.find(t => t.value === currentTheme?.currentThemeValue)
+        curr =
+            themes.find(t => t.value === currentTheme?.currentThemeValue) ??
+            null
     }
 
-    console.log(curr, themes, currentTheme)
     // added suppressHydrationWarning for next-themes within `<Providers />`
     return (
-        <html
-            style={
-                curr
-                    ? {
-                          '--color-primary': `${curr.primaryLightness}% ${curr.primaryChroma} ${curr.primaryHue}`,
-                          '--color-secondary': `${curr.secondaryLightness}% ${curr.secondaryChroma} ${curr.secondaryHue}`,
-                          '--color-success': `${curr.successLightness}% ${curr.successChroma} ${curr.successHue}`,
-                          '--color-incorrect': `${curr.errorLightness}% ${curr.errorChroma} ${curr.errorHue}`,
-                      }
-                    : {}
-            }
-            lang="en"
-            suppressHydrationWarning
-        >
+        <html lang="en" suppressHydrationWarning>
+            <head>
+                {curr && (
+                    <style>
+                        <>{`
+          .${curr.value} {
+            --color-primary: ${curr.primaryLightness}% ${curr.primaryChroma} ${curr.primaryHue};
+            --color-secondary: ${curr.secondaryLightness}% ${curr.secondaryChroma} ${curr.secondaryHue};
+            --color-success: ${curr.successLightness}% ${curr.successChroma} ${curr.successHue};
+            --color-error: ${curr.errorLightness}% ${curr.errorChroma} ${curr.errorHue};
+          }
+        `}</>
+                    </style>
+                )}
+            </head>
             <body
                 className={clsx(
                     'min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 font-sans lg:px-0',
@@ -76,7 +78,7 @@ export default async function RootLayout({
                     ibmPlexMono.variable,
                 )}
             >
-                <Providers session={session}>
+                <Providers session={session} themes={themes}>
                     <Navigation
                         themes={themes}
                         lastTypedVerse={lastTypedVerse}

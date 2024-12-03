@@ -2,10 +2,8 @@ import { getServerSession } from 'next-auth'
 import { NextRequest } from 'next/server'
 import { authOptions } from '~/server/auth'
 import { db } from '~/server/db'
-import {
-    ThemeRepository,
-    themeRecordSchema,
-} from '~/server/repositories/theme.repository'
+import { ThemeRepository } from '~/server/repositories/theme.repository'
+import { themeDTOSchema } from './dto'
 
 export const dynamic = 'force-dynamic' // defaults to auto
 
@@ -18,17 +16,20 @@ export async function POST(request: NextRequest) {
 
     const rawBody = await request.json()
 
-    const body = themeRecordSchema
-        .omit({
-            id: true,
-        })
-        .parse({ userId: session.user.id, ...rawBody })
+    console.log(rawBody)
 
-    console.log({ rawBody, body })
+    const body = themeDTOSchema.safeParse(rawBody)
+
+    if (!body.success) {
+        return Response.json({ error: body.error }, { status: 400 })
+    }
 
     const themeRepository = new ThemeRepository(db)
 
-    const themes = await themeRepository.createTheme(body)
+    const themes = await themeRepository.createTheme({
+        ...body.data,
+        userId: session.user.id,
+    })
 
     return Response.json({ data: themes }, { status: 200 })
 }
@@ -41,6 +42,7 @@ export async function GET() {
     }
 
     const themeRepository = new ThemeRepository(db)
+
     const themes = await themeRepository.getMany({
         userId: session.user.id,
     })

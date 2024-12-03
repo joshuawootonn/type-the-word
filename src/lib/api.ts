@@ -175,5 +175,5 @@ export async function fetchDeleteTheme(id: string): Promise<null> {
         method: 'DELETE',
     })
 
-    return
+    return null
 }
