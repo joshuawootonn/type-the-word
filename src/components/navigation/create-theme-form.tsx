@@ -95,7 +95,11 @@ export const themeToDTOSchema = themeSchema.transform(
     },
 )
 
-export function CreateThemeForm() {
+export function CreateThemeForm({
+    goBackToSettings,
+}: {
+    goBackToSettings: () => void
+}) {
     const [initialValues] = useState(() => getCreateThemeInitialProps())
     const queryClient = useQueryClient()
 
@@ -145,45 +149,73 @@ export function CreateThemeForm() {
             validationSchema={toFormikValidationSchema(themeSchema)}
             onSubmit={values => {
                 createTheme.mutate(themeToDTOSchema.parse(values))
+                goBackToSettings()
             }}
         >
             {props => (
                 <form
                     onSubmit={props.handleSubmit}
-                    className="col-2 grid grid-cols-2 items-center gap-x-2 gap-y-4 [&>*:nth-child(even)]:justify-self-end"
+                    className="flex flex-col  gap-x-2 gap-y-4 [&>*:nth-child(even)]:justify-self-end"
                 >
-                    <label htmlFor="theme-name" className="pr-4">
-                        Theme name:
-                    </label>
-                    <div className="svg-outline relative">
-                        <Field
-                            name="label"
-                            placeholder="Untitled theme"
-                            autoFocus={true}
-                            onFocus={(e: FocusEvent<HTMLInputElement>) =>
-                                e.currentTarget.select()
-                            }
-                            className={
-                                'w-40 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none placeholder:text-primary/50'
-                            }
-                            id="theme-name"
-                            autoComplete="off"
-                            data-1p-ignore={true}
-                        />
+                    <div className="flex justify-between">
+                        <label htmlFor="theme-name" className="pr-4">
+                            Theme name:
+                        </label>
+                        <div>
+                            <div className="svg-outline relative">
+                                <Field
+                                    name="label"
+                                    placeholder="Untitled theme"
+                                    autoFocus={true}
+                                    onFocus={(
+                                        e: FocusEvent<HTMLInputElement>,
+                                    ) => e.currentTarget.select()}
+                                    className={
+                                        'w-40 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none placeholder:text-primary/50'
+                                    }
+                                    id="theme-name"
+                                    autoComplete="off"
+                                    data-1p-ignore={true}
+                                />
+                            </div>
+                            {props.errors.label && (
+                                <div className="mt-2 text-right text-error">
+                                    {JSON.stringify(props.errors)}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                    <ColorInput label="Primary Hue" name="primary" />
-                    <ColorInput label="Secondary Hue" name="secondary" />
-                    <ColorInput label="Success Hue" name="success" />
-                    <ColorInput label="Error Hue" name="error" />
-                    {/* {JSON.stringify(props.values)} */}
-                    {JSON.stringify(props.errors)}
+                    <div className="flex justify-between">
+                        <label htmlFor="primary" className="pr-4">
+                            Primary Hue
+                        </label>
+                        <ColorInput id="primary" name="primary" />
+                    </div>
+                    <div className="flex justify-between">
+                        <label htmlFor="secondary" className="pr-4">
+                            Secondary Hue
+                        </label>
+                        <ColorInput id="secondary" name="secondary" />
+                    </div>
+                    <div className="flex justify-between">
+                        <label htmlFor="success" className="pr-4">
+                            Success Hue
+                        </label>
+                        <ColorInput id="success" name="success" />
+                    </div>
+                    <div className="flex justify-between">
+                        <label htmlFor="error" className="pr-4">
+                            Error Hue
+                        </label>
+                        <ColorInput id="error" name="error" />
+                    </div>
                     <button
                         type="submit"
                         className="svg-outline relative col-span-2 border-2 border-primary px-3 py-1 font-semibold text-primary"
                     >
                         Save{' '}
                     </button>
-                    {/* <input className="hidden" type="submit" /> */}
+                    <input className="hidden" type="submit" />
                 </form>
             )}
         </Formik>

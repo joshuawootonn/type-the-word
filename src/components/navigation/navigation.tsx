@@ -199,7 +199,7 @@ export function Navigation(props: {
                             </Popover.PopoverAnchor>
 
                             <DropdownMenu.Content
-                                className="z-50  border-2 border-primary bg-secondary text-primary "
+                                className="z-50 border-2 border-primary bg-secondary text-primary"
                                 sideOffset={-2}
                                 align="end"
                             >
@@ -240,7 +240,7 @@ export function Navigation(props: {
                                     settingsState === 'create-theme'
                                         ? 'min-w-100'
                                         : 'min-w-52',
-                                    'z-50  border-2 border-primary bg-secondary px-3 py-3 text-primary',
+                                    'z-50 border-2 border-primary bg-secondary px-3 py-3 text-primary',
                                 )}
                                 sideOffset={-2}
                                 align="end"
@@ -268,7 +268,11 @@ export function Navigation(props: {
                                         <h2 className="mb-2 text-xl">
                                             Theme Creator
                                         </h2>
-                                        <CreateThemeForm />
+                                        <CreateThemeForm
+                                            goBackToSettings={() =>
+                                                setSettingsState('initial')
+                                            }
+                                        />
                                     </>
                                 ) : null}
                             </Popover.PopoverContent>

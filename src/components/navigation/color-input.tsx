@@ -2,21 +2,21 @@
 
 import Color from 'colorjs.io'
 import { useField } from 'formik'
+import { ComponentPropsWithoutRef } from 'react'
 
-export function ColorInput(props: { name: string; label: string }) {
+type Props = Omit<ComponentPropsWithoutRef<'input'>, 'name'> & { name: string }
+
+export function ColorInput(props: Props) {
     const [field, , { setValue }] = useField(props.name)
     return (
         <>
-            <label htmlFor="primary-hue" className="pr-4">
-                {props.label}
-            </label>
-
             <div className="group relative z-0 h-8 w-8">
                 <div className="svg-outline-override absolute -z-10 hidden group-focus-within:block" />
                 <input
+                    {...props}
+                    {...field}
                     type="color"
                     className="border-2 border-primary outline-none"
-                    {...field}
                     value={new Color(`oklch(${field.value})`)
                         .to('srgb')
                         .toString({
