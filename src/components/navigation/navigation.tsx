@@ -1,20 +1,13 @@
 'use client'
 
-import { useTheme } from 'next-themes'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import * as Popover from '@radix-ui/react-popover'
 import Link from 'next/link'
 import Head from 'next/head'
 import { usePathname } from 'next/navigation'
-import {
-    fetchCurrentTheme,
-    fetchDeleteTheme,
-    fetchLastVerse,
-    fetchSetCurrentTheme,
-    fetchThemes,
-} from '~/lib/api'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { fetchLastVerse, fetchThemes } from '~/lib/api'
+import { useQuery } from '@tanstack/react-query'
 import { toPassageSegment } from '~/lib/passageSegment'
 import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import { useRef, useState } from 'react'
@@ -24,26 +17,7 @@ import clsx from 'clsx'
 import { ThemeRecord } from '~/server/repositories/theme.repository'
 import { BuiltinTheme } from '~/app/layout'
 import { CreateThemeForm } from './create-theme-form'
-import Color from 'colorjs.io'
-
-const SELECTION_KEYS = [' ', 'Enter']
-
-type Theme = {
-    label: string
-    value: string
-    primary: string
-    secondary: string
-    success: string
-    error: string
-}
-
-type SettingsState =
-    | { state: 'initial' }
-    | {
-          state: 'create-theme'
-          theme: Theme
-      }
-    | { state: 'edit-theme' }
+import { Settings } from './settings'
 
 export function Navigation(props: {
     themes: ThemeRecord[]
@@ -53,79 +27,10 @@ export function Navigation(props: {
     const isRootPath = usePathname() === '/'
     const RootLinkComponent = isRootPath ? 'h1' : 'span'
     const dropDownTriggerRef = useRef<HTMLButtonElement>(null)
-    const { theme, setTheme } = useTheme()
     const [isSettingsOpen, setSettingsOpen] = useState(false)
-    const [settingsState, _setSettingsState] = useState<SettingsState>({
-        state: 'initial',
-    })
-
-    const currentTheme = useQuery({
-        queryKey: ['currentTheme'],
-        queryFn: fetchCurrentTheme,
-        enabled: sessionData?.user?.id != null,
-        initialData: null,
-    })
-
-    const queryClient = useQueryClient()
-
-    const setCurrentTheme = useMutation({
-        mutationFn: fetchSetCurrentTheme,
-        // When mutate is called:
-        onMutate: async nextCurrentTheme => {
-            // Cancel any outgoing refetches
-            // (so they don't overwrite our optimistic update)
-            await queryClient.cancelQueries({ queryKey: ['currentTheme'] })
-
-            // Snapshot the previous value
-            const prevCurrentTheme = queryClient.getQueryData(['currentTheme'])
-
-            // Optimistically update to the new value
-            queryClient.setQueryData(['currentTheme'], nextCurrentTheme)
-
-            // Return a context with the previous and new todo
-            return { prevCurrentTheme, nextCurrentTheme }
-        },
-        // If the mutation fails, use the context we returned above
-        onError: (err, newTodo, context) => {
-            queryClient.setQueryData(
-                ['currentTheme'],
-                context?.prevCurrentTheme,
-            )
-        },
-        // Always refetch after error or success:
-        onSettled: () =>
-            queryClient.invalidateQueries({ queryKey: ['currentTheme'] }),
-    })
-
-    const deleteTheme = useMutation({
-        mutationFn: fetchDeleteTheme,
-        // When mutate is called:
-        onMutate: async id => {
-            // Cancel any outgoing refetches
-            // (so they don't overwrite our optimistic update)
-            await queryClient.cancelQueries({ queryKey: ['themes'] })
-
-            // Snapshot the previous value
-            const prevThemes = queryClient.getQueryData(['themes'])
-
-            // Optimistically update to the new value
-            queryClient.setQueryData(
-                ['themes'],
-                (prev: ThemeRecord[] | undefined) =>
-                    prev?.filter(theme => theme.id !== id),
-            )
-
-            // Return a context with the previous and new todo
-            return { prevThemes }
-        },
-        // If the mutation fails, use the context we returned above
-        onError: (err, theme, context) => {
-            queryClient.setQueryData(['themes'], context?.prevThemes ?? [])
-        },
-        // Always refetch after error or success:
-        onSettled: () =>
-            queryClient.invalidateQueries({ queryKey: ['themes'] }),
-    })
+    const [settingsState, setSettingsState] = useState<
+        'initial' | 'create-theme' | 'edit-theme'
+    >('initial')
 
     const themes = useQuery({
         queryKey: ['themes'],
@@ -168,101 +73,6 @@ export function Navigation(props: {
             errorChroma: 5.32,
         },
     ]
-
-    function setSettingsState(value: SettingsState) {
-        if (value.state === 'create-theme') {
-            setTheme('create-theme')
-            _setSettingsState({
-                ...value,
-                theme: {
-                    ...value.theme,
-                    value: value.theme.label.split(' ').join('-').toLowerCase(),
-                },
-            })
-
-            document.documentElement.style.setProperty(
-                '--color-primary',
-                value.theme.primary,
-            )
-            document.documentElement.style.setProperty(
-                '--color-secondary',
-                value.theme.secondary,
-            )
-            document.documentElement.style.setProperty(
-                '--color-success',
-                value.theme.success,
-            )
-            document.documentElement.style.setProperty(
-                '--color-error',
-                value.theme.error,
-            )
-        } else {
-            _setSettingsState(value)
-        }
-    }
-
-    function createTheme() {
-        setSettingsState({
-            state: 'create-theme',
-            theme: {
-                label: '',
-                value: '',
-                primary: window
-                    .getComputedStyle(document.documentElement)
-                    .getPropertyValue('--color-primary'),
-                secondary: window
-                    .getComputedStyle(document.documentElement)
-                    .getPropertyValue('--color-secondary'),
-                success: window
-                    .getComputedStyle(document.documentElement)
-                    .getPropertyValue('--color-success'),
-                error: window
-                    .getComputedStyle(document.documentElement)
-                    .getPropertyValue('--color-error'),
-            },
-        })
-    }
-
-    function selectTheme(next: string) {
-        const nextTheme: ThemeRecord | BuiltinTheme | null =
-            [...builtinThemes, ...(themes.data ?? [])].find(
-                theme => theme.value === next,
-            ) ?? null
-        setTheme(next)
-        if (nextTheme == null) return
-        console.log(nextTheme, next)
-
-        if ('id' in nextTheme) {
-            void setCurrentTheme.mutateAsync({
-                currentThemeValue: nextTheme.value,
-                currentDarkThemeId: nextTheme.id as string,
-                currentLightThemeId: nextTheme.id as string,
-            })
-        } else {
-            void setCurrentTheme.mutateAsync({
-                currentThemeValue: nextTheme.value,
-                currentDarkThemeId: null,
-                currentLightThemeId: null,
-            })
-        }
-
-        document.documentElement.style.setProperty(
-            '--color-primary',
-            `${nextTheme.primaryLightness}% ${nextTheme.primaryChroma} ${nextTheme.primaryHue}`,
-        )
-        document.documentElement.style.setProperty(
-            '--color-secondary',
-            `${nextTheme.secondaryLightness}% ${nextTheme.secondaryChroma} ${nextTheme.secondaryHue}`,
-        )
-        document.documentElement.style.setProperty(
-            '--color-success',
-            `${nextTheme.successLightness}% ${nextTheme.successChroma} ${nextTheme.successHue}`,
-        )
-        document.documentElement.style.setProperty(
-            '--color-error',
-            `${nextTheme.errorLightness}% ${nextTheme.errorChroma} ${nextTheme.errorHue}`,
-        )
-    }
 
     useHotkeys(
         'mod+shift+comma',
@@ -370,7 +180,7 @@ export function Navigation(props: {
                     <Popover.Root
                         onOpenChange={next => {
                             if (next == false) {
-                                setSettingsState({ state: 'initial' })
+                                setSettingsState('initial')
                             }
                             setSettingsOpen(next)
                         }}
@@ -427,7 +237,7 @@ export function Navigation(props: {
                             </DropdownMenu.Content>
                             <Popover.PopoverContent
                                 className={clsx(
-                                    settingsState.state === 'create-theme'
+                                    settingsState === 'create-theme'
                                         ? 'min-w-100'
                                         : 'min-w-52',
                                     'z-50  border-2 border-primary bg-secondary px-3 py-3 text-primary',
@@ -435,210 +245,30 @@ export function Navigation(props: {
                                 sideOffset={-2}
                                 align="end"
                                 onCloseAutoFocus={e => {
-                                    setSettingsState({ state: 'initial' })
+                                    setSettingsState('initial')
                                     e.preventDefault()
                                     dropDownTriggerRef.current?.focus()
                                 }}
                             >
-                                {settingsState.state === 'initial' ? (
+                                {settingsState === 'initial' ? (
                                     <>
                                         <h2 className="mb-2 text-xl">
                                             Settings
                                         </h2>
-                                        <div className="flex flex-row items-center justify-between">
-                                            <label
-                                                htmlFor="theme-selector"
-                                                className="pr-4"
-                                            >
-                                                Theme:
-                                            </label>
-
-                                            <DropdownMenu.Root>
-                                                <DropdownMenu.Trigger
-                                                    id="theme-selector"
-                                                    className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                >
-                                                    {currentTheme?.data
-                                                        ?.label ??
-                                                    theme === 'system'
-                                                        ? 'System'
-                                                        : theme
-                                                        ? builtinThemes.find(
-                                                              t =>
-                                                                  t.value ===
-                                                                  theme,
-                                                          )?.label
-                                                        : 'System'}
-                                                </DropdownMenu.Trigger>
-
-                                                <DropdownMenu.Portal>
-                                                    <DropdownMenu.Content
-                                                        side="bottom"
-                                                        avoidCollisions={false}
-                                                        className="z-50 w-40 border-2 border-primary bg-secondary text-primary "
-                                                        align="end"
-                                                        sideOffset={-2}
-                                                    >
-                                                        <DropdownMenu.Item
-                                                            onSelect={() =>
-                                                                selectTheme(
-                                                                    'system',
-                                                                )
-                                                            }
-                                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                        >
-                                                            System
-                                                        </DropdownMenu.Item>
-                                                        {builtinThemes.map(
-                                                            theme => (
-                                                                <DropdownMenu.Item
-                                                                    key={
-                                                                        theme.value
-                                                                    }
-                                                                    onSelect={() =>
-                                                                        selectTheme(
-                                                                            theme.value,
-                                                                        )
-                                                                    }
-                                                                    className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                                >
-                                                                    {
-                                                                        theme.label
-                                                                    }
-                                                                </DropdownMenu.Item>
-                                                            ),
-                                                        )}
-                                                        {themes.data.map(t => (
-                                                            <DropdownMenu.Sub
-                                                                key={t.value}
-                                                            >
-                                                                <DropdownMenu.SubTrigger className="flex cursor-pointer flex-row items-center px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary ">
-                                                                    <span className="flex-grow truncate">
-                                                                        {
-                                                                            t.label
-                                                                        }
-                                                                    </span>
-                                                                    <svg
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        fill="none"
-                                                                        viewBox="0 0 24 24"
-                                                                        strokeWidth={
-                                                                            3
-                                                                        }
-                                                                        stroke="currentColor"
-                                                                        className="size-4 shrink-0"
-                                                                    >
-                                                                        <path
-                                                                            strokeLinecap="round"
-                                                                            strokeLinejoin="round"
-                                                                            d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                                                                        />
-                                                                    </svg>
-                                                                </DropdownMenu.SubTrigger>
-                                                                <DropdownMenu.Portal>
-                                                                    <DropdownMenu.SubContent className="border-2 border-primary bg-secondary text-primary">
-                                                                        <DropdownMenu.Item
-                                                                            onSelect={() =>
-                                                                                selectTheme(
-                                                                                    t.value,
-                                                                                )
-                                                                            }
-                                                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
-                                                                        >
-                                                                            Select
-                                                                        </DropdownMenu.Item>
-                                                                        <DropdownMenu.Item
-                                                                            onSelect={() => {
-                                                                                if (
-                                                                                    theme ===
-                                                                                    t.value
-                                                                                ) {
-                                                                                    const prefersDark =
-                                                                                        window.matchMedia(
-                                                                                            '(prefers-color-scheme: dark)',
-                                                                                        ).matches
-                                                                                    selectTheme(
-                                                                                        prefersDark
-                                                                                            ? 'dark'
-                                                                                            : 'light',
-                                                                                    )
-
-                                                                                    document.documentElement.style.removeProperty(
-                                                                                        '--color-primary',
-                                                                                    )
-                                                                                    document.documentElement.style.removeProperty(
-                                                                                        '--color-secondary',
-                                                                                    )
-                                                                                    document.documentElement.style.removeProperty(
-                                                                                        '--color-success',
-                                                                                    )
-                                                                                    document.documentElement.style.removeProperty(
-                                                                                        '--color-error',
-                                                                                    )
-                                                                                }
-
-                                                                                void deleteTheme.mutateAsync(
-                                                                                    t.id,
-                                                                                )
-                                                                            }}
-                                                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
-                                                                        >
-                                                                            Delete
-                                                                        </DropdownMenu.Item>
-                                                                    </DropdownMenu.SubContent>
-                                                                </DropdownMenu.Portal>
-                                                            </DropdownMenu.Sub>
-                                                        ))}
-                                                        <DropdownMenu.Item
-                                                            className="flex cursor-pointer flex-row items-center justify-between space-x-2 px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                            onKeyDown={e => {
-                                                                if (
-                                                                    SELECTION_KEYS.includes(
-                                                                        e.key,
-                                                                    )
-                                                                ) {
-                                                                    e.preventDefault()
-                                                                    createTheme()
-                                                                }
-                                                            }}
-                                                            onPointerUp={e => {
-                                                                e.preventDefault()
-                                                                createTheme()
-                                                            }}
-                                                        >
-                                                            New theme
-                                                            <div>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    fill="none"
-                                                                    viewBox="0 0 24 24"
-                                                                    strokeWidth={
-                                                                        3
-                                                                    }
-                                                                    stroke="currentColor"
-                                                                    className="size-4"
-                                                                >
-                                                                    <path
-                                                                        strokeLinecap="round"
-                                                                        strokeLinejoin="round"
-                                                                        d="M12 4.5v15m7.5-7.5h-15"
-                                                                    />
-                                                                </svg>
-                                                            </div>
-                                                        </DropdownMenu.Item>
-                                                    </DropdownMenu.Content>
-                                                </DropdownMenu.Portal>
-                                            </DropdownMenu.Root>
-                                        </div>
+                                        <Settings
+                                            createTheme={() =>
+                                                setSettingsState('create-theme')
+                                            }
+                                            builtinThemes={builtinThemes}
+                                            themes={themes.data}
+                                        />
                                     </>
-                                ) : settingsState.state === 'create-theme' ? (
+                                ) : settingsState === 'create-theme' ? (
                                     <>
                                         <h2 className="mb-2 text-xl">
                                             Theme Creator
                                         </h2>
-                                        <CreateThemeForm
-                                            selectTheme={selectTheme}
-                                        />
+                                        <CreateThemeForm />
                                     </>
                                 ) : null}
                             </Popover.PopoverContent>

@@ -6,8 +6,8 @@ import { fetchCreateTheme } from '~/lib/api'
 import { ThemeRecord } from '~/server/repositories/theme.repository'
 import { ColorInput } from './color-input'
 import { FocusEvent, useState } from 'react'
-import { useThemes } from '~/app/providers'
 import { themeDTOSchema } from '~/app/api/theme/dto'
+import { useSyncedTheme } from './use-synced-theme'
 
 export function getCreateThemeInitialProps(): z.infer<typeof themeSchema> {
     const primary = window
@@ -95,15 +95,11 @@ export const themeToDTOSchema = themeSchema.transform(
     },
 )
 
-export function CreateThemeForm({
-    selectTheme,
-}: {
-    selectTheme: (theme: string) => void
-}) {
+export function CreateThemeForm() {
     const [initialValues] = useState(() => getCreateThemeInitialProps())
     const queryClient = useQueryClient()
 
-    const { themes, updateThemes } = useThemes()
+    const { setTheme } = useSyncedTheme()
     const createTheme = useMutation({
         mutationFn: fetchCreateTheme,
         onMutate: async nextTheme => {
@@ -126,8 +122,7 @@ export function CreateThemeForm({
                         : [{ id: '', userId: '', ...nextTheme }],
             )
 
-            updateThemes([...themes, nextTheme.value])
-            selectTheme(nextTheme.value)
+            setTheme(nextTheme.value)
 
             return { prevThemes, prevCurrentTheme }
         },
@@ -149,7 +144,6 @@ export function CreateThemeForm({
             initialValues={initialValues}
             validationSchema={toFormikValidationSchema(themeSchema)}
             onSubmit={values => {
-                console.log('submitted')
                 createTheme.mutate(themeToDTOSchema.parse(values))
             }}
         >

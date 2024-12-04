@@ -106,7 +106,7 @@ export async function fetchUserChangelog(): Promise<UserChangelogClientSchema> {
     return userChangelogClientSchema.parse(body.data)
 }
 
-export async function fetchCurrentTheme(): Promise<ThemeRecord | null> {
+export async function fetchCurrentTheme(): Promise<CurrentThemeRecord | null> {
     const response = await fetch(`${getBaseUrl()}/api/user-theme`, {
         headers: {
             'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ export async function fetchCurrentTheme(): Promise<ThemeRecord | null> {
         return null
     }
 
-    const body: Body<ThemeRecord> = await response.json()
+    const body: Body<CurrentThemeRecord> = await response.json()
 
     return body.data
 }
