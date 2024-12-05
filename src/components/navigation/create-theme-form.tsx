@@ -170,7 +170,7 @@ export function CreateThemeForm({
                             Theme name:
                         </label>
                         <div>
-                            <div className="svg-outline relative">
+                            <div className="svg-outline-within relative">
                                 <Field
                                     name="label"
                                     placeholder="Untitled theme"
