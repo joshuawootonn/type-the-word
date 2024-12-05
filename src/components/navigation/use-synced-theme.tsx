@@ -6,7 +6,6 @@ import { fetchSetCurrentTheme } from '~/lib/api'
 export function useSyncedTheme(): UseThemeProps {
     const queryClient = useQueryClient()
     const { theme, ...rest } = useTheme()
-    console.log('test', rest.themes)
 
     const setCurrentTheme = useMutation({
         mutationFn: fetchSetCurrentTheme,
