@@ -4,6 +4,7 @@ import { BuiltinTheme } from '~/app/layout'
 import { fetchDeleteTheme } from '~/lib/api'
 import { ThemeRecord } from '~/server/repositories/theme.repository'
 import { useSyncedTheme } from './use-synced-theme'
+import { useRef, useEffect } from 'react'
 
 const SELECTION_KEYS = [' ', 'Enter']
 
@@ -41,6 +42,12 @@ export function Settings({
             queryClient.invalidateQueries({ queryKey: ['themes'] }),
     })
 
+    const ref = useRef<HTMLButtonElement>(null)
+
+    useEffect(() => {
+        ref.current?.focus()
+    }, [])
+
     return (
         <div className="flex flex-row items-center justify-between">
             <label htmlFor="theme-selector" className="pr-4">
@@ -51,6 +58,7 @@ export function Settings({
                 <DropdownMenu.Trigger
                     id="theme-selector"
                     className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                    ref={ref}
                 >
                     {theme === 'system'
                         ? 'System'
