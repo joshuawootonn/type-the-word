@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { Field, Formik } from 'formik'
-import { toFormikValidationSchema } from 'zod-formik-adapter'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { fetchCreateTheme } from '~/lib/api'
 import { ThemeRecord } from '~/server/repositories/theme.repository'
@@ -63,7 +62,9 @@ const lchSchema = z.string().refine(stringLCHValue => {
 })
 
 export const themeSchema = z.object({
-    label: z.string().min(1),
+    label: z
+        .string({ required_error: 'Name is required' })
+        .min(1, 'Name is required'),
     primary: lchSchema,
     secondary: lchSchema,
     success: lchSchema,
@@ -154,7 +155,18 @@ export function CreateThemeForm({
     return (
         <Formik
             initialValues={initialValues}
-            validationSchema={toFormikValidationSchema(themeSchema)}
+            validate={async values => {
+                const result = await themeSchema.safeParseAsync(values)
+                if (!result.success) {
+                    const errors: Record<string, string> = {}
+
+                    for (const x of result.error.errors) {
+                        errors[x.path.filter(Boolean).join('.')] = x.message
+                    }
+
+                    return errors
+                }
+            }}
             onSubmit={values => {
                 createTheme.mutate(themeToDTOSchema.parse(values))
                 goBackToSettings()
@@ -188,7 +200,7 @@ export function CreateThemeForm({
                             </div>
                             {props.errors.label && (
                                 <div className="mt-2 text-right text-error">
-                                    {JSON.stringify(props.errors)}
+                                    {props.errors.label}
                                 </div>
                             )}
                         </div>
