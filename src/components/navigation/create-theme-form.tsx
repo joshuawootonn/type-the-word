@@ -130,7 +130,11 @@ export function CreateThemeForm({
                         : [{ id: '', userId: '', ...nextTheme }],
             )
 
-            setTheme(nextTheme.value)
+            // Using settimout here to ensure that the `next-theme` provider has the new value.
+            // This hasn't been an issue locally, but I think it will be.
+            setTimeout(() => {
+                setTheme(nextTheme.value)
+            })
 
             return { prevThemes, prevCurrentTheme }
         },
