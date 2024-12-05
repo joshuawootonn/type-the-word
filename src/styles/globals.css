@@ -110,5 +110,6 @@ body {
 }
 
 .extra {
-    @apply text-extra;
+    @apply text-error;
+    filter: brightness(65%);
 }
