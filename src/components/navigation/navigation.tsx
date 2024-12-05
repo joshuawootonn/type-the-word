@@ -240,7 +240,7 @@ export function Navigation(props: {
                                     settingsState === 'create-theme'
                                         ? 'min-w-100'
                                         : 'min-w-52',
-                                    'z-50 border-2 border-primary bg-secondary px-3 py-3 text-primary',
+                                    'z-50 border-2 border-primary bg-secondary px-3 py-3 text-primary outline-none',
                                 )}
                                 sideOffset={-2}
                                 align="end"

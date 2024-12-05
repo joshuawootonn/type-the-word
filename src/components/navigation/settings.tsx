@@ -69,8 +69,7 @@ export function Settings({
                 <DropdownMenu.Portal>
                     <DropdownMenu.Content
                         side="bottom"
-                        avoidCollisions={false}
-                        className="z-50 w-40 border-2 border-primary bg-secondary text-primary "
+                        className=" z-50 w-40 border-2 border-primary bg-secondary text-primary "
                         align="end"
                         sideOffset={-2}
                         loop
