@@ -198,7 +198,7 @@ export function CreateThemeForm({
                                     data-1p-ignore={true}
                                 />
                             </div>
-                            {props.errors.label && (
+                            {props.errors.label && props.submitCount > 0 && (
                                 <div className="mt-2 text-right text-error">
                                     {props.errors.label}
                                 </div>
@@ -228,6 +228,19 @@ export function CreateThemeForm({
                             Error Hue
                         </label>
                         <ColorInput id="error" name="error" />
+                    </div>
+
+                    <div className="flex flex-col items-start justify-start">
+                        <div className="-mb-0.5 border-2 border-primary px-2 text-lg">
+                            Preview
+                        </div>
+                        <p className="prose w-full border-2 border-primary p-3 text-primary">
+                            <span className="correct">The L</span>
+                            <span className="incorrect">o</span>
+                            <span className="correct">rd is my</span>
+                            <span className="extra">Sheppard</span>
+                            <span> I shall not want.</span>
+                        </p>
                     </div>
                     <button
                         type="submit"
