@@ -65,6 +65,7 @@ export function Settings({
                         className="z-50 w-40 border-2 border-primary bg-secondary text-primary "
                         align="end"
                         sideOffset={-2}
+                        loop
                     >
                         <DropdownMenu.Item
                             onSelect={() => setTheme('system')}
@@ -103,7 +104,10 @@ export function Settings({
                                     </svg>
                                 </DropdownMenu.SubTrigger>
                                 <DropdownMenu.Portal>
-                                    <DropdownMenu.SubContent className="border-2 border-primary bg-secondary text-primary">
+                                    <DropdownMenu.SubContent
+                                        loop
+                                        className="border-2 border-primary bg-secondary text-primary"
+                                    >
                                         <DropdownMenu.Item
                                             onSelect={() => setTheme(t.value)}
                                             className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
