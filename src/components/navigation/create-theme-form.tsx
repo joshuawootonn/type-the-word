@@ -78,7 +78,11 @@ export const themeToDTOSchema = themeSchema.transform(
         const error = stringToLCH(t.error)
         return {
             label: t.label,
-            value: t.label.split(' ').join('-').toLowerCase(),
+            value: t.label
+                .split(' ')
+                .join('-')
+                .replaceAll(/([^_\-a-z])+/g, '')
+                .toLowerCase(),
             primaryLightness: primary.lightness,
             primaryChroma: primary.chroma,
             primaryHue: primary.hue,
