@@ -32,8 +32,7 @@ export default async function RootLayout({
 
     let lastTypedVerse: TypedVerse | null = null
     let themes: ThemeRecord[] = []
-    let curr: ThemeRecord | null = null
-    let currentTheme: CurrentThemeRecord | null
+    let currentTheme: CurrentThemeRecord | null = null
 
     if (session != null) {
         const typedVerseRepository = new TypedVerseRepository(db)
@@ -49,27 +48,28 @@ export default async function RootLayout({
         currentTheme = await themeRepository.getCurrentTheme({
             userId: session.user.id,
         })
-        curr =
-            themes.find(t => t.value === currentTheme?.currentThemeValue) ??
-            null
     }
 
     // added suppressHydrationWarning for next-themes within `<Providers />`
     return (
         <html lang="en" suppressHydrationWarning>
             <head>
-                {curr && (
-                    <style>
-                        <>{`
-          .${curr.value} {
-            --color-primary: ${curr.primaryLightness}% ${curr.primaryChroma} ${curr.primaryHue};
-            --color-secondary: ${curr.secondaryLightness}% ${curr.secondaryChroma} ${curr.secondaryHue};
-            --color-success: ${curr.successLightness}% ${curr.successChroma} ${curr.successHue};
-            --color-error: ${curr.errorLightness}% ${curr.errorChroma} ${curr.errorHue};
-          }
-        `}</>
-                    </style>
-                )}
+                <style>
+                    {`
+                ${themes
+                    .map(
+                        t => `
+.${t.value} {
+  --color-primary: ${t.primaryLightness}% ${t.primaryChroma} ${t.primaryHue};
+  --color-secondary: ${t.secondaryLightness}% ${t.secondaryChroma} ${t.secondaryHue};
+  --color-success: ${t.successLightness}% ${t.successChroma} ${t.successHue};
+  --color-error: ${t.errorLightness}% ${t.errorChroma} ${t.errorHue};
+}
+`,
+                    )
+                    .join('')}
+              `}
+                </style>
             </head>
             <body
                 className={clsx(
@@ -78,7 +78,11 @@ export default async function RootLayout({
                     ibmPlexMono.variable,
                 )}
             >
-                <Providers session={session} themes={themes}>
+                <Providers
+                    session={session}
+                    themes={themes}
+                    currentTheme={currentTheme}
+                >
                     <Navigation
                         themes={themes}
                         lastTypedVerse={lastTypedVerse}

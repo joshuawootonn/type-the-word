@@ -4,8 +4,11 @@ import { ThemeProvider as NextThemeProvider } from 'next-themes'
 import { useQuery } from '@tanstack/react-query'
 import { Session } from 'next-auth'
 import { ReactNode, useMemo } from 'react'
-import { ThemeRecord } from '~/server/repositories/theme.repository'
-import { fetchThemes } from '~/lib/api'
+import {
+    CurrentThemeRecord,
+    ThemeRecord,
+} from '~/server/repositories/theme.repository'
+import { fetchCurrentTheme, fetchThemes } from '~/lib/api'
 
 const builtinThemes = ['light', 'dark']
 
@@ -13,11 +16,19 @@ export function ThemeProvider({
     session,
     children,
     themes: serverRenderedThemes,
+    currentTheme: serverRenderedCurrentTheme,
 }: {
     children: ReactNode
     session: Session | null
     themes: ThemeRecord[]
+    currentTheme: CurrentThemeRecord | null
 }) {
+    const currentTheme = useQuery({
+        queryKey: ['currentTheme'],
+        queryFn: fetchCurrentTheme,
+        enabled: session?.user?.id != null,
+        initialData: serverRenderedCurrentTheme,
+    })
     const themes = useQuery({
         queryKey: ['themes'],
         queryFn: fetchThemes,
@@ -83,7 +94,11 @@ export function ThemeProvider({
                 }
             `}</style>
 
-            <NextThemeProvider themes={allThemes} attribute="class">
+            <NextThemeProvider
+                forcedTheme={currentTheme.data?.value ?? undefined}
+                themes={allThemes}
+                attribute="class"
+            >
                 {children}
             </NextThemeProvider>
         </>
