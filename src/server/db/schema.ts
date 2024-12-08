@@ -55,8 +55,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
     accounts: many(accounts),
     typingSessions: many(typingSessions),
     userChangelog: one(userChangelog),
-    userTheme: one(userTheme),
-    themes: many(typingSessions),
+    themes: many(userTheme),
 }))
 
 export const userChangelog = schema.table('userChangelog', {
@@ -65,44 +64,40 @@ export const userChangelog = schema.table('userChangelog', {
         .notNull()
         .$default(() => sql`CURRENT_TIMESTAMP(3)`),
 })
+
 export const userTheme = schema.table('userTheme', {
-    userId: varchar('userId', { length: 255 }).notNull().primaryKey(),
-    currentThemeValue: varchar('currentThemeValue', { length: 255 }),
-    currentDarkThemeId: varchar('currentDarkTheme', { length: 255 }),
-    currentLightThemeId: varchar('currentLightTheme', { length: 255 }),
+    userId: varchar('userId', { length: 255 }).notNull(),
+    themeId: varchar('themeId', { length: 255 }).notNull(),
 })
 
-export const theme = schema.table(
-    'theme',
-    {
-        id: varchar('id', { length: 255 })
-            .notNull()
-            .$default(() => crypto.randomUUID())
-            .primaryKey(),
-        userId: varchar('userId', { length: 255 }).notNull(),
-        label: varchar('label', { length: 255 }).notNull(),
-        value: varchar('value', { length: 255 }).notNull(),
-        primaryLightness: real('primaryLightness').notNull().default(0),
-        primaryChroma: real('primaryChroma').notNull().default(0),
-        primaryHue: real('primaryHue').notNull().default(0),
-        secondaryLightness: real('secondaryLightness').notNull().default(0),
-        secondaryChroma: real('secondaryChroma').notNull().default(0),
-        secondaryHue: real('secondaryHue').notNull().default(0),
-        successLightness: real('successLightness').notNull().default(0),
-        successChroma: real('successChroma').notNull().default(0),
-        successHue: real('successHue').notNull().default(0),
-        errorLightness: real('errorLightness').notNull().default(0),
-        errorChroma: real('errorChroma').notNull().default(0),
-        errorHue: real('errorHue').notNull().default(0),
-    },
-    theme => ({
-        userIdIdx: index('theme_userId_idx').on(theme.userId),
-        themeValueUserIdUniqueIndex: uniqueIndex('theme_value_userId_idx').on(
-            theme.userId,
-            theme.value,
-        ),
-    }),
-)
+export const builtinTheme = schema.table('builtinTheme', {
+    themeId: varchar('themeId', { length: 255 }).notNull(),
+})
+
+export const builtinThemeRelations = relations(builtinTheme, ({ one }) => ({
+    themes: one(theme),
+}))
+
+export const theme = schema.table('theme', {
+    id: varchar('id', { length: 255 })
+        .notNull()
+        .$default(() => crypto.randomUUID())
+        .primaryKey(),
+    label: varchar('label', { length: 255 }).notNull(),
+    value: varchar('value', { length: 255 }).notNull(),
+    primaryLightness: real('primaryLightness').notNull().default(0),
+    primaryChroma: real('primaryChroma').notNull().default(0),
+    primaryHue: real('primaryHue').notNull().default(0),
+    secondaryLightness: real('secondaryLightness').notNull().default(0),
+    secondaryChroma: real('secondaryChroma').notNull().default(0),
+    secondaryHue: real('secondaryHue').notNull().default(0),
+    successLightness: real('successLightness').notNull().default(0),
+    successChroma: real('successChroma').notNull().default(0),
+    successHue: real('successHue').notNull().default(0),
+    errorLightness: real('errorLightness').notNull().default(0),
+    errorChroma: real('errorChroma').notNull().default(0),
+    errorHue: real('errorHue').notNull().default(0),
+})
 
 export const accounts = schema.table(
     'account',
