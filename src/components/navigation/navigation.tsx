@@ -1,28 +1,78 @@
 'use client'
 
-import { useTheme } from 'next-themes'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import * as Popover from '@radix-ui/react-popover'
-import * as Select from '@radix-ui/react-select'
 import Link from 'next/link'
 import Head from 'next/head'
 import { usePathname } from 'next/navigation'
-import { fetchLastVerse } from '~/lib/api'
+import { fetchLastVerse, fetchThemes } from '~/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import { toPassageSegment } from '~/lib/passageSegment'
 import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import { useRef, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
-import HotkeyLabel from './hotkey-label'
+import HotkeyLabel from '../hotkey-label'
+import clsx from 'clsx'
+import { ThemeRecord } from '~/server/repositories/theme.repository'
+import { BuiltinTheme } from '~/app/layout'
+import { CreateThemeForm } from './create-theme-form'
+import { Settings } from './settings'
 
-export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
+export function Navigation(props: {
+    themes: ThemeRecord[]
+    lastTypedVerse: TypedVerse | null
+}) {
     const { data: sessionData } = useSession()
     const isRootPath = usePathname() === '/'
     const RootLinkComponent = isRootPath ? 'h1' : 'span'
     const dropDownTriggerRef = useRef<HTMLButtonElement>(null)
-    const { theme, setTheme } = useTheme()
     const [isSettingsOpen, setSettingsOpen] = useState(false)
+    const [settingsState, setSettingsState] = useState<
+        'initial' | 'create-theme' | 'edit-theme'
+    >('initial')
+
+    const themes = useQuery({
+        queryKey: ['themes'],
+        queryFn: fetchThemes,
+        enabled: sessionData?.user?.id != null,
+        initialData: props.themes,
+    })
+
+    const builtinThemes: BuiltinTheme[] = [
+        {
+            label: 'Light',
+            value: 'light',
+            primaryLightness: 0,
+            primaryHue: 0,
+            primaryChroma: 0,
+            secondaryLightness: 100,
+            secondaryHue: 0,
+            secondaryChroma: 0,
+            successLightness: 56.53,
+            successHue: 0.1293,
+            successChroma: 157.54,
+            errorLightness: 46.77,
+            errorHue: 0.1878,
+            errorChroma: 5.32,
+        },
+        {
+            label: 'Dark',
+            value: 'dark',
+            primaryLightness: 100,
+            primaryHue: 0,
+            primaryChroma: 0,
+            secondaryLightness: 0,
+            secondaryHue: 0,
+            secondaryChroma: 0,
+            successLightness: 56.53,
+            successHue: 0.1293,
+            successChroma: 157.54,
+            errorLightness: 46.77,
+            errorHue: 0.1878,
+            errorChroma: 5.32,
+        },
+    ]
 
     useHotkeys(
         'mod+shift+comma',
@@ -71,7 +121,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                     transform: translateY(1px);
                     width: 39px;
                     height: 33px;
-                    background-color: rgb(var(--color-primary));
+                    background-color: oklch(var(--color-primary));
                     -webkit-mask-image: url('/bible.svg');
                     mask-image: url('/bible.svg');
                     mask-repeat: no-repeat;
@@ -128,7 +178,12 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
             <div className="flex flex-col gap-4">
                 {sessionData ? (
                     <Popover.Root
-                        onOpenChange={setSettingsOpen}
+                        onOpenChange={next => {
+                            if (next == false) {
+                                setSettingsState('initial')
+                            }
+                            setSettingsOpen(next)
+                        }}
                         open={isSettingsOpen}
                     >
                         <DropdownMenu.Root modal={false}>
@@ -144,7 +199,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                             </Popover.PopoverAnchor>
 
                             <DropdownMenu.Content
-                                className="z-50  border-2 border-primary bg-secondary text-primary "
+                                className="z-50 border-2 border-primary bg-secondary text-primary"
                                 sideOffset={-2}
                                 align="end"
                             >
@@ -181,77 +236,45 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                 </DropdownMenu.Item>
                             </DropdownMenu.Content>
                             <Popover.PopoverContent
-                                className="z-50 w-52 border-2 border-primary bg-secondary px-3 py-3 text-primary"
+                                className={clsx(
+                                    settingsState === 'create-theme'
+                                        ? 'min-w-100'
+                                        : 'min-w-52',
+                                    'z-50 border-2 border-primary bg-secondary px-3 py-3 text-primary outline-none',
+                                )}
                                 sideOffset={-2}
                                 align="end"
                                 onCloseAutoFocus={e => {
+                                    setSettingsState('initial')
                                     e.preventDefault()
                                     dropDownTriggerRef.current?.focus()
                                 }}
                             >
-                                <h2 className="mb-2 text-xl">Settings</h2>
-                                <div className="flex flex-row items-center justify-between">
-                                    <label
-                                        htmlFor="theme-selector"
-                                        className="pr-4"
-                                    >
-                                        Theme:
-                                    </label>
-
-                                    <Select.Root
-                                        value={theme}
-                                        onValueChange={next => setTheme(next)}
-                                    >
-                                        <Select.Trigger
-                                            id="theme-selector"
-                                            className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                        >
-                                            <Select.Value />
-                                        </Select.Trigger>
-
-                                        <Select.Portal>
-                                            <Select.Content
-                                                side="bottom"
-                                                position="popper"
-                                                avoidCollisions={false}
-                                                className="z-50 border-2 border-primary bg-secondary text-primary "
-                                                align="end"
-                                                sideOffset={-2}
-                                            >
-                                                <Select.ScrollUpButton />
-                                                <Select.Viewport>
-                                                    <Select.Item
-                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                        value="dark"
-                                                    >
-                                                        <Select.ItemText>
-                                                            Dark
-                                                        </Select.ItemText>
-                                                        <Select.ItemIndicator />
-                                                    </Select.Item>
-                                                    <Select.Item
-                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                        value="light"
-                                                    >
-                                                        <Select.ItemText>
-                                                            Light
-                                                        </Select.ItemText>
-                                                        <Select.ItemIndicator />
-                                                    </Select.Item>
-                                                    <Select.Item
-                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                        value="system"
-                                                    >
-                                                        <Select.ItemText>
-                                                            System
-                                                        </Select.ItemText>
-                                                        <Select.ItemIndicator />
-                                                    </Select.Item>
-                                                </Select.Viewport>
-                                            </Select.Content>
-                                        </Select.Portal>
-                                    </Select.Root>
-                                </div>
+                                {settingsState === 'initial' ? (
+                                    <>
+                                        <h2 className="mb-2 text-xl">
+                                            Settings
+                                        </h2>
+                                        <Settings
+                                            createTheme={() =>
+                                                setSettingsState('create-theme')
+                                            }
+                                            builtinThemes={builtinThemes}
+                                            themes={themes.data}
+                                        />
+                                    </>
+                                ) : settingsState === 'create-theme' ? (
+                                    <>
+                                        <h2 className="mb-2 text-xl">
+                                            Theme Creator
+                                        </h2>
+                                        <CreateThemeForm
+                                            goBackToSettings={() =>
+                                                setSettingsState('initial')
+                                            }
+                                        />
+                                    </>
+                                ) : null}
                             </Popover.PopoverContent>
                         </DropdownMenu.Root>
                     </Popover.Root>

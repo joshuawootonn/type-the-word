@@ -50,7 +50,7 @@ export default function Changelog() {
             </div>
             <UpdateLastVisitedChangelog />
             <p>New updates and improvements to Type the Word</p>
-            <hr className="mx-0 w-full border-t-2 border-black dark:border-white" />
+            <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
                     <DateComponent date={new Date('11/12/2024')} />

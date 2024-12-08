@@ -12,6 +12,8 @@ import {
     varchar,
     json,
     pgSchema,
+    real,
+    uniqueIndex,
 } from 'drizzle-orm/pg-core'
 
 /**
@@ -53,16 +55,48 @@ export const usersRelations = relations(users, ({ many, one }) => ({
     accounts: many(accounts),
     typingSessions: many(typingSessions),
     userChangelog: one(userChangelog),
+    themes: many(userTheme),
 }))
 
 export const userChangelog = schema.table('userChangelog', {
-    userId: varchar('userId', { length: 255 })
-        .notNull()
-        .$default(() => crypto.randomUUID())
-        .primaryKey(),
+    userId: varchar('userId', { length: 255 }).notNull().primaryKey(),
     lastVisitedAt: timestamp('lastVisitedAt', { mode: 'date' })
         .notNull()
         .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+})
+
+export const userTheme = schema.table('userTheme', {
+    userId: varchar('userId', { length: 255 }).notNull(),
+    themeId: varchar('themeId', { length: 255 }).notNull(),
+})
+
+export const builtinTheme = schema.table('builtinTheme', {
+    themeId: varchar('themeId', { length: 255 }).notNull(),
+})
+
+export const builtinThemeRelations = relations(builtinTheme, ({ one }) => ({
+    themes: one(theme),
+}))
+
+export const theme = schema.table('theme', {
+    id: varchar('id', { length: 255 })
+        .notNull()
+        .$default(() => crypto.randomUUID())
+        .primaryKey(),
+    label: varchar('label', { length: 255 }).notNull(),
+    value: varchar('value', { length: 255 }).notNull(),
+    primaryLightness: real('primaryLightness').notNull().default(0),
+    primaryChroma: real('primaryChroma').notNull().default(0),
+    primaryHue: real('primaryHue').notNull().default(0),
+    secondaryLightness: real('secondaryLightness').notNull().default(0),
+    secondaryChroma: real('secondaryChroma').notNull().default(0),
+    secondaryHue: real('secondaryHue').notNull().default(0),
+    successLightness: real('successLightness').notNull().default(0),
+    successChroma: real('successChroma').notNull().default(0),
+    successHue: real('successHue').notNull().default(0),
+    errorLightness: real('errorLightness').notNull().default(0),
+    errorChroma: real('errorChroma').notNull().default(0),
+    errorHue: real('errorHue').notNull().default(0),
 })
 
 export const accounts = schema.table(

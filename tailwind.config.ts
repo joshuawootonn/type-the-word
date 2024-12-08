@@ -16,11 +16,10 @@ module.exports = {
                 white: {
                     DEFAULT: '#ffffff',
                 },
-                primary: 'rgb(var(--color-primary) / <alpha-value>)',
-                secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
-                success: 'rgb(var(--color-success) / <alpha-value>)',
-                incorrect: 'rgb(var(--color-incorrect) / <alpha-value>)',
-                extra: 'rgb(var(--color-extra) / <alpha-value>)',
+                primary: 'oklch(var(--color-primary) / <alpha-value>)',
+                secondary: 'oklch(var(--color-secondary) / <alpha-value>)',
+                success: 'oklch(var(--color-success) / <alpha-value>)',
+                error: 'oklch(var(--color-error) / <alpha-value>)',
             },
             borderWidth: {
                 DEFAULT: '1px',
@@ -33,7 +32,7 @@ module.exports = {
                 8: '8px',
             },
             boxShadow: {
-                lg: '12px 12px 0px rgba(0, 0, 0, 0.5)',
+                lg: '12px 12px 0px oklch(var(--color-primary), 0.5)',
             },
             spacing: {
                 100: '25rem',

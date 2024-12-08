@@ -141,7 +141,11 @@ export function PassageSelector({
             <label htmlFor="passage" className={clsx(labelClassName)}>
                 {label ?? 'Passage:'}
             </label>
-            <div className={'not-prose svg-outline relative flex flex-row'}>
+            <div
+                className={
+                    'not-prose svg-outline-within relative flex flex-row'
+                }
+            >
                 <Combobox
                     className="relative"
                     as="div"

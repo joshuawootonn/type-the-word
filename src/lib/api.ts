@@ -8,6 +8,12 @@ import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 import { UserChangelogRecord } from '~/server/repositories/userChangelog.repository'
 import { z } from 'zod'
+import {
+    CurrentTheme,
+    CurrentThemeRecord,
+    ThemeRecord,
+} from '~/server/repositories/theme.repository'
+import { TryAgainLaterError, ValidationError } from '~/server/error-utils'
 
 export type Body<T> = { data: T }
 
@@ -99,4 +105,85 @@ export async function fetchUserChangelog(): Promise<UserChangelogClientSchema> {
     const body: Body<UserChangelogRecord> = await response.json()
 
     return userChangelogClientSchema.parse(body.data)
+}
+
+export async function fetchCurrentTheme(): Promise<CurrentThemeRecord | null> {
+    const response = await fetch(`${getBaseUrl()}/api/user-theme`, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+
+    if (!response.ok) {
+        return null
+    }
+
+    const body: Body<CurrentThemeRecord> = await response.json()
+
+    return body.data
+}
+
+export async function fetchSetCurrentTheme(
+    theme: Omit<CurrentThemeRecord, 'userId'>,
+): Promise<CurrentThemeRecord> {
+    const response = await fetch(`${getBaseUrl()}/api/user-theme`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(theme),
+    })
+
+    const body: Body<CurrentThemeRecord> = await response.json()
+
+    return body.data
+}
+
+export async function fetchThemes(): Promise<ThemeRecord[]> {
+    const response = await fetch(`${getBaseUrl()}/api/theme`, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+
+    if (!response.ok) {
+        return []
+    }
+
+    const body: Body<ThemeRecord[]> = await response.json()
+
+    return body.data
+}
+
+export async function createTheme(
+    theme: Omit<ThemeRecord, 'id' | 'userId'>,
+): Promise<Body<ThemeRecord>> {
+    const response = await fetch(`${getBaseUrl()}/api/theme`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(theme),
+    })
+
+    if (response.ok) {
+        const body: Body<ThemeRecord> = await response.json()
+
+        return body
+    }
+
+    if (response.status === 422) {
+        const body: ValidationError = await response.json()
+        throw new ValidationError(body.errors)
+    }
+
+    throw new TryAgainLaterError()
+}
+
+export async function fetchDeleteTheme(id: string): Promise<null> {
+    await fetch(`${getBaseUrl()}/api/theme/${id}`, {
+        method: 'DELETE',
+    })
+
+    return null
 }
