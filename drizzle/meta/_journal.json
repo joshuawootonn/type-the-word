@@ -15,6 +15,27 @@
       "when": 1720523196438,
       "tag": "0001_robust_bullseye",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1733690250724,
+      "tag": "0002_bumpy_eddie_brock",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1733692390789,
+      "tag": "0003_builtin-themes",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1733694042920,
+      "tag": "0004_volatile_the_hood",
+      "breakpoints": true
     }
   ]
 }
