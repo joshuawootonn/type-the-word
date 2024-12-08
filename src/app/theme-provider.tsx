@@ -95,7 +95,7 @@ export function ThemeProvider({
             `}</style>
 
             <NextThemeProvider
-                forcedTheme={currentTheme.data?.value ?? undefined}
+                forcedTheme={currentTheme.data?.currentThemeValue ?? undefined}
                 themes={allThemes}
                 attribute="class"
             >

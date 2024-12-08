@@ -3,6 +3,7 @@ import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import { eq } from 'drizzle-orm'
 import { createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
+import { ValidationError } from '../error-utils'
 
 export const themeRecordSchema = createSelectSchema(schema.theme).merge(
     z.object({
@@ -15,9 +16,20 @@ export type ThemeRecord = z.infer<typeof themeRecordSchema>
 
 export const currentThemeRecordSchema = createSelectSchema(
     schema.userTheme,
-).merge(z.object({ value: z.string().length(1).nullish() }))
+).merge(z.object({ currentThemeValue: z.string().min(1).nullish() }))
 
 export type CurrentThemeRecord = z.infer<typeof currentThemeRecordSchema>
+export type CurrentTheme = {
+    userId: string
+    value: string
+}
+
+const uniqueConstraintErrorSchema = z.object({
+    message: z.string(),
+    code: z.literal('23505'),
+})
+
+export class UniqueConstraintError extends ValidationError {}
 
 export class ThemeRepository {
     db: PostgresJsDatabase<typeof schema>
@@ -99,7 +111,7 @@ export class ThemeRepository {
         errorChroma,
         errorHue,
     }: Omit<ThemeRecord, 'id'>): Promise<ThemeRecord> {
-        const record = await this.db
+        return await this.db
             .insert(schema.theme)
             .values({
                 userId,
@@ -120,8 +132,16 @@ export class ThemeRepository {
             })
             .returning()
             .execute()
-
-        return record.at(0)!
+            .catch(e => {
+                const result = uniqueConstraintErrorSchema.safeParse(e)
+                if (result.success) {
+                    throw new UniqueConstraintError({
+                        label: 'Label already used',
+                    })
+                }
+                throw e
+            })
+            .then(result => result.at(0)!)
     }
 
     async deleteTheme({ id }: { id: string }) {

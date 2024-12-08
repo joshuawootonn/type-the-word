@@ -1,12 +1,13 @@
 import { z } from 'zod'
 import { Field, Formik } from 'formik'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { fetchCreateTheme } from '~/lib/api'
-import { ThemeRecord } from '~/server/repositories/theme.repository'
+import { createTheme } from '~/lib/api'
 import { ColorInput } from './color-input'
 import { FocusEvent, useState } from 'react'
 import { themeDTOSchema } from '~/app/api/theme/dto'
 import { useSyncedTheme } from './use-synced-theme'
+import { ValidationError } from '~/server/error-utils'
+import { ThemeRecord } from '~/server/repositories/theme.repository'
 
 export function getCreateThemeInitialProps(): z.infer<typeof themeSchema> {
     const primary = window
@@ -61,10 +62,23 @@ const lchSchema = z.string().refine(stringLCHValue => {
     return result.success
 })
 
+function labelToValue(label: string) {
+    return label
+        .split(' ')
+        .join('-')
+        .replaceAll(/([^_\-a-z])+/g, '')
+        .toLowerCase()
+}
+
 export const themeSchema = z.object({
     label: z
         .string({ required_error: 'Name is required' })
-        .min(1, 'Name is required'),
+        .min(1, 'Name is required')
+        .refine(
+            val => labelToValue(val).length > 0,
+            'Name must include at least 1 letter',
+        ),
+
     primary: lchSchema,
     secondary: lchSchema,
     success: lchSchema,
@@ -79,11 +93,7 @@ export const themeToDTOSchema = themeSchema.transform(
         const error = stringToLCH(t.error)
         return {
             label: t.label,
-            value: t.label
-                .split(' ')
-                .join('-')
-                .replaceAll(/([^_\-a-z])+/g, '')
-                .toLowerCase(),
+            value: labelToValue(t.label),
             primaryLightness: primary.lightness,
             primaryChroma: primary.chroma,
             primaryHue: primary.hue,
@@ -109,46 +119,18 @@ export function CreateThemeForm({
     const queryClient = useQueryClient()
 
     const { setTheme } = useSyncedTheme()
-    const createTheme = useMutation({
-        mutationFn: fetchCreateTheme,
-        onMutate: async nextTheme => {
-            await queryClient.cancelQueries({ queryKey: ['themes'] })
-            await queryClient.cancelQueries({ queryKey: ['currentTheme'] })
-
-            const prevThemes = queryClient.getQueryData(['themes'])
-            const prevCurrentTheme = queryClient.getQueryData(['currentTheme'])
-
-            queryClient.setQueryData(['currentTheme'], () => ({
-                currentThemeValue: nextTheme.value,
-                userId: '',
-            }))
-
+    const [generalError, setGeneralError] = useState<string | null>(null)
+    const { mutateAsync, isLoading } = useMutation({
+        mutationFn: createTheme,
+        onSuccess: ({ data }) => {
             queryClient.setQueryData(
                 ['themes'],
                 (prev: ThemeRecord[] | undefined) =>
-                    prev
-                        ? [...prev, { id: '', userId: '', ...nextTheme }]
-                        : [{ id: '', userId: '', ...nextTheme }],
-            )
-
-            // Using settimout here to ensure that the `next-theme` provider has the new value.
-            // This hasn't been an issue locally, but I think it will be.
-            setTimeout(() => {
-                setTheme(nextTheme.value)
-            })
-
-            return { prevThemes, prevCurrentTheme }
-        },
-        onError: (_err, _theme, context) => {
-            queryClient.setQueryData(['themes'], context?.prevThemes ?? [])
-            queryClient.setQueryData(
-                ['currentTheme'],
-                context?.prevCurrentTheme,
+                    prev ? [...prev, data] : [data],
             )
         },
         onSettled: () => {
             void queryClient.invalidateQueries({ queryKey: ['themes'] })
-            void queryClient.invalidateQueries({ queryKey: ['currentTheme'] })
         },
     })
 
@@ -167,9 +149,24 @@ export function CreateThemeForm({
                     return errors
                 }
             }}
-            onSubmit={values => {
-                createTheme.mutate(themeToDTOSchema.parse(values))
-                goBackToSettings()
+            onSubmit={async (values, { setErrors }) => {
+                try {
+                    setGeneralError(null)
+                    const dto = themeToDTOSchema.parse(values)
+                    await mutateAsync(dto)
+                    setTimeout(() => {
+                        setTheme(dto.value)
+                        goBackToSettings()
+                    })
+                } catch (e) {
+                    if (e instanceof ValidationError) {
+                        console.log('validation error')
+                        setErrors(e.errors)
+                    } else {
+                        console.log('generalError')
+                        setGeneralError('Whoops something is broken')
+                    }
+                }
             }}
         >
             {props => (
@@ -181,7 +178,7 @@ export function CreateThemeForm({
                         <label htmlFor="theme-name" className="pr-4">
                             Theme name:
                         </label>
-                        <div>
+                        <div className="flex flex-col items-end">
                             <div className="svg-outline-within relative">
                                 <Field
                                     name="label"
@@ -242,11 +239,17 @@ export function CreateThemeForm({
                             <span> I shall not want.</span>
                         </p>
                     </div>
+                    {generalError && props.submitCount > 0 && (
+                        <div className="mt-2 text-right text-error">
+                            {props.errors.label}
+                        </div>
+                    )}
                     <button
                         type="submit"
                         className="svg-outline relative col-span-2 border-2 border-primary px-3 py-1 font-semibold text-primary"
+                        disabled={isLoading}
                     >
-                        Save{' '}
+                        Save
                     </button>
                     <input className="hidden" type="submit" />
                 </form>

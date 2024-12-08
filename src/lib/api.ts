@@ -9,10 +9,11 @@ import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 import { UserChangelogRecord } from '~/server/repositories/userChangelog.repository'
 import { z } from 'zod'
 import {
+    CurrentTheme,
     CurrentThemeRecord,
     ThemeRecord,
 } from '~/server/repositories/theme.repository'
-import { BuiltinTheme } from '~/app/layout'
+import { TryAgainLaterError, ValidationError } from '~/server/error-utils'
 
 export type Body<T> = { data: T }
 
@@ -154,9 +155,9 @@ export async function fetchThemes(): Promise<ThemeRecord[]> {
     return body.data
 }
 
-export async function fetchCreateTheme(
+export async function createTheme(
     theme: Omit<ThemeRecord, 'id' | 'userId'>,
-): Promise<ThemeRecord[]> {
+): Promise<Body<ThemeRecord>> {
     const response = await fetch(`${getBaseUrl()}/api/theme`, {
         method: 'POST',
         headers: {
@@ -165,9 +166,18 @@ export async function fetchCreateTheme(
         body: JSON.stringify(theme),
     })
 
-    const body: Body<ThemeRecord[]> = await response.json()
+    if (response.ok) {
+        const body: Body<ThemeRecord> = await response.json()
 
-    return body.data
+        return body
+    }
+
+    if (response.status === 422) {
+        const body: ValidationError = await response.json()
+        throw new ValidationError(body.errors)
+    }
+
+    throw new TryAgainLaterError()
 }
 
 export async function fetchDeleteTheme(id: string): Promise<null> {

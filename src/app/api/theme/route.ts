@@ -2,7 +2,10 @@ import { getServerSession } from 'next-auth'
 import { NextRequest } from 'next/server'
 import { authOptions } from '~/server/auth'
 import { db } from '~/server/db'
-import { ThemeRepository } from '~/server/repositories/theme.repository'
+import {
+    ThemeRepository,
+    UniqueConstraintError,
+} from '~/server/repositories/theme.repository'
 import { themeDTOSchema } from './dto'
 
 export const dynamic = 'force-dynamic' // defaults to auto
@@ -16,8 +19,6 @@ export async function POST(request: NextRequest) {
 
     const rawBody = await request.json()
 
-    console.log(rawBody)
-
     const body = themeDTOSchema.safeParse(rawBody)
 
     if (!body.success) {
@@ -26,12 +27,18 @@ export async function POST(request: NextRequest) {
 
     const themeRepository = new ThemeRepository(db)
 
-    const themes = await themeRepository.createTheme({
-        ...body.data,
-        userId: session.user.id,
-    })
-
-    return Response.json({ data: themes }, { status: 200 })
+    try {
+        const themes = await themeRepository.createTheme({
+            ...body.data,
+            userId: session.user.id,
+        })
+        return Response.json({ data: themes }, { status: 200 })
+    } catch (e) {
+        if (e instanceof UniqueConstraintError) {
+            return Response.json({ errors: e.errors }, { status: 422 })
+        }
+        throw e
+    }
 }
 
 export async function GET() {
