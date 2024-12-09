@@ -8,6 +8,7 @@ import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 import { UserChangelogRecord } from '~/server/repositories/userChangelog.repository'
 import { z } from 'zod'
+import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
 
 export type Body<T> = { data: T }
 
@@ -99,4 +100,20 @@ export async function fetchUserChangelog(): Promise<UserChangelogClientSchema> {
     const body: Body<UserChangelogRecord> = await response.json()
 
     return userChangelogClientSchema.parse(body.data)
+}
+
+export async function fetchBuiltinThemes(): Promise<BuiltinThemeRecord[]> {
+    const response = await fetch(`${getBaseUrl()}/api/builtin-theme`, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+
+    if (!response.ok) {
+        return []
+    }
+
+    const body: Body<BuiltinThemeRecord[]> = await response.json()
+
+    return body.data
 }

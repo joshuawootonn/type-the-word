@@ -2,22 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-    .light {
-        --color-primary: 0% 0 0;
-        --color-secondary: 100% 0 0;
-        --color-success: 56.53% 0.1293 157.54;
-        --color-incorrect: 51.43% 0.1923 6.1;
-        --color-extra: 46.77% 0.1878 5.32;
-    }
-    .dark {
-        --color-primary: 100% 0 0;
-        --color-secondary: 0% 0 0;
-        --color-success: 56.53% 0.1293 157.54;
-        --color-incorrect: 51.43% 0.1923 6.1;
-        --color-extra: 46.77% 0.1878 5.32;
-    }
-}
 /*
   Radix ui popups use `margin-right` to prevent overflow hidden from causing layout shift when popups come up.
   We want to use `margin-left` to prevent layout shift, so that it matches between overflow on 119 and no overflow on 1.

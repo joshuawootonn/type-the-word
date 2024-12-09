@@ -12,6 +12,11 @@ import { TypedVerseRepository } from '~/server/repositories/typedVerse.repositor
 import { db } from '~/server/db'
 import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import { GlobalHotkeys } from './global-hotkeys'
+import {
+    BuiltinThemeRecord,
+    BuiltinThemeRepository,
+} from '~/server/repositories/builtinTheme.repository'
+import { ThemeStyles } from './theme-styles'
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://typetheword.site'),
@@ -25,6 +30,8 @@ export default async function RootLayout({
     const session = await getServerSession(authOptions)
 
     let lastTypedVerse: TypedVerse | null = null
+    const builtinThemeRepository = new BuiltinThemeRepository(db)
+    const builtinThemes = await builtinThemeRepository.getMany()
 
     if (session != null) {
         const typedVerseRepository = new TypedVerseRepository(db)
@@ -36,6 +43,9 @@ export default async function RootLayout({
     // added suppressHydrationWarning for next-themes within `<Providers />`
     return (
         <html lang="en" suppressHydrationWarning>
+            <head>
+                <ThemeStyles builtinThemes={builtinThemes} />
+            </head>
             <body
                 className={clsx(
                     'min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 font-sans lg:px-0',
@@ -43,7 +53,7 @@ export default async function RootLayout({
                     ibmPlexMono.variable,
                 )}
             >
-                <Providers session={session}>
+                <Providers builtinThemes={builtinThemes} session={session}>
                     <Navigation lastTypedVerse={lastTypedVerse} />
                     {children}
                     <Footer />
