@@ -103,8 +103,14 @@ export const userTheme = schema.table('userTheme', {
 })
 
 export const userThemeRelations = relations(userTheme, ({ one }) => ({
-    user: one(users),
-    theme: one(theme),
+    user: one(users, {
+        fields: [userTheme.userId],
+        references: [users.id],
+    }),
+    theme: one(theme, {
+        fields: [userTheme.themeId],
+        references: [theme.id],
+    }),
 }))
 
 export const builtinTheme = schema.table('builtinTheme', {
@@ -112,7 +118,10 @@ export const builtinTheme = schema.table('builtinTheme', {
 })
 
 export const builtinThemeRelations = relations(builtinTheme, ({ one }) => ({
-    themes: one(theme),
+    theme: one(theme, {
+        fields: [builtinTheme.themeId],
+        references: [theme.id],
+    }),
 }))
 
 export const theme = schema.table('theme', {
