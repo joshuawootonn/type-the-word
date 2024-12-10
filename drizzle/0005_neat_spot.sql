@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS "userTheme_userId_idx" ON "type-the-word"."userTheme" USING btree ("userId");
