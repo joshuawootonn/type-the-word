@@ -1,3 +1,4 @@
+import { env } from '~/env.mjs'
 import { passageSegmentSchema } from '~/lib/passageSegment'
 
 export const runtime = 'edge'
@@ -15,9 +16,6 @@ export default async function Image({
     }
 
     return await fetch(
-        new URL(
-            `/api/og?${search.toString()}`,
-            process.env.VERCEL_URL ?? 'https://typetheword.site',
-        ),
+        new URL(`/api/og?${search.toString()}`, env.DEPLOYED_URL),
     )
 }

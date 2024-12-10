@@ -7,13 +7,7 @@ export const env = createEnv({
      * isn't built with invalid env vars.
      */
     server: {
-        POSTGRES_DATABASE_URL: z
-            .string()
-            .url()
-            .refine(
-                str => !str.includes('YOUR_POSTGRES_URL_HERE'),
-                'You forgot to change the default URL',
-            ),
+        POSTGRES_DATABASE_URL: z.string().url(),
         NODE_ENV: z
             .enum(['development', 'test', 'production'])
             .default('development'),
@@ -38,6 +32,15 @@ export const env = createEnv({
 
         CONVERTKIT_API_KEY: z.string(),
         CONVERTKIT_SUBSCRIBE_FORM_ID: z.string(),
+        DEPLOYED_URL:
+            process.env.NODE_ENV === 'production'
+                ? z
+                      .string()
+                      .transform(str => (str ? `https://${str}` : str))
+                      .pipe(z.string().url())
+                : z
+                      .any()
+                      .transform(_ => `http://localhost:${process.env.PORT}`),
     },
 
     /**
@@ -68,6 +71,7 @@ export const env = createEnv({
         SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
         CONVERTKIT_API_KEY: process.env.CONVERTKIT_API_KEY,
         CONVERTKIT_SUBSCRIBE_FORM_ID: process.env.CONVERTKIT_SUBSCRIBE_FORM_ID,
+        DEPLOYED_URL: process.env.VERCEL_URL,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
