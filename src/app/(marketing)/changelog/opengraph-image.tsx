@@ -1,7 +1,9 @@
+import { env } from '~/env.mjs'
+
 export const runtime = 'edge'
 
 export const contentType = 'image/png'
 
 export default async function Image() {
-    return await fetch('https://typetheword.site/api/og?path=changelog')
+    return await fetch(new URL('/api/og?path=changelog', env.DEPLOYED_URL))
 }
