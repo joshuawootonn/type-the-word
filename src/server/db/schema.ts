@@ -97,10 +97,16 @@ export const userCurrentThemeRelations = relations(
     }),
 )
 
-export const userTheme = schema.table('userTheme', {
-    userId: varchar('userId', { length: 255 }).notNull(),
-    themeId: varchar('themeId', { length: 255 }).notNull(),
-})
+export const userTheme = schema.table(
+    'userTheme',
+    {
+        userId: varchar('userId', { length: 255 }).notNull(),
+        themeId: varchar('themeId', { length: 255 }).notNull(),
+    },
+    userTheme => ({
+        userIdIdx: index('userTheme_userId_idx').on(userTheme.userId),
+    }),
+)
 
 export const userThemeRelations = relations(userTheme, ({ one }) => ({
     user: one(users, {
