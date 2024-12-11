@@ -74,8 +74,8 @@ export const userCurrentTheme = schema.table(
     {
         userId: varchar('userId', { length: 255 }).notNull(),
         colorScheme: varchar('colorScheme', { length: 255 }).notNull(),
-        lightThemeId: varchar('lightThemeId', { length: 255 }).notNull(),
-        darkThemeId: varchar('darkThemeId', { length: 255 }).notNull(),
+        lightThemeId: varchar('lightThemeId', { length: 255 }),
+        darkThemeId: varchar('darkThemeId', { length: 255 }),
     },
     table => ({
         checkConstraint: check(
