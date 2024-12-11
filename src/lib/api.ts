@@ -8,7 +8,12 @@ import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 import { UserChangelogRecord } from '~/server/repositories/userChangelog.repository'
 import { z } from 'zod'
+import {
+    CurrentTheme,
+    CurrentThemeRecord,
+} from '~/server/repositories/currentTheme.repository'
 import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
+import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
 
 export type Body<T> = { data: T }
 
@@ -114,6 +119,54 @@ export async function fetchBuiltinThemes(): Promise<BuiltinThemeRecord[]> {
     }
 
     const body: Body<BuiltinThemeRecord[]> = await response.json()
+
+    return body.data
+}
+
+export async function fetchUserThemes(): Promise<UserThemeRecord[]> {
+    const response = await fetch(`${getBaseUrl()}/api/user-theme`, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+
+    if (!response.ok) {
+        return []
+    }
+
+    const body: Body<UserThemeRecord[]> = await response.json()
+
+    return body.data
+}
+
+export async function fetchCurrentTheme(): Promise<CurrentTheme | null> {
+    const response = await fetch(`${getBaseUrl()}/api/current-theme`, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+
+    if (!response.ok) {
+        return null
+    }
+
+    const body: Body<CurrentTheme> = await response.json()
+
+    return body.data
+}
+
+export async function fetchSetCurrentTheme(
+    theme: Omit<CurrentTheme, 'userId'>,
+): Promise<CurrentTheme> {
+    const response = await fetch(`${getBaseUrl()}/api/current-theme`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(theme),
+    })
+
+    const body: Body<CurrentTheme> = await response.json()
 
     return body.data
 }
