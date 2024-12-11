@@ -19,8 +19,7 @@ module.exports = {
                 primary: 'oklch(var(--color-primary) / <alpha-value>)',
                 secondary: 'oklch(var(--color-secondary) / <alpha-value>)',
                 success: 'oklch(var(--color-success) / <alpha-value>)',
-                incorrect: 'oklch(var(--color-incorrect) / <alpha-value>)',
-                extra: 'oklch(var(--color-extra) / <alpha-value>)',
+                error: 'oklch(var(--color-error) / <alpha-value>)',
             },
             borderWidth: {
                 DEFAULT: '1px',

@@ -103,9 +103,10 @@ body {
 }
 
 .incorrect {
-    @apply text-incorrect;
+    @apply text-error;
 }
 
 .extra {
-    @apply text-extra;
+    @apply text-error;
+    filter: brightness(65%);
 }
