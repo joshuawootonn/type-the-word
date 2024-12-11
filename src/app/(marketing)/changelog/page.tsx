@@ -53,6 +53,11 @@ export default function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('12/11/2024')} /> - Fixed a
+                    regression where incorrect letters were not highlighted in
+                    red.
+                </li>{' '}
+                <li>
                     <DateComponent date={new Date('11/12/2024')} />
                     <ul>
                         <li>
