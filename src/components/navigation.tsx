@@ -1,6 +1,5 @@
 'use client'
 
-import { useTheme } from 'next-themes'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import * as Popover from '@radix-ui/react-popover'
@@ -15,14 +14,15 @@ import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import { useRef, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import HotkeyLabel from './hotkey-label'
+import { useTheme } from '~/app/theme-provider'
 
 export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
     const { data: sessionData } = useSession()
     const isRootPath = usePathname() === '/'
     const RootLinkComponent = isRootPath ? 'h1' : 'span'
     const dropDownTriggerRef = useRef<HTMLButtonElement>(null)
-    const { theme, setTheme } = useTheme()
     const [isSettingsOpen, setSettingsOpen] = useState(false)
+    const { setTheme, themes, currentTheme } = useTheme()
 
     useHotkeys(
         'mod+shift+comma',
@@ -199,8 +199,34 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                     </label>
 
                                     <Select.Root
-                                        value={theme}
-                                        onValueChange={next => setTheme(next)}
+                                        value={currentTheme.colorScheme}
+                                        onValueChange={next => {
+                                            const lightThemeId = themes.find(
+                                                t => t.label === 'Light',
+                                            )!.id
+                                            const darkThemeId = themes.find(
+                                                t => t.label === 'Dark',
+                                            )!.id
+                                            if (next === 'light') {
+                                                return setTheme({
+                                                    colorScheme: 'light',
+                                                    lightThemeId,
+                                                    darkThemeId: null,
+                                                })
+                                            }
+                                            if (next === 'dark') {
+                                                return setTheme({
+                                                    colorScheme: 'dark',
+                                                    lightThemeId: null,
+                                                    darkThemeId,
+                                                })
+                                            }
+                                            return setTheme({
+                                                colorScheme: 'system',
+                                                lightThemeId,
+                                                darkThemeId,
+                                            })
+                                        }}
                                     >
                                         <Select.Trigger
                                             id="theme-selector"
