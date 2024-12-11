@@ -1,0 +1,2 @@
+ALTER TABLE "type-the-word"."userCurrentTheme" ALTER COLUMN "lightThemeId" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "type-the-word"."userCurrentTheme" ALTER COLUMN "darkThemeId" DROP NOT NULL;
