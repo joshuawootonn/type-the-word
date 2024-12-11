@@ -17,7 +17,6 @@ export async function POST(request: NextRequest) {
     const rawBody = await request.json()
 
     const body = DTOToRecordSchema.parse(rawBody)
-    console.log({ rawBody, body })
 
     const userChangelogRepository = new UserChangelogRepository(db)
     const userChangelog = userChangelogRepository.updateLastVisitedChangelog({
