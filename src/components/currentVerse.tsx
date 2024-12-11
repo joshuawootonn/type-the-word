@@ -245,7 +245,6 @@ export function CurrentVerse({
     }, [keystrokes.length])
 
     function handleKnownEvents(event: KnownNativeInputEvent) {
-        console.log(event.inputType)
         let isVerseComplete = false
 
         setIsPassageActive(true)
