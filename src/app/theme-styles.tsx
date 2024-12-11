@@ -1,16 +1,19 @@
 import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
+import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
 
 export function ThemeStyles({
     builtinThemes,
+    userThemes,
 }: {
     builtinThemes: BuiltinThemeRecord[]
+    userThemes: UserThemeRecord[]
 }) {
     return (
         <style suppressHydrationWarning>{`
-            ${builtinThemes
+            ${[...builtinThemes, ...userThemes]
                 .map(
                     t => `
-.${t.theme.label.toLowerCase()} {
+.${t.themeId.toLowerCase()} {
   --color-primary: ${t.theme.primaryLightness}% ${t.theme.primaryChroma} ${
       t.theme.primaryHue
   };

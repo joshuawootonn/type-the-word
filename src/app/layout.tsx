@@ -12,10 +12,15 @@ import { TypedVerseRepository } from '~/server/repositories/typedVerse.repositor
 import { db } from '~/server/db'
 import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import { GlobalHotkeys } from './global-hotkeys'
+import { BuiltinThemeRepository } from '~/server/repositories/builtinTheme.repository'
 import {
-    BuiltinThemeRecord,
-    BuiltinThemeRepository,
-} from '~/server/repositories/builtinTheme.repository'
+    CurrentTheme,
+    CurrentThemeRepository,
+} from '~/server/repositories/currentTheme.repository'
+import {
+    UserThemeRecord,
+    UserThemeRepository,
+} from '~/server/repositories/userTheme.repository'
 import { ThemeStyles } from './theme-styles'
 
 export const metadata: Metadata = {
@@ -30,6 +35,9 @@ export default async function RootLayout({
     const session = await getServerSession(authOptions)
 
     let lastTypedVerse: TypedVerse | null = null
+    let currentTheme: CurrentTheme | null = null
+    let userThemes: UserThemeRecord[] = []
+
     const builtinThemeRepository = new BuiltinThemeRepository(db)
     const builtinThemes = await builtinThemeRepository.getMany()
 
@@ -38,13 +46,25 @@ export default async function RootLayout({
         lastTypedVerse = await typedVerseRepository.getOneOrNull({
             userId: session.user.id,
         })
+        const userThemeRepository = new UserThemeRepository(db)
+        userThemes = await userThemeRepository.getMany({
+            userId: session.user.id,
+        })
+
+        const currentThemeRepository = new CurrentThemeRepository(db)
+        currentTheme = await currentThemeRepository.getCurrentTheme({
+            userId: session.user.id,
+        })
     }
 
     // added suppressHydrationWarning for next-themes within `<Providers />`
     return (
         <html lang="en" suppressHydrationWarning>
             <head>
-                <ThemeStyles builtinThemes={builtinThemes} />
+                <ThemeStyles
+                    builtinThemes={builtinThemes}
+                    userThemes={userThemes}
+                />
             </head>
             <body
                 className={clsx(
@@ -53,7 +73,12 @@ export default async function RootLayout({
                     ibmPlexMono.variable,
                 )}
             >
-                <Providers builtinThemes={builtinThemes} session={session}>
+                <Providers
+                    currentTheme={currentTheme}
+                    userThemes={userThemes}
+                    builtinThemes={builtinThemes}
+                    session={session}
+                >
                     <Navigation lastTypedVerse={lastTypedVerse} />
                     {children}
                     <Footer />
