@@ -7,6 +7,7 @@ import {
     useContext,
     useEffect,
     useMemo,
+    useRef,
 } from 'react'
 import {
     fetchBuiltinThemes,
@@ -151,7 +152,24 @@ export function ThemeProvider({
         [builtinThemes.data, userThemes.data],
     )
 
+    const hasUpdatedCurrentTheme = useRef(false)
+
+    useEffect(() => {
+        // todo(josh): remove this after January 2024.
+        // This function sets the currentTheme based on the legacy `localstorage` version of themes.
+        // Even if users don't manually set a theme I want to start migrating users to db based themes,
+        // so I can eventually delete the legacy code without impacting active users.
+        if (
+            session?.user.id &&
+            currentTheme.data == null &&
+            !hasUpdatedCurrentTheme.current
+        ) {
+            const { userId, ...currentTheme } = currentThemeOrFallback
+            setCurrentTheme.mutate(currentTheme)
+            hasUpdatedCurrentTheme.current = true
         }
+    }, [])
+
     const handleMediaQuery = useCallback(() => {
         applyTheme(currentThemeOrFallback)
     }, [currentThemeOrFallback, applyTheme])
