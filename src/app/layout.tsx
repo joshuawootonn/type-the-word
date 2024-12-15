@@ -58,7 +58,7 @@ export default async function RootLayout({
         })
     }
 
-    // added suppressHydrationWarning for next-themes within `<Providers />`
+    // added suppressHydrationWarning since `ThemeScript` adds classes to `html` onload
     return (
         <html lang="en" suppressHydrationWarning>
             <head>

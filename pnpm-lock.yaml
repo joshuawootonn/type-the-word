@@ -98,9 +98,6 @@ dependencies:
   next-auth:
     specifier: ^4.23.0
     version: 4.23.1(next@14.2.4)(react-dom@18.3.1)(react@18.3.1)
-  next-themes:
-    specifier: ^0.3.0
-    version: 0.3.0(react-dom@18.3.1)(react@18.3.1)
   parse5:
     specifier: ^7.1.2
     version: 7.1.2
@@ -4741,7 +4738,7 @@ packages:
   /@types/ioredis@4.28.10:
     resolution: {integrity: sha512-69LyhUgrXdgcNDv7ogs1qXZomnfOEnSmrmMFqKgt1XMJxmoOSG/u3wYy13yACIfKuMJ8IhKgHafDO3sx19zVQQ==}
     dependencies:
-      '@types/node': 18.17.19
+      '@types/node': 18.19.67
     dev: false
 
   /@types/jsdom@21.1.4:
@@ -7785,16 +7782,6 @@ packages:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       uuid: 8.3.2
-    dev: false
-
-  /next-themes@0.3.0(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-/QHIrsYpd6Kfk7xakK4svpDI5mmXP0gfvCoJdGpZQ2TOrQZmsW0QxjaiLn8wbIKjtm4BTSqLoix4lxYYOnLJ/w==}
-    peerDependencies:
-      react: ^16.8 || ^17 || ^18
-      react-dom: ^16.8 || ^17 || ^18
-    dependencies:
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
     dev: false
 
   /next@14.2.4(@babel/core@7.24.7)(@opentelemetry/api@1.7.0)(react-dom@18.3.1)(react@18.3.1):
