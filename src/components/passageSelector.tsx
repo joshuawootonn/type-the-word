@@ -175,11 +175,11 @@ export function PassageSelector({
                             {simpleBibleMetadata[book]?.name ?? ''}
                         </div>
                     )}
-                    <ScrollArea.Root>
+                    <ScrollArea.Root className="bg-secondary">
                         <ScrollArea.Viewport>
                             <Combobox.Options
                                 className={
-                                    'absolute z-50 max-h-60 w-full -translate-y-0.5 overflow-auto border-2 border-primary bg-secondary '
+                                    'absolute z-50 max-h-60 w-full -translate-y-0.5 overflow-auto border-2 border-primary bg-secondary'
                                 }
                             >
                                 {filteredBooks.map(book => (
