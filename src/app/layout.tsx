@@ -22,6 +22,7 @@ import {
     UserThemeRepository,
 } from '~/server/repositories/userTheme.repository'
 import { ThemeStyles } from './theme-styles'
+import { ThemeScript } from './theme-script'
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://typetheword.site'),
@@ -62,6 +63,11 @@ export default async function RootLayout({
         <html lang="en" suppressHydrationWarning>
             <head>
                 <ThemeStyles
+                    builtinThemes={builtinThemes}
+                    userThemes={userThemes}
+                />
+                <ThemeScript
+                    currentTheme={currentTheme}
                     builtinThemes={builtinThemes}
                     userThemes={userThemes}
                 />
