@@ -20,6 +20,7 @@ import {
 } from '~/server/repositories/builtinTheme.repository'
 import { CurrentTheme } from '~/server/repositories/currentTheme.repository'
 import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
+import { getCurrentThemeOrFallback } from './get-current-theme-or-fallback'
 
 const ThemeContext = createContext<{
     themes: ThemeRecord[]
@@ -66,28 +67,6 @@ function getResolvedTheme(
     }
 
     return { isDark, resolvedTheme }
-}
-
-const isServer = typeof window === 'undefined'
-
-function clearLegacyTheme(): void {
-    try {
-        localStorage.removeItem('theme')
-    } catch (e) {
-        // Unsupported
-    }
-}
-
-function getLegacyTheme(): 'system' | 'dark' | 'light' | undefined {
-    if (isServer) return undefined
-    let theme
-    try {
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-        theme = localStorage.getItem('theme') || undefined
-    } catch (e) {
-        // Unsupported
-    }
-    return theme as 'system' | 'dark' | 'light'
 }
 
 export function ThemeProvider({
@@ -148,46 +127,8 @@ export function ThemeProvider({
             queryClient.invalidateQueries({ queryKey: ['currentTheme'] }),
     })
 
-    const getCurrentThemeOrLegacy = useMemo<CurrentTheme>(() => {
-        const current = currentTheme.data
-        if (current) {
-            clearLegacyTheme()
-            return current
-        }
-
-        const legacyTheme = getLegacyTheme()
-
-        const lightThemeId = builtinThemes.data.find(
-            t => t.theme.label === 'Light',
-        )!.themeId
-        const darkThemeId = builtinThemes.data.find(
-            t => t.theme.label === 'Dark',
-        )!.themeId
-
-        if (legacyTheme === 'light') {
-            return {
-                userId: '',
-                lightThemeId,
-                darkThemeId: null,
-                colorScheme: legacyTheme,
-            }
-        }
-
-        if (legacyTheme === 'dark') {
-            return {
-                userId: '',
-                lightThemeId: null,
-                darkThemeId,
-                colorScheme: legacyTheme,
-            }
-        }
-
-        return {
-            userId: '',
-            lightThemeId,
-            darkThemeId,
-            colorScheme: legacyTheme ?? 'system',
-        }
+    const currentThemeOrFallback = useMemo<CurrentTheme>(() => {
+        return getCurrentThemeOrFallback(currentTheme.data, builtinThemes.data)
     }, [currentTheme, builtinThemes])
 
     const applyTheme = useCallback(
@@ -210,11 +151,10 @@ export function ThemeProvider({
         [builtinThemes.data, userThemes.data],
     )
 
-    const handleMediaQuery = useCallback(() => {
-        if (getCurrentThemeOrLegacy.colorScheme === 'system') {
-            applyTheme(getCurrentThemeOrLegacy)
         }
-    }, [getCurrentThemeOrLegacy, applyTheme])
+    const handleMediaQuery = useCallback(() => {
+        applyTheme(currentThemeOrFallback)
+    }, [currentThemeOrFallback, applyTheme])
 
     // Always listen to System preference
     useEffect(() => {
@@ -234,7 +174,7 @@ export function ThemeProvider({
                     ...builtinThemes.data.map(t => t.theme),
                     ...userThemes.data.map(t => t.theme),
                 ],
-                currentTheme: getCurrentThemeOrLegacy,
+                currentTheme: currentThemeOrFallback,
                 setTheme: (currentTheme: Omit<CurrentTheme, 'userId'>) => {
                     setCurrentTheme.mutate(currentTheme)
                     applyTheme(currentTheme)
