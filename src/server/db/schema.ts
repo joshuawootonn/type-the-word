@@ -14,6 +14,7 @@ import {
     pgSchema,
     real,
     check,
+    unique,
 } from 'drizzle-orm/pg-core'
 
 /**
@@ -86,6 +87,7 @@ export const userCurrentTheme = schema.table(
         (${table.colorScheme} IS 'dark' AND ${table.lightThemeId} IS NULL AND ${table.darkThemeId} IS NOT NULL)
         `,
         ),
+        unique: unique().on(table.userId),
     }),
 )
 

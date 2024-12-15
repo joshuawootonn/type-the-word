@@ -1,0 +1,1 @@
+ALTER TABLE "type-the-word"."userCurrentTheme" ADD CONSTRAINT "userCurrentTheme_userId_unique" UNIQUE("userId");
