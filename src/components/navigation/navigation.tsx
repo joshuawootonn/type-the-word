@@ -3,26 +3,40 @@
 import { signIn, signOut, useSession } from 'next-auth/react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import * as Popover from '@radix-ui/react-popover'
-import * as Select from '@radix-ui/react-select'
 import Link from 'next/link'
 import Head from 'next/head'
 import { usePathname } from 'next/navigation'
-import { fetchLastVerse } from '~/lib/api'
+import { fetchBuiltinThemes, fetchLastVerse, fetchUserThemes } from '~/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import { toPassageSegment } from '~/lib/passageSegment'
 import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import { useRef, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
-import HotkeyLabel from './hotkey-label'
+import HotkeyLabel from '../hotkey-label'
 import { useTheme } from '~/app/theme-provider'
+import clsx from 'clsx'
+import { Settings } from './settings'
+import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
+import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
+import { CreateThemeForm } from './create-theme-form'
 
-export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
+export function Navigation({
+    builtinThemes: serverRenderedBuiltinThemes,
+    userThemes: serverRenderedUserThemes,
+    ...props
+}: {
+    userThemes: UserThemeRecord[]
+    builtinThemes: BuiltinThemeRecord[]
+    lastTypedVerse: TypedVerse | null
+}) {
     const { data: sessionData } = useSession()
     const isRootPath = usePathname() === '/'
     const RootLinkComponent = isRootPath ? 'h1' : 'span'
     const dropDownTriggerRef = useRef<HTMLButtonElement>(null)
     const [isSettingsOpen, setSettingsOpen] = useState(false)
-    const { setTheme, themes, currentTheme } = useTheme()
+    const [settingsState, setSettingsState] = useState<
+        'initial' | 'create-theme' | 'edit-theme'
+    >('initial')
 
     useHotkeys(
         'mod+shift+comma',
@@ -30,6 +44,19 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
         { enableOnFormTags: true },
         [setSettingsOpen],
     )
+
+    const builtinThemes = useQuery({
+        queryKey: ['builtinThemes'],
+        queryFn: fetchBuiltinThemes,
+        initialData: serverRenderedBuiltinThemes,
+    })
+
+    const userThemes = useQuery({
+        queryKey: ['userThemes'],
+        queryFn: fetchUserThemes,
+        enabled: Boolean(sessionData?.user.id),
+        initialData: serverRenderedUserThemes,
+    })
 
     const { data: lastTypedVerse } = useQuery({
         queryKey: ['last-verse'],
@@ -128,7 +155,12 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
             <div className="flex flex-col gap-4">
                 {sessionData ? (
                     <Popover.Root
-                        onOpenChange={setSettingsOpen}
+                        onOpenChange={next => {
+                            if (next == false) {
+                                setSettingsState('initial')
+                            }
+                            setSettingsOpen(next)
+                        }}
                         open={isSettingsOpen}
                     >
                         <DropdownMenu.Root modal={false}>
@@ -144,7 +176,7 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                             </Popover.PopoverAnchor>
 
                             <DropdownMenu.Content
-                                className="z-50  border-2 border-primary bg-secondary text-primary "
+                                className="z-50 border-2 border-primary bg-secondary text-primary"
                                 sideOffset={-2}
                                 align="end"
                             >
@@ -181,103 +213,45 @@ export function Navigation(props: { lastTypedVerse: TypedVerse | null }) {
                                 </DropdownMenu.Item>
                             </DropdownMenu.Content>
                             <Popover.PopoverContent
-                                className="z-50 w-52 border-2 border-primary bg-secondary px-3 py-3 text-primary"
+                                className={clsx(
+                                    settingsState === 'create-theme'
+                                        ? 'min-w-100'
+                                        : 'min-w-52',
+                                    'z-50 border-2 border-primary bg-secondary px-3 py-3 text-primary outline-none',
+                                )}
                                 sideOffset={-2}
                                 align="end"
                                 onCloseAutoFocus={e => {
+                                    setSettingsState('initial')
                                     e.preventDefault()
                                     dropDownTriggerRef.current?.focus()
                                 }}
                             >
-                                <h2 className="mb-2 text-xl">Settings</h2>
-                                <div className="flex flex-row items-center justify-between">
-                                    <label
-                                        htmlFor="theme-selector"
-                                        className="pr-4"
-                                    >
-                                        Theme:
-                                    </label>
-
-                                    <Select.Root
-                                        value={currentTheme.colorScheme}
-                                        onValueChange={next => {
-                                            const lightThemeId = themes.find(
-                                                t => t.label === 'Light',
-                                            )!.id
-                                            const darkThemeId = themes.find(
-                                                t => t.label === 'Dark',
-                                            )!.id
-                                            if (next === 'light') {
-                                                return setTheme({
-                                                    colorScheme: 'light',
-                                                    lightThemeId,
-                                                    darkThemeId: null,
-                                                })
+                                {settingsState === 'initial' ? (
+                                    <>
+                                        <h2 className="mb-2 text-xl">
+                                            Settings
+                                        </h2>
+                                        <Settings
+                                            createTheme={() =>
+                                                setSettingsState('create-theme')
                                             }
-                                            if (next === 'dark') {
-                                                return setTheme({
-                                                    colorScheme: 'dark',
-                                                    lightThemeId: null,
-                                                    darkThemeId,
-                                                })
+                                            builtinThemes={builtinThemes.data}
+                                            userThemes={userThemes.data}
+                                        />
+                                    </>
+                                ) : settingsState === 'create-theme' ? (
+                                    <>
+                                        <h2 className="mb-2 text-xl">
+                                            Theme Creator
+                                        </h2>
+                                        <CreateThemeForm
+                                            goBackToSettings={() =>
+                                                setSettingsState('initial')
                                             }
-                                            return setTheme({
-                                                colorScheme: 'system',
-                                                lightThemeId,
-                                                darkThemeId,
-                                            })
-                                        }}
-                                    >
-                                        <Select.Trigger
-                                            id="theme-selector"
-                                            className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                        >
-                                            <Select.Value />
-                                        </Select.Trigger>
-
-                                        <Select.Portal>
-                                            <Select.Content
-                                                side="bottom"
-                                                position="popper"
-                                                avoidCollisions={false}
-                                                className="z-50 border-2 border-primary bg-secondary text-primary "
-                                                align="end"
-                                                sideOffset={-2}
-                                            >
-                                                <Select.ScrollUpButton />
-                                                <Select.Viewport>
-                                                    <Select.Item
-                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                        value="dark"
-                                                    >
-                                                        <Select.ItemText>
-                                                            Dark
-                                                        </Select.ItemText>
-                                                        <Select.ItemIndicator />
-                                                    </Select.Item>
-                                                    <Select.Item
-                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                        value="light"
-                                                    >
-                                                        <Select.ItemText>
-                                                            Light
-                                                        </Select.ItemText>
-                                                        <Select.ItemIndicator />
-                                                    </Select.Item>
-                                                    <Select.Item
-                                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                                        value="system"
-                                                    >
-                                                        <Select.ItemText>
-                                                            System
-                                                        </Select.ItemText>
-                                                        <Select.ItemIndicator />
-                                                    </Select.Item>
-                                                </Select.Viewport>
-                                            </Select.Content>
-                                        </Select.Portal>
-                                    </Select.Root>
-                                </div>
+                                        />
+                                    </>
+                                ) : null}
                             </Popover.PopoverContent>
                         </DropdownMenu.Root>
                     </Popover.Root>

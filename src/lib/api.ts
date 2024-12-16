@@ -12,7 +12,10 @@ import {
     CurrentTheme,
     CurrentThemeRecord,
 } from '~/server/repositories/currentTheme.repository'
-import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
+import {
+    BuiltinThemeRecord,
+    ThemeRecord,
+} from '~/server/repositories/builtinTheme.repository'
 import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
 
 export type Body<T> = { data: T }
@@ -167,6 +170,22 @@ export async function fetchSetCurrentTheme(
     })
 
     const body: Body<CurrentTheme> = await response.json()
+
+    return body.data
+}
+
+export async function fetchCreateTheme(
+    theme: Omit<ThemeRecord, 'id'>,
+): Promise<UserThemeRecord> {
+    const response = await fetch(`${getBaseUrl()}/api/user-theme`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(theme),
+    })
+
+    const body: Body<UserThemeRecord> = await response.json()
 
     return body.data
 }
