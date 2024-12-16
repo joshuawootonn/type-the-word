@@ -1,7 +1,12 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRef, useEffect, useCallback } from 'react'
 import { getResolvedTheme, useTheme } from '~/app/theme-provider'
-import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
+import { fetchDeleteTheme } from '~/lib/api'
+import {
+    BuiltinThemeRecord,
+    ThemeRecord,
+} from '~/server/repositories/builtinTheme.repository'
 import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
 
 const SELECTION_KEYS = [' ', 'Enter']
@@ -28,6 +33,28 @@ export function Settings({
     const darkThemeId = builtinThemes.find(
         t => t.theme.label === 'Dark',
     )!.themeId
+    const queryClient = useQueryClient()
+    const deleteThemeQuery = useMutation({
+        mutationFn: fetchDeleteTheme,
+        onMutate: async id => {
+            await queryClient.cancelQueries({ queryKey: ['userThemes'] })
+
+            const prevThemes = queryClient.getQueryData(['userThemes'])
+
+            queryClient.setQueryData(
+                ['userThemes'],
+                (prev: ThemeRecord[] | undefined) =>
+                    prev?.filter(theme => theme.id !== id),
+            )
+
+            return { prevThemes }
+        },
+        onError: (_err, _theme, context) => {
+            queryClient.setQueryData(['userThemes'], context?.prevThemes ?? [])
+        },
+        onSettled: () =>
+            queryClient.invalidateQueries({ queryKey: ['userThemes'] }),
+    })
 
     const selectTheme = useCallback(
         (theme: BuiltinThemeRecord | UserThemeRecord) => {
@@ -48,6 +75,29 @@ export function Settings({
         },
         [],
     )
+
+    const deleteTheme = useCallback((theme: UserThemeRecord) => {
+        if (
+            theme.themeId === currentTheme.lightThemeId ||
+            theme.themeId === currentTheme.darkThemeId
+        ) {
+            const isDark = theme.theme.primaryLightness > 0.5 ? 'dark' : 'light'
+            if (isDark) {
+                setTheme({
+                    colorScheme: 'dark',
+                    darkThemeId,
+                    lightThemeId: null,
+                })
+            } else {
+                setTheme({
+                    colorScheme: 'light',
+                    darkThemeId: null,
+                    lightThemeId,
+                })
+            }
+        }
+        deleteThemeQuery.mutate(theme.themeId)
+    }, [])
 
     return (
         <div className="flex flex-row items-center justify-between">
@@ -130,6 +180,12 @@ export function Settings({
                                             className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
                                         >
                                             Select
+                                        </DropdownMenu.Item>
+                                        <DropdownMenu.Item
+                                            onSelect={() => deleteTheme(t)}
+                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                        >
+                                            Delete
                                         </DropdownMenu.Item>
                                     </DropdownMenu.SubContent>
                                 </DropdownMenu.Portal>
