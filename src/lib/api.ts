@@ -189,3 +189,11 @@ export async function fetchCreateTheme(
 
     return body.data
 }
+
+export async function fetchDeleteTheme(id: string): Promise<null> {
+    await fetch(`${getBaseUrl()}/api/user-theme/${id}`, {
+        method: 'DELETE',
+    })
+
+    return null
+}

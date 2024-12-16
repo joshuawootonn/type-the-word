@@ -141,9 +141,11 @@ export function ThemeProvider({
                 builtinThemes.data,
             )
             const d = document.documentElement
+
             d.classList.remove(
-                ...builtinThemes.data.map(t => idToClassName(t.themeId)),
-                ...userThemes.data.map(t => idToClassName(t.themeId)),
+                ...Array.from(d.classList.values()).filter(c => {
+                    return c.startsWith('theme-')
+                }),
             )
             d.classList.add(idToClassName(resolvedTheme.resolvedTheme.themeId))
 

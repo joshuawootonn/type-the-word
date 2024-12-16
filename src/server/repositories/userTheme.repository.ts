@@ -67,4 +67,8 @@ export class UserThemeRepository {
             return result
         })
     }
+
+    async deleteTheme({ id }: { id: string }) {
+        return this.db.delete(schema.theme).where(eq(schema.theme.id, id))
+    }
 }
