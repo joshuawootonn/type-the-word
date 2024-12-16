@@ -3,7 +3,7 @@ import { Providers } from './providers'
 import clsx from 'clsx'
 import '~/styles/globals.css'
 import { Footer } from '~/components/footer'
-import { Navigation } from '~/components/navigation'
+import { Navigation } from '~/components/navigation/navigation'
 import { poppins, ibmPlexMono } from './fonts'
 import { authOptions } from '~/server/auth'
 import Fathom from './fathom'
@@ -85,7 +85,11 @@ export default async function RootLayout({
                     builtinThemes={builtinThemes}
                     session={session}
                 >
-                    <Navigation lastTypedVerse={lastTypedVerse} />
+                    <Navigation
+                        lastTypedVerse={lastTypedVerse}
+                        userThemes={userThemes}
+                        builtinThemes={builtinThemes}
+                    />
                     {children}
                     <Footer />
                 </Providers>

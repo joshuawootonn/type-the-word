@@ -82,9 +82,9 @@ export const script = (
             : 'light'
     }
 
-    function updateDOM(theme: string) {
+    function updateDOM(themeId: string) {
         el.classList.remove(...themes)
-        el.classList.add(theme)
+        el.classList.add(`theme-${themeId}`)
     }
 
     function getResolvedThemeId(): string {

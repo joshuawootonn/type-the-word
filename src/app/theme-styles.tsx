@@ -1,5 +1,6 @@
 import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
 import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
+import { idToClassName } from './id-to-className'
 
 export function ThemeStyles({
     builtinThemes,
@@ -13,7 +14,7 @@ export function ThemeStyles({
             ${[...builtinThemes, ...userThemes]
                 .map(
                     t => `
-.${t.themeId.toLowerCase()} {
+.${idToClassName(t.themeId)} {
   --color-primary: ${t.theme.primaryLightness}% ${t.theme.primaryChroma} ${
       t.theme.primaryHue
   };

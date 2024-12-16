@@ -22,13 +22,13 @@ import {
 import { CurrentTheme } from '~/server/repositories/currentTheme.repository'
 import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
 import { getCurrentThemeOrFallback } from './get-current-theme-or-fallback'
+import { idToClassName } from './id-to-className'
+import { cleanUpdateDocumentStyles } from '~/components/navigation/create-theme-form'
 
 const ThemeContext = createContext<{
-    themes: ThemeRecord[]
     currentTheme: CurrentTheme
     setTheme: (currentTheme: Omit<CurrentTheme, 'userId'>) => void
 }>({
-    themes: [],
     currentTheme: {
         lightThemeId: '',
         darkThemeId: '',
@@ -44,7 +44,7 @@ export const useTheme = function () {
     return useContext(ThemeContext)
 }
 
-function getResolvedTheme(
+export function getResolvedTheme(
     currentTheme: Omit<CurrentTheme, 'userId'>,
     userThemes: UserThemeRecord[],
     builtinThemes: BuiltinThemeRecord[],
@@ -142,10 +142,10 @@ export function ThemeProvider({
             )
             const d = document.documentElement
             d.classList.remove(
-                ...builtinThemes.data.map(t => t.themeId),
-                ...userThemes.data.map(t => t.themeId),
+                ...builtinThemes.data.map(t => idToClassName(t.themeId)),
+                ...userThemes.data.map(t => idToClassName(t.themeId)),
             )
-            d.classList.add(resolvedTheme.resolvedTheme.themeId)
+            d.classList.add(idToClassName(resolvedTheme.resolvedTheme.themeId))
 
             d.style.colorScheme = resolvedTheme.isDark ? 'dark' : 'light'
         },
@@ -188,13 +188,10 @@ export function ThemeProvider({
     return (
         <ThemeContext.Provider
             value={{
-                themes: [
-                    ...builtinThemes.data.map(t => t.theme),
-                    ...userThemes.data.map(t => t.theme),
-                ],
                 currentTheme: currentThemeOrFallback,
                 setTheme: (currentTheme: Omit<CurrentTheme, 'userId'>) => {
                     setCurrentTheme.mutate(currentTheme)
+                    cleanUpdateDocumentStyles()
                     applyTheme(currentTheme)
                 },
             }}
