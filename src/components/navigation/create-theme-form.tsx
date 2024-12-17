@@ -173,7 +173,7 @@ export function CreateThemeForm({
                     return errors
                 }
             }}
-            onSubmit={async values => {
+            onSubmit={values => {
                 try {
                     setGeneralError(null)
                     const dto = themeToDTOSchema.parse(values)
