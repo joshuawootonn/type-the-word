@@ -6,8 +6,8 @@ import { FocusEvent, useState } from 'react'
 import { ThemeRecord } from '~/server/repositories/builtinTheme.repository'
 import { useTheme } from '~/app/theme-provider'
 import { fetchCreateTheme } from '~/lib/api'
-import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
 import { themeCSS } from '~/app/theme-styles'
+import { isThemeDark } from '~/lib/theme-helpers'
 
 export function cleanUpdateDocumentStyles() {
     document.documentElement.style.removeProperty(`--color-primary`)
@@ -139,8 +139,7 @@ export function CreateThemeForm({
         onSuccess: async data => {
             injectNewClassIntoStyle(data.theme)
             await queryClient.invalidateQueries(['userThemes'])
-            const isDark = data.theme.primaryLightness > 0.5
-            if (isDark) {
+            if (isThemeDark(data.theme)) {
                 setTheme({
                     colorScheme: 'dark',
                     darkThemeId: data.themeId,
@@ -174,7 +173,7 @@ export function CreateThemeForm({
                     return errors
                 }
             }}
-            onSubmit={async (values, { setErrors }) => {
+            onSubmit={async values => {
                 try {
                     setGeneralError(null)
                     const dto = themeToDTOSchema.parse(values)

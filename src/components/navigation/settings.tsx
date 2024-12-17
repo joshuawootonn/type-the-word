@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRef, useEffect, useCallback } from 'react'
 import { getResolvedTheme, useTheme } from '~/app/theme-provider'
 import { fetchDeleteTheme } from '~/lib/api'
+import { isThemeDark } from '~/lib/theme-helpers'
 import {
     BuiltinThemeRecord,
     ThemeRecord,
@@ -58,8 +59,7 @@ export function Settings({
 
     const selectTheme = useCallback(
         (theme: BuiltinThemeRecord | UserThemeRecord) => {
-            const isDark = theme.theme.primaryLightness > 0.5 ? 'dark' : 'light'
-            if (isDark) {
+            if (isThemeDark(theme.theme)) {
                 return setTheme({
                     colorScheme: 'dark',
                     darkThemeId: theme.themeId,
@@ -73,31 +73,40 @@ export function Settings({
                 })
             }
         },
-        [],
+        [setTheme],
     )
 
-    const deleteTheme = useCallback((theme: UserThemeRecord) => {
-        if (
-            theme.themeId === currentTheme.lightThemeId ||
-            theme.themeId === currentTheme.darkThemeId
-        ) {
-            const isDark = theme.theme.primaryLightness > 0.5 ? 'dark' : 'light'
-            if (isDark) {
-                setTheme({
-                    colorScheme: 'dark',
-                    darkThemeId,
-                    lightThemeId: null,
-                })
-            } else {
-                setTheme({
-                    colorScheme: 'light',
-                    darkThemeId: null,
-                    lightThemeId,
-                })
+    const deleteTheme = useCallback(
+        (theme: UserThemeRecord) => {
+            if (
+                theme.themeId === currentTheme.lightThemeId ||
+                theme.themeId === currentTheme.darkThemeId
+            ) {
+                if (isThemeDark(theme.theme)) {
+                    setTheme({
+                        colorScheme: 'dark',
+                        darkThemeId,
+                        lightThemeId: null,
+                    })
+                } else {
+                    setTheme({
+                        colorScheme: 'light',
+                        darkThemeId: null,
+                        lightThemeId,
+                    })
+                }
             }
-        }
-        deleteThemeQuery.mutate(theme.themeId)
-    }, [])
+            deleteThemeQuery.mutate(theme.themeId)
+        },
+        [
+            currentTheme.darkThemeId,
+            currentTheme.lightThemeId,
+            darkThemeId,
+            deleteThemeQuery,
+            lightThemeId,
+            setTheme,
+        ],
+    )
 
     return (
         <div className="flex flex-row items-center justify-between">
