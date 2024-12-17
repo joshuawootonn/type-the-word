@@ -15,15 +15,13 @@ import {
     fetchSetCurrentTheme,
     fetchUserThemes,
 } from '~/lib/api'
-import {
-    BuiltinThemeRecord,
-    ThemeRecord,
-} from '~/server/repositories/builtinTheme.repository'
+import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
 import { CurrentTheme } from '~/server/repositories/currentTheme.repository'
 import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
 import { getCurrentThemeOrFallback } from './get-current-theme-or-fallback'
 import { idToClassName } from './id-to-className'
 import { cleanUpdateDocumentStyles } from '~/components/navigation/create-theme-form'
+import { isThemeDark } from '~/lib/theme-helpers'
 
 const ThemeContext = createContext<{
     currentTheme: CurrentTheme
@@ -50,12 +48,12 @@ export function getResolvedTheme(
     builtinThemes: BuiltinThemeRecord[],
 ): { isDark: boolean; resolvedTheme: BuiltinThemeRecord | UserThemeRecord } {
     const media = window.matchMedia('(prefers-color-scheme: dark)')
-    const isDark =
+    const isDarkId =
         currentTheme.colorScheme === 'system'
             ? media.matches
             : currentTheme.colorScheme === 'dark'
 
-    const resolvedId = isDark
+    const resolvedId = isDarkId
         ? currentTheme.darkThemeId
         : currentTheme.lightThemeId
     const resolvedTheme =
@@ -66,6 +64,11 @@ export function getResolvedTheme(
     if (resolvedTheme == null) {
         throw new Error('There are no themes to resolve from')
     }
+
+    const isDark =
+        currentTheme.colorScheme === 'system'
+            ? media.matches
+            : isThemeDark(resolvedTheme.theme)
 
     return { isDark, resolvedTheme }
 }
