@@ -246,6 +246,7 @@ export function Navigation({
                                             Theme Creator
                                         </h2>
                                         <CreateThemeForm
+                                            builtinThemes={builtinThemes.data}
                                             goBackToSettings={() =>
                                                 setSettingsState('initial')
                                             }
