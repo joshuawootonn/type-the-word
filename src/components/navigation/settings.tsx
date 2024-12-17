@@ -177,13 +177,13 @@ export function Settings({
                                     >
                                         <DropdownMenu.Item
                                             onSelect={() => selectTheme(t)}
-                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                            className="h-[31px] cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
                                         >
                                             Select
                                         </DropdownMenu.Item>
                                         <DropdownMenu.Item
                                             onSelect={() => deleteTheme(t)}
-                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                            className="h-[31px] cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
                                         >
                                             Delete
                                         </DropdownMenu.Item>
