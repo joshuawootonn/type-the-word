@@ -15,21 +15,13 @@ body[style] {
 }
 
 /* focus-within is required because inputs have no content, and `:before` is prepended to content.*/
-.svg-outline:focus-within *,
 .svg-outline:focus,
-.svg-outline-sm:focus-within *,
-.svg-outline-sm:focus {
+.svg-outline-sm:focus,
+.svg-outline-within:focus-within * {
     @apply outline-none;
 }
 
-.svg-outline:focus:before,
-.svg-outline:focus-within:before,
-.svg-outline-sm:focus:before,
-.svg-outline-sm:focus-within:before,
-.svg-outline-xs:focus:before,
-.svg-outline-xs:focus-within:before,
-.svg-outline-stubby:focus:before,
-.svg-outline-stubby:focus-within:before {
+.svg-outline-within:focus-within:before {
     @apply -inset-2;
     content: ' ';
     background-color: oklch(var(--color-primary));
@@ -38,40 +30,34 @@ body[style] {
     position: absolute;
 }
 
+.svg-outline-override,
+.svg-outline:focus:before,
 .svg-outline-sm:focus:before,
-.svg-outline-sm:focus-within:before {
+.svg-outline-xs:focus:before,
+.svg-outline-stubby:focus:before {
+    @apply -inset-2;
+    content: ' ';
+    background-color: oklch(var(--color-primary));
+    -webkit-mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
+    mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
+    position: absolute;
+}
+
+.svg-outline-sm:focus:before {
     @apply -inset-1;
 }
 
-.svg-outline-xs:focus:before,
-.svg-outline-xs:focus-within:before {
+.svg-outline-xs:focus:before {
     @apply inset-0;
 }
 
-.svg-outline-stubby:focus:before,
-.svg-outline-stubby:focus-within:before {
+.svg-outline-stubby:focus:before {
     @apply -bottom-0.5 -left-3 -right-3 -top-0.5;
 
     background-color: oklch(var(--color-primary));
     -webkit-mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="var(--color-primary)" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
 }
-
-@media (prefers-color-scheme: dark) {
-    .svg-outline:focus:before,
-    .svg-outline:focus-within:before,
-    .svg-outline-sm:focus:before,
-    .svg-outline-sm:focus-within:before,
-    .svg-outline-xs:focus:before,
-    .svg-outline-xs:focus-within:before,
-    .svg-outline-stubby:focus:before,
-    .svg-outline-stubby:focus-within:before {
-        background-color: oklch(var(--color-primary));
-        -webkit-mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
-        mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
-    }
-}
-
 .hazard {
     border-image: repeating-linear-gradient(
             -80deg,
