@@ -224,8 +224,8 @@ export function CreateThemeForm({
                         <p className="prose w-full border-2 border-primary p-3 text-primary">
                             <span className="correct">The L</span>
                             <span className="incorrect">o</span>
-                            <span className="correct">rd is my</span>
-                            <span className="extra">Sheppard</span>
+                            <span className="correct">rd is my</span>{' '}
+                            <span className="extra">Shepherd</span>
                             <span> I shall not want.</span>
                         </p>
                     </div>
