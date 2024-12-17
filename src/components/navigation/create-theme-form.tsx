@@ -7,12 +7,21 @@ import { ThemeRecord } from '~/server/repositories/builtinTheme.repository'
 import { useTheme } from '~/app/theme-provider'
 import { fetchCreateTheme } from '~/lib/api'
 import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
+import { themeCSS } from '~/app/theme-styles'
 
 export function cleanUpdateDocumentStyles() {
     document.documentElement.style.removeProperty(`--color-primary`)
     document.documentElement.style.removeProperty(`--color-secondary`)
     document.documentElement.style.removeProperty(`--color-success`)
     document.documentElement.style.removeProperty(`--color-error`)
+}
+
+function injectNewClassIntoStyle(theme: ThemeRecord) {
+    const el = document.getElementById('themes')
+    console.log(el)
+    if (el == null) return
+
+    el.innerHTML += themeCSS({ theme })
 }
 
 export function getCreateThemeInitialProps(): z.infer<typeof themeSchema> {
@@ -128,6 +137,7 @@ export function CreateThemeForm({
     const { mutate, isLoading } = useMutation({
         mutationFn: fetchCreateTheme,
         onSuccess: async data => {
+            injectNewClassIntoStyle(data.theme)
             await queryClient.invalidateQueries(['userThemes'])
             const isDark = data.theme.primaryLightness > 0.5
             if (isDark) {
@@ -145,6 +155,7 @@ export function CreateThemeForm({
             }
 
             goBackToSettings()
+            cleanUpdateDocumentStyles()
         },
     })
 
@@ -168,7 +179,6 @@ export function CreateThemeForm({
                     setGeneralError(null)
                     const dto = themeToDTOSchema.parse(values)
                     mutate(dto)
-                    cleanUpdateDocumentStyles()
                 } catch (e) {
                     setGeneralError('Whoops something went wrong!')
                 }

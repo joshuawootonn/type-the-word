@@ -1,6 +1,28 @@
-import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
+import {
+    BuiltinThemeRecord,
+    ThemeRecord,
+} from '~/server/repositories/builtinTheme.repository'
 import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
 import { idToClassName } from './id-to-className'
+
+export function themeCSS({ theme }: { theme: ThemeRecord }): string {
+    return `
+.${idToClassName(theme.id)} {
+  --color-primary: ${theme.primaryLightness}% ${theme.primaryChroma} ${
+      theme.primaryHue
+  };
+  --color-secondary: ${theme.secondaryLightness}% ${theme.secondaryChroma} ${
+      theme.secondaryHue
+  };
+  --color-success: ${theme.successLightness}% ${theme.successChroma} ${
+      theme.successHue
+  };
+  --color-error: ${theme.errorLightness}% ${theme.errorChroma} ${
+      theme.errorHue
+  };
+}
+`
+}
 
 export function ThemeStyles({
     builtinThemes,
@@ -10,26 +32,9 @@ export function ThemeStyles({
     userThemes: UserThemeRecord[]
 }) {
     return (
-        <style suppressHydrationWarning>{`
+        <style id="themes" suppressHydrationWarning>{`
             ${[...builtinThemes, ...userThemes]
-                .map(
-                    t => `
-.${idToClassName(t.themeId)} {
-  --color-primary: ${t.theme.primaryLightness}% ${t.theme.primaryChroma} ${
-      t.theme.primaryHue
-  };
-  --color-secondary: ${t.theme.secondaryLightness}% ${
-      t.theme.secondaryChroma
-  } ${t.theme.secondaryHue};
-  --color-success: ${t.theme.successLightness}% ${t.theme.successChroma} ${
-      t.theme.successHue
-  };
-  --color-error: ${t.theme.errorLightness}% ${t.theme.errorChroma} ${
-      t.theme.errorHue
-  };
-}
-`,
-                )
+                .map(t => themeCSS({ theme: t.theme }))
                 .join('')}
         `}</style>
     )
