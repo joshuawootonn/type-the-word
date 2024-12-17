@@ -3,7 +3,10 @@ import { Field, Formik } from 'formik'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ColorInput } from './color-input'
 import { FocusEvent, useState } from 'react'
-import { ThemeRecord } from '~/server/repositories/builtinTheme.repository'
+import {
+    BuiltinThemeRecord,
+    ThemeRecord,
+} from '~/server/repositories/builtinTheme.repository'
 import { useTheme } from '~/app/theme-provider'
 import { fetchCreateTheme } from '~/lib/api'
 import {
@@ -11,7 +14,12 @@ import {
     getCSSVarValue,
     injectNewClassIntoStyle,
 } from '~/lib/theme/dom'
-import { isThemeDark, oklchSchema, stringToOKLCH } from '~/lib/theme/lch'
+import {
+    isThemeDark,
+    oklchSchema,
+    oklchToString,
+    stringToOKLCH,
+} from '~/lib/theme/lch'
 
 export const formSchema = z.object({
     label: z
@@ -47,11 +55,37 @@ export const themeToDTOSchema = formSchema.transform(
     },
 )
 
-export function getCreateThemeInitialProps(): z.infer<typeof formSchema> {
-    const primary = getCSSVarValue('--color-primary')
-    const secondary = getCSSVarValue('--color-secondary')
-    const success = getCSSVarValue('--color-success')
-    const error = getCSSVarValue('--color-error')
+export function getCreateThemeInitialProps(
+    firstBuiltinTheme: BuiltinThemeRecord,
+): z.infer<typeof formSchema> {
+    const primary =
+        getCSSVarValue('--color-primary') ||
+        oklchToString({
+            lightness: firstBuiltinTheme.theme.primaryLightness,
+            chroma: firstBuiltinTheme.theme.primaryChroma,
+            hue: firstBuiltinTheme.theme.primaryHue,
+        })
+    const secondary =
+        getCSSVarValue('--color-secondary') ||
+        oklchToString({
+            lightness: firstBuiltinTheme.theme.secondaryLightness,
+            chroma: firstBuiltinTheme.theme.secondaryChroma,
+            hue: firstBuiltinTheme.theme.secondaryHue,
+        })
+    const success =
+        getCSSVarValue('--color-success') ||
+        oklchToString({
+            lightness: firstBuiltinTheme.theme.successLightness,
+            chroma: firstBuiltinTheme.theme.successChroma,
+            hue: firstBuiltinTheme.theme.successHue,
+        })
+    const error =
+        getCSSVarValue('--color-error') ||
+        oklchToString({
+            lightness: firstBuiltinTheme.theme.errorLightness,
+            chroma: firstBuiltinTheme.theme.errorChroma,
+            hue: firstBuiltinTheme.theme.errorHue,
+        })
 
     return {
         primary,
@@ -63,11 +97,15 @@ export function getCreateThemeInitialProps(): z.infer<typeof formSchema> {
 }
 
 export function CreateThemeForm({
+    builtinThemes,
     goBackToSettings,
 }: {
+    builtinThemes: BuiltinThemeRecord[]
     goBackToSettings: () => void
 }) {
-    const [initialValues] = useState(() => getCreateThemeInitialProps())
+    const [initialValues] = useState(() =>
+        getCreateThemeInitialProps(builtinThemes.at(0)!),
+    )
     const queryClient = useQueryClient()
 
     const { setTheme } = useTheme()

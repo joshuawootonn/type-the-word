@@ -19,6 +19,14 @@ export function stringToOKLCH(s: string): {
     }
 }
 
+export function oklchToString(oklch: {
+    lightness: number
+    chroma: number
+    hue: number
+}) {
+    return `${oklch.lightness}% ${oklch.chroma} ${oklch.hue}`
+}
+
 const oklchObjectSchema = z.object({
     lightness: z.number(),
     chroma: z.number(),
