@@ -18,10 +18,13 @@ import {
 import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
 import { CurrentTheme } from '~/server/repositories/currentTheme.repository'
 import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
-import { getCurrentThemeOrFallback } from './get-current-theme-or-fallback'
-import { idToClassName } from './id-to-className'
-import { cleanUpdateDocumentStyles } from '~/components/navigation/create-theme-form'
-import { isThemeDark } from '~/lib/theme-helpers'
+import { getCurrentThemeOrFallback } from '../lib/theme/get-current-theme-or-fallback'
+import {
+    cleanUpdateDocumentStyles,
+    uuidToThemeClassname,
+    isThemeClassname,
+} from '~/lib/theme/dom'
+import { isThemeDark } from '~/lib/theme/lch'
 
 const ThemeContext = createContext<{
     currentTheme: CurrentTheme
@@ -146,11 +149,11 @@ export function ThemeProvider({
             const d = document.documentElement
 
             d.classList.remove(
-                ...Array.from(d.classList.values()).filter(c => {
-                    return c.startsWith('theme-')
-                }),
+                ...Array.from(d.classList.values()).filter(isThemeClassname),
             )
-            d.classList.add(idToClassName(resolvedTheme.resolvedTheme.themeId))
+            d.classList.add(
+                uuidToThemeClassname(resolvedTheme.resolvedTheme.themeId),
+            )
 
             d.style.colorScheme = resolvedTheme.isDark ? 'dark' : 'light'
         },

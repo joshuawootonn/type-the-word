@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRef, useEffect, useCallback } from 'react'
 import { getResolvedTheme, useTheme } from '~/app/theme-provider'
 import { fetchDeleteTheme } from '~/lib/api'
-import { isThemeDark } from '~/lib/theme-helpers'
+import { isThemeDark } from '~/lib/theme/lch'
 import {
     BuiltinThemeRecord,
     ThemeRecord,
