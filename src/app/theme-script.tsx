@@ -75,24 +75,21 @@ export const script = (
         }
     }
 
-    function setColorScheme() {
-        el.style.colorScheme = window.matchMedia('(prefers-color-scheme: dark)')
-            .matches
-            ? 'dark'
-            : 'light'
+    function setColorScheme(currentTheme: CurrentTheme) {
+        el.style.colorScheme =
+            currentTheme.colorScheme === 'system'
+                ? window.matchMedia('(prefers-color-scheme: dark)').matches
+                    ? 'dark'
+                    : 'light'
+                : currentTheme.colorScheme
     }
 
-    function updateDOM(themeId: string) {
+    function updateClasses(themeId: string) {
         el.classList.remove(...themes)
         el.classList.add(`theme-${themeId}`)
     }
 
-    function getResolvedThemeId(): string {
-        const currentThemeOrFallback = getCurrentThemeOrFallback(
-            currentTheme,
-            builtinThemes,
-        )
-
+    function getResolvedThemeId(currentThemeOrFallback: CurrentTheme): string {
         if (currentThemeOrFallback.colorScheme === 'light')
             return currentThemeOrFallback.lightThemeId
         if (currentThemeOrFallback.colorScheme === 'dark')
@@ -108,8 +105,13 @@ export const script = (
     }
 
     try {
-        updateDOM(getResolvedThemeId())
-        setColorScheme()
+        const currentThemeOrFallback = getCurrentThemeOrFallback(
+            currentTheme,
+            builtinThemes,
+        )
+        const resolvedId = getResolvedThemeId(currentThemeOrFallback)
+        updateClasses(resolvedId)
+        setColorScheme(currentThemeOrFallback)
     } catch (e) {
         //
     }
