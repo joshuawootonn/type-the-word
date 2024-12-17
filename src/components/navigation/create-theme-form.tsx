@@ -6,106 +6,29 @@ import { FocusEvent, useState } from 'react'
 import { ThemeRecord } from '~/server/repositories/builtinTheme.repository'
 import { useTheme } from '~/app/theme-provider'
 import { fetchCreateTheme } from '~/lib/api'
-import { themeCSS } from '~/app/theme-styles'
-import { isThemeDark } from '~/lib/theme-helpers'
+import {
+    cleanUpdateDocumentStyles,
+    getCSSVarValue,
+    injectNewClassIntoStyle,
+} from '~/lib/theme/dom'
+import { isThemeDark, oklchSchema, stringToOKLCH } from '~/lib/theme/lch'
 
-export function cleanUpdateDocumentStyles() {
-    document.documentElement.style.removeProperty(`--color-primary`)
-    document.documentElement.style.removeProperty(`--color-secondary`)
-    document.documentElement.style.removeProperty(`--color-success`)
-    document.documentElement.style.removeProperty(`--color-error`)
-}
-
-function injectNewClassIntoStyle(theme: ThemeRecord) {
-    const el = document.getElementById('themes')
-    console.log(el)
-    if (el == null) return
-
-    el.innerHTML += themeCSS({ theme })
-}
-
-export function getCreateThemeInitialProps(): z.infer<typeof themeSchema> {
-    const primary = window
-        .getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-primary')
-
-    const secondary = window
-        .getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-secondary')
-
-    const success = window
-        .getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-success')
-    const error = window
-        .getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-error')
-
-    return {
-        primary,
-        secondary,
-        success,
-        error,
-        label: '',
-    }
-}
-
-function stringToLCH(myString: string): {
-    lightness: number
-    chroma: number
-    hue: number
-} {
-    const a = myString.split(' ')
-
-    return {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-        lightness: parseFloat(a.at(0)?.replace('%', '')!),
-        chroma: parseFloat(a.at(1)!),
-        hue: parseFloat(a.at(2)!),
-    }
-}
-
-const lchObjectSchema = z.object({
-    lightness: z.number(),
-    chroma: z.number(),
-    hue: z.number(),
-})
-
-const lchSchema = z.string().refine(stringLCHValue => {
-    const objectLCHValue = stringToLCH(stringLCHValue)
-    const result = lchObjectSchema.safeParse(objectLCHValue)
-
-    return result.success
-})
-
-function labelToValue(label: string) {
-    return label
-        .split(' ')
-        .join('-')
-        .replaceAll(/([^_\-a-z])+/g, '')
-        .toLowerCase()
-}
-
-export const themeSchema = z.object({
+export const formSchema = z.object({
     label: z
         .string({ required_error: 'Name is required' })
-        .min(1, 'Name is required')
-        .refine(
-            val => labelToValue(val).length > 0,
-            'Name must include at least 1 letter',
-        ),
-
-    primary: lchSchema,
-    secondary: lchSchema,
-    success: lchSchema,
-    error: lchSchema,
+        .min(1, 'Name is required'),
+    primary: oklchSchema,
+    secondary: oklchSchema,
+    success: oklchSchema,
+    error: oklchSchema,
 })
 
-export const themeToDTOSchema = themeSchema.transform(
+export const themeToDTOSchema = formSchema.transform(
     (t): Omit<ThemeRecord, 'id'> => {
-        const primary = stringToLCH(t.primary)
-        const secondary = stringToLCH(t.secondary)
-        const success = stringToLCH(t.success)
-        const error = stringToLCH(t.error)
+        const primary = stringToOKLCH(t.primary)
+        const secondary = stringToOKLCH(t.secondary)
+        const success = stringToOKLCH(t.success)
+        const error = stringToOKLCH(t.error)
         return {
             label: t.label,
             primaryLightness: primary.lightness,
@@ -123,6 +46,21 @@ export const themeToDTOSchema = themeSchema.transform(
         }
     },
 )
+
+export function getCreateThemeInitialProps(): z.infer<typeof formSchema> {
+    const primary = getCSSVarValue('--color-primary')
+    const secondary = getCSSVarValue('--color-secondary')
+    const success = getCSSVarValue('--color-success')
+    const error = getCSSVarValue('--color-error')
+
+    return {
+        primary,
+        secondary,
+        success,
+        error,
+        label: '',
+    }
+}
 
 export function CreateThemeForm({
     goBackToSettings,
@@ -162,7 +100,7 @@ export function CreateThemeForm({
         <Formik
             initialValues={initialValues}
             validate={async values => {
-                const result = await themeSchema.safeParseAsync(values)
+                const result = await formSchema.safeParseAsync(values)
                 if (!result.success) {
                     const errors: Record<string, string> = {}
 

@@ -1,13 +1,13 @@
+import { uuidToThemeClassname } from '~/lib/theme/dom'
 import {
     BuiltinThemeRecord,
     ThemeRecord,
 } from '~/server/repositories/builtinTheme.repository'
 import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
-import { idToClassName } from './id-to-className'
 
 export function themeCSS({ theme }: { theme: ThemeRecord }): string {
     return `
-.${idToClassName(theme.id)} {
+.${uuidToThemeClassname(theme.id)} {
   --color-primary: ${theme.primaryLightness}% ${theme.primaryChroma} ${
       theme.primaryHue
   };
