@@ -169,10 +169,12 @@ export function ThemeProvider({
             currentTheme.data == null &&
             !hasUpdatedCurrentTheme.current
         ) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { userId, ...currentTheme } = currentThemeOrFallback
             setCurrentTheme.mutate(currentTheme)
             hasUpdatedCurrentTheme.current = true
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleMediaQuery = useCallback(() => {
