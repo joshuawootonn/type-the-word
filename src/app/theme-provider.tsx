@@ -76,6 +76,43 @@ export function getResolvedTheme(
     return { isDark, resolvedTheme }
 }
 
+export function getDarkTheme(
+    currentTheme: Omit<CurrentTheme, 'userId'>,
+    userThemes: UserThemeRecord[],
+    builtinThemes: BuiltinThemeRecord[],
+): BuiltinThemeRecord | UserThemeRecord {
+    const resolvedId = currentTheme.darkThemeId
+    const resolvedTheme =
+        builtinThemes.find(t => t.themeId === resolvedId) ??
+        userThemes.find(t => t.themeId === resolvedId) ??
+        builtinThemes.find(t => t.theme.label === 'Dark')
+
+    if (resolvedTheme == null) {
+        throw new Error('There are no light themes to resolve from')
+    }
+
+    return resolvedTheme
+}
+
+export function getLightTheme(
+    currentTheme: Omit<CurrentTheme, 'userId'>,
+    userThemes: UserThemeRecord[],
+    builtinThemes: BuiltinThemeRecord[],
+): BuiltinThemeRecord | UserThemeRecord {
+    const resolvedId = currentTheme.lightThemeId
+    const resolvedTheme =
+        builtinThemes.find(t => t.themeId === resolvedId) ??
+        userThemes.find(t => t.themeId === resolvedId) ??
+        builtinThemes.find(t => t.theme.label === 'Light')
+
+    if (resolvedTheme == null) {
+        throw new Error('There are no light themes to resolve from')
+    }
+
+    return resolvedTheme
+}
+
+
 export function ThemeProvider({
     session,
     children,
