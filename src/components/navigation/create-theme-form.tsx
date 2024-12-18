@@ -108,26 +108,40 @@ export function CreateThemeForm({
     )
     const queryClient = useQueryClient()
 
-    const { setTheme } = useTheme()
+    const { currentTheme, setTheme } = useTheme()
     const [generalError, setGeneralError] = useState<string | null>(null)
     const { mutate, isLoading } = useMutation({
         mutationFn: fetchCreateTheme,
         onSuccess: async data => {
             injectNewClassIntoStyle(data.theme)
             await queryClient.invalidateQueries(['userThemes'])
-            if (isThemeDark(data.theme)) {
-                setTheme({
-                    colorScheme: 'dark',
-                    darkThemeId: data.themeId,
-                    lightThemeId: null,
-                })
-            } else {
-                setTheme({
-                    colorScheme: 'light',
-                    lightThemeId: data.themeId,
-                    darkThemeId: null,
-                })
-            }
+
+            let nextLightThemeId: string | null = null
+            let nextDarkThemeId: string | null = null
+
+            nextLightThemeId =
+                currentTheme.colorScheme === 'light'
+                    ? data.themeId
+                    : currentTheme.colorScheme === 'system'
+                    ? !isThemeDark(data.theme)
+                        ? data.themeId
+                        : currentTheme.lightThemeId
+                    : null
+
+            nextDarkThemeId =
+                currentTheme.colorScheme === 'dark'
+                    ? data.themeId
+                    : currentTheme.colorScheme === 'system'
+                    ? isThemeDark(data.theme)
+                        ? data.themeId
+                        : currentTheme.darkThemeId
+                    : null
+
+            setTheme({
+                colorScheme: currentTheme.colorScheme,
+                darkThemeId: nextDarkThemeId,
+                lightThemeId: nextLightThemeId,
+            })
 
             goBackToSettings()
             cleanUpdateDocumentStyles()
