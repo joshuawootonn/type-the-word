@@ -53,6 +53,113 @@ export default function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('12/20/2024')} /> - Custom
+                    themes are live!
+                    <ul>
+                        <li>
+                            You can now create your own themes for Type the
+                            Word.
+                            <div className="px-8 pb-4 pt-4">
+                                <video
+                                    className="m-0 rounded-lg"
+                                    autoPlay={true}
+                                    playsInline
+                                    muted
+                                    loop
+                                    style={{
+                                        maxWidth: '100%',
+                                    }}
+                                >
+                                    <source
+                                        src={
+                                            '/assets/themes/creating-changelog.mp4'
+                                        }
+                                    />
+                                </video>
+                            </div>
+                        </li>
+                        <li>
+                            Themes are saved in the database and will be
+                            available on all devices you are logged in with.
+                        </li>
+                        <li>
+                            When creating a theme, you can minimize the
+                            settings, and preview your theme throughout Type the
+                            Word, before opening up the Theme Creator again to
+                            save it.
+                            <div className="px-8 pb-4 pt-4">
+                                <video
+                                    className="m-0 rounded-lg"
+                                    autoPlay={true}
+                                    playsInline
+                                    muted
+                                    loop
+                                    style={{
+                                        maxWidth: '100%',
+                                    }}
+                                >
+                                    <source
+                                        src={
+                                            '/assets/themes/previewing-changelog.mp4'
+                                        }
+                                    />
+                                </video>
+                            </div>
+                        </li>
+                        <li>
+                            The &quot;System&quot; theme now allows you to
+                            choose what particular light and dark themes you
+                            want to use.
+                            <div className="px-8 pb-4 pt-4">
+                                <video
+                                    className="m-0 rounded-lg"
+                                    autoPlay={true}
+                                    playsInline
+                                    muted
+                                    loop
+                                    style={{
+                                        maxWidth: '100%',
+                                    }}
+                                >
+                                    <source
+                                        src={
+                                            '/assets/themes/system-changelog.mp4'
+                                        }
+                                    />
+                                </video>
+                            </div>
+                        </li>
+                        <li>
+                            And if you match the &quot;Secondary&quot; color and
+                            &quot;Success&quot; colors you get this fun
+                            disappearing effect.
+                            <div className="px-8 pb-4 pt-4">
+                                <video
+                                    className="m-0 rounded-lg"
+                                    autoPlay={true}
+                                    playsInline
+                                    muted
+                                    loop
+                                    style={{
+                                        maxWidth: '100%',
+                                    }}
+                                >
+                                    <source
+                                        src={
+                                            '/assets/themes/mirkwood-changelog.mp4'
+                                        }
+                                    />
+                                </video>
+                            </div>
+                        </li>
+                    </ul>
+                    I will be making the best user created themes available by
+                    default for everyone, so if you create any themes that you
+                    particularly love, share a screenshot in the Discord channel
+                    or email me directly. Can&apos;t wait to see what everyone
+                    comes up with! 🎨
+                </li>{' '}
+                <li>
                     <DateComponent date={new Date('12/11/2024')} /> - Fixed a
                     regression where incorrect letters were not highlighted in
                     red.
