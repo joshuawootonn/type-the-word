@@ -65,8 +65,8 @@ export default function Changelog() {
                             was no longer restarting the verse.
                         </li>
                         <li>
-                            Fixed a bug where
-                            <Link href="/passage/matthew_6">Romans 16</Link> was
+                            Fixed a bug where{' '}
+                            <Link href="/passage/romans_16">Romans 16</Link> was
                             mistakenly only showing the first 26 verses.
                         </li>
                         <li>
