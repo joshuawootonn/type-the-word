@@ -23,6 +23,10 @@ export default function PassageLayout({
                 />
             </div>
             <main className="relative mx-auto w-full flex-grow">
+                <div className="bg-primary p-4 text-secondary">
+                    Hi everyone Logging into TTW is broken currently. Working on
+                    this now.
+                </div>
                 {children}
             </main>
         </>
