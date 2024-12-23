@@ -38,9 +38,7 @@ export const env = createEnv({
                       .string()
                       .transform(str => (str ? `https://${str}` : str))
                       .pipe(z.string().url())
-                : z
-                      .any()
-                      .transform(_ => `http://localhost:${process.env.PORT}`),
+                : z.string().url(),
     },
 
     /**
@@ -71,7 +69,7 @@ export const env = createEnv({
         SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
         CONVERTKIT_API_KEY: process.env.CONVERTKIT_API_KEY,
         CONVERTKIT_SUBSCRIBE_FORM_ID: process.env.CONVERTKIT_SUBSCRIBE_FORM_ID,
-        DEPLOYED_URL: process.env.VERCEL_URL,
+        DEPLOYED_URL: process.env.VERCEL_URL ?? process.env.DEPLOYED_URL,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
