@@ -194,12 +194,13 @@ export function parseChapter(passage: string): ParsedPassage {
                 .split(splitBySpaceOrNewLine)
                 .filter(word => word !== '' && word !== ' ' && word !== '\n')
 
-            if (words.length === 0) {
-                return []
-            }
             const leading = new Array<{ type: 'space' }>(leadingSpaces).fill({
                 type: 'space',
             })
+
+            if (words.length === 0) {
+                return [...leading]
+            }
 
             return [
                 ...leading,
@@ -360,7 +361,9 @@ export function parseChapter(passage: string): ParsedPassage {
                     i === 0 &&
                     (verseIndex === -1 || verseIndex > firstWordIndex)
 
-                if (continuingVerse && context?.lastVerse == undefined) {
+                if (verseSection.every(inline => inline.type === 'space')) {
+                    // noop
+                } else if (continuingVerse && context?.lastVerse == undefined) {
                     throw new Error(
                         'continuing prev verse but verseMetadata is undefined',
                     )
