@@ -53,6 +53,13 @@ export default function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('12/23/2024')} /> -Fixed some
+                    incorrect spacing in the quote within{' '}
+                    <Link href="/passage/matthew_6">Matthew 6:10-13</Link>. This
+                    was previously fixed and then reverted. It&apos;s fixed for
+                    good now!
+                </li>
+                <li>
                     <DateComponent date={new Date('12/20/2024')} /> - Custom
                     themes are live!
                     <ul>
