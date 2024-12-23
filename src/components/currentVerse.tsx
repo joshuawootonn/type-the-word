@@ -321,7 +321,13 @@ export function CurrentVerse({
         }
 
         if (os === 'MacOS') {
-            if (event.altKey && event.key === 'Backspace') {
+            if (event.metaKey && event.key === 'Backspace') {
+                event.preventDefault()
+                handleKnownEvents({
+                    data: null,
+                    inputType: 'deleteSoftLineBackward',
+                })
+            } else if (event.altKey && event.key === 'Backspace') {
                 event.preventDefault()
                 handleKnownEvents({
                     data: null,
