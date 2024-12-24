@@ -172,7 +172,7 @@ export async function GET(
     const response = await fetch(
         `https://api.esv.org/v3/passage/html/?q=${passageData.book
             .split('_')
-            .join(' ')} ${passageData.chapter}${verseSuffix}`,
+            .join(' ')} ${passageData.chapter}`,
         {
             headers: {
                 Authorization: `Token ${env.CROSSWAY_SECRET}`,
