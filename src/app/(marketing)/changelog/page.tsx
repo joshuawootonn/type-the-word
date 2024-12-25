@@ -53,6 +53,11 @@ export default function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('12/24/2024')} /> - Fixed an
+                    issue where the previous verse button on Titus 1 was
+                    pointing to a non existent 2 Timothy 6.
+                </li>
+                <li>
                     <DateComponent date={new Date('12/23/2024')} />
                     <ul>
                         <li>
