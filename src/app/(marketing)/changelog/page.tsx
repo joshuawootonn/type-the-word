@@ -61,6 +61,11 @@ export default function Changelog() {
                             <Link href="/passage/psalm_145">Psalm 145:13</Link>.
                         </li>
                         <li>
+                            Fixed an a bug in the color input where it
+                            wouldn&apos;t allow you to select completely
+                            desaturated colors.
+                        </li>
+                        <li>
                             Fixed an issue where the previous verse button on{' '}
                             <Link href="/passage/titus_1">Titus 1</Link> was
                             pointing to a non existent 2 Timothy 6.
