@@ -215,6 +215,7 @@ export function CurrentVerse({
                 queryKey: ['last-verse'],
             })
         },
+        retry: 3,
     })
 
     const ref = useRef<HTMLSpanElement>(null)
