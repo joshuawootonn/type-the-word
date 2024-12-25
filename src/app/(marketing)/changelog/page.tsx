@@ -53,6 +53,16 @@ export default function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('12/25/2024')} />
+                    <ul>
+                        <li>
+                            Fixed an edge case in theming where changing your
+                            theme on one device wouldn&apos;t inject the new
+                            theme styles on other devices.
+                        </li>
+                    </ul>
+                </li>
+                <li>
                     <DateComponent date={new Date('12/24/2024')} />
                     <ul>
                         <li>
