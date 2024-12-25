@@ -53,9 +53,19 @@ export default function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
-                    <DateComponent date={new Date('12/24/2024')} /> - Fixed an
-                    issue where the previous verse button on Titus 1 was
-                    pointing to a non existent 2 Timothy 6.
+                    <DateComponent date={new Date('12/24/2024')} />
+                    <ul>
+                        <li>
+                            Fixed some parsing issues that prevented typing
+                            through{' '}
+                            <Link href="/passage/psalm_145">Psalm 145:13</Link>.
+                        </li>
+                        <li>
+                            Fixed an issue where the previous verse button on{' '}
+                            <Link href="/passage/titus_1">Titus 1</Link> was
+                            pointing to a non existent 2 Timothy 6.
+                        </li>
+                    </ul>
                 </li>
                 <li>
                     <DateComponent date={new Date('12/23/2024')} />
