@@ -25,6 +25,7 @@ import {
     isThemeClassname,
 } from '~/lib/theme/dom'
 import { isThemeDark } from '~/lib/theme/lch'
+import { themeCSS } from './theme-styles'
 
 const ThemeContext = createContext<{
     currentTheme: CurrentTheme
@@ -112,6 +113,17 @@ export function getLightTheme(
     return resolvedTheme
 }
 
+export function updateThemeStyleTag(
+    builtinThemes: BuiltinThemeRecord[],
+    userThemes: UserThemeRecord[],
+) {
+    const themeStyleTag = document.getElementById('themes')
+    if (themeStyleTag) {
+        themeStyleTag.innerHTML = [...builtinThemes, ...userThemes]
+            .map(t => themeCSS({ theme: t.theme }))
+            .join('')
+    }
+}
 
 export function ThemeProvider({
     session,
@@ -127,10 +139,14 @@ export function ThemeProvider({
     currentTheme: CurrentTheme | null
 }) {
     const userId = session?.user?.id
+
     const builtinThemes = useQuery({
         queryKey: ['builtinThemes'],
         queryFn: fetchBuiltinThemes,
         initialData: serverRenderedBuiltinThemes,
+        onSuccess: data => {
+            updateThemeStyleTag(data, userThemes.data)
+        },
     })
 
     const userThemes = useQuery({
@@ -138,6 +154,9 @@ export function ThemeProvider({
         queryFn: fetchUserThemes,
         enabled: Boolean(userId),
         initialData: serverRenderedUserThemes,
+        onSuccess: data => {
+            updateThemeStyleTag(builtinThemes.data, data)
+        },
     })
 
     const currentTheme = useQuery({
