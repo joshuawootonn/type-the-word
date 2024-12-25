@@ -29,6 +29,7 @@ export function ColorInput(props: Props) {
                             .toString({ precision: 4 })
                             .replace(')', '')
                             .replace('oklch(', '')
+                            .replace('none', '0')
                         document.documentElement.style.setProperty(
                             `--color-${field.name}`,
                             colorString,
