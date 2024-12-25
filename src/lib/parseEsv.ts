@@ -1,13 +1,13 @@
 import { parseFragment } from 'parse5'
 import { ChildNode } from 'parse5/dist/tree-adapters/default'
 import { isAtomTyped } from '~/lib/isEqual'
-import { splitBySpaceOrNewLine } from '~/lib/splitBySpaceOrNewLine'
 import { isAtomComplete } from '~/lib/keystroke'
 import { JSDOM } from 'jsdom'
 import { Book, bookSchema } from '~/lib/types/book'
 import { getBibleMetadata } from '~/server/bibleMetadata'
 import { PassageSegment, toPassageSegment } from './passageSegment'
 import { PassageReference, passageReferenceSchema } from './passageReference'
+import { splitLineBySpaceOrNewLine } from './splitBySpaceOrNewLine'
 
 export type Translation = 'esv'
 
@@ -165,11 +165,6 @@ export function parseNextChapter(
     return null
 }
 
-function isHeading(node: Element) {
-    const headingTags = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6']
-    return headingTags.includes(node.tagName)
-}
-
 export function parseChapter(passage: string): ParsedPassage {
     const dom = new JSDOM(passage)
     dom.window.document.querySelectorAll('sup.footnote').forEach(node => {
@@ -187,39 +182,29 @@ export function parseChapter(passage: string): ParsedPassage {
 
     function parseInline(node: ChildNode): Inline[] {
         if (node.nodeName === '#text' && 'value' in node) {
-            const leadingSpaces =
-                node.value.length - node.value.trimStart().length
-            const words = node.value
-                .trimStart()
-                .split(splitBySpaceOrNewLine)
-                .filter(word => word !== '' && word !== ' ' && word !== '\n')
-
-            const leading = new Array<{ type: 'space' }>(leadingSpaces).fill({
+            const leadingSpaces = new Array<{ type: 'space' }>(
+                node.value.length - node.value.trimStart().length,
+            ).fill({
                 type: 'space',
             })
 
-            if (words.length === 0) {
-                return [...leading]
-            }
+            const wordSegments = splitLineBySpaceOrNewLine(node.value)
+            const words =
+                wordSegments.length > 0
+                    ? wordSegments.map((word): Inline => {
+                          const letters = word.split('')
+                          const atom: Word = {
+                              type: 'word',
+                              letters,
+                          }
 
-            return [
-                ...leading,
-                ...words.map((word): Inline => {
-                    const atom: Word = {
-                        type: 'word',
-                        letters: [...word.split('')],
-                    }
+                          return isAtomComplete(atom)
+                              ? atom
+                              : { ...atom, letters: [...atom.letters, ' '] }
+                      })
+                    : []
 
-                    if (isAtomComplete(atom)) {
-                        return atom
-                    } else {
-                        return {
-                            ...atom,
-                            letters: [...atom.letters, ' '],
-                        }
-                    }
-                }),
-            ]
+            return [...leadingSpaces, ...words]
         }
 
         if (

@@ -1,21 +1,33 @@
-export const splitBySpaceOrNewLine = {
+export function splitLineBySpaceOrNewLine(str: string): string[] {
+    return str.trimStart().split(splitBySpaceOrNewLine)
+}
+
+function numberOfSpaces(str: string, startIndex = 0) {
+    let numberOfSpaces = 1
+    let i = startIndex + 1
+
+    while (str[i] === ' ') {
+        numberOfSpaces += 1
+        i += 1
+    }
+    return numberOfSpaces
+}
+
+const splitBySpaceOrNewLine = {
     [Symbol.split](str: string) {
         let pos = 0
         const result = []
         while (pos < str.length) {
             if (str[pos] === ' ') {
                 result.push(' ')
-                pos += 1
+                pos += numberOfSpaces(str, pos)
             } else if (str[pos] === '\n') {
                 result.push('\n')
                 pos += 1
-            } else if (str[pos] === '[') {
+            } else if (str[pos] === '[' && str.indexOf(']', pos) !== -1) {
                 const indexOfEndOfVerseNumber = str.indexOf(']', pos)
 
-                if (indexOfEndOfVerseNumber === -1) {
-                    result.push(str.substring(pos))
-                    pos = str.length
-                } else {
+                if (indexOfEndOfVerseNumber !== -1) {
                     result.push(str.substring(pos, indexOfEndOfVerseNumber + 1))
                     pos = indexOfEndOfVerseNumber + 1
                 }
