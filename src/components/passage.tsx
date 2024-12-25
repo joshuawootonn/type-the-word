@@ -13,7 +13,7 @@ import { useHydrateAtoms } from 'jotai/react/utils'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { toPassageSegment } from '~/lib/passageSegment'
+import { PassageSegment, toPassageSegment } from '~/lib/passageSegment'
 import { fetchChapterHistory, fetchTypingSessionUpsert } from '~/lib/api'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
@@ -50,6 +50,7 @@ export function Passage({
     autofocus?: boolean
     typingSession?: TypingSession
     chapterHistory?: ChapterHistory
+    passageSegmentOverride?: PassageSegment
 }) {
     const passageId = useId()
 
@@ -75,10 +76,11 @@ export function Passage({
         queryKey: ['chapter-history'],
         queryFn: () =>
             fetchChapterHistory(
-                toPassageSegment(
-                    passage.firstVerse.book,
-                    passage.firstVerse.chapter,
-                ),
+                props.passageSegmentOverride ??
+                    toPassageSegment(
+                        passage.firstVerse.book,
+                        passage.firstVerse.chapter,
+                    ),
             ),
         enabled: sessionData?.user?.id != null,
         initialData: props.chapterHistory,

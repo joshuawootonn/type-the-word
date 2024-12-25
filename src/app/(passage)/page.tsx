@@ -52,6 +52,7 @@ export default async function PassagePage() {
                     passage={passage}
                     typingSession={typingSession}
                     chapterHistory={chapterHistory}
+                    passageSegmentOverride={value}
                 />
                 <div className="absolute bottom-0 right-0 translate-x-0.5 translate-y-0.5 border-2 border-primary px-3">
                     Example of typing experience with Psalm 23
