@@ -221,7 +221,7 @@ export function Navigation({
                                 )}
                                 sideOffset={-2}
                                 align="end"
-                                onCloseAutoFocus={e => {
+                                onEscapeKeyDown={e => {
                                     setSettingsState('initial')
                                     e.preventDefault()
                                     dropDownTriggerRef.current?.focus()
