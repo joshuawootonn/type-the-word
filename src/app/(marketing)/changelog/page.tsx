@@ -53,6 +53,56 @@ export default function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('1/6/2024')} />
+
+
+                    <ul>
+                        <li>
+                            Fixed a bug where TTW was not downloading the last verse of chapters in the ESV translation where verses are omitted.
+                        </li>
+                        <ul>
+                            <li>
+                                <Link href="/passage/matthew_12">Matthew 12</Link>
+                            </li>
+                            <li>
+                                <Link href="/passage/matthew_17">Matthew 17</Link>
+                            </li>
+                            <li>
+                                <Link href="/passage/matthew_18">Matthew 18</Link>
+                            </li>
+                            <li>
+                                <Link href="/passage/matthew_23">Matthew 23</Link>
+                            </li>
+                            <li>
+                                <Link href="/passage/mark_9">Mark 9</Link>
+                            </li>
+                            <li>
+                                <Link href="/passage/luke_17">Luke 17</Link>
+                            </li>
+                            <li>
+                                <Link href="/passage/luke_23">Luke 23</Link>
+                            </li>
+                            <li>
+                                <Link href="/passage/john_5">John 5</Link>
+                            </li>
+                            <li>
+                                <Link href="/passage/acts_15">Acts 15</Link>
+                            </li>
+                            <li>
+                                <Link href="/passage/acts_24">Acts 24</Link>
+                            </li>
+                            <li>
+                                <Link href="/passage/romans_16">Romans 16</Link>
+                            </li>
+                        </ul>
+                        <div>If you have typed these chapters and are not seeing 100% completion I would navigate to them now and check the last verse. </div>
+                        <li>
+                            Fixed a bug where{' '}
+                            <Link href="/passage/2_timothy_1">2 Timothy 1</Link> was incorrectly counting the number of verses on the <Link href="/history">history</Link> page.
+                        </li>
+                    </ul>
+                </li>
+                <li>
                     <DateComponent date={new Date('12/25/2024')} />
                     <ul>
                         <li>
