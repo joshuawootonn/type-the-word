@@ -37,11 +37,9 @@ export function Word({
                             className={clsx(
                                 'letter',
                                 isEqual && 'correct',
-                                typedLetter &&
-                                    !isEqual &&
-                                    'incorrect',
+                                typedLetter && !isEqual && 'incorrect',
                                 isErrored &&
-                                    'error underline decoration-rose-500 decoration-2',
+                                    'error underline decoration-error decoration-2',
                             )}
                         >
                             {letter}
@@ -55,7 +53,7 @@ export function Word({
                             className={clsx(
                                 'letter extra',
                                 isErrored &&
-                                    'error underline decoration-rose-500 decoration-2',
+                                    'error underline decoration-error decoration-2',
                             )}
                         >
                             {letter}
@@ -63,7 +61,7 @@ export function Word({
                     )
                 })}
 
-                <span  className={clsx('letter relative z-0')}>
+                <span className={clsx('letter relative z-0')}>
                     {ender === '\n' ? (
                         <NewLineIndicator isActive={active} />
                     ) : ender === ' ' ? (
