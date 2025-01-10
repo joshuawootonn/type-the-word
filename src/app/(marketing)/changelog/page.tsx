@@ -4,6 +4,9 @@ import Image from 'next/image'
 import { UpdateLastVisitedChangelog } from './update-last-visited-changelog'
 import { changelogUpdatedAt } from './updated-at'
 import HotkeyLabel from '~/components/hotkey-label'
+import { useSession } from 'next-auth/react'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '~/server/auth'
 
 function Link({ href, children }: { href: string; children: React.ReactNode }) {
     return (
@@ -35,7 +38,9 @@ export const metadata: Metadata = {
         'All the product changes happening to Type the Word. A typing practice tool that tracks your progress through the Bible.',
 }
 
-export default function Changelog() {
+export default async function Changelog() {
+    const session = await getServerSession(authOptions)
+
     return (
         <div
             className={
@@ -49,7 +54,14 @@ export default function Changelog() {
                 </span>
             </div>
             <UpdateLastVisitedChangelog />
-            <p>New updates and improvements to Type the Word</p>
+            {session != null && (
+                <p>
+                    These changelogs are batched into monthly update emails with
+                    more details and usages stats. If you&apos;re interested
+                    search your email for &quot;Type the Word newsletter
+                    subscription.&quot;
+                </p>
+            )}
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
