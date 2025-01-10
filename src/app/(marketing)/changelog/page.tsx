@@ -59,7 +59,7 @@ export default async function Changelog() {
                     These changelogs are batched into monthly update emails with
                     more details and usages stats. If you&apos;re interested
                     search your email for &quot;Type the Word newsletter
-                    subscription.&quot;
+                    subscription&quot; and click &quot;Confirm.&quot;
                 </p>
             )}
             <hr className="mx-0 w-full border-t-2 border-primary" />
