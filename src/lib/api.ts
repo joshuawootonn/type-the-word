@@ -8,10 +8,7 @@ import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 import { UserChangelogRecord } from '~/server/repositories/userChangelog.repository'
 import { z } from 'zod'
-import {
-    CurrentTheme,
-    CurrentThemeRecord,
-} from '~/server/repositories/currentTheme.repository'
+import { CurrentTheme } from '~/server/repositories/currentTheme.repository'
 import {
     BuiltinThemeRecord,
     ThemeRecord,
@@ -23,7 +20,8 @@ export type Body<T> = { data: T }
 export function getBaseUrl() {
     if (typeof window !== 'undefined') return ''
 
-    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+    if (process.env.VERCEL_PROJECT_PRODUCTION_URL)
+        return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
 
     return `http://localhost:${process.env.PORT ?? 3010}`
 }
