@@ -18,6 +18,9 @@ export function GlobalHotkeys() {
 type OS = 'MacOS' | 'Windows' | 'iOS' | 'Linux' | 'Android'
 
 export function getOS(): { os: OS; isMobile: boolean } {
+    if (typeof window === 'undefined') {
+        return { os: 'Windows', isMobile: false }
+    }
     const userAgent = window.navigator.userAgent,
         platform: string =
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
