@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+import { Metadata, ResolvingMetadata } from 'next'
 import { Passage } from '~/components/passage'
 import { DEFAULT_PASSAGE_SEGMENT } from './default-passage'
 import Link from 'next/link'
@@ -12,11 +12,20 @@ import { authOptions } from '~/server/auth'
 import { getServerSession } from 'next-auth'
 import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
 import { db } from '~/server/db'
+import { passageReferenceSchema } from '~/lib/passageReference'
 
-export const metadata: Metadata = {
-    title: 'Type the Word',
-    description:
-        "A typing practice tool that tracks your typing progress through the Bible. Improve your typing skills while meditating on God's word.",
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ passage?: PassageSegment }>
+}): Promise<Metadata> {
+    const passage = (await params).passage
+    const a = passageReferenceSchema.parse(passage)
+
+    return {
+        title: `Type the Word - ${a}`,
+        description: `Practice typing through the Bible passage of ${a}.`,
+    }
 }
 
 export default async function PassagePage(props: {
