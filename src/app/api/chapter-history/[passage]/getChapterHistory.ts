@@ -49,6 +49,15 @@ export async function getChapterHistory(
         }
     }
 
+    console.log(
+        JSON.stringify({
+            book: passageObject.book,
+            chapter: passageObject.chapter,
+            numberOfVersesInChapterBookCombo,
+            typingSessions,
+        }),
+    )
+
     const chapterLogs = typingSessions.map(typingSession => ({
         location: typingSessionToString(
             typingSession.typedVerses.filter(
