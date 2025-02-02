@@ -24,6 +24,7 @@ import { fetchAddVerseToTypingSession } from '~/lib/api'
 import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 import { getOS } from '~/app/global-hotkeys'
+import { PassageSegment } from '~/lib/passageSegment'
 
 const knownInputEventSchema = z.discriminatedUnion('inputType', [
     z.object({
@@ -119,6 +120,7 @@ export function CurrentVerse({
     passage,
     typingSession,
     chapterHistory,
+    passageSegment,
 }: {
     isCurrentVerse: boolean
     isIndented: boolean
@@ -127,6 +129,7 @@ export function CurrentVerse({
     passage: ParsedPassage
     typingSession?: TypingSession
     chapterHistory?: ChapterHistory
+    passageSegment: PassageSegment
 }) {
     const inputRef = useRef<HTMLInputElement>(null)
     const [position, setPosition] = useAtom(positionAtom)
@@ -182,7 +185,7 @@ export function CurrentVerse({
                 },
             )
             queryClient.setQueryData<ChapterHistory>(
-                ['chapter-history'],
+                ['chapter-history', passageSegment],
                 prevChapterHistory => {
                     if (prevChapterHistory == null) {
                         return undefined

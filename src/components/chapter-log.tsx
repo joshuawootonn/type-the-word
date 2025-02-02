@@ -15,7 +15,7 @@ export function ChapterLog({
 }) {
     const { data: sessionData } = useSession()
     const chapterHistory = useQuery({
-        queryKey: ['chapter-history'],
+        queryKey: ['chapter-history', passageSegment],
         queryFn: () => fetchChapterHistory(passageSegment),
         enabled: sessionData?.user?.id != null,
         initialData: props.chapterHistory,

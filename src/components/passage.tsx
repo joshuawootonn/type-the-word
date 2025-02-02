@@ -66,6 +66,9 @@ export function Passage({
         [],
     )
     const { data: sessionData } = useSession()
+    const passageSegementOrOverride =
+        props.passageSegmentOverride ??
+        toPassageSegment(passage.firstVerse.book, passage.firstVerse.chapter)
     const typingSession = useQuery({
         queryKey: ['typing-session'],
         queryFn: fetchTypingSessionUpsert,
@@ -73,15 +76,8 @@ export function Passage({
         initialData: props.typingSession,
     })
     const chapterHistory = useQuery({
-        queryKey: ['chapter-history'],
-        queryFn: () =>
-            fetchChapterHistory(
-                props.passageSegmentOverride ??
-                    toPassageSegment(
-                        passage.firstVerse.book,
-                        passage.firstVerse.chapter,
-                    ),
-            ),
+        queryKey: ['chapter-history', passageSegementOrOverride],
+        queryFn: () => fetchChapterHistory(passageSegementOrOverride),
         enabled: sessionData?.user?.id != null,
         initialData: props.chapterHistory,
     })
@@ -123,6 +119,9 @@ export function Passage({
                                             passage={passage}
                                             typingSession={typingSession.data}
                                             chapterHistory={chapterHistory.data}
+                                            passageSegment={
+                                                passageSegementOrOverride
+                                            }
                                         />
                                     )
 

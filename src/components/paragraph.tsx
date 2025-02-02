@@ -8,17 +8,20 @@ import { ReadonlyVerse } from '~/components/readonlyVerse'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
 import { ibmPlexMono } from '~/app/fonts'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
+import { PassageSegment } from '~/lib/passageSegment'
 
 export function Paragraph({
     node,
     passage,
     typingSession,
     chapterHistory,
+    passageSegment,
 }: {
     passage: ParsedPassage
     node: Paragraph
     typingSession?: TypingSession
     chapterHistory?: ChapterHistory
+    passageSegment: PassageSegment
 }) {
     const [currentVerse] = useAtom(currentVerseAtom)
     return (
@@ -44,6 +47,7 @@ export function Paragraph({
                         passage={passage}
                         typingSession={typingSession}
                         chapterHistory={chapterHistory}
+                        passageSegment={passageSegment}
                     />
                 ) : (
                     <ReadonlyVerse
