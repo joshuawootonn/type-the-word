@@ -380,7 +380,10 @@ export function parseChapter(passage: string): ParsedPassage {
                     })
                 }
 
-                if (context.firstVerseOfPassage == undefined) {
+                if (
+                    context.firstVerseOfPassage == undefined &&
+                    verseIndex !== -1
+                ) {
                     context.firstVerseOfPassage = verseSection.at(
                         verseIndex,
                     ) as VerseNumber
