@@ -4,7 +4,6 @@ import Image from 'next/image'
 import { UpdateLastVisitedChangelog } from './update-last-visited-changelog'
 import { changelogUpdatedAt } from './updated-at'
 import HotkeyLabel from '~/components/hotkey-label'
-import { useSession } from 'next-auth/react'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '~/server/auth'
 
@@ -64,6 +63,58 @@ export default async function Changelog() {
             )}
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
+                <li>
+                    <DateComponent date={new Date('2/2/2025')} /> - Did a small
+                    batch of updates to optimize for retyping through sections
+                    of the Bible.{' '}
+                    <ul>
+                        <li>
+                            The passage text being dimmed now means something
+                            different.{' '}
+                            <ul>
+                                <li>
+                                    Before the text was dimmed when you had
+                                    previously typed it.
+                                </li>
+                                <li>
+                                    Now the text is only dimmed when you have
+                                    started typing this chapter and have typed
+                                    this verse. When you complete the chapter
+                                    the dimming is reset.
+                                </li>
+                            </ul>
+                            This change allows you to type through a chapter
+                            multiple times and see your building progress each
+                            time.
+                        </li>
+                        <li>
+                            Since chapters can now reset,
+                            <ul>
+                                <li>
+                                    I added a Log section to the bottom of each
+                                    chapter. Unlike the Log within
+                                    <Link href="/history">
+                                        <code> /history</code>
+                                    </Link>{' '}
+                                    this Log is specific to this chapter.
+                                    <Image
+                                        src={'/assets/chapter-log.png'}
+                                        alt={
+                                            'Screen shot of the new "Log" section for each chapter'
+                                        }
+                                        className="mt-3 border-2 border-primary"
+                                        width={2454}
+                                        height={2252}
+                                    />
+                                </li>
+                                <li>
+                                    And I removed the dimming on that would
+                                    automatically happen for the current verse.
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
                 <li>
                     <DateComponent date={new Date('1/7/2025')} />
                     <ul>
