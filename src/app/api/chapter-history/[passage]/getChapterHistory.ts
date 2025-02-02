@@ -33,7 +33,7 @@ export async function getChapterHistory(
 
     let verses: ChapterHistory['verses'] = {}
 
-    const chronologicalTypingSession = typingSessions.reverse()
+    const chronologicalTypingSession = typingSessions.slice().reverse()
     for (const session of chronologicalTypingSession) {
         for (const verse of session.typedVerses) {
             if (
