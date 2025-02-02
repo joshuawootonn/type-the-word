@@ -52,9 +52,7 @@ export function ReadonlyVerse({
             className={clsx(
                 'verse break-spaces group inline h-3 text-balance hover:cursor-pointer',
                 isCurrentVerse && 'active-verse',
-                isTypedInSession ?? isTypedInHistory
-                    ? 'text-primary/50'
-                    : 'text-primary',
+                isTypedInHistory ? 'text-primary/50' : 'text-primary',
             )}
             ref={ref}
             onClick={() => {

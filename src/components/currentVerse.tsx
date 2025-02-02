@@ -154,6 +154,10 @@ export function CurrentVerse({
             const previousTypingSession = queryClient.getQueryData([
                 'typing-session',
             ])
+            // Snapshot the previous value
+            const previousChapterHistory = queryClient.getQueryData([
+                'chapter-history',
+            ])
 
             // Optimistically update to the new value
             queryClient.setQueryData<TypingSession>(
@@ -177,6 +181,22 @@ export function CurrentVerse({
                     }
                 },
             )
+            queryClient.setQueryData<ChapterHistory>(
+                ['chapter-history'],
+                prevChapterHistory => {
+                    if (prevChapterHistory == null) {
+                        return undefined
+                    }
+
+                    return {
+                        ...prevChapterHistory,
+                        verses: {
+                            ...prevChapterHistory.verses,
+                            [verse.verse]: true,
+                        },
+                    }
+                },
+            )
 
             // This waits to toggle the verse till ^ has gone through.
             // It prevents a flicker that can happen in this mutation.
@@ -196,7 +216,7 @@ export function CurrentVerse({
             })
 
             // Return a context object with the snapshotted value
-            return { previousTypingSession }
+            return { previousTypingSession, previousChapterHistory }
         },
         // If the mutation fails,
         // use the context returned from onMutate to roll back
@@ -205,11 +225,18 @@ export function CurrentVerse({
                 ['typing-session'],
                 context?.previousTypingSession,
             )
+            queryClient.setQueryData(
+                ['chapter-history'],
+                context?.previousChapterHistory,
+            )
         },
         // Always refetch after error or success:
         onSettled: async () => {
             await queryClient.invalidateQueries({
                 queryKey: ['typing-session'],
+            })
+            await queryClient.invalidateQueries({
+                queryKey: ['chapter-history'],
             })
             await queryClient.invalidateQueries({
                 queryKey: ['last-verse'],

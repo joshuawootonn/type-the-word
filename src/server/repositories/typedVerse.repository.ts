@@ -1,6 +1,6 @@
 import * as schema from '~/server/db/schema'
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
-import { desc, eq, count as sqlCount } from 'drizzle-orm'
+import { and, desc, eq, count as sqlCount } from 'drizzle-orm'
 import { TypedVerse } from './typingSession.repository'
 
 export class TypedVerseRepository {
@@ -28,5 +28,28 @@ export class TypedVerseRepository {
         })
 
         return typedVerse ?? null
+    }
+
+    async getMany({
+        userId,
+        book,
+        chapter,
+    }: {
+        userId: string
+        book?: schema.Book
+        chapter?: number
+    }): Promise<TypedVerse[]> {
+        const builder = this.db.query.typedVerses.findMany({
+            where: and(
+                ...[
+                    eq(schema.typedVerses.userId, userId),
+                    book ? eq(schema.typedVerses.book, book) : null,
+                    chapter ? eq(schema.typedVerses.chapter, chapter) : null,
+                ].flatMap(val => (val ? [val] : [])),
+            ),
+            orderBy: [desc(schema.typedVerses.createdAt)],
+        })
+
+        return await builder
     }
 }

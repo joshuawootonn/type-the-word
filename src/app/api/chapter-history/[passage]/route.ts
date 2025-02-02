@@ -2,11 +2,10 @@ import { getServerSession } from 'next-auth'
 import { NextRequest } from 'next/server'
 import { segmentToPassageObject } from '~/lib/passageObject'
 import { authOptions } from '~/server/auth'
-import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import { getChapterHistory } from './getChapterHistory'
 
 export type ChapterHistory = {
-    verses: Record<number, TypedVerse[]>
+    verses: Record<number, boolean>
 }
 
 export const dynamic = 'force-dynamic'

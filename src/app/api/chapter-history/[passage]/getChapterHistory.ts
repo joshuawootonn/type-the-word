@@ -1,31 +1,46 @@
-import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
 import { ChapterHistory } from './route'
 import { PassageObject } from '~/lib/passageObject'
+import { getBibleMetadata } from '~/server/bibleMetadata'
 import { db } from '~/server/db'
+import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
 
 export async function getChapterHistory(
     userId: string,
     passageObject: PassageObject,
 ): Promise<ChapterHistory> {
-    const typingSessionRepository = new TypingSessionRepository(db)
+    const typedVerseRepository = new TypedVerseRepository(db)
 
-    const typingSessions = await typingSessionRepository.getMany({
+    const typedVersesForPassage = await typedVerseRepository.getMany({
         userId,
+        book: passageObject.book,
+        chapter: passageObject.chapter,
     })
 
-    const verses: ChapterHistory['verses'] = {}
+    const bibleMetadata = getBibleMetadata()
+    const numberOfVersesInChapterBookCombo =
+        bibleMetadata[passageObject.book]?.chapters?.[passageObject.chapter - 1]
+            ?.length
 
-    for (const session of typingSessions) {
-        for (const verse of session.typedVerses) {
-            if (
-                verse.book !== passageObject.book ||
-                verse.chapter !== passageObject.chapter
-            ) {
-                continue
-            }
+    if (numberOfVersesInChapterBookCombo == null) {
+        throw new Error(
+            `Failed to find the number of verses for ${passageObject.book} ${passageObject.chapter}`,
+        )
+    }
 
-            const acc = verses[verse.verse] ?? []
-            verses[verse.verse] = [...acc, verse]
+    let verses: ChapterHistory['verses'] = {}
+
+    for (const verse of typedVersesForPassage) {
+        if (
+            verse.book !== passageObject.book ||
+            verse.chapter !== passageObject.chapter
+        ) {
+            continue
+        }
+
+        verses[verse.verse] = true
+
+        if (Object.values(verses).length >= numberOfVersesInChapterBookCombo) {
+            verses = {}
         }
     }
 
