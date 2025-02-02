@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react'
 import { getServerSession } from 'next-auth'
 import { Providers } from './providers'
 import clsx from 'clsx'
@@ -95,6 +96,7 @@ export default async function RootLayout({
                         <Footer />
                     </Providers>
                     <Fathom />
+                    <Analytics />
                     <GlobalHotkeys />
                 </div>
             </body>
