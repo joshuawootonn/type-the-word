@@ -74,27 +74,29 @@ export default async function RootLayout({
             </head>
             <body
                 className={clsx(
-                    'min-h-screen-1px container mx-auto flex max-w-page flex-col px-4 font-sans lg:px-0',
+                    'min-h-screen-1px flex w-full font-sans',
                     poppins.variable,
                     ibmPlexMono.variable,
                 )}
             >
-                <Providers
-                    currentTheme={currentTheme}
-                    userThemes={userThemes}
-                    builtinThemes={builtinThemes}
-                    session={session}
-                >
-                    <Navigation
-                        lastTypedVerse={lastTypedVerse}
+                <div className="container mx-auto flex max-w-page flex-col px-4  lg:px-0">
+                    <Providers
+                        currentTheme={currentTheme}
                         userThemes={userThemes}
                         builtinThemes={builtinThemes}
-                    />
-                    {children}
-                    <Footer />
-                </Providers>
-                <Fathom />
-                <GlobalHotkeys />
+                        session={session}
+                    >
+                        <Navigation
+                            lastTypedVerse={lastTypedVerse}
+                            userThemes={userThemes}
+                            builtinThemes={builtinThemes}
+                        />
+                        {children}
+                        <Footer />
+                    </Providers>
+                    <Fathom />
+                    <GlobalHotkeys />
+                </div>
             </body>
         </html>
     )
