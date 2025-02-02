@@ -412,9 +412,7 @@ export function CurrentVerse({
             className={clsx(
                 'verse break-spaces group inline h-3 text-balance hover:cursor-pointer',
                 isCurrentVerse && 'active-verse',
-                isTypedInSession && position.length === 0 && isTypedInHistory
-                    ? 'text-primary/50'
-                    : 'text-primary',
+                isTypedInHistory ? 'text-primary/50' : 'text-primary',
             )}
             ref={ref}
             onClick={() => {
