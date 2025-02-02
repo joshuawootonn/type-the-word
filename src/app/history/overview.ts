@@ -1,6 +1,6 @@
 import { passageReferenceSchema } from '~/lib/passageReference'
 import { Book, bookSchema } from '~/lib/types/book'
-import { getBibleMetadata } from '~/server/bibleMetadata'
+import { BookMetadata, getBibleMetadata } from '~/server/bibleMetadata'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
 
 function toPluralBookForm(book: Book) {
@@ -16,7 +16,6 @@ export type ChapterOverview = {
     verses: number
     typedVerses: number
     percentage: number
-    prestige: number
 }
 
 export type BookOverview = {
@@ -24,10 +23,52 @@ export type BookOverview = {
     label: string
     prestige: number
     percentage: number
-    alt: number
     chapters: ChapterOverview[]
     verses: number
     typedVerses: number
+}
+
+type AggregatedChapterData = {
+    typedVersesInCurrentPrestige: number
+    totalVerses: number
+    verses: Record<number, boolean>
+}
+
+type AggregatedBookData = {
+    prestige: number
+    typedVersesInCurrentPrestige: number
+    totalVerses: number
+    chapters: Record<number, AggregatedChapterData>
+}
+
+type AggregatedData = Record<
+    (typeof bookSchema.options)[number],
+    AggregatedBookData
+>
+
+function getInitialAggregatedBookData(
+    bookData: BookMetadata,
+    prestige = 0,
+): AggregatedBookData {
+    return {
+        prestige,
+        typedVersesInCurrentPrestige: 0,
+        totalVerses: bookData.chapters.reduce(
+            (acc, chapter) => acc + chapter.length,
+            0,
+        ),
+        chapters: bookData.chapters.reduce(
+            (acc, chapter, i) => ({
+                ...acc,
+                [i + 1]: {
+                    typedVersesInCurrentPrestige: 0,
+                    totalVerses: chapter.length,
+                    verses: {},
+                },
+            }),
+            {} as Record<number, AggregatedChapterData>,
+        ),
+    }
 }
 
 export function getBookOverview(
@@ -35,99 +76,115 @@ export function getBookOverview(
 ): BookOverview[] {
     const bibleMetadata = getBibleMetadata()
 
-    let bookVerses: Record<
-        Partial<(typeof bookSchema.options)[number]>,
-        Record<number, Record<number, number>>
-    > = {} as never
-    for (const typingSession of typingSessions) {
-        for (const verse of typingSession.typedVerses) {
-            if (bookVerses[verse.book] == null) {
-                bookVerses[verse.book] = {}
+    let bookData: AggregatedData = Object.entries(bibleMetadata).reduce(
+        (acc, [book, bookData]) => ({
+            ...acc,
+            [book]: getInitialAggregatedBookData(bookData),
+        }),
+        {} as AggregatedData,
+    )
+
+    const chronologicalTypingSessions = typingSessions.slice().reverse()
+
+    for (const typingSession of chronologicalTypingSessions) {
+        for (const typedVerse of typingSession.typedVerses) {
+            const bookIsPerfectlyPrestiged = Object.values(
+                bookData[typedVerse.book].chapters,
+            ).every(
+                book => book.typedVersesInCurrentPrestige === book.totalVerses,
+            )
+
+            if (bookIsPerfectlyPrestiged) {
+                bookData = {
+                    ...bookData,
+                    [typedVerse.book]: getInitialAggregatedBookData(
+                        bibleMetadata[typedVerse.book]!,
+                        bookData[typedVerse.book].prestige,
+                    ),
+                }
             }
-            if (bookVerses[verse.book][verse.chapter] == null) {
-                bookVerses[verse.book][verse.chapter] = {}
+            const book = bookData[typedVerse.book]
+
+            const chapter = book.chapters[typedVerse.chapter]!
+
+            const nextChapterVerses = {
+                ...chapter.verses,
+                [typedVerse.verse]: true,
             }
-            if (bookVerses[verse.book][verse.chapter]) {
-                const current =
-                    bookVerses[verse.book]?.[verse.chapter]?.[verse.verse] ?? 0
-                const next = current + 1
-                bookVerses = {
-                    ...bookVerses,
-                    [verse.book]: {
-                        ...bookVerses[verse.book],
-                        [verse.chapter]: {
-                            ...bookVerses[verse.book][verse.chapter],
-                            [verse.verse]: next,
-                        },
+
+            const nextNumberOfVerses = Object.values(nextChapterVerses).length
+
+            const nextChapter = {
+                ...chapter,
+                verses: nextChapterVerses,
+                typedVersesInCurrentPrestige: nextNumberOfVerses,
+            }
+            const nextBookChapters = {
+                ...book.chapters,
+                [typedVerse.chapter]: nextChapter,
+            }
+
+            const nextBook = {
+                ...book,
+                prestige: book.prestige,
+                chapters: nextBookChapters,
+                typedVersesInCurrentPrestige: Object.values(
+                    nextBookChapters,
+                ).reduce(
+                    (sum, chapter) =>
+                        sum + chapter.typedVersesInCurrentPrestige,
+                    0,
+                ),
+            }
+
+            const prestigingBook = Object.values(nextBook.chapters).every(
+                book => book.typedVersesInCurrentPrestige >= book.totalVerses,
+            )
+
+            if (prestigingBook) {
+                bookData = {
+                    ...bookData,
+                    [typedVerse.book]: {
+                        ...book,
+                        prestige: book.prestige + 1,
+                        chapters: nextBookChapters,
+                        typedVersesInCurrentPrestige: 0,
                     },
+                }
+            } else {
+                bookData = {
+                    ...bookData,
+                    [typedVerse.book]: nextBook,
                 }
             }
         }
     }
 
-    return Object.entries(bibleMetadata)
-        .map(([book, content]) => ({ book, content }))
-        .map(({ book, content }) => {
-            const validatedBook = bookSchema.parse(book)
-            const bookPrestigeCount = Math.min(
-                ...content.chapters.map(
-                    ({ length: chapterLength }, chapterIndex) => {
-                        const typedVerses =
-                            bookVerses[validatedBook]?.[chapterIndex + 1]
-                        const prestigeCount =
-                            typedVerses == null
-                                ? 0
-                                : Object.keys(typedVerses).length <
-                                    chapterLength
-                                  ? 0
-                                  : Math.min(...Object.values(typedVerses))
-                        return prestigeCount
-                    },
-                ),
-            )
-            return { book, content, bookPrestigeCount }
-        })
-        .map(({ book, content, bookPrestigeCount }) => {
-            const validatedBook = bookSchema.parse(book)
-            let totalVersesCount = 0
-            let typedVersesInPrestige = 0
+    const result = Object.keys(bibleMetadata)
+        .map(bookSlug => {
+            const validatedBook = bookSchema.parse(bookSlug)
+            const book = bookData[validatedBook]
+
+            if (book == null) return null
+
             return {
-                book,
-                chapters: content.chapters.map(
-                    ({ length: chapterLength }, chapterIndex) => {
-                        const typedVerses =
-                            bookVerses[validatedBook]?.[chapterIndex + 1]
-                        const numberOfTypedVerses = Object.keys(
-                            typedVerses ?? {},
-                        ).length
-                        const prestigeCount =
-                            typedVerses == null
-                                ? 0
-                                : Object.keys(typedVerses).length <
-                                    chapterLength
-                                  ? 0
-                                  : Math.min(...Object.values(typedVerses))
-                        const numberOfTypedVersesInPrestige = Math.min(
-                            numberOfTypedVerses -
-                                bookPrestigeCount * chapterLength,
-                            chapterLength,
-                        )
-                        totalVersesCount += chapterLength
-                        typedVersesInPrestige += numberOfTypedVersesInPrestige
+                book: bookSlug,
+                chapters: Object.entries(book.chapters).map(
+                    ([chapter, chapterData]) => {
                         return {
-                            chapter: chapterIndex + 1,
-                            verses: chapterLength,
-                            typedVerses: numberOfTypedVersesInPrestige,
+                            chapter: parseInt(chapter),
+                            verses: chapterData.totalVerses,
+                            typedVerses:
+                                chapterData.typedVersesInCurrentPrestige,
                             percentage: Math.round(
-                                (numberOfTypedVersesInPrestige /
-                                    chapterLength) *
+                                (chapterData.typedVersesInCurrentPrestige /
+                                    chapterData.totalVerses) *
                                     100,
                             ),
-                            prestige: prestigeCount,
                             alt:
                                 Math.floor(
-                                    (numberOfTypedVersesInPrestige /
-                                        chapterLength) *
+                                    (chapterData.typedVersesInCurrentPrestige /
+                                        chapterData.totalVerses) *
                                         10000,
                                 ) / 100,
                         }
@@ -136,17 +193,19 @@ export function getBookOverview(
                 label: passageReferenceSchema.parse(
                     toPluralBookForm(validatedBook),
                 ),
-                prestige: bookPrestigeCount,
-                typedVerses: typedVersesInPrestige,
-                verses: totalVersesCount,
-                percentage: Math.round(
-                    (typedVersesInPrestige / totalVersesCount) * 100,
-                ),
-                alt:
+                prestige: book.prestige,
+                typedVerses: book.typedVersesInCurrentPrestige,
+                verses: book.totalVerses,
+                percentage:
                     Math.floor(
-                        (typedVersesInPrestige / totalVersesCount) * 10000,
+                        (book.typedVersesInCurrentPrestige / book.totalVerses) *
+                            10000,
                     ) / 100,
             }
         })
-        .filter(book => book.alt !== 0 || book.prestige >= 0)
+        .filter(
+            (book: BookOverview | null): book is BookOverview =>
+                book != null && (book.percentage !== 0 || book.prestige > 0),
+        ) as BookOverview[]
+    return result
 }
