@@ -2,7 +2,6 @@ import { ChapterHistory } from './route'
 import { PassageObject } from '~/lib/passageObject'
 import { getBibleMetadata } from '~/server/bibleMetadata'
 import { db } from '~/server/db'
-import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
 import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
 import { typingSessionToString } from '~/app/history/typingSessionToString'
 
@@ -10,16 +9,9 @@ export async function getChapterHistory(
     userId: string,
     passageObject: PassageObject,
 ): Promise<ChapterHistory> {
-    const typedVerseRepository = new TypedVerseRepository(db)
     const typingSessionRepository = new TypingSessionRepository(db)
 
     const typingSessions = await typingSessionRepository.getMany({
-        userId,
-        book: passageObject.book,
-        chapter: passageObject.chapter,
-    })
-
-    const typedVersesForPassage = await typedVerseRepository.getMany({
         userId,
         book: passageObject.book,
         chapter: passageObject.chapter,
@@ -38,18 +30,22 @@ export async function getChapterHistory(
 
     let verses: ChapterHistory['verses'] = {}
 
-    for (const verse of typedVersesForPassage) {
-        if (
-            verse.book !== passageObject.book ||
-            verse.chapter !== passageObject.chapter
-        ) {
-            continue
-        }
+    for (const session of typingSessions) {
+        for (const verse of session.typedVerses) {
+            if (
+                verse.book !== passageObject.book ||
+                verse.chapter !== passageObject.chapter
+            ) {
+                continue
+            }
 
-        verses[verse.verse] = true
+            verses[verse.verse] = true
 
-        if (Object.values(verses).length >= numberOfVersesInChapterBookCombo) {
-            verses = {}
+            if (
+                Object.values(verses).length >= numberOfVersesInChapterBookCombo
+            ) {
+                verses = {}
+            }
         }
     }
 
