@@ -2,7 +2,10 @@ import { ChapterHistory } from './route'
 import { PassageObject } from '~/lib/passageObject'
 import { getBibleMetadata } from '~/server/bibleMetadata'
 import { db } from '~/server/db'
-import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
+import {
+    TypingSession,
+    TypingSessionRepository,
+} from '~/server/repositories/typingSession.repository'
 import { typingSessionToString } from '~/app/history/typingSessionToString'
 
 export async function getChapterHistory(
@@ -30,7 +33,8 @@ export async function getChapterHistory(
 
     let verses: ChapterHistory['verses'] = {}
 
-    for (const session of typingSessions) {
+    const chronologicalTypingSession = typingSessions.reverse()
+    for (const session of chronologicalTypingSession) {
         for (const verse of session.typedVerses) {
             if (
                 verse.book !== passageObject.book ||
@@ -48,15 +52,6 @@ export async function getChapterHistory(
             }
         }
     }
-
-    console.log(
-        JSON.stringify({
-            book: passageObject.book,
-            chapter: passageObject.chapter,
-            numberOfVersesInChapterBookCombo,
-            typingSessions,
-        }),
-    )
 
     const chapterLogs = typingSessions.map(typingSession => ({
         location: typingSessionToString(
