@@ -5,13 +5,19 @@ import clsx from 'clsx'
 import Link from 'next/link'
 import { BookOverview } from './overview'
 
-function Box({ percentage }: { percentage: number }) {
+function Box({
+    percentage,
+    className,
+}: {
+    percentage: number
+    className?: string
+}) {
     const isComplete = percentage >= 100
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={clsx('h-full w-full')}
+            className={clsx('w-full', className)}
         >
             <rect
                 height="14"
@@ -53,16 +59,45 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                             <summary className="svg-outline-stubby relative select-none outline-none">
                                 <div className="ml-3 inline-flex w-[calc(100%-32px)] items-center justify-between">
                                     <h3 className="m-0">{book.label}</h3>
-                                    <div
-                                        className={clsx(
-                                            ' font-bold',
-                                            // {
-                                            //     [` bg-primary px-3 py-1 text-secondary `]:
-                                            //         isBookComplete,
-                                            // },
-                                        )}
-                                    >
-                                        {book.alt}%
+
+                                    <div className="flex gap-2">
+                                        <Tooltip.Root>
+                                            <Tooltip.Trigger>
+                                                <>
+                                                    {new Array(book.prestige)
+                                                        .fill(null)
+                                                        .map((_, i) => (
+                                                            <Box
+                                                                className={
+                                                                    'aspect-square h-[28.5px]'
+                                                                }
+                                                                key={i}
+                                                                percentage={100}
+                                                            />
+                                                        ))}
+                                                    <Box
+                                                        className={
+                                                            'aspect-square h-[28.5px]'
+                                                        }
+                                                        percentage={book.alt}
+                                                    />
+                                                </>
+                                            </Tooltip.Trigger>
+                                            <Tooltip.Content
+                                                className="prose grid select-none grid-cols-[1fr_minmax(30px,min-content)] gap-x-3 gap-y-1 border-2 border-primary bg-secondary px-3 py-2 font-sans leading-none text-primary "
+                                                sideOffset={2}
+                                            >
+                                                <div>Times completed: </div>
+                                                <div>{book.prestige}</div>
+                                                <div>Current Progress: </div>
+                                                <div>
+                                                    {book.typedVerses}/
+                                                    {book.verses}
+                                                </div>
+                                                <div>Current Completion: </div>
+                                                <div>{book.alt}%</div>
+                                            </Tooltip.Content>
+                                        </Tooltip.Root>
                                     </div>
                                 </div>
                             </summary>

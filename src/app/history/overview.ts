@@ -1,10 +1,7 @@
 import { passageReferenceSchema } from '~/lib/passageReference'
 import { Book, bookSchema } from '~/lib/types/book'
 import { getBibleMetadata } from '~/server/bibleMetadata'
-import {
-    TypingSession,
-    TypedVerse,
-} from '~/server/repositories/typingSession.repository'
+import { TypingSession } from '~/server/repositories/typingSession.repository'
 
 function toPluralBookForm(book: Book) {
     if (book === 'psalm') {
@@ -19,14 +16,18 @@ export type ChapterOverview = {
     verses: number
     typedVerses: number
     percentage: number
+    prestige: number
 }
 
 export type BookOverview = {
     book: string
     label: string
+    prestige: number
     percentage: number
     alt: number
     chapters: ChapterOverview[]
+    verses: number
+    typedVerses: number
 }
 
 export function getBookOverview(
@@ -36,7 +37,7 @@ export function getBookOverview(
 
     let bookVerses: Record<
         Partial<(typeof bookSchema.options)[number]>,
-        Record<number, Record<number, TypedVerse>>
+        Record<number, Record<number, number>>
     > = {} as never
     for (const typingSession of typingSessions) {
         for (const verse of typingSession.typedVerses) {
@@ -47,13 +48,16 @@ export function getBookOverview(
                 bookVerses[verse.book][verse.chapter] = {}
             }
             if (bookVerses[verse.book][verse.chapter]) {
+                const current =
+                    bookVerses[verse.book]?.[verse.chapter]?.[verse.verse] ?? 0
+                const next = current + 1
                 bookVerses = {
                     ...bookVerses,
                     [verse.book]: {
                         ...bookVerses[verse.book],
                         [verse.chapter]: {
                             ...bookVerses[verse.book][verse.chapter],
-                            [verse.verse]: verse,
+                            [verse.verse]: next,
                         },
                     },
                 }
@@ -62,10 +66,31 @@ export function getBookOverview(
     }
 
     return Object.entries(bibleMetadata)
-        .map(([book, content]) => {
+        .map(([book, content]) => ({ book, content }))
+        .map(({ book, content }) => {
+            const validatedBook = bookSchema.parse(book)
+            const bookPrestigeCount = Math.min(
+                ...content.chapters.map(
+                    ({ length: chapterLength }, chapterIndex) => {
+                        const typedVerses =
+                            bookVerses[validatedBook]?.[chapterIndex + 1]
+                        const prestigeCount =
+                            typedVerses == null
+                                ? 0
+                                : Object.keys(typedVerses).length <
+                                    chapterLength
+                                  ? 0
+                                  : Math.min(...Object.values(typedVerses))
+                        return prestigeCount
+                    },
+                ),
+            )
+            return { book, content, bookPrestigeCount }
+        })
+        .map(({ book, content, bookPrestigeCount }) => {
             const validatedBook = bookSchema.parse(book)
             let totalVersesCount = 0
-            let typedVersesCount = 0
+            let typedVersesInPrestige = 0
             return {
                 book,
                 chapters: content.chapters.map(
@@ -75,18 +100,34 @@ export function getBookOverview(
                         const numberOfTypedVerses = Object.keys(
                             typedVerses ?? {},
                         ).length
+                        const prestigeCount =
+                            typedVerses == null
+                                ? 0
+                                : Object.keys(typedVerses).length <
+                                    chapterLength
+                                  ? 0
+                                  : Math.min(...Object.values(typedVerses))
+                        const numberOfTypedVersesInPrestige = Math.min(
+                            numberOfTypedVerses -
+                                bookPrestigeCount * chapterLength,
+                            chapterLength,
+                        )
                         totalVersesCount += chapterLength
-                        typedVersesCount += numberOfTypedVerses
+                        typedVersesInPrestige += numberOfTypedVersesInPrestige
                         return {
                             chapter: chapterIndex + 1,
                             verses: chapterLength,
-                            typedVerses: numberOfTypedVerses,
+                            typedVerses: numberOfTypedVersesInPrestige,
                             percentage: Math.round(
-                                (numberOfTypedVerses / chapterLength) * 100,
+                                (numberOfTypedVersesInPrestige /
+                                    chapterLength) *
+                                    100,
                             ),
+                            prestige: prestigeCount,
                             alt:
                                 Math.floor(
-                                    (numberOfTypedVerses / chapterLength) *
+                                    (numberOfTypedVersesInPrestige /
+                                        chapterLength) *
                                         10000,
                                 ) / 100,
                         }
@@ -95,13 +136,17 @@ export function getBookOverview(
                 label: passageReferenceSchema.parse(
                     toPluralBookForm(validatedBook),
                 ),
+                prestige: bookPrestigeCount,
+                typedVerses: typedVersesInPrestige,
+                verses: totalVersesCount,
                 percentage: Math.round(
-                    (typedVersesCount / totalVersesCount) * 100,
+                    (typedVersesInPrestige / totalVersesCount) * 100,
                 ),
                 alt:
-                    Math.floor((typedVersesCount / totalVersesCount) * 10000) /
-                    100,
+                    Math.floor(
+                        (typedVersesInPrestige / totalVersesCount) * 10000,
+                    ) / 100,
             }
         })
-        .filter(book => book.alt !== 0)
+        .filter(book => book.alt !== 0 || book.prestige >= 0)
 }
