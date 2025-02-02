@@ -113,6 +113,10 @@ export default async function Changelog() {
                                 </li>
                             </ul>
                         </li>
+                        <li>
+                            Fixed incorrect verse counts in 2 Timothy 3 and 4
+                            that were allowing you to have over 100% completion.
+                        </li>{' '}
                     </ul>
                 </li>
                 <li>
