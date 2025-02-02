@@ -13,7 +13,7 @@ export function stringToOKLCH(s: string): {
     const components = s.split(' ')
 
     return {
-        lightness: parseFloat(components.at(0)!.replace('%', '')!),
+        lightness: parseFloat(components.at(0)!.replace('%', '')),
         chroma: parseFloat(components.at(1)!),
         hue: parseFloat(components.at(2)!),
     }

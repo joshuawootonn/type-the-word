@@ -200,7 +200,7 @@ export function CurrentVerse({
         },
         // If the mutation fails,
         // use the context returned from onMutate to roll back
-        onError: (err, newTodo, context) => {
+        onError: (_err, _newTodo, context) => {
             queryClient.setQueryData(
                 ['typing-session'],
                 context?.previousTypingSession,
@@ -231,9 +231,10 @@ export function CurrentVerse({
             setIsPassageFocused(true)
             return inputRef.current?.focus()
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    const isActiveTimer = useRef<NodeJS.Timer>()
+    const isActiveTimer = useRef<ReturnType<typeof setTimeout>>()
 
     useEffect(() => {
         clearTimeout(isActiveTimer.current)
@@ -243,7 +244,7 @@ export function CurrentVerse({
         }, 3000)
 
         return () => clearTimeout(isActiveTimer.current)
-    }, [keystrokes.length])
+    }, [keystrokes.length, setIsPassageActive])
 
     function handleKnownEvents(event: KnownNativeInputEvent) {
         let isVerseComplete = false

@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 
 import { isAtomEqual, isLetterEqual } from '~/lib/isEqual'
-import { Word } from '~/lib/parseEsv'
+import { type Word } from '~/lib/parseEsv'
 import { NewLineIndicator } from '~/components/newLineIndicator'
 
 export function Word({
