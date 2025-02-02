@@ -91,12 +91,10 @@ export class TypingSessionRepository {
         }
 
         return result.filter(session =>
-            session.typedVerses.some(typedVerse =>
-                chapter
-                    ? typedVerse.chapter === chapter
-                    : true && book
-                      ? typedVerse.book === book
-                      : true,
+            session.typedVerses.some(
+                typedVerse =>
+                    (chapter ? typedVerse.chapter === chapter : true) &&
+                    (book ? typedVerse.book === book : true),
             ),
         )
     }
