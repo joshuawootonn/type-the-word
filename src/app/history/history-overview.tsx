@@ -53,17 +53,18 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
         <Tooltip.Provider delayDuration={0}>
             <div className="flex flex-col text-primary">
                 {overview.map(book => {
-                    if (book.alt === 0) return null
                     return (
                         <details key={book.book}>
-                            <summary className="svg-outline-stubby relative select-none outline-none">
-                                <div className="ml-3 inline-flex w-[calc(100%-32px)] items-center justify-between">
-                                    <h3 className="m-0">{book.label}</h3>
+                            <Tooltip.Root>
+                                <Tooltip.Trigger asChild>
+                                    <summary className="svg-outline-stubby relative select-none outline-none">
+                                        <div className="ml-3 inline-flex w-[calc(100%-32px)] items-center justify-between">
+                                            <h3 className="m-0">
+                                                {book.label}
+                                            </h3>
 
-                                    <div className="flex gap-2">
-                                        <Tooltip.Root>
-                                            <Tooltip.Trigger>
-                                                <>
+                                            <div className="flex gap-2">
+                                                <div className="flex flex-row gap-2">
                                                     {new Array(book.prestige)
                                                         .fill(null)
                                                         .map((_, i) => (
@@ -75,32 +76,38 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                                                 percentage={100}
                                                             />
                                                         ))}
-                                                    <Box
-                                                        className={
-                                                            'aspect-square h-[28.5px]'
-                                                        }
-                                                        percentage={book.alt}
-                                                    />
-                                                </>
-                                            </Tooltip.Trigger>
-                                            <Tooltip.Content
-                                                className="prose grid select-none grid-cols-[1fr_minmax(30px,min-content)] gap-x-3 gap-y-1 border-2 border-primary bg-secondary px-3 py-2 font-sans leading-none text-primary "
-                                                sideOffset={2}
-                                            >
-                                                <div>Times completed: </div>
-                                                <div>{book.prestige}</div>
-                                                <div>Current Progress: </div>
-                                                <div>
-                                                    {book.typedVerses}/
-                                                    {book.verses}
+                                                    {book.percentage !== 0 && (
+                                                        <Box
+                                                            className={
+                                                                'aspect-square h-[28.5px]'
+                                                            }
+                                                            percentage={
+                                                                book.percentage
+                                                            }
+                                                        />
+                                                    )}
                                                 </div>
-                                                <div>Current Completion: </div>
-                                                <div>{book.alt}%</div>
-                                            </Tooltip.Content>
-                                        </Tooltip.Root>
+                                            </div>
+                                        </div>
+                                    </summary>
+                                </Tooltip.Trigger>
+                            </Tooltip.Root>
+                            <div>
+                                <div className="prose flex flex-col gap-x-3 gap-y-2 pt-4 leading-4 text-primary">
+                                    {book.prestige > 0 && (
+                                        <div>
+                                            Times completed: {book.prestige}
+                                        </div>
+                                    )}
+                                    <div>
+                                        Current Progress: {book.typedVerses} /{' '}
+                                        {book.verses}
+                                    </div>
+                                    <div>
+                                        Current Completion: {book.percentage}%
                                     </div>
                                 </div>
-                            </summary>
+                            </div>
                             <div className="grid grid-cols-[repeat(auto-fill,_minmax(max(36px),_1fr))] py-4">
                                 {book.chapters.map((chapterOverview, j) => (
                                     <Tooltip.Root key={j}>
