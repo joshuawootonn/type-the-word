@@ -30,8 +30,8 @@ export class TypingSessionRepository {
         const where = userId
             ? eq(typingSessions.userId, userId)
             : id
-            ? eq(typingSessions.id, id)
-            : null
+              ? eq(typingSessions.id, id)
+              : null
         if (where == null) {
             throw new Error('Must provide either userId or id')
         }
@@ -62,12 +62,16 @@ export class TypingSessionRepository {
 
     async getMany({
         userId,
+        book,
+        chapter,
     }: {
         userId: string | SQL
+        book?: schema.Book
+        chapter?: number
     }): Promise<TypingSession[]> {
         const where = eq(typingSessions.userId, userId)
 
-        const builder = this.db.query.typingSessions.findMany({
+        const result = await this.db.query.typingSessions.findMany({
             with: {
                 typedVerses: {
                     // This nested query automatically filters by typing session so I don't have to add it.
@@ -79,6 +83,21 @@ export class TypingSessionRepository {
             where,
             orderBy: [desc(typingSessions.createdAt)],
         })
-        return await builder
+
+        // https://github.com/drizzle-team/drizzle-orm/discussions/2316
+        // Once this is resolved I will be able to do this at the db level
+        if (book == null && chapter == null) {
+            return result
+        }
+
+        return result.filter(session =>
+            session.typedVerses.some(typedVerse =>
+                chapter
+                    ? typedVerse.chapter === chapter
+                    : true && book
+                      ? typedVerse.book === book
+                      : true,
+            ),
+        )
     }
 }

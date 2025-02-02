@@ -4,8 +4,14 @@ import { segmentToPassageObject } from '~/lib/passageObject'
 import { authOptions } from '~/server/auth'
 import { getChapterHistory } from './getChapterHistory'
 
+export type ChapterLog = {
+    location: string[]
+    createdAt: Date
+}
+
 export type ChapterHistory = {
     verses: Record<number, boolean>
+    chapterLogs: ChapterLog[]
 }
 
 export const dynamic = 'force-dynamic'

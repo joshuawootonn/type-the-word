@@ -13,6 +13,7 @@ import { getServerSession } from 'next-auth'
 import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
 import { db } from '~/server/db'
 import { passageReferenceSchema } from '~/lib/passageReference'
+import { ChapterLog } from '~/components/chapter-log'
 
 export async function generateMetadata({
     params,
@@ -88,6 +89,13 @@ export default async function PassagePage(props: {
                     <div />
                 )}
             </div>
+
+            {chapterHistory && (
+                <ChapterLog
+                    passageSegment={value}
+                    chapterHistory={chapterHistory}
+                />
+            )}
         </>
     )
 }

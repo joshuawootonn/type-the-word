@@ -1,10 +1,16 @@
 import toProperCase from '~/lib/toProperCase'
 import { getBibleMetadata } from '~/server/bibleMetadata'
+import { Book } from '~/server/db/schema'
 import { TypedVerse } from '~/server/repositories/typingSession.repository'
 
 export function typingSessionToString(
     typedVerses: TypedVerse[],
-    { seperator }: { seperator?: string } = { seperator: ',' },
+    {
+        seperator,
+        filter,
+    }: { seperator?: string; filter?: { book?: Book; chapter?: number } } = {
+        seperator: ',',
+    },
 ) {
     const bibleMetadata = getBibleMetadata()
 
