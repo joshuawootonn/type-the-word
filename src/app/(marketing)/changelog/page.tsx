@@ -114,8 +114,32 @@ export default async function Changelog() {
                             </ul>
                         </li>
                         <li>
-                            Fixed incorrect verse counts in 2 Timothy 3 and 4
-                            that were allowing you to have over 100% completion.
+                            I also updated the overview section within{' '}
+                            <Link href="/history">
+                                <code> /history</code>
+                            </Link>{' '}
+                            to reset once you have finished typing through a
+                            book.
+                            <br />
+                            <br />
+                            Your progress through a book is now shown with a
+                            box. Similar to chapter progression, this box will
+                            fill up until you completely type the book and then
+                            it will be checked and another box will appear.
+                            <Image
+                                src={'/assets/overview-with-reset.png'}
+                                alt={
+                                    'Screen shot of the new "Log" section for each chapter'
+                                }
+                                className="mt-3 border-2 border-primary"
+                                width={2226}
+                                height={1842}
+                            />
+                        </li>
+                        <li>
+                            Lastly I fixed some incorrect verse counts in 2
+                            Timothy 3 and 4 that were allowing you to have over
+                            100% completion.
                         </li>{' '}
                     </ul>
                 </li>
