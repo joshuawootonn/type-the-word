@@ -140,6 +140,8 @@ export function Footer() {
                 <Link href={'https://discord.com/invite/a9eYv4sgWp '}>
                     discord
                 </Link>
+                <div>/</div>
+                <Link href={'https://typetheword.kit.com'}>newsletter</Link>
             </div>
         </footer>
     )
