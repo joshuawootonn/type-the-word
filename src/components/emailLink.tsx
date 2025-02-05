@@ -3,17 +3,20 @@
 import clsx from 'clsx'
 
 import * as Popover from '@radix-ui/react-popover'
-import { useEffect, useState } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 
-export function EmailLink({
-    children,
-    className,
-    popoverClassName,
-}: {
-    children?: string
-    className?: string
-    popoverClassName?: string
-}) {
+export const EmailLink = forwardRef(function EmailLink(
+    {
+        children,
+        className,
+        popoverClassName,
+    }: {
+        children?: string
+        className?: string
+        popoverClassName?: string
+    },
+    ref: any,
+) {
     const [isOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
@@ -32,6 +35,7 @@ export function EmailLink({
         <Popover.Root open={isOpen}>
             <Popover.Trigger asChild>
                 <button
+                    ref={ref}
                     tabIndex={0}
                     className={clsx('relative z-[5] font-medium', className)}
                     onClick={e => {
@@ -66,4 +70,4 @@ export function EmailLink({
             </Popover.Content>
         </Popover.Root>
     )
-}
+})

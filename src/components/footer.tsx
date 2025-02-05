@@ -92,16 +92,6 @@ export function Footer() {
             {/* <div className="block md:hidden">/</div> */}
             <div className="flex items-center justify-between space-x-3">
                 <Link
-                    className="svg-outline relative no-underline"
-                    href={'https://github.com/joshuawootonn/type-the-word'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    github
-                </Link>
-
-                <div>/</div>
-                <Link
                     className={clsx(`svg-outline relative`)}
                     href={'/changelog'}
                 >
@@ -128,20 +118,58 @@ export function Footer() {
                         </svg>
                     )}
                 </Link>
-                <div className="hidden sm:block">/</div>
-                <EmailLink
-                    className={
-                        'svg-outline hidden shrink-0 font-normal sm:block'
-                    }
-                >
-                    email me feedback
+                <div>/</div>
+                <EmailLink className={'svg-outline shrink-0 font-normal'}>
+                    email me
                 </EmailLink>
                 <div>/</div>
-                <Link href={'https://discord.com/invite/a9eYv4sgWp '}>
-                    discord
-                </Link>
-                <div>/</div>
-                <Link href={'https://typetheword.kit.com'}>newsletter</Link>
+                <DropdownMenu.Root>
+                    <DropdownMenu.Trigger asChild>
+                        <button
+                            className="svg-outline relative no-underline"
+                            aria-label="Customise options"
+                        >
+                            connect
+                        </button>
+                    </DropdownMenu.Trigger>
+
+                    <DropdownMenu.Content
+                        className="flex flex-col border-2 border-primary bg-secondary "
+                        sideOffset={4}
+                        align="center"
+                        side="top"
+                    >
+                        <DropdownMenu.Item asChild>
+                            <Link
+                                className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary "
+                                href={
+                                    'https://github.com/joshuawootonn/type-the-word'
+                                }
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                github
+                            </Link>
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item asChild={true}>
+                            <Link
+                                className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary "
+                                href={'https://typetheword.kit.com'}
+                            >
+                                newsletter
+                            </Link>
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item asChild={true}>
+                            <Link
+                                className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary "
+                                href={'https://discord.com/invite/a9eYv4sgWp '}
+                            >
+                                discord
+                            </Link>
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item asChild={true}></DropdownMenu.Item>
+                    </DropdownMenu.Content>
+                </DropdownMenu.Root>
             </div>
         </footer>
     )
