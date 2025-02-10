@@ -155,6 +155,8 @@ export function Footer() {
                             <Link
                                 className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary "
                                 href={'https://typetheword.kit.com'}
+                                target="_blank"
+                                rel="noopener noreferrer"
                             >
                                 newsletter
                             </Link>
@@ -163,6 +165,8 @@ export function Footer() {
                             <Link
                                 className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary "
                                 href={'https://discord.com/invite/a9eYv4sgWp '}
+                                target="_blank"
+                                rel="noopener noreferrer"
                             >
                                 discord
                             </Link>
