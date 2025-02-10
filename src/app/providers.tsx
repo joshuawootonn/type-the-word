@@ -8,6 +8,7 @@ import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repositor
 import { ThemeProvider } from './theme-provider'
 import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
 import { CurrentTheme } from '~/server/repositories/currentTheme.repository'
+import { useSoliDeoGloria } from '~/components/use-soli-deo-gloria'
 
 const queryClient = new QueryClient()
 
@@ -24,6 +25,8 @@ export function Providers({
     userThemes: UserThemeRecord[]
     currentTheme: CurrentTheme | null
 }) {
+    useSoliDeoGloria()
+
     return (
         <QueryClientProvider client={queryClient}>
             <SessionProvider session={session}>
