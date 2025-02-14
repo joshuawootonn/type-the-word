@@ -1,4 +1,6 @@
-![og](https://github.com/joshuawootonn/type-the-word/assets/20950876/b74efaba-0b77-4df4-8787-e0b3caefb1fc)
+![image](https://github.com/user-attachments/assets/16363097-d036-4c5e-bf60-0e0032a37c0b)
+
+
 
 A couple of years ago, I typed out Psalms 1 to 137 over a 6 month period. Not only did this improve my typing,
 but it also encouraged me daily. When I later discovered
