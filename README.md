@@ -26,19 +26,12 @@ Bible in a deeper way.
 
 ## Contributing
 
-If you would like to contribute, Genesis 1, Psalm 23, and James 1 will load without an API key
+I would love your help. There are an abundance of feature requests, project ideas, and translations to add.
 
-Here are some features that others have requested:
+If you are interested, reach out via email (josh@typetheword.site) or on [discord](https://discord.com/invite/a9eYv4sgWp).
 
--   [ ] New translations (Medium)
-    -   [ ] NASB
-    -   [ ] NLT
-    -   [ ] NRSV2CE
--   [ ] Different languages (Medium)
-    -   Portuguese was requested
--   [x] Dark mode - Thanks @IsaacHatton
--   [ ] Typing Speed / WPM (Hard)
-    -   This will mainly be hard because I will have lots of opinions. If you want to implements it though we can chat.
--   [x] Keyboard shortcuts (Medium)
-    -   [x] `ctrl + backspace` to delete the last word
-    -   [x] `command + backspace` to restart the verse
+I do have a [contribution guide](/CONTRIBUTING.md), but please reach out before contributing so we align.
+
+### Contributor History
+
+- [x] Dark mode - Thanks @IsaacHatton
