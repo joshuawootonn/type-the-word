@@ -22,7 +22,7 @@ Bible. Typing it over and over made me realize that
 Jesus wept because he loved Lazarus. He died for us
 because he loves us with the same love.
 <br />
-<br />s
+<br />
 My hope is that by typing the word you will also see the
 Bible in a deeper way.
 
