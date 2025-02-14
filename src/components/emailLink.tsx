@@ -37,7 +37,7 @@ export function EmailLink({
                     onClick={e => {
                         setIsOpen(true)
                         const el = document.createElement('textarea')
-                        el.value = 'joshuawootonn@gmail.com'
+                        el.value = 'josh@typetheword.site'
                         document.body.appendChild(el)
                         el.select()
                         document.execCommand('copy')
