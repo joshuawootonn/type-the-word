@@ -13,5 +13,6 @@ services:
         ports:
             - 5435:5432
         volumes:
-            - ./.data/postgres:/var/lib/postgresql/data
+          - ./seed.sql:/docker-entrypoint-initdb.d/seed.sql
+          - ./.data/postgres:/var/lib/postgresql/data
         restart: on-failure:3

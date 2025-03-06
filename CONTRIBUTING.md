@@ -29,10 +29,29 @@ This will allow you to load [Psalm 23](http://localhost:1199/passage/psalm_23) a
 
 Reach out via email (josh@typetheword.site) or on [discord](https://discord.com/invite/a9eYv4sgWp) and if we hit it off I can give you the env for further work.
 
-2. Install docker + container runtime + pnpm
+2. Start Postgres
+
+`/docker/docker-compose.yaml` contains a postgres service with some pre-configured credentials + start up scripts to work with [drizzle](https://orm.drizzle.team/) migrations. Start that up using:
+
+```
+docker-compose -f docker/docker-compose.yaml up
+```
+
+
+To run migrations, run
+```
+pnpm drizzle-kit migrate
+```
+
+
+2. Start the next js server
 
 Here is a how I startup the app
+
+
+One-liner to restart the db + server
 
 ```bash
 kill $(lsof -t -i:1199) || true && colima start --cpu 10 --memory 8 --disk 10 && docker compose --project-directory ./docker up -d && pnpm dev -p 1199
 ```
+
