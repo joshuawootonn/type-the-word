@@ -15,6 +15,7 @@ import {
     toPassageSegment,
 } from '~/lib/passageSegment'
 import { passageReferenceSchema } from '~/lib/passageReference'
+import { createESVURL } from './create-esv-url'
 
 const passageSchema = z.object({
     query: z.string(),
@@ -76,12 +77,6 @@ export async function GET(
         )
     }
 
-    const verseSuffix =
-        passageData.firstVerse && passageData.lastVerse
-            ? passageData.firstVerse === passageData.lastVerse
-                ? `:${passageData.firstVerse}`
-                : `:${passageData.firstVerse}-${passageData.lastVerse}`
-            : ''
     const referenceIncludesVerses = reference.includes(':')
 
     if (
@@ -127,16 +122,11 @@ export async function GET(
             "Passage route cache MISS: reference isn't entire chapter",
             { reference },
         )
-        const response = await fetch(
-            `https://api.esv.org/v3/passage/html/?q=${passageData.book
-                .split('_')
-                .join(' ')} ${passageData.chapter}${verseSuffix}`,
-            {
-                headers: {
-                    Authorization: `Token ${env.CROSSWAY_SECRET}`,
-                },
+        const response = await fetch(createESVURL(passageData), {
+            headers: {
+                Authorization: `Token ${env.CROSSWAY_SECRET}`,
             },
-        )
+        })
         const data: unknown = await response.json()
         const parsedData = passageSchema.parse(data)
 
@@ -169,18 +159,11 @@ export async function GET(
         )
     }
 
-    const response = await fetch(
-        `https://api.esv.org/v3/passage/html/?q=${passageData.book
-            .split('_')
-            .join(
-                ' ',
-            )} ${passageData.book === 'jude' ? '' : passageData.chapter}`,
-        {
-            headers: {
-                Authorization: `Token ${env.CROSSWAY_SECRET}`,
-            },
+    const response = await fetch(createESVURL(passageData), {
+        headers: {
+            Authorization: `Token ${env.CROSSWAY_SECRET}`,
         },
-    )
+    })
 
     const data: unknown = await response.json()
     const parsedData = passageSchema.parse(data)
