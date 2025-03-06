@@ -3,7 +3,10 @@ import { TypingSessionRepository } from '~/server/repositories/typingSession.rep
 import { BookOverview, getBookOverview } from './overview'
 import { MonthlyLogDTO, getLog2 } from './log2'
 
-export async function getHistory(userId: string): Promise<{
+export async function getHistory(
+    userId: string,
+    timezoneOffset: number,
+): Promise<{
     overview: BookOverview[]
     log2: MonthlyLogDTO[]
 }> {
@@ -15,7 +18,7 @@ export async function getHistory(userId: string): Promise<{
 
     const overview = getBookOverview(typingSessions)
 
-    const log2 = getLog2(typingSessions)
+    const log2 = getLog2(typingSessions, timezoneOffset)
 
     return { overview, log2 }
 }

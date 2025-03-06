@@ -4,7 +4,6 @@ import {
 } from '~/server/repositories/typingSession.repository'
 import { typingSessionToString } from './typingSessionToString'
 import { format, startOfMonth } from 'date-fns'
-import { typedVerses } from '~/server/db/schema'
 
 type DayLog = {
     typedVerses: TypedVerse[]
@@ -34,24 +33,33 @@ export type MonthlyLogDTO = {
     numberOfVersesTyped: number
 }
 
-export function getLog2(typingSessions: TypingSession[]): MonthlyLogDTO[] {
+export function getLog2(
+    typingSessions: TypingSession[],
+    clientTimezoneOffset: number,
+): MonthlyLogDTO[] {
     const monthLogs: Record<string, MonthlyLog> = {}
 
     for (const typingSession of typingSessions) {
         if (typingSession.typedVerses.length === 0) continue
-        const monthString = format(typingSession.createdAt, 'yyyy-MM')
-        const dayString = format(typingSession.createdAt, 'dd')
+        const serverUTCOffset = new Date().getTimezoneOffset()
+        const clientTimezoneCreatedAt = new Date(
+            typingSession.createdAt.getTime() +
+                (clientTimezoneOffset - serverUTCOffset) * 60 * 1000,
+        )
+        const monthString = format(clientTimezoneCreatedAt, 'yyyy-MM')
+        const dayString = format(clientTimezoneCreatedAt, 'dd')
         const currentMonthLog = monthLogs[monthString]
         const currentDayLog = currentMonthLog?.days[dayString]
+
         if (currentMonthLog == null) {
             monthLogs[monthString] = {
-                month: startOfMonth(typingSession.createdAt),
+                month: startOfMonth(clientTimezoneCreatedAt),
                 numberOfVersesTyped: typingSession.typedVerses.length,
                 days: {
                     [dayString]: {
                         typedVerses: typingSession.typedVerses,
                         numberOfVersesTyped: typingSession.typedVerses.length,
-                        createdAt: typingSession.createdAt,
+                        createdAt: clientTimezoneCreatedAt,
                     },
                 },
             }
@@ -61,7 +69,7 @@ export function getLog2(typingSessions: TypingSession[]): MonthlyLogDTO[] {
             currentMonthLog.days[dayString] = {
                 typedVerses: typingSession.typedVerses,
                 numberOfVersesTyped: typingSession.typedVerses.length,
-                createdAt: typingSession.createdAt,
+                createdAt: clientTimezoneCreatedAt,
             }
         } else {
             currentMonthLog.numberOfVersesTyped +=
@@ -74,7 +82,7 @@ export function getLog2(typingSessions: TypingSession[]): MonthlyLogDTO[] {
                 numberOfVersesTyped:
                     currentDayLog.numberOfVersesTyped +
                     typingSession.typedVerses.length,
-                createdAt: typingSession.createdAt,
+                createdAt: clientTimezoneCreatedAt,
             }
         }
     }

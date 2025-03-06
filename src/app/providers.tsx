@@ -9,6 +9,7 @@ import { ThemeProvider } from './theme-provider'
 import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
 import { CurrentTheme } from '~/server/repositories/currentTheme.repository'
 import { useSoliDeoGloria } from '~/components/use-soli-deo-gloria'
+import { useTimezoneOffsetCookie } from '~/components/use-time-zone-offset-cookie'
 
 const queryClient = new QueryClient()
 
@@ -25,6 +26,7 @@ export function Providers({
     userThemes: UserThemeRecord[]
     currentTheme: CurrentTheme | null
 }) {
+    useTimezoneOffsetCookie()
     useSoliDeoGloria()
 
     return (

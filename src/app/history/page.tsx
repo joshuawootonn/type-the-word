@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { authOptions } from '~/server/auth'
 import { getHistory } from './getHistory'
 import { HistoryLogV2 } from './history-log-2'
+import { cookies } from 'next/headers'
 export const metadata: Metadata = {
     title: 'Type the Word - History',
     description: 'History of all the passages you have typed.',
@@ -12,12 +13,17 @@ export const metadata: Metadata = {
 
 export default async function History() {
     const session = await getServerSession(authOptions)
+    const cookieStore = cookies()
+
+    const timezoneOffset = parseInt(
+        cookieStore.get('timezoneOffset')?.value ?? '0',
+    )
 
     if (session == null) {
         redirect('/')
     }
 
-    const { overview, log2 } = await getHistory(session.user.id)
+    const { overview, log2 } = await getHistory(session.user.id, timezoneOffset)
 
     return (
         <>
