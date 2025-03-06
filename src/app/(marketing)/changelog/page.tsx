@@ -64,6 +64,12 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('3/5/2025')} /> - Fixed bug
+                    where only the first verse in{' '}
+                    <Link href="/passage/jude_1">Jude</Link> was being loaded
+                    preventing you from typing the chapter.
+                </li>{' '}
+                <li>
                     <DateComponent date={new Date('2/2/2025')} /> - Did a small
                     batch of updates to optimize for retyping through sections
                     of the Bible.{' '}
