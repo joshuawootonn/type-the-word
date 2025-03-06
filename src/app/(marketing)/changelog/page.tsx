@@ -83,7 +83,7 @@ export default async function Changelog() {
                     </ul>
                 </li>{' '}
                 <li>
-                    <DateComponent date={new Date('3/5/2025')} /> - Fixed bug
+                    <DateComponent date={new Date('3/5/2025')} /> - Fixed a bug
                     where only the first verse in{' '}
                     <Link href="/passage/jude_1">Jude</Link> was being loaded
                     preventing you from typing the chapter.
