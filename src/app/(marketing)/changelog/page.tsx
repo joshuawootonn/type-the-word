@@ -64,6 +64,25 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('3/6/2025')} />
+                    <ul>
+                        <li>
+                            Fixed a visual bug in the &quot;Overview&quot;
+                            section within <Link href="/history">/history</Link>{' '}
+                            where your book progression wasn&apos;t aligned to
+                            the right on mobile or safari.
+                        </li>
+                        <li>
+                            Fixed a bug where your the &quot;Log&quot; section
+                            within <Link href="/history">/history</Link> was
+                            being calculated based on the server&apos;s
+                            timezone. This was misleading because sometimes your
+                            typed verses would show up in the next or previous
+                            day.
+                        </li>
+                    </ul>
+                </li>{' '}
+                <li>
                     <DateComponent date={new Date('3/5/2025')} /> - Fixed bug
                     where only the first verse in{' '}
                     <Link href="/passage/jude_1">Jude</Link> was being loaded
