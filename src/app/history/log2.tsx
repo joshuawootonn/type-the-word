@@ -42,9 +42,10 @@ export function getLog2(
     for (const typingSession of typingSessions) {
         if (typingSession.typedVerses.length === 0) continue
         const serverUTCOffset = new Date().getTimezoneOffset()
+
         const clientTimezoneCreatedAt = new Date(
             typingSession.createdAt.getTime() +
-                (clientTimezoneOffset - serverUTCOffset) * 60 * 1000,
+                (serverUTCOffset - clientTimezoneOffset) * 60 * 1000,
         )
         const monthString = format(clientTimezoneCreatedAt, 'yyyy-MM')
         const dayString = format(clientTimezoneCreatedAt, 'dd')
@@ -59,7 +60,7 @@ export function getLog2(
                     [dayString]: {
                         typedVerses: typingSession.typedVerses,
                         numberOfVersesTyped: typingSession.typedVerses.length,
-                        createdAt: clientTimezoneCreatedAt,
+                        createdAt: typingSession.createdAt,
                     },
                 },
             }
@@ -69,7 +70,7 @@ export function getLog2(
             currentMonthLog.days[dayString] = {
                 typedVerses: typingSession.typedVerses,
                 numberOfVersesTyped: typingSession.typedVerses.length,
-                createdAt: clientTimezoneCreatedAt,
+                createdAt: typingSession.createdAt,
             }
         } else {
             currentMonthLog.numberOfVersesTyped +=
@@ -82,7 +83,7 @@ export function getLog2(
                 numberOfVersesTyped:
                     currentDayLog.numberOfVersesTyped +
                     typingSession.typedVerses.length,
-                createdAt: clientTimezoneCreatedAt,
+                createdAt: typingSession.createdAt,
             }
         }
     }

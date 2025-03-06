@@ -12,8 +12,8 @@ import {
     endOfWeek,
     eachDayOfInterval,
     isWithinInterval,
-    startOfToday,
     isSameYear,
+    endOfToday,
 } from 'date-fns'
 import { MonthlyLogDTO } from './log2'
 import clsx from 'clsx'
@@ -29,7 +29,7 @@ function isInThisYear(date: Date) {
 }
 
 function isInTheFuture(date: Date) {
-    return isAfter(date, startOfToday())
+    return isAfter(date, endOfToday())
 }
 
 export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
@@ -62,8 +62,8 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                                     {isThisMonth(month)
                                         ? 'This Month'
                                         : isInThisYear(month)
-                                        ? format(month, 'MMMM')
-                                        : format(month, 'MMMM, yyyy')}
+                                          ? format(month, 'MMMM')
+                                          : format(month, 'MMMM, yyyy')}
                                 </h3>
                                 <p>Verses: {monthLog.numberOfVersesTyped}</p>
                             </div>
