@@ -17,7 +17,7 @@ function Box({
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={clsx('w-full', className)}
+            className={clsx(className)}
         >
             <rect
                 height="14"
@@ -59,34 +59,32 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                 <Tooltip.Trigger asChild>
                                     <summary className="svg-outline-stubby relative select-none outline-none">
                                         <div className="ml-3 inline-flex w-[calc(100%-32px)] items-center justify-between">
-                                            <h3 className="m-0">
+                                            <h3 className="m-0 flex-grow">
                                                 {book.label}
                                             </h3>
 
-                                            <div className="flex gap-2">
-                                                <div className="flex flex-row gap-2">
-                                                    {new Array(book.prestige)
-                                                        .fill(null)
-                                                        .map((_, i) => (
-                                                            <Box
-                                                                className={
-                                                                    'aspect-square h-[28.5px]'
-                                                                }
-                                                                key={i}
-                                                                percentage={100}
-                                                            />
-                                                        ))}
-                                                    {book.percentage !== 0 && (
+                                            <div className="flex flex-row items-center justify-end gap-2">
+                                                {new Array(book.prestige)
+                                                    .fill(null)
+                                                    .map((_, i) => (
                                                         <Box
                                                             className={
                                                                 'aspect-square h-[28.5px]'
                                                             }
-                                                            percentage={
-                                                                book.percentage
-                                                            }
+                                                            key={i}
+                                                            percentage={100}
                                                         />
-                                                    )}
-                                                </div>
+                                                    ))}
+                                                {book.percentage !== 0 && (
+                                                    <Box
+                                                        className={
+                                                            'aspect-square h-[28.5px]'
+                                                        }
+                                                        percentage={
+                                                            book.percentage
+                                                        }
+                                                    />
+                                                )}
                                             </div>
                                         </div>
                                     </summary>
