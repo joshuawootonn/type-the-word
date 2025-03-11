@@ -1,7 +1,11 @@
 import { PassageObject } from '~/lib/passageObject'
 
 export function createESVURL(passageData: PassageObject): string {
-    const chapterVerseDelimiter = passageData.book === 'jude' ? '' : ':'
+    const isSingleBookChapter =
+        passageData.book === 'obadiah' ||
+        passageData.book === 'philemon' ||
+        passageData.book === 'jude'
+    const chapterVerseDelimiter = isSingleBookChapter ? '' : ':'
     const verseSegment =
         passageData.firstVerse && passageData.lastVerse
             ? passageData.firstVerse === passageData.lastVerse
@@ -9,8 +13,7 @@ export function createESVURL(passageData: PassageObject): string {
                 : `${chapterVerseDelimiter}${passageData.firstVerse}-${passageData.lastVerse}`
             : ''
 
-    const chapterSegment =
-        passageData.book === 'jude' ? '' : passageData.chapter
+    const chapterSegment = isSingleBookChapter ? '' : passageData.chapter
 
     const url = `https://api.esv.org/v3/passage/html/?q=${passageData.book
         .split('_')
