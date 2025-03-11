@@ -64,6 +64,17 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('3/11/2025')} /> - Fixed a bug
+                    shipped on March 6th similar to an issue I&apos;ve seen
+                    before where I was depending on the number of verses in a
+                    chapter to download the entire chapter. Since many chapters
+                    skip verses this means TTW was not downloading the last
+                    verse. <Link href="/passage/mark_11">Mark 11</Link>,{' '}
+                    <Link href="/passage/mark_15">Mark 15</Link>, and{' '}
+                    <Link href="/passage/luke_17">Luke 17</Link> were the
+                    effected passages.
+                </li>{' '}
+                <li>
                     <DateComponent date={new Date('3/6/2025')} />
                     <ul>
                         <li>
