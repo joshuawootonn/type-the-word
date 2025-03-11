@@ -88,7 +88,7 @@ describe('createESVURL', () => {
     test('3 john chapter only', () => {
         const result = createESVURL({ book: '3_john', chapter: 1 })
 
-        expect(result).toBe('https://api.esv.org/v3/passage/html/?q=23 john 1')
+        expect(result).toBe('https://api.esv.org/v3/passage/html/?q=3 john 1')
     })
     test('3 john with verses', () => {
         const result = createESVURL({
