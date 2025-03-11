@@ -10,7 +10,6 @@ describe('passageObject parsing', () => {
             book: 'song_of_solomon',
             chapter: 1,
             firstVerse: 1,
-            lastVerse: 17,
         })
     })
     test('WHEN single word book THEN success', () => {
@@ -20,7 +19,6 @@ describe('passageObject parsing', () => {
             book: '1_john',
             chapter: 3,
             firstVerse: 1,
-            lastVerse: 24,
         })
     })
     test('WHEN verse included THEN success', () => {
@@ -44,7 +42,7 @@ describe('passageObject parsing', () => {
         })
     })
 
-    test.only('WHEN using url segment THEN you need to use passageReferenceSchema ', () => {
+    test('WHEN using url segment THEN you need to use passageReferenceSchema ', () => {
         const result = stringToPassageObject.parse(
             passageReferenceSchema.parse('2_thessalonians_2'),
         )
@@ -53,7 +51,6 @@ describe('passageObject parsing', () => {
             book: '2_thessalonians',
             chapter: 2,
             firstVerse: 1,
-            lastVerse: 17,
         })
     })
 })

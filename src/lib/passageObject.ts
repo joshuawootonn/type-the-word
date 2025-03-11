@@ -1,7 +1,4 @@
-// todo: shitty name but I got nothing
-
 import { z } from 'zod'
-import { getBibleMetadata } from '~/server/bibleMetadata'
 import { bookSchema } from '~/lib/types/book'
 import { passageReferenceSchema } from './passageReference'
 import { passageSegmentSchema } from './passageSegment'
@@ -58,8 +55,6 @@ export const stringToPassageObject = z.string().transform(text => {
         .at(-1)
         ?.trim()
 
-    const metadata = getBibleMetadata()
-
     try {
         if (includesRangeOfVerses) {
             const verses = verseText?.split('-')
@@ -93,8 +88,5 @@ export const stringToPassageObject = z.string().transform(text => {
         book: bookResult.data,
         chapter: chapter,
         firstVerse: chapter ? 1 : undefined,
-        lastVerse: chapter
-            ? metadata[bookResult.data]?.chapters?.at(chapter - 1)?.length
-            : undefined,
     })
 })
