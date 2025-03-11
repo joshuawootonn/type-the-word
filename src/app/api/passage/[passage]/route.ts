@@ -122,7 +122,7 @@ export async function GET(
             "Passage route cache MISS: reference isn't entire chapter",
             { reference },
         )
-        const response = await fetch(createESVURL(passageData), {
+        const response = await fetch(createESVURL(passageData, true), {
             headers: {
                 Authorization: `Token ${env.CROSSWAY_SECRET}`,
             },
@@ -159,7 +159,7 @@ export async function GET(
         )
     }
 
-    const response = await fetch(createESVURL(passageData), {
+    const response = await fetch(createESVURL(passageData, false), {
         headers: {
             Authorization: `Token ${env.CROSSWAY_SECRET}`,
         },
