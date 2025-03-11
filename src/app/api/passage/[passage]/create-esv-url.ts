@@ -1,12 +1,9 @@
 import { PassageObject } from '~/lib/passageObject'
 
-export function createESVURL(
-    passageData: PassageObject,
-    includeVerses: boolean,
-): string {
+export function createESVURL(passageData: PassageObject): string {
     const chapterVerseDelimiter = passageData.book === 'jude' ? '' : ':'
     const verseSegment =
-        passageData.firstVerse && passageData.lastVerse && includeVerses
+        passageData.firstVerse && passageData.lastVerse
             ? passageData.firstVerse === passageData.lastVerse
                 ? `${chapterVerseDelimiter}${passageData.firstVerse}`
                 : `${chapterVerseDelimiter}${passageData.firstVerse}-${passageData.lastVerse}`

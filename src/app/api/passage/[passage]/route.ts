@@ -77,10 +77,10 @@ export async function GET(
         )
     }
 
-    const referenceIncludesVerses = reference.includes(':')
+    const includesVerses = passageData.lastVerse != null
 
     if (
-        !referenceIncludesVerses &&
+        !includesVerses &&
         [
             'genesis_1',
             'psalm_23',
@@ -117,12 +117,12 @@ export async function GET(
     }
 
     // Only optimize whole chapter fetches
-    if (passageData.chapter != null && referenceIncludesVerses) {
+    if (passageData.chapter != null && includesVerses) {
         console.log(
             "Passage route cache MISS: reference isn't entire chapter",
             { reference },
         )
-        const response = await fetch(createESVURL(passageData, true), {
+        const response = await fetch(createESVURL(passageData), {
             headers: {
                 Authorization: `Token ${env.CROSSWAY_SECRET}`,
             },
@@ -159,7 +159,7 @@ export async function GET(
         )
     }
 
-    const response = await fetch(createESVURL(passageData, false), {
+    const response = await fetch(createESVURL(passageData), {
         headers: {
             Authorization: `Token ${env.CROSSWAY_SECRET}`,
         },
