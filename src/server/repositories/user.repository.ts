@@ -1,6 +1,13 @@
 import * as schema from '~/server/db/schema'
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import { count as sqlCount } from 'drizzle-orm'
+import { createSelectSchema } from 'drizzle-zod'
+import { z } from 'zod'
+
+
+export const userSchema = createSelectSchema(schema.users)
+
+export type User = z.infer<typeof userSchema>
 
 export class UserRepository {
     db: PostgresJsDatabase<typeof schema>
