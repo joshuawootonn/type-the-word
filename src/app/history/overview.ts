@@ -71,9 +71,10 @@ function getInitialAggregatedBookData(
     }
 }
 
-export function getBookOverview(
+
+export function aggregateBookData(
     typingSessions: TypingSession[],
-): BookOverview[] {
+): AggregatedData {
     const bibleMetadata = getBibleMetadata()
 
     let bookData: AggregatedData = Object.entries(bibleMetadata).reduce(
@@ -159,53 +160,67 @@ export function getBookOverview(
             }
         }
     }
+    return bookData
+}
 
+export function formatBookData(
+    bookData: AggregatedData,
+): BookOverview[] {
+    const bibleMetadata = getBibleMetadata()
     const result = Object.keys(bibleMetadata)
-        .map(bookSlug => {
-            const validatedBook = bookSchema.parse(bookSlug)
-            const book = bookData[validatedBook]
+    .map(bookSlug => {
+        const validatedBook = bookSchema.parse(bookSlug)
+        const book = bookData[validatedBook]
 
-            if (book == null) return null
+        if (book == null) return null
 
-            return {
-                book: bookSlug,
-                chapters: Object.entries(book.chapters).map(
-                    ([chapter, chapterData]) => {
-                        return {
-                            chapter: parseInt(chapter),
-                            verses: chapterData.totalVerses,
-                            typedVerses:
-                                chapterData.typedVersesInCurrentPrestige,
-                            percentage: Math.round(
+        return {
+            book: bookSlug,
+            chapters: Object.entries(book.chapters).map(
+                ([chapter, chapterData]) => {
+                    return {
+                        chapter: parseInt(chapter),
+                        verses: chapterData.totalVerses,
+                        typedVerses:
+                            chapterData.typedVersesInCurrentPrestige,
+                        percentage: Math.round(
+                            (chapterData.typedVersesInCurrentPrestige /
+                                chapterData.totalVerses) *
+                                100,
+                        ),
+                        alt:
+                            Math.floor(
                                 (chapterData.typedVersesInCurrentPrestige /
                                     chapterData.totalVerses) *
-                                    100,
-                            ),
-                            alt:
-                                Math.floor(
-                                    (chapterData.typedVersesInCurrentPrestige /
-                                        chapterData.totalVerses) *
-                                        10000,
-                                ) / 100,
-                        }
-                    },
-                ),
-                label: passageReferenceSchema.parse(
-                    toPluralBookForm(validatedBook),
-                ),
-                prestige: book.prestige,
-                typedVerses: book.typedVersesInCurrentPrestige,
-                verses: book.totalVerses,
-                percentage:
-                    Math.floor(
-                        (book.typedVersesInCurrentPrestige / book.totalVerses) *
-                            10000,
-                    ) / 100,
-            }
-        })
-        .filter(
-            (book: BookOverview | null): book is BookOverview =>
-                book != null && (book.percentage !== 0 || book.prestige > 0),
-        ) as BookOverview[]
+                                    10000,
+                            ) / 100,
+                    }
+                },
+            ),
+            label: passageReferenceSchema.parse(
+                toPluralBookForm(validatedBook),
+            ),
+            prestige: book.prestige,
+            typedVerses: book.typedVersesInCurrentPrestige,
+            verses: book.totalVerses,
+            percentage:
+                Math.floor(
+                    (book.typedVersesInCurrentPrestige / book.totalVerses) *
+                        10000,
+                ) / 100,
+        }
+    })
+    .filter(
+        (book: BookOverview | null): book is BookOverview =>
+            book != null && (book.percentage !== 0 || book.prestige > 0),
+    ) as BookOverview[]
+    
     return result
+}
+
+export function getBookOverview(
+    typingSessions: TypingSession[],
+): BookOverview[] {
+    const bookData = aggregateBookData(typingSessions)
+    return formatBookData(bookData)
 }
