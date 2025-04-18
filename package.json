@@ -13,8 +13,7 @@
         "db:generate-migration": "dotenv drizzle-kit generate",
         "migrate:dev": "dotenv drizzle-kit migrate",
         "migrate:test": "dotenv --env-file .env.test drizzle-kit migrate",
-        "db:up": "docker compose --project-directory ./docker up -d",
-        "db:seed": "// todo make a script that connects and runs seed.sql"
+        "db:up": "docker compose --project-directory ./docker up -d"
     },
     "dependencies": {
         "@auth/drizzle-adapter": "0.3.2",
