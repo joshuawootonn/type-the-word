@@ -27,8 +27,7 @@ export class UserRepository {
             where: eq(schema.typedVerses.id, id),
         })
 
-        if (user == null)
-            throw new Error(`Attempted to getOne user with ${userId}`)
+        if (user == null) throw new Error(`Attempted to getOne user with ${id}`)
 
         return user ?? null
     }
