@@ -4,7 +4,9 @@ export function createESVURL(passageData: PassageObject): string {
     const isSingleBookChapter =
         passageData.book === 'obadiah' ||
         passageData.book === 'philemon' ||
-        passageData.book === 'jude'
+        passageData.book === 'jude' ||
+        passageData.book === '2_john' ||
+        passageData.book === '3_john'
     const chapterVerseDelimiter = isSingleBookChapter ? '' : ':'
     const verseSegment =
         passageData.firstVerse && passageData.lastVerse
