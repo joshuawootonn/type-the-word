@@ -64,6 +64,32 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('4/18/2025')} />
+
+                    <ul>
+                        <li>
+                            Fixed a bug with how the overview section looked for
+                            2 Timothy. If you typed the second chapter more than
+                            once each verse past the first time through was
+                            causing the overview section to indicate you had
+                            typed the entire book again.
+                        </li>
+                        <li>
+                            Fixed a bug where only the first verse in{' '}
+                            <Link href="/passage/2_john">2 John</Link> and{' '}
+                            <Link href="/passage/3_john">3 John</Link> were
+                            available to be typed.
+                            <br />
+                            This is related to the issue I solved for Philemon
+                            and Obadiah on March 11th. The ESV API has been
+                            transitioning how to reference books with a single
+                            chapter. Before &quot;Obadiah 1&quot; pulled the
+                            chapter of Obadiah, but now it only pulls the first
+                            verse.
+                        </li>
+                    </ul>
+                </li>{' '}
+                <li>
                     <DateComponent date={new Date('3/11/2025')} />
 
                     <ul>
