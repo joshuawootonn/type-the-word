@@ -71,18 +71,14 @@ export class TypingSessionRepository {
     }): Promise<TypingSession[]> {
         const where = eq(typingSessions.userId, userId)
 
-        const result = await this.db.query.typingSessions.findMany({
+        const builder = this.db.query.typingSessions.findMany({
             with: {
-                typedVerses: {
-                    // This nested query automatically filters by typing session so I don't have to add it.
-                    // I would just add it to be explicit I don't think there is a simple way of doing so.
-                    where: (typedVerse, { eq, and }) =>
-                        and(eq(typedVerse.userId, userId)),
-                },
+                typedVerses: true,
             },
             where,
             orderBy: [desc(typingSessions.createdAt)],
         })
+        const result = await builder
 
         // https://github.com/drizzle-team/drizzle-orm/discussions/2316
         // Once this is resolved I will be able to do this at the db level
@@ -99,4 +95,3 @@ export class TypingSessionRepository {
         )
     }
 }
-
