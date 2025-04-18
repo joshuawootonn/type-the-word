@@ -24,7 +24,7 @@ export async function createUser({
     userId,
 }: {
     userId?: string
-}): Promise<User> {
+} = {}): Promise<User> {
     let user: User
 
     if (userId) {
