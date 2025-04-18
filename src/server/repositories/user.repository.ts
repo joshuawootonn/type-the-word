@@ -1,9 +1,8 @@
 import * as schema from '~/server/db/schema'
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
-import { count as sqlCount } from 'drizzle-orm'
+import { eq, count as sqlCount } from 'drizzle-orm'
 import { createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
-
 
 export const userSchema = createSelectSchema(schema.users)
 
@@ -21,5 +20,16 @@ export class UserRepository {
             .from(schema.users)
 
         return result.at(0)?.count ?? 0
+    }
+
+    async getOne({ id }: { id: string }): Promise<User> {
+        const user = await this.db.query.users.findFirst({
+            where: eq(schema.typedVerses.id, id),
+        })
+
+        if (user == null)
+            throw new Error(`Attempted to getOne user with ${userId}`)
+
+        return user ?? null
     }
 }
