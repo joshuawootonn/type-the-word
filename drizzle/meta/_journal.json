@@ -57,6 +57,13 @@
       "when": 1734304224623,
       "tag": "0007_lethal_scourge",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1744939270070,
+      "tag": "0008_bored_mongoose",
+      "breakpoints": true
     }
   ]
 }
