@@ -1,26 +1,34 @@
-import { describe, it } from "vitest"
-import { db } from "~/server/db"
-import { TypingSessionRepository } from "~/server/repositories/typingSession.repository"
-import { createUser, truncateTables } from "~/test-infra/test-utils"
-import { aggregateBookData } from "./overview"
+import { describe, expect, it } from 'vitest'
+import { db } from '~/server/db'
+import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
+import { createUser, truncateTables } from '~/test-infra/test-utils'
+import { aggregateBookData } from './overview'
+import { Book } from '~/lib/types/book'
 
 describe('History Overview', () => {
-    it('should render', async () => {
+    it('janet 2_timothy', async () => {
         await truncateTables()
         const user = await createUser()
-        console.log('user created',user)
         const typingSessionRepository = new TypingSessionRepository(db)
 
-        console.log('getting typing sessions')
         const typingSessions = await typingSessionRepository.getMany({
             userId: user.id,
         })
-        console.log('typing sessions got',typingSessions.length)
-    
-        // const overview = aggregateBookData(typingSessions)
 
-        // console.log(overview["2_timothy"])
+        const overview = aggregateBookData(typingSessions)
 
-    },10000)
+        const secondTimothy = overview[Book['2_timothy']]
+        const chapterOne = secondTimothy.chapters['1']!
+        const chapterTwo = secondTimothy.chapters['2']!
+        const chapterThree = secondTimothy.chapters['3']!
+        const chapterFour = secondTimothy.chapters['4']!
+        expect(chapterOne.typedVersesInCurrentPrestige).toBeLessThanOrEqual(0)
+        expect(chapterTwo.typedVersesInCurrentPrestige).toBeLessThanOrEqual(0)
+        expect(chapterThree.typedVersesInCurrentPrestige).toBeLessThanOrEqual(
+            14,
+        )
+        expect(chapterFour.typedVersesInCurrentPrestige).toBeLessThanOrEqual(0)
+        expect(secondTimothy.typedVersesInCurrentPrestige).toBe(14)
+        expect(secondTimothy.totalVerses).toBe(83)
+    }, 10000)
 })
-
