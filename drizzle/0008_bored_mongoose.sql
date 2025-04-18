@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS "typingSessionId_idx" ON "type-the-word"."typedVerse" USING btree ("typingSessionId");

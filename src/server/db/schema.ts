@@ -265,6 +265,9 @@ export const typedVerses = schema.table(
             typedVerse.typingSessionId,
             typedVerse.userId,
         ),
+        typingSessionIdIdx: index('typingSessionId_idx').on(
+            typedVerse.typingSessionId,
+        ),
     }),
 )
 
