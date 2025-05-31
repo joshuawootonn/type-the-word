@@ -64,6 +64,18 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('5/31/2025')} /> - Fixed a bug
+                    preventing you from completing{' '}
+                    <Link href="www.typetheword.site/passage/1_kings_4">
+                        1 Kings 4:20
+                    </Link>{' '}
+                    and{' '}
+                    <Link href="https://www.typetheword.site/passage/2_chronicles_2">
+                        2 Chronicles 2:1
+                    </Link>
+                    .
+                </li>
+                <li>
                     <DateComponent date={new Date('4/18/2025')} />
 
                     <ul>
