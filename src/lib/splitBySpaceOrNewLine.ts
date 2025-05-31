@@ -1,5 +1,11 @@
+function trimEndToAtMostOneSpace(str: string): string {
+    if (str.trimEnd() == str) return str
+
+    return str.trimEnd() + ' '
+}
+
 export function splitLineBySpaceOrNewLine(str: string): string[] {
-    return str.trimStart().split(splitBySpaceOrNewLine)
+    return trimEndToAtMostOneSpace(str.trimStart()).split(splitBySpaceOrNewLine)
 }
 
 function numberOfSpaces(str: string, startIndex = 0) {
@@ -38,8 +44,8 @@ const splitBySpaceOrNewLine = {
                     indexOfSpace === -1
                         ? indexOfNewLine
                         : indexOfNewLine === -1
-                        ? indexOfSpace
-                        : Math.min(indexOfNewLine, indexOfSpace)
+                          ? indexOfSpace
+                          : Math.min(indexOfNewLine, indexOfSpace)
                 if (endOfWord === -1) {
                     // Note omitting the end index argument matches to the end of the string
                     // Negative indexes do not work with substring
