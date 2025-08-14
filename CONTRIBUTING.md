@@ -23,6 +23,7 @@ SENTRY_AUTH_TOKEN=""
 CONVERTKIT_API_KEY=""
 CONVERTKIT_SUBSCRIBE_FORM_ID=""
 DEPLOYED_URL="http://localhost:1199"
+STRIPE_SECRET_KEY=""
 ```
 
 This will allow you to load [Psalm 23](http://localhost:1199/passage/psalm_23) and [Gensis 1](http://localhost:1199/passage/genesis_1).

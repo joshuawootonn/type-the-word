@@ -64,6 +64,11 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('8/14/2025')} /> - Added a new
+                    <Link href="/donate"> donate</Link> page and a donate link in
+                    the footer. Any help paying hosting costs is greatly appreciated.
+                </li>
+                <li>
                     <DateComponent date={new Date('5/31/2025')} /> - Fixed a bug
                     preventing you from completing{' '}
                     <Link href="www.typetheword.site/passage/1_kings_4">

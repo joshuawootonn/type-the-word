@@ -12,6 +12,7 @@ export const env = createEnv({
             .enum(['development', 'test', 'production'])
             .default('development'),
         CROSSWAY_SECRET: z.string(),
+        STRIPE_SECRET_KEY: z.string().min(1),
         // NEXTAUTH_SECRET:
         //   process.env.NODE_ENV === "production"
         //     ? z.string().min(1)
@@ -70,6 +71,7 @@ export const env = createEnv({
         CONVERTKIT_API_KEY: process.env.CONVERTKIT_API_KEY,
         CONVERTKIT_SUBSCRIBE_FORM_ID: process.env.CONVERTKIT_SUBSCRIBE_FORM_ID,
         DEPLOYED_URL: process.env.VERCEL_URL ?? process.env.DEPLOYED_URL,
+        STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

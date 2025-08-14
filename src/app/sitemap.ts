@@ -5,6 +5,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     const urls = [
         '/',
         '/changelog',
+        '/donate',
         '/copyright',
         '/history',
         '/privacy-policy',

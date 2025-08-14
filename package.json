@@ -59,6 +59,7 @@
         "react-hotkeys-hook": "^4.5.0",
         "sharp": "^0.33.4",
         "superjson": "^1.13.1",
+        "stripe": "^18.4.0",
         "zod": "^3.21.4"
     },
     "devDependencies": {

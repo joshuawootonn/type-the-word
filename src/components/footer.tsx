@@ -91,6 +91,10 @@ export function Footer() {
             <div className="hidden flex-grow md:block"> </div>
             {/* <div className="block md:hidden">/</div> */}
             <div className="flex items-center justify-between space-x-3">
+                <Link className={clsx(`svg-outline relative`)} href={'/donate'}>
+                    donate
+                </Link>
+                <div>/</div>
                 <Link
                     className={clsx(`svg-outline relative`)}
                     href={'/changelog'}
