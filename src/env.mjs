@@ -50,6 +50,7 @@ export const env = createEnv({
     client: {
         // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
         NEXT_PUBLIC_FATHOM_ID: z.string(),
+        NEXT_PUBLIC_SQUIRREL_STATS_ID: z.string(),
     },
 
     /**
@@ -72,6 +73,7 @@ export const env = createEnv({
         CONVERTKIT_SUBSCRIBE_FORM_ID: process.env.CONVERTKIT_SUBSCRIBE_FORM_ID,
         DEPLOYED_URL: process.env.VERCEL_URL ?? process.env.DEPLOYED_URL,
         STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+        NEXT_PUBLIC_SQUIRREL_STATS_ID: process.env.NEXT_PUBLIC_SQUIRREL_STATS_ID,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
