@@ -176,7 +176,7 @@ export default async function DonatePage() {
                 <p>
                     <strong>Q:</strong> Where will excess donations go?
                     <br />
-                    <strong>A:</strong> Scholarships for children going to Christian
+                    <strong>A:</strong> Scholarships for underprivileged kids from unbelieving families to go to Christian
                     school through{' '}
                     <Link
                         href="https://www.faithacademyiowa.org/"
