@@ -158,12 +158,11 @@ export default function SignUpPage() {
                                         autoComplete="given-name"
                                     />
                                 </div>
-                                {props.errors.firstName &&
-                                    props.touched.firstName && (
-                                        <div className="mt-2 text-error">
-                                            {props.errors.firstName}
-                                        </div>
-                                    )}
+                                {props.errors.firstName && props.submitCount > 0 && (
+                                    <div className="mt-2 text-error">
+                                        {props.errors.firstName}
+                                    </div>
+                                )}
                             </div>
 
                             <div>
@@ -183,7 +182,7 @@ export default function SignUpPage() {
                                         autoComplete="email"
                                     />
                                 </div>
-                                {props.errors.email && props.touched.email && (
+                                {props.errors.email && props.submitCount > 0 && (
                                     <div className="mt-2 text-error">
                                         {props.errors.email}
                                     </div>
@@ -207,12 +206,11 @@ export default function SignUpPage() {
                                         autoComplete="new-password"
                                     />
                                 </div>
-                                {props.errors.password &&
-                                    props.touched.password && (
-                                        <div className="mt-2 text-error">
-                                            {props.errors.password}
-                                        </div>
-                                    )}
+                                {props.errors.password && props.submitCount > 0 && (
+                                    <div className="mt-2 text-error">
+                                        {props.errors.password}
+                                    </div>
+                                )}
                             </div>
 
                             <div>
@@ -232,12 +230,11 @@ export default function SignUpPage() {
                                         autoComplete="new-password"
                                     />
                                 </div>
-                                {props.errors.confirmPassword &&
-                                    props.touched.confirmPassword && (
-                                        <div className="mt-2 text-error">
-                                            {props.errors.confirmPassword}
-                                        </div>
-                                    )}
+                                {props.errors.confirmPassword && props.submitCount > 0 && (
+                                    <div className="mt-2 text-error">
+                                        {props.errors.confirmPassword}
+                                    </div>
+                                )}
                             </div>
 
                             <button

@@ -126,7 +126,7 @@ export default function ForgotPasswordPage() {
                                         autoComplete="email"
                                     />
                                 </div>
-                                {props.errors.email && props.touched.email && (
+                                {props.errors.email && props.submitCount > 0 && (
                                     <div className="mt-2 text-error">
                                         {props.errors.email}
                                     </div>

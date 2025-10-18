@@ -169,12 +169,11 @@ export default function ResetPasswordPage() {
                                         autoComplete="new-password"
                                     />
                                 </div>
-                                {props.errors.password &&
-                                    props.touched.password && (
-                                        <div className="mt-2 text-error">
-                                            {props.errors.password}
-                                        </div>
-                                    )}
+                                {props.errors.password && props.submitCount > 0 && (
+                                    <div className="mt-2 text-error">
+                                        {props.errors.password}
+                                    </div>
+                                )}
                             </div>
 
                             <div>
@@ -194,12 +193,11 @@ export default function ResetPasswordPage() {
                                         autoComplete="new-password"
                                     />
                                 </div>
-                                {props.errors.confirmPassword &&
-                                    props.touched.confirmPassword && (
-                                        <div className="mt-2 text-error">
-                                            {props.errors.confirmPassword}
-                                        </div>
-                                    )}
+                                {props.errors.confirmPassword && props.submitCount > 0 && (
+                                    <div className="mt-2 text-error">
+                                        {props.errors.confirmPassword}
+                                    </div>
+                                )}
                             </div>
 
                             <button

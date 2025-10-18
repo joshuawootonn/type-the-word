@@ -96,7 +96,7 @@ export default function LogInPage() {
                                         autoComplete="email"
                                     />
                                 </div>
-                                {props.errors.email && props.touched.email && (
+                                {props.errors.email && props.submitCount > 0 && (
                                     <div className="mt-2 text-error">
                                         {props.errors.email}
                                     </div>
@@ -120,12 +120,11 @@ export default function LogInPage() {
                                         autoComplete="current-password"
                                     />
                                 </div>
-                                {props.errors.password &&
-                                    props.touched.password && (
-                                        <div className="mt-2 text-error">
-                                            {props.errors.password}
-                                        </div>
-                                    )}
+                                {props.errors.password && props.submitCount > 0 && (
+                                    <div className="mt-2 text-error">
+                                        {props.errors.password}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex justify-end">
