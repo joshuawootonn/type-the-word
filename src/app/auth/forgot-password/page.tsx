@@ -13,7 +13,7 @@ export default function ForgotPasswordPage() {
 
     if (isSubmitted) {
         return (
-            <div className="flex min-h-screen items-center justify-center px-4">
+            <div className="flex min-h-screen items-start justify-center mt-8">
                 <div className="w-full max-w-md text-center">
                     <h1 className="mb-4 text-3xl font-semibold text-primary">
                         Check your email
@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center px-4">
+        <div className="flex min-h-screen items-start justify-center mt-8">
             <div className="w-full max-w-md">
                 <h1 className="mb-4 text-center text-3xl font-semibold text-primary">
                     Forgot your password?

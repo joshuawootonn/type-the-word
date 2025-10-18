@@ -16,7 +16,7 @@ export default function ResetPasswordPage() {
 
     if (!token) {
         return (
-            <div className="flex min-h-screen items-center justify-center px-4">
+            <div className="flex min-h-screen items-start justify-center mt-8">
                 <div className="w-full max-w-md text-center">
                     <h1 className="mb-4 text-3xl font-semibold text-primary">
                         Invalid reset link
@@ -37,7 +37,7 @@ export default function ResetPasswordPage() {
 
     if (isSubmitted) {
         return (
-            <div className="flex min-h-screen items-center justify-center px-4">
+            <div className="flex min-h-screen items-start justify-center mt-8">
                 <div className="w-full max-w-md text-center">
                     <h1 className="mb-4 text-3xl font-semibold text-primary">
                         Password reset successful
@@ -58,7 +58,7 @@ export default function ResetPasswordPage() {
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center px-4">
+        <div className="flex min-h-screen items-start justify-center mt-8">
             <div className="w-full max-w-md">
                 <h1 className="mb-4 text-center text-3xl font-semibold text-primary">
                     Reset your password
