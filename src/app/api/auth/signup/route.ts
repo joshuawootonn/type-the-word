@@ -4,6 +4,7 @@ import { db } from '~/server/db'
 import { users } from '~/server/db/schema'
 import { eq } from 'drizzle-orm'
 import { hashPassword, passwordSchema, firstNameSchema } from '~/lib/auth/password'
+import { createSubscription } from '~/lib/convert-kit.service'
 
 const signupSchema = z.object({
     firstName: firstNameSchema,
@@ -53,6 +54,14 @@ export async function POST(request: Request) {
                 emailVerified: null,
             })
             .returning()
+
+        // Create newsletter subscription
+        try {
+            await createSubscription({ email, name: firstName })
+        } catch (error) {
+            console.error('Failed to create subscription:', error)
+            // Don't fail the signup if subscription fails
+        }
 
         return NextResponse.json(
             {
