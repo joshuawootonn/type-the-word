@@ -50,6 +50,7 @@ export const users = schema.table('user', {
         mode: 'date',
     }).default(sql`CURRENT_TIMESTAMP(3)`),
     image: varchar('image', { length: 255 }),
+    hashedPassword: text('hashedPassword'),
 })
 
 export const usersRelations = relations(users, ({ many, one }) => ({

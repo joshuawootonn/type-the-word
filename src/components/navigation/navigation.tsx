@@ -1,6 +1,6 @@
 'use client'
 
-import { signIn, signOut, useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import * as Popover from '@radix-ui/react-popover'
 import Link from 'next/link'
@@ -13,7 +13,6 @@ import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import { useRef, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import HotkeyLabel from '../hotkey-label'
-import { useTheme } from '~/app/theme-provider'
 import clsx from 'clsx'
 import { Settings } from './settings'
 import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
@@ -209,7 +208,7 @@ export function Navigation({
                                         void signOut({ redirect: true })
                                     }
                                 >
-                                    Sign out
+                                    Log out
                                 </DropdownMenu.Item>
                             </DropdownMenu.Content>
                             <Popover.PopoverContent
@@ -257,12 +256,12 @@ export function Navigation({
                         </DropdownMenu.Root>
                     </Popover.Root>
                 ) : (
-                    <button
+                    <Link
+                        href="/auth/login"
                         className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary "
-                        onClick={() => void signIn()}
                     >
-                        Sign in
-                    </button>
+                        Log in
+                    </Link>
                 )}
             </div>
         </nav>

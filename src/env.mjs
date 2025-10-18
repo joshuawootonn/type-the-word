@@ -13,10 +13,10 @@ export const env = createEnv({
             .default('development'),
         CROSSWAY_SECRET: z.string(),
         STRIPE_SECRET_KEY: z.string().min(1),
-        // NEXTAUTH_SECRET:
-        //   process.env.NODE_ENV === "production"
-        //     ? z.string().min(1)
-        //     : z.string().min(1).optional(),
+        NEXTAUTH_SECRET:
+            process.env.NODE_ENV === 'production'
+                ? z.string().min(1)
+                : z.string().min(1).optional(),
         // NEXTAUTH_URL: z.preprocess(
         //   // This makes Vercel deployments not fail if you don't set NEXTAUTH_URL
         //   // Since NextAuth.js automatically uses the VERCEL_URL if present.
@@ -33,6 +33,7 @@ export const env = createEnv({
 
         CONVERTKIT_API_KEY: z.string(),
         CONVERTKIT_SUBSCRIBE_FORM_ID: z.string(),
+        MAILPACE_API_TOKEN: z.string(),
         DEPLOYED_URL:
             process.env.NODE_ENV === 'production'
                 ? z
@@ -63,7 +64,7 @@ export const env = createEnv({
         CROSSWAY_SECRET: process.env.CROSSWAY_SECRET,
         GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
         GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-        // NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+        NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
         // NEXTAUTH_URL: process.env.NEXTAUTH_URL,
         // DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
         // DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
@@ -71,6 +72,7 @@ export const env = createEnv({
         SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
         CONVERTKIT_API_KEY: process.env.CONVERTKIT_API_KEY,
         CONVERTKIT_SUBSCRIBE_FORM_ID: process.env.CONVERTKIT_SUBSCRIBE_FORM_ID,
+        MAILPACE_API_TOKEN: process.env.MAILPACE_API_TOKEN,
         DEPLOYED_URL: process.env.VERCEL_URL ?? process.env.DEPLOYED_URL,
         STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
         NEXT_PUBLIC_SQUIRREL_STATS_ID: process.env.NEXT_PUBLIC_SQUIRREL_STATS_ID,

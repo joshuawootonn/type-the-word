@@ -39,6 +39,7 @@
         "@tanstack/react-query": "^4.32.6",
         "@vercel/analytics": "^1.4.1",
         "@vercel/og": "^0.5.20",
+        "bcryptjs": "^3.0.2",
         "clsx": "^2.0.0",
         "colorjs.io": "^0.5.2",
         "csv-parse": "^5.6.0",
@@ -61,12 +62,14 @@
         "sharp": "^0.33.4",
         "stripe": "^18.4.0",
         "superjson": "^1.13.1",
+        "tailwind-merge": "^3.3.1",
         "zod": "^3.21.4"
     },
     "devDependencies": {
         "@csstools/postcss-oklab-function": "^4.0.5",
         "@tailwindcss/typography": "^0.5.14",
         "@trivago/prettier-plugin-sort-imports": "^4.2.0",
+        "@types/bcryptjs": "^3.0.0",
         "@types/eslint": "^8.44.2",
         "@types/jsdom": "^21.1.4",
         "@types/node": "^18.16.0",

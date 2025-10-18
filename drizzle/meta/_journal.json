@@ -64,6 +64,20 @@
       "when": 1744939270070,
       "tag": "0008_bored_mongoose",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1760750795419,
+      "tag": "0009_modern_legion",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1760757784100,
+      "tag": "0010_mushy_trish_tilby",
+      "breakpoints": true
     }
   ]
 }

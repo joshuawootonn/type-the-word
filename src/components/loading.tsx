@@ -1,9 +1,12 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { cn } from '~/lib/cn'
 
 export function Loading(
-    { initialDots }: { initialDots?: number } = { initialDots: 1 },
+    { initialDots, className }: { initialDots?: number; className?: string } = {
+        initialDots: 1,
+    },
 ) {
     const initialText = useRef(
         `Loading${new Array(initialDots)
@@ -28,7 +31,7 @@ export function Loading(
     }, [])
 
     return (
-        <div className={'text-xl font-normal text-primary'} ref={ref}>
+        <div className={cn('text-xl font-normal', className)} ref={ref}>
             {initialText.current}
         </div>
     )
