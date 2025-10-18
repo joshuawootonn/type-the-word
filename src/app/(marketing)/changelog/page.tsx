@@ -64,6 +64,37 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('10/18/2025')} /> - Added
+                    email/password authentication alongside Google log in. You can
+                    now <Link href="/auth/signup">create an account</Link> with just
+                    your first name, email, and password. Features include:
+                    <ul>
+                        <li>
+                            Password requirements: minimum 8 characters, at least one
+                            uppercase letter, and one special character
+                        </li>
+                        <li>
+                            Full password reset flow via email - use{' '}
+                            <Link href="/auth/forgot-password">forgot password</Link>{' '}
+                            if you need to reset
+                        </li>
+                        <li>
+                            Google and email/password accounts are kept completely
+                            separate for security (no account linking)
+                        </li>
+                        <li>
+                            All forms only show validation errors after your first
+                            submission attempt for a cleaner experience
+                        </li>
+                        <li>
+                            <strong>Pro tip:</strong> If you want multiple accounts
+                            with the same email, use email aliases like{' '}
+                            <code>yourname+test@gmail.com</code> - they all deliver
+                            to the same inbox but are treated as different accounts
+                        </li>
+                    </ul>
+                </li>
+                <li>
                     <DateComponent date={new Date('8/14/2025')} /> - Added a new
                     <Link href="/donate"> donate</Link> page and a donate link in
                     the footer. Any help paying hosting costs is greatly appreciated.
