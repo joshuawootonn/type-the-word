@@ -78,7 +78,7 @@ export default async function Changelog() {
                             with <code>josh+2@typetheword.site</code> and it
                             would be treated as a different account. Note the{' '}
                             <code>+2</code> is just an example and you can use
-                            any text after the <code>@</code>.
+                            any text after the <code>+</code>.
                         </li>
                         <li>
                             If you already have an account with Google and want
