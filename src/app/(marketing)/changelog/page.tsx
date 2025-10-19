@@ -65,39 +65,35 @@ export default async function Changelog() {
             <ul>
                 <li>
                     <DateComponent date={new Date('10/18/2025')} /> - Added
-                    email/password authentication alongside Google log in. You can
-                    now <Link href="/auth/signup">create an account</Link> with just
-                    your first name, email, and password. Features include:
+                    email/password auth so you no longer have to sign in with
+                    Google. You can now{' '}
+                    <Link href="/auth/signup">create an account</Link> with just
+                    your email and password.
                     <ul>
                         <li>
-                            Password requirements: minimum 8 characters, at least one
-                            uppercase letter, and one special character
+                            If you want to create multiple accounts with the
+                            same email you can use email aliases. For example,
+                            if I wanted to create an additional account for{' '}
+                            <code>josh@typetheword.site</code> I could sign up
+                            with <code>josh+2@typetheword.site</code> and it
+                            would be treated as a different account. Note the{' '}
+                            <code>+2</code> is just an example and you can use
+                            any text after the <code>@</code>.
                         </li>
                         <li>
-                            Full password reset flow via email - use{' '}
-                            <Link href="/auth/forgot-password">forgot password</Link>{' '}
-                            if you need to reset
-                        </li>
-                        <li>
-                            Google and email/password accounts are kept completely
-                            separate for security (no account linking)
-                        </li>
-                        <li>
-                            All forms only show validation errors after your first
-                            submission attempt for a cleaner experience
-                        </li>
-                        <li>
-                            <strong>Pro tip:</strong> If you want multiple accounts
-                            with the same email, use email aliases like{' '}
-                            <code>yourname+test@gmail.com</code> - they all deliver
-                            to the same inbox but are treated as different accounts
+                            If you already have an account with Google and want
+                            to move to an email/password account: Create a new
+                            email/password account and email me both the old and
+                            new email addresses and I can migrate your data for
+                            you.
                         </li>
                     </ul>
                 </li>
                 <li>
                     <DateComponent date={new Date('8/14/2025')} /> - Added a new
-                    <Link href="/donate"> donate</Link> page and a donate link in
-                    the footer. Any help paying hosting costs is greatly appreciated.
+                    <Link href="/donate"> donate</Link> page and a donate link
+                    in the footer. Any help paying hosting costs is greatly
+                    appreciated.
                 </li>
                 <li>
                     <DateComponent date={new Date('5/31/2025')} /> - Fixed a bug
