@@ -132,7 +132,7 @@ export default function ForgotPasswordPage() {
                                         id="email"
                                         innerRef={emailRef}
                                         className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
-                                        placeholder="Enter your email"
+                                        placeholder="Enter your email..."
                                         autoComplete="email"
                                     />
                                 </div>

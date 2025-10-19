@@ -180,7 +180,7 @@ export default function ResetPasswordPage() {
                                         id="password"
                                         innerRef={passwordRef}
                                         className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
-                                        placeholder="Enter new password"
+                                        placeholder="Enter new password..."
                                         autoComplete="new-password"
                                     />
                                 </div>
@@ -206,7 +206,7 @@ export default function ResetPasswordPage() {
                                         id="confirmPassword"
                                         innerRef={confirmPasswordRef}
                                         className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
-                                        placeholder="Confirm new password"
+                                        placeholder="Confirm new password..."
                                         autoComplete="new-password"
                                     />
                                 </div>

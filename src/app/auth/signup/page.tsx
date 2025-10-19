@@ -175,7 +175,7 @@ export default function SignUpPage() {
                                         id="firstName"
                                         innerRef={firstNameRef}
                                         className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
-                                        placeholder="Enter your first name"
+                                        placeholder="Enter your first name..."
                                         autoComplete="given-name"
                                     />
                                 </div>
@@ -201,7 +201,7 @@ export default function SignUpPage() {
                                         id="email"
                                         innerRef={emailRef}
                                         className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
-                                        placeholder="Enter your email"
+                                        placeholder="Enter your email..."
                                         autoComplete="email"
                                     />
                                 </div>
@@ -227,7 +227,7 @@ export default function SignUpPage() {
                                         id="password"
                                         innerRef={passwordRef}
                                         className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
-                                        placeholder="Create a password"
+                                        placeholder="Create a password..."
                                         autoComplete="new-password"
                                     />
                                 </div>
@@ -253,7 +253,7 @@ export default function SignUpPage() {
                                         id="confirmPassword"
                                         innerRef={confirmPasswordRef}
                                         className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
-                                        placeholder="Confirm your password"
+                                        placeholder="Confirm your password..."
                                         autoComplete="new-password"
                                     />
                                 </div>
