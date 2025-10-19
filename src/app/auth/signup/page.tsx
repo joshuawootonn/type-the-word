@@ -2,7 +2,7 @@
 
 import { signIn } from 'next-auth/react'
 import { Field, Formik } from 'formik'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Loading } from '~/components/loading'
@@ -12,9 +12,13 @@ export default function SignUpPage() {
     const router = useRouter()
     const [error, setError] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(false)
+    const firstNameRef = useRef<HTMLInputElement>(null)
+    const emailRef = useRef<HTMLInputElement>(null)
+    const passwordRef = useRef<HTMLInputElement>(null)
+    const confirmPasswordRef = useRef<HTMLInputElement>(null)
 
     return (
-        <div className="flex min-h-screen items-start justify-center mt-8">
+        <div className="mt-8 flex min-h-screen items-start justify-center">
             <div className="w-full max-w-md">
                 <h1 className="mb-8 text-center text-3xl font-semibold text-primary">
                     Sign up
@@ -76,8 +80,24 @@ export default function SignUpPage() {
                             errors.confirmPassword = 'Passwords do not match'
                         }
 
+                        // Focus first field with error
+                        if (errors.firstName && firstNameRef.current) {
+                            firstNameRef.current.focus()
+                        } else if (errors.email && emailRef.current) {
+                            emailRef.current.focus()
+                        } else if (errors.password && passwordRef.current) {
+                            passwordRef.current.focus()
+                        } else if (
+                            errors.confirmPassword &&
+                            confirmPasswordRef.current
+                        ) {
+                            confirmPasswordRef.current.focus()
+                        }
+
                         return errors
                     }}
+                    validateOnChange={false}
+                    validateOnBlur={false}
                     onSubmit={async (values, { setSubmitting }) => {
                         setError(null)
                         setIsLoading(true)
@@ -153,16 +173,18 @@ export default function SignUpPage() {
                                         name="firstName"
                                         type="text"
                                         id="firstName"
+                                        innerRef={firstNameRef}
                                         className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Enter your first name"
                                         autoComplete="given-name"
                                     />
                                 </div>
-                                {props.errors.firstName && props.submitCount > 0 && (
-                                    <div className="mt-2 text-error">
-                                        {props.errors.firstName}
-                                    </div>
-                                )}
+                                {props.errors.firstName &&
+                                    props.submitCount > 0 && (
+                                        <div className="mt-2 text-error">
+                                            {props.errors.firstName}
+                                        </div>
+                                    )}
                             </div>
 
                             <div>
@@ -177,16 +199,18 @@ export default function SignUpPage() {
                                         name="email"
                                         type="email"
                                         id="email"
+                                        innerRef={emailRef}
                                         className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Enter your email"
                                         autoComplete="email"
                                     />
                                 </div>
-                                {props.errors.email && props.submitCount > 0 && (
-                                    <div className="mt-2 text-error">
-                                        {props.errors.email}
-                                    </div>
-                                )}
+                                {props.errors.email &&
+                                    props.submitCount > 0 && (
+                                        <div className="mt-2 text-error">
+                                            {props.errors.email}
+                                        </div>
+                                    )}
                             </div>
 
                             <div>
@@ -201,16 +225,18 @@ export default function SignUpPage() {
                                         name="password"
                                         type="password"
                                         id="password"
+                                        innerRef={passwordRef}
                                         className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Create a password"
                                         autoComplete="new-password"
                                     />
                                 </div>
-                                {props.errors.password && props.submitCount > 0 && (
-                                    <div className="mt-2 text-error">
-                                        {props.errors.password}
-                                    </div>
-                                )}
+                                {props.errors.password &&
+                                    props.submitCount > 0 && (
+                                        <div className="mt-2 text-error">
+                                            {props.errors.password}
+                                        </div>
+                                    )}
                             </div>
 
                             <div>
@@ -225,16 +251,18 @@ export default function SignUpPage() {
                                         name="confirmPassword"
                                         type="password"
                                         id="confirmPassword"
+                                        innerRef={confirmPasswordRef}
                                         className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Confirm your password"
                                         autoComplete="new-password"
                                     />
                                 </div>
-                                {props.errors.confirmPassword && props.submitCount > 0 && (
-                                    <div className="mt-2 text-error">
-                                        {props.errors.confirmPassword}
-                                    </div>
-                                )}
+                                {props.errors.confirmPassword &&
+                                    props.submitCount > 0 && (
+                                        <div className="mt-2 text-error">
+                                            {props.errors.confirmPassword}
+                                        </div>
+                                    )}
                             </div>
 
                             <button

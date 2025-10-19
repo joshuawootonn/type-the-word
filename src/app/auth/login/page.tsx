@@ -2,7 +2,7 @@
 
 import { signIn } from 'next-auth/react'
 import { Field, Formik } from 'formik'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import clsx from 'clsx'
@@ -15,6 +15,8 @@ export default function LogInPage() {
     const callbackUrl = searchParams?.get('callbackUrl') ?? '/'
     const [error, setError] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(false)
+    const emailRef = useRef<HTMLInputElement>(null)
+    const passwordRef = useRef<HTMLInputElement>(null)
 
     return (
         <div className="flex min-h-screen items-start justify-center mt-8">
@@ -39,8 +41,18 @@ export default function LogInPage() {
                         if (!values.password) {
                             errors.password = 'Password is required'
                         }
+                        
+                        // Focus first field with error
+                        if (errors.email && emailRef.current) {
+                            emailRef.current.focus()
+                        } else if (errors.password && passwordRef.current) {
+                            passwordRef.current.focus()
+                        }
+                        
                         return errors
                     }}
+                    validateOnChange={false}
+                    validateOnBlur={false}
                     onSubmit={async (values, { setSubmitting }) => {
                         setError(null)
                         setIsLoading(true)
@@ -91,6 +103,7 @@ export default function LogInPage() {
                                         name="email"
                                         type="email"
                                         id="email"
+                                        innerRef={emailRef}
                                         className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Enter your email"
                                         autoComplete="email"
@@ -115,6 +128,7 @@ export default function LogInPage() {
                                         name="password"
                                         type="password"
                                         id="password"
+                                        innerRef={passwordRef}
                                         className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Enter your password"
                                         autoComplete="current-password"

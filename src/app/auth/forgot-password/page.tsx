@@ -1,7 +1,7 @@
 'use client'
 
 import { Field, Formik } from 'formik'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { cn } from '~/lib/cn'
 import { Loading } from '~/components/loading'
@@ -10,17 +10,18 @@ export default function ForgotPasswordPage() {
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(false)
+    const emailRef = useRef<HTMLInputElement>(null)
 
     if (isSubmitted) {
         return (
-            <div className="flex min-h-screen items-start justify-center mt-8">
+            <div className="mt-8 flex min-h-screen items-start justify-center">
                 <div className="w-full max-w-md text-center">
                     <h1 className="mb-4 text-3xl font-semibold text-primary">
                         Check your email
                     </h1>
                     <p className="mb-8 text-primary">
-                        If an account exists with that email address, we&apos;ve sent
-                        you a password reset link.
+                        If an account exists with that email address, we&apos;ve
+                        sent you a password reset link.
                     </p>
                     <Link
                         href="/auth/login"
@@ -34,14 +35,14 @@ export default function ForgotPasswordPage() {
     }
 
     return (
-        <div className="flex min-h-screen items-start justify-center mt-8">
+        <div className="mt-8 flex min-h-screen items-start justify-center">
             <div className="w-full max-w-md">
                 <h1 className="mb-4 text-center text-3xl font-semibold text-primary">
                     Forgot your password?
                 </h1>
                 <p className="mb-8 text-center text-primary">
-                    Enter your email address and we&apos;ll send you a link to reset
-                    your password.
+                    Enter your email address and we&apos;ll send you a link to
+                    reset your password.
                 </p>
 
                 <Formik
@@ -57,8 +58,16 @@ export default function ForgotPasswordPage() {
                         ) {
                             errors.email = 'Invalid email address'
                         }
+
+                        // Focus first field with error
+                        if (errors.email && emailRef.current) {
+                            emailRef.current.focus()
+                        }
+
                         return errors
                     }}
+                    validateOnChange={false}
+                    validateOnBlur={false}
                     onSubmit={async (values, { setSubmitting }) => {
                         setError(null)
                         setIsLoading(true)
@@ -121,16 +130,18 @@ export default function ForgotPasswordPage() {
                                         name="email"
                                         type="email"
                                         id="email"
+                                        innerRef={emailRef}
                                         className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Enter your email"
                                         autoComplete="email"
                                     />
                                 </div>
-                                {props.errors.email && props.submitCount > 0 && (
-                                    <div className="mt-2 text-error">
-                                        {props.errors.email}
-                                    </div>
-                                )}
+                                {props.errors.email &&
+                                    props.submitCount > 0 && (
+                                        <div className="mt-2 text-error">
+                                            {props.errors.email}
+                                        </div>
+                                    )}
                             </div>
 
                             <button

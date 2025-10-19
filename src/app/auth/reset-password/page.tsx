@@ -1,7 +1,7 @@
 'use client'
 
 import { Field, Formik } from 'formik'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { Loading } from '~/components/loading'
@@ -13,10 +13,12 @@ export default function ResetPasswordPage() {
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(false)
+    const passwordRef = useRef<HTMLInputElement>(null)
+    const confirmPasswordRef = useRef<HTMLInputElement>(null)
 
     if (!token) {
         return (
-            <div className="flex min-h-screen items-start justify-center mt-8">
+            <div className="mt-8 flex min-h-screen items-start justify-center">
                 <div className="w-full max-w-md text-center">
                     <h1 className="mb-4 text-3xl font-semibold text-primary">
                         Invalid reset link
@@ -37,7 +39,7 @@ export default function ResetPasswordPage() {
 
     if (isSubmitted) {
         return (
-            <div className="flex min-h-screen items-start justify-center mt-8">
+            <div className="mt-8 flex min-h-screen items-start justify-center">
                 <div className="w-full max-w-md text-center">
                     <h1 className="mb-4 text-3xl font-semibold text-primary">
                         Password reset successful
@@ -58,7 +60,7 @@ export default function ResetPasswordPage() {
     }
 
     return (
-        <div className="flex min-h-screen items-start justify-center mt-8">
+        <div className="mt-8 flex min-h-screen items-start justify-center">
             <div className="w-full max-w-md">
                 <h1 className="mb-4 text-center text-3xl font-semibold text-primary">
                     Reset your password
@@ -99,8 +101,20 @@ export default function ResetPasswordPage() {
                             errors.confirmPassword = 'Passwords do not match'
                         }
 
+                        // Focus first field with error
+                        if (errors.password && passwordRef.current) {
+                            passwordRef.current.focus()
+                        } else if (
+                            errors.confirmPassword &&
+                            confirmPasswordRef.current
+                        ) {
+                            confirmPasswordRef.current.focus()
+                        }
+
                         return errors
                     }}
+                    validateOnChange={false}
+                    validateOnBlur={false}
                     onSubmit={async (values, { setSubmitting }) => {
                         setError(null)
                         setIsLoading(true)
@@ -164,16 +178,18 @@ export default function ResetPasswordPage() {
                                         name="password"
                                         type="password"
                                         id="password"
+                                        innerRef={passwordRef}
                                         className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Enter new password"
                                         autoComplete="new-password"
                                     />
                                 </div>
-                                {props.errors.password && props.submitCount > 0 && (
-                                    <div className="mt-2 text-error">
-                                        {props.errors.password}
-                                    </div>
-                                )}
+                                {props.errors.password &&
+                                    props.submitCount > 0 && (
+                                        <div className="mt-2 text-error">
+                                            {props.errors.password}
+                                        </div>
+                                    )}
                             </div>
 
                             <div>
@@ -188,16 +204,18 @@ export default function ResetPasswordPage() {
                                         name="confirmPassword"
                                         type="password"
                                         id="confirmPassword"
+                                        innerRef={confirmPasswordRef}
                                         className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Confirm new password"
                                         autoComplete="new-password"
                                     />
                                 </div>
-                                {props.errors.confirmPassword && props.submitCount > 0 && (
-                                    <div className="mt-2 text-error">
-                                        {props.errors.confirmPassword}
-                                    </div>
-                                )}
+                                {props.errors.confirmPassword &&
+                                    props.submitCount > 0 && (
+                                        <div className="mt-2 text-error">
+                                            {props.errors.confirmPassword}
+                                        </div>
+                                    )}
                             </div>
 
                             <button
