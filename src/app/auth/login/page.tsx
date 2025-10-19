@@ -104,7 +104,7 @@ export default function LogInPage() {
                                         type="email"
                                         id="email"
                                         innerRef={emailRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="w-full rounded-none border-2 border-primary bg-secondary py-1.5 px-3 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Enter your email..."
                                         autoComplete="email"
                                     />
@@ -129,7 +129,7 @@ export default function LogInPage() {
                                         type="password"
                                         id="password"
                                         innerRef={passwordRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="w-full rounded-none border-2 border-primary bg-secondary py-1.5 px-3 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Enter your password..."
                                         autoComplete="current-password"
                                     />
@@ -154,7 +154,7 @@ export default function LogInPage() {
                                 type="submit"
                                 disabled={isLoading}
                                 className={clsx(
-                                    'svg-outline relative w-full cursor-pointer border-2 border-primary bg-primary px-4 py-3 font-semibold text-secondary',
+                                    'svg-outline relative w-full cursor-pointer border-2 border-primary bg-primary px-3 py-1 font-semibold text-secondary',
                                     'disabled:cursor-not-allowed disabled:bg-primary disabled:text-secondary',
                                 )}
                             >
@@ -188,7 +188,7 @@ export default function LogInPage() {
                 <button
                     onClick={() => void signIn('google', { callbackUrl })}
                     disabled={isLoading}
-                    className="svg-outline relative w-full cursor-pointer border-2 border-primary bg-secondary px-4 py-3 font-semibold text-primary disabled:cursor-not-allowed"
+                    className="svg-outline relative w-full cursor-pointer border-2 border-primary bg-secondary px-3 py-1 font-semibold text-primary disabled:cursor-not-allowed"
                 >
                     Continue with Google
                 </button>

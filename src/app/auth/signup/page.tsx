@@ -174,7 +174,7 @@ export default function SignUpPage() {
                                         type="text"
                                         id="firstName"
                                         innerRef={firstNameRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="w-full rounded-none border-2 border-primary bg-secondary py-1.5 px-3 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Enter your first name..."
                                         autoComplete="given-name"
                                     />
@@ -200,7 +200,7 @@ export default function SignUpPage() {
                                         type="email"
                                         id="email"
                                         innerRef={emailRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="w-full rounded-none border-2 border-primary bg-secondary py-1.5 px-3 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Enter your email..."
                                         autoComplete="email"
                                     />
@@ -226,7 +226,7 @@ export default function SignUpPage() {
                                         type="password"
                                         id="password"
                                         innerRef={passwordRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="w-full rounded-none border-2 border-primary bg-secondary py-1.5 px-3 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Create a password..."
                                         autoComplete="new-password"
                                     />
@@ -252,7 +252,7 @@ export default function SignUpPage() {
                                         type="password"
                                         id="confirmPassword"
                                         innerRef={confirmPasswordRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="w-full rounded-none border-2 border-primary bg-secondary py-1.5 px-3 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Confirm your password..."
                                         autoComplete="new-password"
                                     />
@@ -268,7 +268,7 @@ export default function SignUpPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="svg-outline relative w-full cursor-pointer border-2 border-primary bg-primary px-4 py-3 font-semibold text-secondary disabled:cursor-not-allowed"
+                                className="svg-outline relative w-full cursor-pointer border-2 border-primary bg-primary px-3 py-1 font-semibold text-secondary disabled:cursor-not-allowed"
                             >
                                 {isLoading ? (
                                     <>

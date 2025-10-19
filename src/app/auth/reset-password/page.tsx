@@ -23,12 +23,12 @@ export default function ResetPasswordPage() {
                     <h1 className="mb-4 text-3xl font-semibold text-primary">
                         Invalid reset link
                     </h1>
-                    <p className="mb-8 text-primary">
+                    <p className="mb-8 text-pretty text-primary">
                         This password reset link is invalid or has expired.
                     </p>
                     <Link
                         href="/auth/forgot-password"
-                        className="svg-outline relative inline-block border-2 border-primary bg-secondary px-6 py-3 font-semibold text-primary transition-colors hover:bg-primary hover:text-secondary"
+                        className="svg-outline relative inline-block border-2 border-primary bg-secondary px-3 py-1 font-semibold text-primary transition-colors hover:bg-primary hover:text-secondary"
                     >
                         Request new link
                     </Link>
@@ -44,13 +44,13 @@ export default function ResetPasswordPage() {
                     <h1 className="mb-4 text-3xl font-semibold text-primary">
                         Password reset successful
                     </h1>
-                    <p className="mb-8 text-primary">
+                    <p className="mb-8 text-pretty text-primary">
                         Your password has been reset. You can now log in with
                         your new password.
                     </p>
                     <Link
                         href="/auth/login"
-                        className="svg-outline relative inline-block border-2 border-primary bg-primary px-6 py-3 font-semibold text-secondary"
+                        className="svg-outline relative inline-block border-2 border-primary bg-primary px-3 py-1 font-semibold text-secondary"
                     >
                         Log in
                     </Link>
@@ -179,7 +179,7 @@ export default function ResetPasswordPage() {
                                         type="password"
                                         id="password"
                                         innerRef={passwordRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="w-full rounded-none border-2 border-primary bg-secondary px-3 py-1.5 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Enter new password..."
                                         autoComplete="new-password"
                                     />
@@ -205,7 +205,7 @@ export default function ResetPasswordPage() {
                                         type="password"
                                         id="confirmPassword"
                                         innerRef={confirmPasswordRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="w-full rounded-none border-2 border-primary bg-secondary px-3 py-1.5 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Confirm new password..."
                                         autoComplete="new-password"
                                     />
@@ -221,7 +221,7 @@ export default function ResetPasswordPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="svg-outline relative w-full cursor-pointer border-2 border-primary bg-primary px-4 py-3 font-semibold text-secondary disabled:cursor-not-allowed"
+                                className="svg-outline relative w-full cursor-pointer border-2 border-primary bg-primary px-3 py-1 font-semibold text-secondary disabled:cursor-not-allowed"
                             >
                                 {isLoading ? (
                                     <>

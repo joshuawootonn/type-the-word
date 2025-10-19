@@ -19,13 +19,13 @@ export default function ForgotPasswordPage() {
                     <h1 className="mb-4 text-3xl font-semibold text-primary">
                         Check your email
                     </h1>
-                    <p className="mb-8 text-primary">
+                    <p className="mb-8 text-pretty text-primary">
                         If an account exists with that email address, we&apos;ve
                         sent you a password reset link.
                     </p>
                     <Link
                         href="/auth/login"
-                        className="svg-outline relative inline-block border-2 border-primary bg-secondary px-6 py-3 font-semibold text-primary"
+                        className="svg-outline relative inline-block border-2 border-primary bg-secondary px-3 py-1 font-semibold text-primary"
                     >
                         Back to log in
                     </Link>
@@ -40,7 +40,7 @@ export default function ForgotPasswordPage() {
                 <h1 className="mb-4 text-center text-3xl font-semibold text-primary">
                     Forgot your password?
                 </h1>
-                <p className="mb-8 text-center text-primary">
+                <p className="mb-8 text-pretty text-center text-primary">
                     Enter your email address and we&apos;ll send you a link to
                     reset your password.
                 </p>
@@ -131,7 +131,7 @@ export default function ForgotPasswordPage() {
                                         type="email"
                                         id="email"
                                         innerRef={emailRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary p-3 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="w-full rounded-none border-2 border-primary bg-secondary px-3 py-1.5 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Enter your email..."
                                         autoComplete="email"
                                     />
@@ -147,7 +147,7 @@ export default function ForgotPasswordPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="svg-outline relative w-full cursor-pointer border-2 border-primary bg-primary px-4 py-3 font-semibold text-secondary disabled:cursor-not-allowed"
+                                className="svg-outline relative w-full cursor-pointer border-2 border-primary bg-primary px-3 py-1 font-semibold text-secondary disabled:cursor-not-allowed"
                             >
                                 {isLoading ? (
                                     <>
