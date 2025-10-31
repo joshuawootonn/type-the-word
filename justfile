@@ -51,3 +51,11 @@ lint:
 setup: db-up migrate
     @echo "✅ Database is up and migrations are complete"
 
+# Drop the database schema and recreate it (WARNING: deletes all data)
+db-reset:
+    docker exec -it type_the_word-postgres-1 psql -U postgres -d type-the-word -c "DROP SCHEMA IF EXISTS \"type-the-word\" CASCADE;"
+    docker exec -it type_the_word-postgres-1 psql -U postgres -d type-the-word -c "DROP SCHEMA IF EXISTS \"drizzle\" CASCADE;"
+    docker exec -it type_the_word-postgres-1 psql -U postgres -d type-the-word -c "CREATE SCHEMA \"type-the-word\";"
+    docker exec -it type_the_word-postgres-1 psql -U postgres -d type-the-word -c "CREATE SCHEMA \"drizzle\";"
+    pnpm exec dotenv drizzle-kit migrate
+    @echo "✅ Database has been reset"
