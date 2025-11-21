@@ -72,7 +72,11 @@ export function Navigation({
         : `/`
 
     return (
-        <nav className="mx-auto mb-2 flex w-full items-center justify-between pt-4 lg:pt-8">
+        <>
+            <div className="mx-auto my-2 w-full border-2 border-primary bg-secondary px-4 py-2 text-center text-sm font-medium text-primary text-pretty">
+                I&apos;m about to upgrade TTW&apos;s database. This will take less than 30 minutes. Feel free to keep typing, but I can&apos;t guarantee your progress will be saved for this period.
+            </div>
+            <nav className="mx-auto mb-2 flex w-full items-center justify-between pt-4 lg:pt-8">
             <Head>
                 <link rel="preload" href="/bible.svg" as="image" />
             </Head>
@@ -265,5 +269,6 @@ export function Navigation({
                 )}
             </div>
         </nav>
+        </>
     )
 }
