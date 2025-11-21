@@ -64,6 +64,16 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('11/21/2025')} /> - TTW will
+                    be down for maintenance from 10pm to 11pm CST on Sunday,
+                    11/23 for a database upgrade. Feel free to keep typing, but
+                    your progress will not be saved.
+                    <br />
+                    <br />
+                    Note: I attempted to do this upgrade today, but ran out of
+                    time before work. No data was lost during this attempt.
+                </li>
+                <li>
                     <DateComponent date={new Date('10/18/2025')} /> - Added
                     email/password auth so you no longer have to sign in with
                     Google. You can now{' '}

@@ -73,202 +73,206 @@ export function Navigation({
 
     return (
         <>
-            <div className="mx-auto my-2 w-full border-2 border-primary bg-secondary px-4 py-2 text-center text-sm font-medium text-primary text-pretty">
-                I&apos;m about to upgrade TTW&apos;s database. This will take less than 30 minutes. Feel free to keep typing, but I can&apos;t guarantee your progress will be saved for this period.
-            </div>
             <nav className="mx-auto mb-2 flex w-full items-center justify-between pt-4 lg:pt-8">
-            <Head>
-                <link rel="preload" href="/bible.svg" as="image" />
-            </Head>
-            <style jsx global>{`
-                @keyframes bibleAnimation {
-                    from {
-                        mask-position: 0px 0;
+                <Head>
+                    <link rel="preload" href="/bible.svg" as="image" />
+                </Head>
+                <style jsx global>{`
+                    @keyframes bibleAnimation {
+                        from {
+                            mask-position: 0px 0;
+                        }
+                        to {
+                            mask-position: -741px 0;
+                        }
                     }
-                    to {
+
+                    .icon {
+                        display: block;
+                        transform: translateY(1px);
+                        width: 39px;
+                        height: 33px;
+                    }
+                    .animated-icon {
+                        display: none;
+                        transform: translateY(1px);
+                        width: 39px;
+                        height: 33px;
+                        background-color: oklch(var(--color-primary));
+                        -webkit-mask-image: url('/bible.svg');
+                        mask-image: url('/bible.svg');
+                        mask-repeat: no-repeat;
                         mask-position: -741px 0;
                     }
-                }
 
-                .icon {
-                    display: block;
-                    transform: translateY(1px);
-                    width: 39px;
-                    height: 33px;
-                }
-                .animated-icon {
-                    display: none;
-                    transform: translateY(1px);
-                    width: 39px;
-                    height: 33px;
-                    background-color: oklch(var(--color-primary));
-                    -webkit-mask-image: url('/bible.svg');
-                    mask-image: url('/bible.svg');
-                    mask-repeat: no-repeat;
-                    mask-position: -741px 0;
-                }
-
-                .link:hover .icon,
-                .link:focus-visible .icon {
-                    display: none;
-                }
-                .link:hover .animated-icon,
-                .link:focus-visible .animated-icon {
-                    display: block;
-                    animation: bibleAnimation 0.6s steps(20, jump-none) forwards;
-                }
-            `}</style>
-            <Link
-                className={
-                    'link svg-outline relative flex items-center space-x-1'
-                }
-                href={rootPathname}
-                aria-label={'Type the Word logo'}
-            >
-                <RootLinkComponent className="text-xl font-semibold">
-                    <span className="text-primary/50">Type th</span>
-                    <span className="relative text-primary">
-                        <span className="absolute -left-[3px] scale-y-125 font-normal">
-                            |
-                        </span>
-                        e Word
-                    </span>
-                </RootLinkComponent>
-
-                <svg
-                    width="39"
-                    height="33"
-                    viewBox="0 0 39 33"
-                    fill="none"
-                    className="icon translate-y-[1px] stroke-primary"
-                    xmlns="http://www.w3.org/2000/svg"
+                    .link:hover .icon,
+                    .link:focus-visible .icon {
+                        display: none;
+                    }
+                    .link:hover .animated-icon,
+                    .link:focus-visible .animated-icon {
+                        display: block;
+                        animation: bibleAnimation 0.6s steps(20, jump-none)
+                            forwards;
+                    }
+                `}</style>
+                <Link
+                    className={
+                        'link svg-outline relative flex items-center space-x-1'
+                    }
+                    href={rootPathname}
+                    aria-label={'Type the Word logo'}
                 >
-                    <path
-                        d="M19.7754 5.04895V31.7156M23.6464 6.59934H33.3238M23.6464 10.6303L31.6577 10.6303M23.6464 14.6614H33.3238M23.6464 18.6924L29.8873 18.6924M23.6464 22.4133H33.3238M6.22705 6.59934L13.7748 6.59934M6.22705 10.6303H15.9045M6.22705 14.6614L14.8396 14.6614M6.22705 18.6924H15.9045M6.22705 22.4133L12.5399 22.4133"
-                        strokeWidth="2"
-                    />
-                    <path
-                        d="M2.11353 27.5747V1.94971H15.9209C18.2328 1.94971 19.7741 2.88721 19.7741 5.07471C19.7741 2.88721 21.0585 1.94971 23.6273 1.94971H37.1135V27.5747H23.6273C20.7374 27.5747 19.7741 30.3872 19.7741 31.9497C19.7741 30.3872 18.4897 27.5747 15.2787 27.5747H2.11353Z"
-                        strokeWidth="2"
-                    />
-                </svg>
+                    <RootLinkComponent className="text-xl font-semibold">
+                        <span className="text-primary/50">Type th</span>
+                        <span className="relative text-primary">
+                            <span className="absolute -left-[3px] scale-y-125 font-normal">
+                                |
+                            </span>
+                            e Word
+                        </span>
+                    </RootLinkComponent>
 
-                <div className="animated-icon stroke-primary"></div>
-            </Link>
-            <div className="flex flex-col gap-4">
-                {sessionData ? (
-                    <Popover.Root
-                        onOpenChange={next => {
-                            if (next == false) {
-                                setSettingsState('initial')
-                            }
-                            setSettingsOpen(next)
-                        }}
-                        open={isSettingsOpen}
+                    <svg
+                        width="39"
+                        height="33"
+                        viewBox="0 0 39 33"
+                        fill="none"
+                        className="icon translate-y-[1px] stroke-primary"
+                        xmlns="http://www.w3.org/2000/svg"
                     >
-                        <DropdownMenu.Root modal={false}>
-                            <Popover.PopoverAnchor asChild>
-                                <DropdownMenu.Trigger asChild>
-                                    <button
-                                        ref={dropDownTriggerRef}
-                                        className="svg-outline relative border-2 border-primary px-3 py-1 font-medium text-primary"
-                                    >
-                                        {sessionData.user.name}
-                                    </button>
-                                </DropdownMenu.Trigger>
-                            </Popover.PopoverAnchor>
+                        <path
+                            d="M19.7754 5.04895V31.7156M23.6464 6.59934H33.3238M23.6464 10.6303L31.6577 10.6303M23.6464 14.6614H33.3238M23.6464 18.6924L29.8873 18.6924M23.6464 22.4133H33.3238M6.22705 6.59934L13.7748 6.59934M6.22705 10.6303H15.9045M6.22705 14.6614L14.8396 14.6614M6.22705 18.6924H15.9045M6.22705 22.4133L12.5399 22.4133"
+                            strokeWidth="2"
+                        />
+                        <path
+                            d="M2.11353 27.5747V1.94971H15.9209C18.2328 1.94971 19.7741 2.88721 19.7741 5.07471C19.7741 2.88721 21.0585 1.94971 23.6273 1.94971H37.1135V27.5747H23.6273C20.7374 27.5747 19.7741 30.3872 19.7741 31.9497C19.7741 30.3872 18.4897 27.5747 15.2787 27.5747H2.11353Z"
+                            strokeWidth="2"
+                        />
+                    </svg>
 
-                            <DropdownMenu.Content
-                                className="z-50 border-2 border-primary bg-secondary text-primary"
-                                sideOffset={-2}
-                                align="end"
-                            >
-                                <DropdownMenu.Item asChild={true}>
-                                    <Link
-                                        className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
-                                        href={'/history'}
-                                    >
-                                        History
-                                        <HotkeyLabel
-                                            className="ml-auto pl-5 text-sm text-primary/80 group-focus:text-secondary/80"
-                                            mac="⌘+⇧+Y"
-                                            nonMac="^+⇧+Y"
-                                        />
-                                    </Link>
-                                </DropdownMenu.Item>
-                                <Popover.PopoverTrigger asChild>
-                                    <DropdownMenu.Item className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary ">
-                                        Settings
-                                        <HotkeyLabel
-                                            className="ml-auto pl-5 text-sm text-primary/80 group-focus:text-secondary/80"
-                                            mac="⌘+⇧+,"
-                                            nonMac="^+⇧+,"
-                                        />
-                                    </DropdownMenu.Item>
-                                </Popover.PopoverTrigger>
-                                <DropdownMenu.Item
-                                    className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
-                                    onClick={() =>
-                                        void signOut({ redirect: true })
-                                    }
-                                >
-                                    Log out
-                                </DropdownMenu.Item>
-                            </DropdownMenu.Content>
-                            <Popover.PopoverContent
-                                className={clsx(
-                                    settingsState === 'create-theme'
-                                        ? 'min-w-100'
-                                        : 'min-w-52',
-                                    'z-50 border-2 border-primary bg-secondary px-3 py-3 text-primary outline-none',
-                                )}
-                                sideOffset={-2}
-                                align="end"
-                                onEscapeKeyDown={e => {
+                    <div className="animated-icon stroke-primary"></div>
+                </Link>
+                <div className="flex flex-col gap-4">
+                    {sessionData ? (
+                        <Popover.Root
+                            onOpenChange={next => {
+                                if (next == false) {
                                     setSettingsState('initial')
-                                    e.preventDefault()
-                                    dropDownTriggerRef.current?.focus()
-                                }}
-                            >
-                                {settingsState === 'initial' ? (
-                                    <>
-                                        <h2 className="mb-2 text-xl">
+                                }
+                                setSettingsOpen(next)
+                            }}
+                            open={isSettingsOpen}
+                        >
+                            <DropdownMenu.Root modal={false}>
+                                <Popover.PopoverAnchor asChild>
+                                    <DropdownMenu.Trigger asChild>
+                                        <button
+                                            ref={dropDownTriggerRef}
+                                            className="svg-outline relative border-2 border-primary px-3 py-1 font-medium text-primary"
+                                        >
+                                            {sessionData.user.name}
+                                        </button>
+                                    </DropdownMenu.Trigger>
+                                </Popover.PopoverAnchor>
+
+                                <DropdownMenu.Content
+                                    className="z-50 border-2 border-primary bg-secondary text-primary"
+                                    sideOffset={-2}
+                                    align="end"
+                                >
+                                    <DropdownMenu.Item asChild={true}>
+                                        <Link
+                                            className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
+                                            href={'/history'}
+                                        >
+                                            History
+                                            <HotkeyLabel
+                                                className="ml-auto pl-5 text-sm text-primary/80 group-focus:text-secondary/80"
+                                                mac="⌘+⇧+Y"
+                                                nonMac="^+⇧+Y"
+                                            />
+                                        </Link>
+                                    </DropdownMenu.Item>
+                                    <Popover.PopoverTrigger asChild>
+                                        <DropdownMenu.Item className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary ">
                                             Settings
-                                        </h2>
-                                        <Settings
-                                            createTheme={() =>
-                                                setSettingsState('create-theme')
-                                            }
-                                            builtinThemes={builtinThemes.data}
-                                            userThemes={userThemes.data}
-                                        />
-                                    </>
-                                ) : settingsState === 'create-theme' ? (
-                                    <>
-                                        <h2 className="mb-2 text-xl">
-                                            Theme Creator
-                                        </h2>
-                                        <CreateThemeForm
-                                            builtinThemes={builtinThemes.data}
-                                            goBackToSettings={() =>
-                                                setSettingsState('initial')
-                                            }
-                                        />
-                                    </>
-                                ) : null}
-                            </Popover.PopoverContent>
-                        </DropdownMenu.Root>
-                    </Popover.Root>
-                ) : (
-                    <Link
-                        href="/auth/login"
-                        className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary "
-                    >
-                        Log in
-                    </Link>
-                )}
-            </div>
-        </nav>
+                                            <HotkeyLabel
+                                                className="ml-auto pl-5 text-sm text-primary/80 group-focus:text-secondary/80"
+                                                mac="⌘+⇧+,"
+                                                nonMac="^+⇧+,"
+                                            />
+                                        </DropdownMenu.Item>
+                                    </Popover.PopoverTrigger>
+                                    <DropdownMenu.Item
+                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                        onClick={() =>
+                                            void signOut({ redirect: true })
+                                        }
+                                    >
+                                        Log out
+                                    </DropdownMenu.Item>
+                                </DropdownMenu.Content>
+                                <Popover.PopoverContent
+                                    className={clsx(
+                                        settingsState === 'create-theme'
+                                            ? 'min-w-100'
+                                            : 'min-w-52',
+                                        'z-50 border-2 border-primary bg-secondary px-3 py-3 text-primary outline-none',
+                                    )}
+                                    sideOffset={-2}
+                                    align="end"
+                                    onEscapeKeyDown={e => {
+                                        setSettingsState('initial')
+                                        e.preventDefault()
+                                        dropDownTriggerRef.current?.focus()
+                                    }}
+                                >
+                                    {settingsState === 'initial' ? (
+                                        <>
+                                            <h2 className="mb-2 text-xl">
+                                                Settings
+                                            </h2>
+                                            <Settings
+                                                createTheme={() =>
+                                                    setSettingsState(
+                                                        'create-theme',
+                                                    )
+                                                }
+                                                builtinThemes={
+                                                    builtinThemes.data
+                                                }
+                                                userThemes={userThemes.data}
+                                            />
+                                        </>
+                                    ) : settingsState === 'create-theme' ? (
+                                        <>
+                                            <h2 className="mb-2 text-xl">
+                                                Theme Creator
+                                            </h2>
+                                            <CreateThemeForm
+                                                builtinThemes={
+                                                    builtinThemes.data
+                                                }
+                                                goBackToSettings={() =>
+                                                    setSettingsState('initial')
+                                                }
+                                            />
+                                        </>
+                                    ) : null}
+                                </Popover.PopoverContent>
+                            </DropdownMenu.Root>
+                        </Popover.Root>
+                    ) : (
+                        <Link
+                            href="/auth/login"
+                            className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary "
+                        >
+                            Log in
+                        </Link>
+                    )}
+                </div>
+            </nav>
         </>
     )
 }
