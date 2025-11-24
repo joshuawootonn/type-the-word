@@ -11,38 +11,25 @@ import {
     timestamp,
     varchar,
     json,
-    pgSchema,
     real,
     check,
     unique,
+    pgEnum,
+    pgTable,
 } from 'drizzle-orm/pg-core'
 
-/**
- * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
- * database instance for multiple projects.
- *
- * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
- */
-const schema = pgSchema('type-the-word')
-
-/**
- * This database was originally generated in mysql where there is no enum construct.
- * So that is why these are defined twice.
- */
-export const passageResponseBook = schema.enum(
+export const passageResponseBook = pgEnum(
     'passageResponse_book',
     bookSchema.options,
 )
-export const passageResponseTranslation = schema.enum(
+export const passageResponseTranslation = pgEnum(
     'passageResponse_translation',
     ['esv'],
 )
-export const typedVerseBook = schema.enum('typedVerse_book', bookSchema.options)
-export const typedVerseTranslation = schema.enum('typedVerse_translation', [
-    'esv',
-])
+export const typedVerseBook = pgEnum('typedVerse_book', bookSchema.options)
+export const typedVerseTranslation = pgEnum('typedVerse_translation', ['esv'])
 
-export const users = schema.table('user', {
+export const users = pgTable('user', {
     id: varchar('id', { length: 255 }).notNull().primaryKey(),
     name: varchar('name', { length: 255 }),
     email: varchar('email', { length: 255 }).notNull(),
@@ -61,7 +48,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
     userCurrentTheme: one(userCurrentTheme),
 }))
 
-export const userChangelog = schema.table('userChangelog', {
+export const userChangelog = pgTable('userChangelog', {
     userId: varchar('userId', { length: 255 })
         .notNull()
         .$default(() => crypto.randomUUID())
@@ -71,7 +58,7 @@ export const userChangelog = schema.table('userChangelog', {
         .$default(() => sql`CURRENT_TIMESTAMP(3)`),
 })
 
-export const userCurrentTheme = schema.table(
+export const userCurrentTheme = pgTable(
     'userCurrentTheme',
     {
         userId: varchar('userId', { length: 255 }).notNull(),
@@ -100,7 +87,7 @@ export const userCurrentThemeRelations = relations(
     }),
 )
 
-export const userTheme = schema.table(
+export const userTheme = pgTable(
     'userTheme',
     {
         userId: varchar('userId', { length: 255 }).notNull(),
@@ -122,7 +109,7 @@ export const userThemeRelations = relations(userTheme, ({ one }) => ({
     }),
 }))
 
-export const builtinTheme = schema.table('builtinTheme', {
+export const builtinTheme = pgTable('builtinTheme', {
     themeId: varchar('themeId', { length: 255 }).notNull(),
 })
 
@@ -133,7 +120,7 @@ export const builtinThemeRelations = relations(builtinTheme, ({ one }) => ({
     }),
 }))
 
-export const theme = schema.table('theme', {
+export const theme = pgTable('theme', {
     id: varchar('id', { length: 255 })
         .notNull()
         .$default(() => crypto.randomUUID())
@@ -153,7 +140,7 @@ export const theme = schema.table('theme', {
     errorHue: real('errorHue').notNull().default(0),
 })
 
-export const accounts = schema.table(
+export const accounts = pgTable(
     'account',
     {
         userId: varchar('userId', { length: 255 }).notNull(),
@@ -182,7 +169,7 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
     user: one(users, { fields: [accounts.userId], references: [users.id] }),
 }))
 
-export const sessions = schema.table(
+export const sessions = pgTable(
     'session',
     {
         sessionToken: varchar('sessionToken', { length: 255 })
@@ -200,7 +187,7 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
     user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }))
 
-export const verificationTokens = schema.table(
+export const verificationTokens = pgTable(
     'verificationToken',
     {
         identifier: varchar('identifier', { length: 255 }).notNull(),
@@ -212,7 +199,7 @@ export const verificationTokens = schema.table(
     }),
 )
 
-export const typingSessions = schema.table(
+export const typingSessions = pgTable(
     'typingSession',
     {
         id: varchar('id', { length: 255 })
@@ -243,7 +230,7 @@ export const typingSessionRelations = relations(
     }),
 )
 
-export const typedVerses = schema.table(
+export const typedVerses = pgTable(
     'typedVerse',
     {
         id: varchar('id', { length: 255 })
@@ -288,7 +275,7 @@ export const typedVerseRelations = relations(typedVerses, ({ one }) => ({
     }),
 }))
 
-export const passageResponse = schema.table('passageResponse', {
+export const passageResponse = pgTable('passageResponse', {
     id: varchar('id', { length: 255 })
         .notNull()
         .$default(() => crypto.randomUUID())
