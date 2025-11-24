@@ -259,7 +259,13 @@ export function CurrentVerse({
             // This redundant call is so because the `input.onFocus`  wasn't firing
             // for chrome hard reload, and ff soft/hard reload.
             setIsPassageFocused(true)
-            return inputRef.current?.focus()
+            inputRef.current?.focus()
+            document
+                .getElementById(`${passageId}-scroll-anchor`)
+                ?.scrollIntoView({
+                    block: 'start',
+                    behavior: 'smooth',
+                })
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])

@@ -3,6 +3,7 @@
 import React, { useCallback, useId, useRef, useState } from 'react'
 
 import { Inline, ParsedPassage } from '~/lib/parseEsv'
+import { getNextVerseToType } from '~/lib/getNextVerseToType'
 
 import { Paragraph } from './paragraph'
 import { Keystroke } from '~/lib/keystroke'
@@ -91,7 +92,9 @@ export function Passage({
                 initialValues={[
                     [
                         currentVerseAtom,
-                        props.autofocus ? passage.firstVerse.value : '',
+                        props.autofocus
+                            ? getNextVerseToType(passage, chapterHistory.data)
+                            : '',
                     ],
                     [autofocusAtom, props.autofocus],
                     [passageIdAtom, passageId],
