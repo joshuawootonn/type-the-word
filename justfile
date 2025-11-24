@@ -29,7 +29,7 @@ dev:
 
 # Run tests
 test:
-    pnpm exec dotenv --env-file .env.test vitest
+    pnpm exec dotenv --env-file .env.test vitest run
 
 # Run tests in watch mode
 test-watch:
