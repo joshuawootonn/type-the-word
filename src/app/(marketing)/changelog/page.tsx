@@ -65,15 +65,25 @@ export default async function Changelog() {
             <ul>
                 <li>
                     <DateComponent date={new Date('11/23/2025')} />{' '}
-                    <span className="line-through">
-                        - I&apos;m performing a scheduled database upgrade right
-                        now. Feel free to keep typing, but your progress will
-                        not be saved.
-                    </span>
-                    <br />
-                    <br />
-                    This migration is completed. This database instance is
-                    slighly cheaper, and should be faster than the previous one.
+                    <ul>
+                        <li>
+                            When you navigate to a chapter TTW will now find and
+                            focus on the next verse to type based on your typing
+                            history.
+                        </li>
+                        <li>
+                            <span className="line-through">
+                                - I&apos;m performing a scheduled database
+                                upgrade right now. Feel free to keep typing, but
+                                your progress will not be saved.
+                            </span>
+                            <br />
+                            <br />
+                            This migration is completed. This database instance
+                            is slighly cheaper, and should be faster than the
+                            previous one.
+                        </li>
+                    </ul>
                 </li>
                 <li>
                     <DateComponent date={new Date('11/21/2025')} /> - TTW will
