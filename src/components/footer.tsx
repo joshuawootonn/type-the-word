@@ -27,10 +27,9 @@ export function Footer() {
 
     return (
         <>
-            <div className="mx-auto my-2 w-full text-pretty border-2 border-primary bg-secondary px-4 py-2 text-center text-sm text-primary">
-                TTW will be down for maintenance from 10pm to 11pm CST on
-                Sunday, 11/23 for a database upgrade. Feel free to keep
-                typing, but your progress will not be saved.
+            <div className="mx-auto my-2 w-full text-pretty border-2 border-error bg-secondary px-4 py-2 text-center text-sm text-error">
+                I&apos;m performing a scheduled database upgrade right now. Feel
+                free to keep typing, but your progress will not be saved.
             </div>
             <footer className="flex w-full flex-col items-center justify-between py-2 text-sm text-primary sm:flex-row">
                 <div className="mb-3 flex items-center justify-between space-x-3 sm:mb-0">

@@ -63,6 +63,11 @@ export default async function Changelog() {
             )}
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
+                <li className="!text-error">
+                    <DateComponent date={new Date('11/23/2025')} /> - I&apos;m
+                    performing a scheduled database upgrade right now. Feel free
+                    to keep typing, but your progress will not be saved.
+                </li>
                 <li>
                     <DateComponent date={new Date('11/21/2025')} /> - TTW will
                     be down for maintenance from 10pm to 11pm CST on Sunday,
