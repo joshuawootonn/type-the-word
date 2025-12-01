@@ -64,6 +64,15 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('12/1/2025')} /> - I&apos;m
+                    working on adding WPM stats to Type the Word and while I was
+                    doing a small migration I accidentally ran some SQL against
+                    the prod database. I restored to a backup point at 1:02pm,
+                    but I wanted to move quickly and I may have lost the data
+                    within the window of 1:02 pm and 1:22 pm CST. Sorry for the
+                    inconvenience everyone!
+                </li>
+                <li>
                     <DateComponent date={new Date('11/23/2025')} />{' '}
                     <ul>
                         <li>
