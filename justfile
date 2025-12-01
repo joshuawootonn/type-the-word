@@ -27,7 +27,7 @@ migrate:
 
 # Run migrations on test database
 migrate-test:
-    pnpm exec dotenv --env-file .env.test drizzle-kit migrate
+    pnpm exec dotenv -e .env.test -- drizzle-kit migrate
 
 # Generate a new migration from schema changes
 generate:
@@ -40,11 +40,11 @@ dev:
 
 # Run tests
 test:
-    pnpm exec dotenv --env-file .env.test vitest run
+    pnpm exec dotenv -e .env.test -- vitest run
 
 # Run tests in watch mode
 test-watch:
-    pnpm exec dotenv --env-file .env.test vitest --watch --reporter=verbose
+    pnpm exec dotenv -e .env.test -- vitest --watch --reporter=verbose
 
 # Build the project
 build:
