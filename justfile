@@ -29,6 +29,10 @@ migrate:
 migrate-test:
     pnpm exec dotenv -e .env.test -- drizzle-kit migrate
 
+# Run migrations on test database
+migrate-prod:
+    pnpm exec dotenv -e .env.prod -- drizzle-kit migrate
+
 # Generate a new migration from schema changes
 generate:
     pnpm exec dotenv drizzle-kit generate
