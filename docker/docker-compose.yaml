@@ -5,7 +5,7 @@ services:
     postgres:
         image: postgres:15.5-alpine
         environment:
-            POSTGRES_DB: type-the-word
+            POSTGRES_DB: type_the_word
             POSTGRES_PASSWORD: postgres
             POSTGRES_USER: postgres
             POSTGRES_HOST_AUTH_METHOD: trust
@@ -19,7 +19,7 @@ services:
     postgres-test:
         image: postgres:15.5-alpine
         environment:
-            POSTGRES_DB: type-the-word-test
+            POSTGRES_DB: type_the_word_test
             POSTGRES_PASSWORD: postgres
             POSTGRES_USER: postgres
             POSTGRES_HOST_AUTH_METHOD: trust

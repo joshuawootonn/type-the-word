@@ -10,14 +10,14 @@
 1. Create a `.env` in the root with these values
 
 ```bash
-POSTGRES_DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:5435/type-the-word'
+POSTGRES_DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:5435/type_the_word'
 NEXTAUTH_SECRET=""
 NEXTAUTH_URL="http://localhost:1199"
 GOOGLE_CLIENT_SECRET=""
 GOOGLE_CLIENT_ID=""
 CROSSWAY_SECRET=""
 NEXT_PUBLIC_FATHOM_ID=""
-NEXT_PUBLIC_AXIOM_DATASET=type-the-word
+NEXT_PUBLIC_AXIOM_DATASET=type_the_word
 NEXT_PUBLIC_AXIOM_TOKEN=""
 SENTRY_AUTH_TOKEN=""
 CONVERTKIT_API_KEY=""

@@ -10,6 +10,14 @@ db-up:
 db-down:
     docker compose --project-directory ./docker down
 
+db-local-logs:
+    docker compose --project-directory ./docker logs -f postgres
+
+# Stop containers and delete volumes (WARNING: deletes all data)
+db-nuke:
+    docker compose --project-directory ./docker down -v
+    @echo "✅ Database containers stopped and volumes deleted"
+
 # Run migrations on development database
 migrate:
     pnpm exec dotenv drizzle-kit migrate
