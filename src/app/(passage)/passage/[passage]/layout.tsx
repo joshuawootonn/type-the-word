@@ -16,6 +16,10 @@ export default function PassageLayout({
     )
     return (
         <>
+            <div>
+                Type the Word is currently down. Working on it now. I&apos;ll
+                share more info in the changelog soon.
+            </div>
             <div className="prose mx-auto mb-8 flex w-full items-center justify-start space-x-3 pt-4 lg:pt-8">
                 <PassageSelector
                     value={value}
