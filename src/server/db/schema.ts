@@ -11,6 +11,7 @@ import {
     timestamp,
     varchar,
     json,
+    jsonb,
     real,
     check,
     unique,
@@ -230,6 +231,25 @@ export const typingSessionRelations = relations(
     }),
 )
 
+export const typingDataSchema = z.object({
+    userActions: z.array(
+        z.object({
+            type: z.enum([
+                'deleteContentBackward',
+                'deleteSoftLineBackward',
+                'deleteWordBackward',
+                'insertText',
+            ]),
+            key: z.string(),
+            datetime: z.string(),
+        }),
+    ),
+    userNodes: z.array(z.object({ type: z.literal('word'), letters: z.array(z.string()) })),
+    correctNodes: z.array(z.object({ type: z.literal('word'), letters: z.array(z.string()) })),
+})
+
+export type TypingData = z.infer<typeof typingDataSchema>
+
 export const typedVerses = pgTable(
     'typedVerse',
     {
@@ -246,6 +266,7 @@ export const typedVerses = pgTable(
         createdAt: timestamp('createdAt', { mode: 'date' })
             .notNull()
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+        typingData: jsonb('typingData').$type<TypingData | null>(),
     },
     typedVerse => ({
         userIdIdx: index('typedVerse_userId_idx').on(typedVerse.userId),

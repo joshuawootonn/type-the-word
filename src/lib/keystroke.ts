@@ -9,6 +9,7 @@ export type Keystroke = {
         | 'deleteWordBackward'
         | 'insertText'
     key: string
+    datetime: string // ISO string
 }
 
 export function cleanInputKey(key: string): string {
@@ -101,5 +102,6 @@ export function isValidKeystroke(e: KnownNativeInputEvent, prev: Keystroke[]) {
     return prev.concat({
         type: e.inputType,
         key: e.data ?? '',
+        datetime: new Date().toISOString(),
     })
 }

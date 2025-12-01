@@ -5,12 +5,14 @@ import { NextRequest } from 'next/server'
 import { z } from 'zod'
 import { authOptions } from '~/server/auth'
 import { db } from '~/server/db'
-import { typedVerses, typingSessions } from '~/server/db/schema'
+import { typedVerses, typingSessions, typingDataSchema } from '~/server/db/schema'
 import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
 
 export const dynamic = 'force-dynamic' // defaults to auto
 
-const addTypedVerseBodySchema = createInsertSchema(typedVerses).omit({
+const addTypedVerseBodySchema = createInsertSchema(typedVerses, {
+    typingData: typingDataSchema.optional(),
+}).omit({
     userId: true,
     id: true,
 })
@@ -51,7 +53,7 @@ export const POST = async function POST(
             updatedAt: sql`CURRENT_TIMESTAMP(3)`,
         })
         .where(eq(typingSessions.id, params.id))
-    await db.insert(typedVerses).values({
+    await db.insert(typedVerses).values( {
         userId: session.user.id,
         ...verse,
     })

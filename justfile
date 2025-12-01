@@ -18,6 +18,9 @@ db-nuke:
     docker compose --project-directory ./docker down -v
     @echo "✅ Database containers stopped and volumes deleted"
 
+db-local-delete:
+    docker volume rm type_the_word_pgdata type_the_word_pgdata_test
+
 # Run migrations on development database
 migrate:
     pnpm exec dotenv drizzle-kit migrate

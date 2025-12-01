@@ -1,5 +1,10 @@
 import { db } from '../server/db'
-import { typedVerses, typingSessions, users } from '../server/db/schema'
+import {
+    typedVerses,
+    TypingData,
+    typingSessions,
+    users,
+} from '../server/db/schema'
 import { User, UserRepository } from '../server/repositories/user.repository'
 
 import fs from 'fs'
@@ -105,6 +110,7 @@ export async function createUser({
                     ...verse,
                     createdAt: new Date(verse.createdAt),
                     userId: user.id,
+                    typingData: verse.typingData as TypingData | null,
                 }))
 
                 await typedVerseRepository.db

@@ -179,6 +179,7 @@ export function CurrentVerse({
                                 id: crypto.randomUUID(),
                                 userId: crypto.randomUUID(),
                                 createdAt: new Date(),
+                                typingData: verse.typingData ?? null,
                             },
                         ],
                     }
@@ -301,6 +302,7 @@ export function CurrentVerse({
             position,
         )
 
+        console.log({ next, position })
         if (isVerseComplete) {
             const verse = getVerse(currentVerse, passage.nodes)
             trackEvent('typed-verse')
@@ -311,6 +313,21 @@ export function CurrentVerse({
                     verse: verse.verse.verse,
                     translation: verse.verse.translation,
                     typingSessionId: typingSession.id,
+                    typingData: {
+                        userActions: next,
+                        userNodes: position
+                            .filter(isAtomTyped)
+                            .filter(
+                                (n): n is { type: 'word'; letters: string[] } =>
+                                    n.type === 'word',
+                            ),
+                        correctNodes: currentVerseNodes
+                            .filter(isAtomTyped)
+                            .filter(
+                                (n): n is { type: 'word'; letters: string[] } =>
+                                    n.type === 'word',
+                            ),
+                    },
                 })
             } else {
                 const nextVerse = getNextVerse(currentVerse, passage.nodes)
