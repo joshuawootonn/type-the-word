@@ -24,6 +24,8 @@ CONVERTKIT_API_KEY=""
 CONVERTKIT_SUBSCRIBE_FORM_ID=""
 DEPLOYED_URL="http://localhost:1199"
 STRIPE_SECRET_KEY=""
+NEXT_PUBLIC_POSTHOG_KEY=phc_foo_bar
+NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
 ```
 
 This will allow you to load [Psalm 23](http://localhost:1199/passage/psalm_23) and [Gensis 1](http://localhost:1199/passage/genesis_1).

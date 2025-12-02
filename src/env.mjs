@@ -51,6 +51,8 @@ export const env = createEnv({
     client: {
         // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
         NEXT_PUBLIC_FATHOM_ID: z.string(),
+        NEXT_PUBLIC_POSTHOG_KEY: z.string(),
+        NEXT_PUBLIC_POSTHOG_HOST: z.string().url(),
     },
 
     /**
@@ -68,6 +70,8 @@ export const env = createEnv({
         // DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
         // DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
         NEXT_PUBLIC_FATHOM_ID: process.env.NEXT_PUBLIC_FATHOM_ID,
+        NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+        NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
         SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
         CONVERTKIT_API_KEY: process.env.CONVERTKIT_API_KEY,
         CONVERTKIT_SUBSCRIBE_FORM_ID: process.env.CONVERTKIT_SUBSCRIBE_FORM_ID,

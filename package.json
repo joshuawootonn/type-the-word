@@ -55,6 +55,8 @@
         "next-auth": "^4.23.0",
         "parse5": "^7.1.2",
         "postgres": "^3.4.4",
+        "posthog-js": "^1.299.0",
+        "posthog-node": "^5.15.0",
         "react": "18.3.1",
         "react-dom": "18.3.1",
         "react-hotkeys-hook": "^4.5.0",
