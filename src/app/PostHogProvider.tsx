@@ -1,7 +1,8 @@
 'use client'
 
 import posthog from 'posthog-js'
-import { PostHogProvider as PHProvider } from 'posthog-js/react'
+import { PostHogProvider as PHProvider, usePostHog } from 'posthog-js/react'
+import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
 import { env } from '~/env.mjs'
 
@@ -17,4 +18,22 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     }, [])
 
     return <PHProvider client={posthog}>{children}</PHProvider>
+}
+
+export function PostHogIdentify() {
+    const { data: session, status } = useSession()
+    const posthog = usePostHog()
+
+    useEffect(() => {
+        if (status === 'authenticated' && session?.user) {
+            posthog.identify(session.user.id, {
+                email: session.user.email,
+                name: session.user.name,
+            })
+        } else if (status === 'unauthenticated') {
+            posthog.reset()
+        }
+    }, [session, status, posthog])
+
+    return null
 }

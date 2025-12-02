@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { Field, Formik } from 'formik'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAnalytics } from '~/lib/hooks/useAnalytics'
 import { ColorInput } from './color-input'
 import { FocusEvent, useState } from 'react'
 import {
@@ -107,12 +108,16 @@ export function CreateThemeForm({
         getCreateThemeInitialProps(builtinThemes.at(0)!),
     )
     const queryClient = useQueryClient()
+    const { trackThemeCreated } = useAnalytics()
 
     const { currentTheme, setTheme } = useTheme()
     const [generalError, setGeneralError] = useState<string | null>(null)
     const { mutate, isLoading } = useMutation({
         mutationFn: fetchCreateTheme,
         onSuccess: async data => {
+            trackThemeCreated({
+                theme_name: data.theme.label,
+            })
             injectNewClassIntoStyle(data.theme)
             await queryClient.invalidateQueries(['userThemes'])
 

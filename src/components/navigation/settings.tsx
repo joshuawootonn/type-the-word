@@ -1,6 +1,7 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRef, useEffect, useCallback } from 'react'
+import { useAnalytics } from '~/lib/hooks/useAnalytics'
 import {
     getDarkTheme,
     getLightTheme,
@@ -28,6 +29,7 @@ export function Settings({
 }) {
     const { currentTheme, setTheme } = useTheme()
     const ref = useRef<HTMLButtonElement>(null)
+    const { trackThemeDeleted } = useAnalytics()
 
     useEffect(() => {
         ref.current?.focus()
@@ -124,6 +126,9 @@ export function Settings({
                 lightThemeId: nextLightThemeId,
             })
 
+            trackThemeDeleted({
+                theme_name: theme.theme.label,
+            })
             deleteThemeQuery.mutate(theme.themeId)
         },
         [
@@ -133,6 +138,7 @@ export function Settings({
             darkThemeId,
             deleteThemeQuery,
             lightThemeId,
+            trackThemeDeleted,
             setTheme,
         ],
     )

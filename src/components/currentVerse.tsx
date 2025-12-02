@@ -17,6 +17,7 @@ import clsx from 'clsx'
 import { Word } from '~/components/word'
 import { usePassageRect, useVerseRect } from '~/lib/hooks/passageRectContext'
 import { trackEvent } from 'fathom-client'
+import { useAnalytics } from '~/lib/hooks/useAnalytics'
 import { z } from 'zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
@@ -137,6 +138,7 @@ export function CurrentVerse({
     const [passageId] = useAtom(passageIdAtom)
     const [autoFocus] = useAtom(autofocusAtom)
     const { data: sessionData } = useSession()
+    const { trackVerseCompleted } = useAnalytics()
 
     const passageRect = usePassageRect()
     const [isPassageActive, setIsPassageActive] = useAtom(isPassageActiveAtom)
@@ -306,6 +308,12 @@ export function CurrentVerse({
         if (isVerseComplete) {
             const verse = getVerse(currentVerse, passage.nodes)
             trackEvent('typed-verse')
+            trackVerseCompleted({
+                book: verse.verse.book,
+                chapter: verse.verse.chapter,
+                verse: verse.verse.verse,
+                translation: verse.verse.translation,
+            })
             if (typingSession?.id != null && sessionData?.user?.id != null) {
                 void addTypedVerseToSession.mutateAsync({
                     book: verse.verse.book,

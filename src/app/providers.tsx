@@ -10,7 +10,7 @@ import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
 import { CurrentTheme } from '~/server/repositories/currentTheme.repository'
 import { useSoliDeoGloria } from '~/components/use-soli-deo-gloria'
 import { useTimezoneOffsetCookie } from '~/components/use-time-zone-offset-cookie'
-import { PostHogProvider } from './PostHogProvider'
+import { PostHogProvider, PostHogIdentify } from './PostHogProvider'
 
 const queryClient = new QueryClient()
 
@@ -34,6 +34,7 @@ export function Providers({
         <PostHogProvider>
             <QueryClientProvider client={queryClient}>
                 <SessionProvider session={session}>
+                    <PostHogIdentify />
                     <ThemeProvider
                         session={session}
                         builtinThemes={builtinThemes}

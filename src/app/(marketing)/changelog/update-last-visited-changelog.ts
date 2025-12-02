@@ -2,9 +2,11 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
+import { useAnalytics } from '~/lib/hooks/useAnalytics'
 
 export function UpdateLastVisitedChangelog() {
     const queryClient = useQueryClient()
+    const { trackChangelogViewed } = useAnalytics()
     const { mutate } = useMutation(
         async () => {
             const response = await fetch('/api/user-changelog', {
@@ -17,8 +19,10 @@ export function UpdateLastVisitedChangelog() {
             return response.json()
         },
         {
-            onSuccess: () =>
-                void queryClient.invalidateQueries(['user-changelog']),
+            onSuccess: () => {
+                trackChangelogViewed()
+                void queryClient.invalidateQueries(['user-changelog'])
+            },
         },
     )
 
