@@ -64,6 +64,11 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('12/3/2025')} /> - Added a
+                    global shortcut for focusing the passage selector:{' '}
+                    <HotkeyLabel mac="⌘+P" mobile="⌘+P" nonMac="^+P" />
+                </li>
+                <li>
                     <DateComponent date={new Date('12/1/2025')} /> - I&apos;m
                     working on adding WPM stats to Type the Word and while I was
                     doing a small migration I accidentally ran some SQL against
