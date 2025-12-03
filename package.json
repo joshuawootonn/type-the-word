@@ -38,6 +38,8 @@
         "@tanstack/react-query": "^4.32.6",
         "@vercel/analytics": "^1.4.1",
         "@vercel/og": "^0.5.20",
+        "@visx/responsive": "^3.12.0",
+        "@visx/xychart": "^3.12.0",
         "bcryptjs": "^3.0.2",
         "clsx": "^2.0.0",
         "colorjs.io": "^0.5.2",

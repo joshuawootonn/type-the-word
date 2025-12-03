@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { authOptions } from '~/server/auth'
 import { getHistory } from './getHistory'
 import { HistoryLogV2 } from './history-log-2'
+import { WPMChart } from './wpm-chart'
 import { cookies } from 'next/headers'
 export const metadata: Metadata = {
     title: 'Type the Word - History',
@@ -23,7 +24,10 @@ export default async function History() {
         redirect('/')
     }
 
-    const { overview, log2 } = await getHistory(session.user.id, timezoneOffset)
+    const { overview, log2, allVerseStats } = await getHistory(
+        session.user.id,
+        timezoneOffset,
+    )
 
     return (
         <>
@@ -36,6 +40,18 @@ export default async function History() {
             ) : (
                 <HistoryOverview overview={overview} />
             )}
+            <hr className="mx-0 w-full border-t-2 border-primary" />
+            <WPMChart
+                allStats={allVerseStats}
+                title={
+                    <div className="flex items-center gap-2">
+                        <h2 className="m-0">WPM + Accuracy</h2>
+                        <span className="border border-primary px-1.5 py-0.5 translate-y-0.5 text-xs font-medium text-primary">
+                            beta
+                        </span>
+                    </div>
+                }
+            />
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <h2>Log</h2>
             {log2.length === 0 ? (
