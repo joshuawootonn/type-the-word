@@ -304,7 +304,6 @@ export function CurrentVerse({
             position,
         )
 
-        console.log({ next, position })
         if (isVerseComplete) {
             const verse = getVerse(currentVerse, passage.nodes)
             trackEvent('typed-verse')
