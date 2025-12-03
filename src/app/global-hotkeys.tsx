@@ -1,6 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { useHotkeys } from 'react-hotkeys-hook'
+import { PASSAGE_BOOK_INPUT_ID } from '~/components/passageSelector'
 
 export function GlobalHotkeys() {
     const router = useRouter()
@@ -10,6 +11,20 @@ export function GlobalHotkeys() {
         () => void router.push('/history'),
         { enableOnFormTags: true },
         [router],
+    )
+
+    useHotkeys(
+        'mod+p',
+        e => {
+            e.preventDefault()
+            const input = document.getElementById(PASSAGE_BOOK_INPUT_ID)
+            if (input instanceof HTMLInputElement) {
+                input.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                input.focus()
+                input.select()
+            }
+        },
+        { enableOnFormTags: true, preventDefault: true },
     )
 
     return null

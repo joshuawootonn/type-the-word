@@ -9,6 +9,8 @@ import React, {
     useRef,
     useState,
 } from 'react'
+
+export const PASSAGE_BOOK_INPUT_ID = 'passage-book-input'
 import { Combobox } from '@headlessui/react'
 import metadata from '../lib/simple-bible-metadata.json'
 import { z } from 'zod'
@@ -151,6 +153,7 @@ export function PassageSelector({
                     }}
                 >
                     <Combobox.Input
+                        id={PASSAGE_BOOK_INPUT_ID}
                         onChange={event => setBookQuery(event.target.value)}
                         onFocus={event => {
                             event.currentTarget.select()
