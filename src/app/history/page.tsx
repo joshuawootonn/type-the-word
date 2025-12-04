@@ -7,6 +7,8 @@ import { getHistory } from './getHistory'
 import { HistoryLogV2 } from './history-log-2'
 import { WPMChart } from './wpm-chart'
 import { cookies } from 'next/headers'
+import PostHogClient from '~/server/posthog'
+
 export const metadata: Metadata = {
     title: 'Type the Word - History',
     description: 'History of all the passages you have typed.',
@@ -24,9 +26,14 @@ export default async function History() {
         redirect('/')
     }
 
-    const { overview, log2, allVerseStats } = await getHistory(
-        session.user.id,
-        timezoneOffset,
+    const [{ overview, log2, allVerseStats }, showWpmChart] = await Promise.all(
+        [
+            getHistory(session.user.id, timezoneOffset),
+            PostHogClient().isFeatureEnabled(
+                'use-wpm-accuracy-history-chart',
+                session.user.id,
+            ),
+        ],
     )
 
     return (
@@ -40,18 +47,22 @@ export default async function History() {
             ) : (
                 <HistoryOverview overview={overview} />
             )}
-            <hr className="mx-0 w-full border-t-2 border-primary" />
-            <WPMChart
-                allStats={allVerseStats}
-                title={
-                    <div className="flex items-center gap-2">
-                        <h2 className="m-0">WPM + Accuracy</h2>
-                        <span className="border border-primary px-1.5 py-0.5 translate-y-0.5 text-xs font-medium text-primary">
-                            beta
-                        </span>
-                    </div>
-                }
-            />
+            {showWpmChart && (
+                <>
+                    <hr className="mx-0 w-full border-t-2 border-primary" />
+                    <WPMChart
+                        allStats={allVerseStats}
+                        title={
+                            <div className="flex items-center gap-2">
+                                <h2 className="m-0">WPM + Accuracy</h2>
+                                <span className="translate-y-0.5 border border-primary px-1.5 py-0.5 text-xs font-medium text-primary">
+                                    beta
+                                </span>
+                            </div>
+                        }
+                    />
+                </>
+            )}
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <h2>Log</h2>
             {log2.length === 0 ? (
