@@ -6,6 +6,7 @@ import { changelogUpdatedAt } from './updated-at'
 import HotkeyLabel from '~/components/hotkey-label'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '~/server/auth'
+import { EmailLink } from '~/components/emailLink'
 
 function Link({ href, children }: { href: string; children: React.ReactNode }) {
     return (
@@ -63,6 +64,19 @@ export default async function Changelog() {
             )}
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
+                <li>
+                    <DateComponent date={new Date('12/5/2025')} /> - Started a
+                    beta for WPM and accuracy stats on the history page. If
+                    you&apos;re interested in joining, reach out at{' '}
+                    <EmailLink className="underline" />.
+                    <Image
+                        src={'/assets/2025-12-05-WPM.png'}
+                        alt={'Screenshot of the new WPM and accuracy chart'}
+                        className="mt-3 border-2 border-primary"
+                        width={800}
+                        height={400}
+                    />
+                </li>
                 <li>
                     <DateComponent date={new Date('12/3/2025')} /> - Added a
                     global shortcut for focusing the passage selector:{' '}
