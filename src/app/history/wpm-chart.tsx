@@ -2,7 +2,15 @@
 
 import { useState, useMemo } from 'react'
 import { ParentSize } from '@visx/responsive'
-import { Axis, LineSeries, XYChart, Tooltip, GlyphSeries } from '@visx/xychart'
+import {
+    Axis,
+    LineSeries,
+    XYChart,
+    Tooltip,
+    GlyphSeries,
+    buildChartTheme,
+} from '@visx/xychart'
+import { defaultStyles as defaultTooltipStyles } from '@visx/tooltip'
 import {
     AggregatedStats,
     VerseStatsWithDate,
@@ -29,6 +37,19 @@ const accessors = {
     yAccessorWpm: (d: AggregatedStats) => d.averageWpm ?? 0,
     yAccessorAccuracy: (d: AggregatedStats) => d.averageAccuracy ?? 0,
 }
+// Add before the component
+const chartTheme = buildChartTheme({
+    backgroundColor: 'transparent',
+    colors: [
+        'oklch(var(--color-primary))',
+        'oklch(var(--color-primary))', // wpm-points same as wpm
+        'oklch(var(--color-success))',
+        'oklch(var(--color-success))', // accuracy-points same as accuracy
+    ],
+    gridColor: 'oklch(var(--color-primary))',
+    gridColorDark: 'oklch(var(--color-primary))',
+    tickLength: 4,
+})
 
 function WPMChartInner({ data }: { data: AggregatedStats[] }) {
     const hasAnyData = data.some(
@@ -56,6 +77,7 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                     xScale={{ type: 'band', paddingInner: 0.5 }}
                     yScale={{ type: 'linear', domain: [0, 100] }}
                     margin={{ top: 20, right: 50, bottom: 40, left: 50 }}
+                    theme={chartTheme}
                 >
                     <Axis
                         orientation="bottom"
@@ -142,35 +164,33 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                         snapTooltipToDatumY
                         showVerticalCrosshair
                         showSeriesGlyphs
+                        style={{
+                            ...defaultTooltipStyles,
+                            padding: '0',
+                            borderRadius: '0',
+                            border: '1.5px solid oklch(var(--color-primary))',
+                        }}
                         renderTooltip={({ tooltipData }) => {
                             const datum = tooltipData?.nearestDatum
                                 ?.datum as AggregatedStats
                             if (!datum) return null
                             return (
-                                <div className="border-2 border-primary bg-secondary px-3 py-2 text-primary">
-                                    <div className="font-medium">
+                                <div className="bg-secondary px-3 py-2 text-primary">
+                                    <div className="mb-1 text-base font-medium">
                                         {datum.dateLabel}
                                     </div>
                                     {datum.averageWpm !== null && (
-                                        <div>WPM: {datum.averageWpm}</div>
+                                        <div className="mb-1 flex justify-between font-normal">
+                                            <div>WPM:</div>
+                                            <div>{datum.averageWpm}</div>
+                                        </div>
                                     )}
                                     {datum.averageAccuracy !== null && (
-                                        <div>
-                                            Accuracy: {datum.averageAccuracy}%
+                                        <div className="flex justify-between space-x-3 font-normal">
+                                            <div>Accuracy:</div>
+                                            <div>{datum.averageAccuracy}</div>
                                         </div>
                                     )}
-                                    {datum.versesWithData > 0 && (
-                                        <div className="text-sm opacity-70">
-                                            {datum.versesWithData} verse
-                                            {datum.versesWithData !== 1
-                                                ? 's'
-                                                : ''}
-                                        </div>
-                                    )}
-                                    {datum.averageWpm === null &&
-                                        datum.averageAccuracy === null && (
-                                            <div>No data</div>
-                                        )}
                                 </div>
                             )
                         }}
