@@ -3,7 +3,7 @@ version: '3.8'
 
 services:
     postgres:
-        image: postgres:15.5-alpine
+        image: postgres:17.5-alpine
         environment:
             POSTGRES_DB: type_the_word
             POSTGRES_PASSWORD: postgres
@@ -17,7 +17,7 @@ services:
             - pgdata:/var/lib/postgresql/data
         restart: on-failure:3
     postgres-test:
-        image: postgres:15.5-alpine
+        image: postgres:17.5-alpine
         environment:
             POSTGRES_DB: type_the_word_test
             POSTGRES_PASSWORD: postgres
