@@ -47,6 +47,7 @@ const PAUSE_PENALTY_MS = 1000 // Only count 1 second of pause time
 export function parseTypingData(data: unknown): TypingData | null {
     const result = typingDataSchema.safeParse(data)
     if (!result.success) {
+        console.log(result.error)
         return null
     }
     return result.data
@@ -121,11 +122,6 @@ export function getValidActionsAfterReset(
             ? actions.slice(lastSoftLineBackwardIndex + 1)
             : actions
 
-    // Need at least 2 valid actions to calculate WPM
-    if (validActions.length < 2) {
-        return null
-    }
-
     return validActions
 }
 
@@ -133,12 +129,16 @@ export function calculateStatsForVerse(
     typedVerse: TypedVerse,
 ): VerseStats | null {
     const typingData = parseTypingData(typedVerse.typingData)
-    if (!typingData || typingData.userActions.length < 2) {
+    if (!typingData) {
         return null
     }
 
     const validActions = getValidActionsAfterReset(typingData.userActions)
     if (validActions === null) {
+        return null
+    }
+
+    if (validActions.length < 2) {
         return null
     }
 
@@ -187,30 +187,27 @@ export function getAllVerseStats(
     clientTimezoneOffset: number,
 ): VerseStatsWithDate[] {
     const serverUTCOffset = new Date().getTimezoneOffset()
-    const now = new Date()
-
-    // Get data for the past year
-    const yearInterval = {
-        start: startOfDay(subYears(now, 1)),
-        end: now,
-    }
 
     const allStats: VerseStatsWithDate[] = []
 
     for (const session of typingSessions) {
         for (const typedVerse of session.typedVerses) {
-            // Adjust for timezone
-            const clientTimezoneCreatedAt = new Date(
-                typedVerse.createdAt.getTime() +
-                    (serverUTCOffset - clientTimezoneOffset) * 60 * 1000,
-            )
+            const hasTypingData = !!typedVerse.typingData
 
-            // Only include verses from the past year
-            if (!isWithinInterval(clientTimezoneCreatedAt, yearInterval)) {
+            if (!hasTypingData) {
                 continue
             }
 
+            // I have to use the session.createdAt, because for some reason the nested entity date is an "Invalid Date"
+            const parsedCreatedAt = session.createdAt
+
+            const clientTimezoneCreatedAt = new Date(
+                parsedCreatedAt.getTime() +
+                    (serverUTCOffset - clientTimezoneOffset) * 60 * 1000,
+            )
+
             const stats = calculateStatsForVerse(typedVerse)
+
             if (stats === null) {
                 continue
             }
@@ -225,7 +222,10 @@ export function getAllVerseStats(
     return allStats
 }
 
-function getTimeRangeInterval(timeRange: TimeRange): { start: Date; end: Date } {
+function getTimeRangeInterval(timeRange: TimeRange): {
+    start: Date
+    end: Date
+} {
     const now = new Date()
     switch (timeRange) {
         case 'week':
@@ -333,13 +333,4 @@ export function aggregateStats(
             versesWithData: intervalStats.length,
         }
     })
-}
-
-// Legacy function for backwards compatibility
-export function getWeeklyStats(
-    typingSessions: TypingSession[],
-    clientTimezoneOffset: number,
-): AggregatedStats[] {
-    const allStats = getAllVerseStats(typingSessions, clientTimezoneOffset)
-    return aggregateStats(allStats, 'week', 'daily')
 }

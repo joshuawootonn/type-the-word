@@ -2,13 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { ParentSize } from '@visx/responsive'
-import {
-    Axis,
-    LineSeries,
-    XYChart,
-    Tooltip,
-    GlyphSeries,
-} from '@visx/xychart'
+import { Axis, LineSeries, XYChart, Tooltip, GlyphSeries } from '@visx/xychart'
 import {
     AggregatedStats,
     VerseStatsWithDate,
@@ -226,24 +220,15 @@ export function WPMChart({
     const [timeRange, setTimeRange] = useState<TimeRange>('week')
     const [interval, setInterval] = useState<Interval>('daily')
 
-    // Serialize dates for client-side use (dates come as strings from server)
-    const statsWithDates = useMemo(() => {
-        if (!allStats) return []
-        return allStats.map(stat => ({
-            ...stat,
-            date: new Date(stat.date),
-        }))
-    }, [allStats])
-
     const aggregatedData = useMemo(() => {
-        return aggregateStats(statsWithDates, timeRange, interval)
-    }, [statsWithDates, timeRange, interval])
+        return aggregateStats(allStats, timeRange, interval)
+    }, [allStats, timeRange, interval])
 
     return (
         <div className="mb-8">
-            <div className="flex flex-col justify-start items-start gap-4">
+            <div className="flex flex-col items-start justify-start gap-4">
                 {title}
-                <div className="self-end flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-4 self-end">
                     <Select
                         value={timeRange}
                         onChange={setTimeRange}
