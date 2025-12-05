@@ -56,7 +56,7 @@
         "next": "^14.2.4",
         "next-auth": "^4.23.0",
         "parse5": "^7.1.2",
-        "postgres": "^3.4.4",
+        "postgres": "^3.4.7",
         "posthog-js": "^1.299.0",
         "posthog-node": "^5.15.0",
         "react": "18.3.1",
