@@ -205,7 +205,7 @@ export function Navigation({
                                         </DropdownMenu.Item>
                                     </Popover.PopoverTrigger>
                                     <DropdownMenu.Item
-                                        className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                        className="cursor-pointer px-3 py-1 outline-none focus:bg-primary focus:text-secondary"
                                         onClick={() =>
                                             void signOut({ redirect: true })
                                         }
