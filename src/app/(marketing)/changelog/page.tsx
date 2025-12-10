@@ -431,9 +431,9 @@ export default async function Changelog() {
                         <li>
                             Fixed a bug where
                             <HotkeyLabel
-                                mac="⌘+⇦"
-                                mobile="⌘+⇦"
-                                nonMac="⌘+⇦"
+                                mac="⌘+←"
+                                mobile="⌘+←"
+                                nonMac="⌘+←"
                             />{' '}
                             was no longer restarting the verse.
                         </li>
@@ -569,11 +569,11 @@ export default async function Changelog() {
                     <ul>
                         <li>
                             Fixed a bug with backspace (
-                            <HotkeyLabel mac="⇦" mobile="⇦" nonMac="⇦" />) where
+                            <HotkeyLabel mac="←" mobile="←" nonMac="←" />) where
                             it would delete an entire word. This was a bug in
                             Chrome that would happen after the shortcut for
                             deleting the previous word was used (
-                            <HotkeyLabel mac="⌥+⇦" mobile="⌥+⇦" nonMac="^+⇦" />)
+                            <HotkeyLabel mac="⌥+←" mobile="⌥+←" nonMac="^+←" />)
                             despite the{' '}
                             <HotkeyLabel mac="⌥" mobile="⌥" nonMac="^" /> being
                             unpressed.{' '}
@@ -611,8 +611,8 @@ export default async function Changelog() {
                         pointing this out{' '}
                     </Link>
                     @AidenC! You can now restart the current verse on Windows
-                    with <HotkeyLabel value="^+⇧+⇦" /> . The MacOS shortcut is
-                    still <HotkeyLabel value="⌘+⇦" /> .
+                    with <HotkeyLabel value="^+↑+←" /> . The MacOS shortcut is
+                    still <HotkeyLabel value="⌘+←" /> .
                 </li>{' '}
                 <li>
                     <DateComponent date={new Date('8/25/2024')} />{' '}
@@ -643,17 +643,17 @@ export default async function Changelog() {
                     <ul>
                         <li>
                             <HotkeyLabel
-                                mac="⌘+⇧+Y"
-                                mobile="⌘+⇧+Y"
-                                nonMac="^+⇧+Y"
+                                mac="⌘+↑+Y"
+                                mobile="⌘+↑+Y"
+                                nonMac="^+↑+Y"
                             />{' '}
                             navigates to history
                         </li>
                         <li>
                             <HotkeyLabel
-                                mac="⌘+⇧+,"
-                                mobile="⌘+⇧+,"
-                                nonMac="^+⇧+,"
+                                mac="⌘+↑+,"
+                                mobile="⌘+↑+,"
+                                nonMac="^+↑+,"
                             />{' '}
                             opens settings
                         </li>
@@ -684,14 +684,14 @@ export default async function Changelog() {
                     restarting the verse.
                     <ul>
                         <li>
-                            <HotkeyLabel mac="⌥+⇦" mobile="⌥+⇦" nonMac="^+⇦" />{' '}
+                            <HotkeyLabel mac="⌥+←" mobile="⌥+←" nonMac="^+←" />{' '}
                             deletes the previous word
                         </li>
                         <li>
                             <HotkeyLabel
-                                mac="⌘+⇦"
-                                mobile="⌘+⇦"
-                                nonMac="^+⇧+⇦"
+                                mac="⌘+←"
+                                mobile="⌘+←"
+                                nonMac="^+↑+←"
                             />{' '}
                             restarts the current verse
                         </li>

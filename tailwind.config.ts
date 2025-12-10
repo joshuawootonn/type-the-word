@@ -7,7 +7,7 @@ module.exports = {
     theme: {
         fontFamily: {
             sans: ['var(--font-poppins)', ...defaultTheme.fontFamily.sans],
-            mono: ['var(--font-ibm-plex)', ...defaultTheme.fontFamily.mono],
+            mono: ['"Google Sans Mono"', ...defaultTheme.fontFamily.mono],
         },
         extend: {
             colors: {

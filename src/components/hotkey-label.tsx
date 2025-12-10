@@ -17,7 +17,7 @@ export default function HotkeyLabel(
         return (
             <kbd
                 suppressHydrationWarning
-                className={clsx(props.className, 'font-sans tracking-[0.2em]')}
+                className={clsx(props.className, 'font-mono tracking-[0.2em]')}
             >
                 {props.value}
             </kbd>
@@ -30,7 +30,7 @@ export default function HotkeyLabel(
         <kbd
             suppressHydrationWarning
             className={clsx(props.className, {
-                ['font-sans tracking-[0.2em]']: !isMobile,
+                ['font-mono tracking-[0.2em]']: !isMobile,
             })}
         >
             {isMobile && props.mobile

@@ -189,8 +189,8 @@ export function Navigation({
                                             History
                                             <HotkeyLabel
                                                 className="ml-auto pl-5 text-sm text-primary/80 group-focus:text-secondary/80"
-                                                mac="⌘+⇧+Y"
-                                                nonMac="^+⇧+Y"
+                                                mac="⌘+↑+Y"
+                                                nonMac="^+↑+Y"
                                             />
                                         </Link>
                                     </DropdownMenu.Item>
@@ -199,8 +199,8 @@ export function Navigation({
                                             Settings
                                             <HotkeyLabel
                                                 className="ml-auto pl-5 text-sm text-primary/80 group-focus:text-secondary/80"
-                                                mac="⌘+⇧+,"
-                                                nonMac="^+⇧+,"
+                                                mac="⌘+↑+,"
+                                                nonMac="^+↑+,"
                                             />
                                         </DropdownMenu.Item>
                                     </Popover.PopoverTrigger>

@@ -5,7 +5,7 @@ import clsx from 'clsx'
 import '~/styles/globals.css'
 import { Footer } from '~/components/footer'
 import { Navigation } from '~/components/navigation/navigation'
-import { poppins, ibmPlexMono } from './fonts'
+import { poppins } from './fonts'
 import { authOptions } from '~/server/auth'
 import Fathom from './fathom'
 import { Metadata } from 'next'
@@ -77,7 +77,6 @@ export default async function RootLayout({
                 className={clsx(
                     'min-h-screen-1px flex w-full font-sans',
                     poppins.variable,
-                    ibmPlexMono.variable,
                 )}
             >
                 <div className="container mx-auto flex max-w-page flex-col px-4  lg:px-0">

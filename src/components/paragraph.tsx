@@ -6,7 +6,6 @@ import { useAtom } from 'jotai'
 import { CurrentVerse } from '~/components/currentVerse'
 import { ReadonlyVerse } from '~/components/readonlyVerse'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
-import { ibmPlexMono } from '~/app/fonts'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 import { PassageSegment } from '~/lib/passageSegment'
 
@@ -25,13 +24,7 @@ export function Paragraph({
 }) {
     const [currentVerse] = useAtom(currentVerseAtom)
     return (
-        <p
-            className={clsx(
-                'text-lg',
-                node.metadata.blockIndent && 'ml-3',
-                ibmPlexMono.className,
-            )}
-        >
+        <p className={clsx('text-lg', node.metadata.blockIndent && 'ml-3')}>
             {node.nodes.map((verse, vIndex) => {
                 const isCurrentVerse = verse.verse.value === currentVerse
 
