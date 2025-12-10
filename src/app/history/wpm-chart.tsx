@@ -1,6 +1,13 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '~/components/ui/select'
 import { ParentSize } from '@visx/responsive'
 import {
     Axis,
@@ -201,7 +208,7 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
     )
 }
 
-function Select<T extends string>({
+function ChartSelect<T extends string>({
     value,
     onChange,
     options,
@@ -213,20 +220,21 @@ function Select<T extends string>({
     label: string
 }) {
     return (
-        <label className="flex items-center gap-2 text-sm text-primary">
+        <div className="flex items-center gap-2 text-sm text-primary">
             <span>{label}:</span>
-            <select
-                value={value}
-                onChange={e => onChange(e.target.value as T)}
-                className="border-2 border-primary bg-secondary px-2 py-1 text-primary outline-none"
-            >
-                {options.map(option => (
-                    <option key={option.value} value={option.value}>
-                        {option.label}
-                    </option>
-                ))}
-            </select>
-        </label>
+            <Select value={value} onValueChange={onChange}>
+                <SelectTrigger>
+                    <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                    {options.map(option => (
+                        <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        </div>
     )
 }
 
@@ -249,13 +257,13 @@ export function WPMChart({
             <div className="flex flex-col items-start justify-start gap-4">
                 {title}
                 <div className="flex flex-wrap gap-4 self-end">
-                    <Select
+                    <ChartSelect
                         value={timeRange}
                         onChange={setTimeRange}
                         options={TIME_RANGE_OPTIONS}
                         label="Range"
                     />
-                    <Select
+                    <ChartSelect
                         value={interval}
                         onChange={setInterval}
                         options={INTERVAL_OPTIONS}
