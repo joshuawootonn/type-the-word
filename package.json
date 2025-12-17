@@ -6,7 +6,7 @@
         "build": "next build",
         "dev": "next dev -p 1199",
         "lint": "next lint",
-        "format": "prettier ./src/**/* --write",
+        "format": "prettier ./src/ --write",
         "format:check": "prettier ./src --check",
         "type-check": "tsc --noEmit",
         "start": "next start",

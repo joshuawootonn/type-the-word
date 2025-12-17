@@ -1,7 +1,7 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRef, useEffect, useCallback } from 'react'
-import { useAnalytics } from '~/lib/hooks/useAnalytics'
+
 import {
     getDarkTheme,
     getLightTheme,
@@ -9,6 +9,7 @@ import {
     useTheme,
 } from '~/app/theme-provider'
 import { fetchDeleteTheme } from '~/lib/api'
+import { useAnalytics } from '~/lib/hooks/useAnalytics'
 import { isThemeDark } from '~/lib/theme/lch'
 import {
     BuiltinThemeRecord,

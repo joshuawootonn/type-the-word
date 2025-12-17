@@ -9,14 +9,13 @@
  *
  * Run with: npx tsx src/scripts/backfill-book-progress.ts
  */
-
+import { aggregateBookData } from '~/app/history/overview'
+import { Book, bookSchema } from '~/lib/types/book'
+import { getBibleMetadata } from '~/server/bibleMetadata'
 import { db } from '~/server/db'
 import { users, Translation } from '~/server/db/schema'
 import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
 import { UserProgressRepository } from '~/server/repositories/userProgress.repository'
-import { aggregateBookData } from '~/app/history/overview'
-import { Book, bookSchema } from '~/lib/types/book'
-import { getBibleMetadata } from '~/server/bibleMetadata'
 
 async function backfillUserBookProgress() {
     console.log('Starting backfill of book/chapter progress tables...')

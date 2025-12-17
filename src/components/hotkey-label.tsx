@@ -1,6 +1,7 @@
 'use client'
 
 import clsx from 'clsx'
+
 import { getOS } from '~/app/global-hotkeys'
 
 export default function HotkeyLabel(
@@ -36,8 +37,8 @@ export default function HotkeyLabel(
             {isMobile && props.mobile
                 ? props.mobile
                 : os === 'MacOS'
-                ? props.mac
-                : props.nonMac}
+                  ? props.mac
+                  : props.nonMac}
         </kbd>
     )
 }

@@ -1,8 +1,9 @@
-import React from 'react'
-import { useCursor } from '~/lib/hooks'
 import clsx from 'clsx'
 import { useAtom } from 'jotai'
+import React from 'react'
+
 import { isPassageActiveAtom, isPassageFocusedAtom } from '~/components/passage'
+import { useCursor } from '~/lib/hooks'
 
 export function Cursor({ passageId }: { passageId: string }) {
     const [isPassageActive] = useAtom(isPassageActiveAtom)

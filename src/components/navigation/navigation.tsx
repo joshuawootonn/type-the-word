@@ -1,23 +1,25 @@
 'use client'
 
-import { signOut, useSession } from 'next-auth/react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import * as Popover from '@radix-ui/react-popover'
-import Link from 'next/link'
-import Head from 'next/head'
-import { usePathname } from 'next/navigation'
-import { fetchBuiltinThemes, fetchLastVerse, fetchUserThemes } from '~/lib/api'
 import { useQuery } from '@tanstack/react-query'
-import { toPassageSegment } from '~/lib/passageSegment'
-import { TypedVerse } from '~/server/repositories/typingSession.repository'
+import clsx from 'clsx'
+import { signOut, useSession } from 'next-auth/react'
+import Head from 'next/head'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useRef, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
-import HotkeyLabel from '../hotkey-label'
-import clsx from 'clsx'
-import { Settings } from './settings'
-import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
+
+import { fetchBuiltinThemes, fetchLastVerse, fetchUserThemes } from '~/lib/api'
+import { toPassageSegment } from '~/lib/passageSegment'
 import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
+import { TypedVerse } from '~/server/repositories/typingSession.repository'
+import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
+
+import HotkeyLabel from '../hotkey-label'
 import { CreateThemeForm } from './create-theme-form'
+import { Settings } from './settings'
 
 export function Navigation({
     builtinThemes: serverRenderedBuiltinThemes,

@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest'
+
 import { createESVURL } from './create-esv-url'
 
 describe('createESVURL', () => {

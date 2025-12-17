@@ -3,9 +3,14 @@ import { createInsertSchema } from 'drizzle-zod'
 import { getServerSession } from 'next-auth'
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
+
 import { authOptions } from '~/server/auth'
 import { db } from '~/server/db'
-import { typedVerses, typingSessions, typingDataSchema } from '~/server/db/schema'
+import {
+    typedVerses,
+    typingSessions,
+    typingDataSchema,
+} from '~/server/db/schema'
 import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
 import { UserProgressRepository } from '~/server/repositories/userProgress.repository'
 

@@ -1,15 +1,11 @@
-import { z } from 'zod'
-import { Field, Formik } from 'formik'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAnalytics } from '~/lib/hooks/useAnalytics'
-import { ColorInput } from './color-input'
+import { Field, Formik } from 'formik'
 import { FocusEvent, useState } from 'react'
-import {
-    BuiltinThemeRecord,
-    ThemeRecord,
-} from '~/server/repositories/builtinTheme.repository'
+import { z } from 'zod'
+
 import { useTheme } from '~/app/theme-provider'
 import { fetchCreateTheme } from '~/lib/api'
+import { useAnalytics } from '~/lib/hooks/useAnalytics'
 import {
     cleanUpdateDocumentStyles,
     getCSSVarValue,
@@ -21,6 +17,12 @@ import {
     oklchToString,
     stringToOKLCH,
 } from '~/lib/theme/lch'
+import {
+    BuiltinThemeRecord,
+    ThemeRecord,
+} from '~/server/repositories/builtinTheme.repository'
+
+import { ColorInput } from './color-input'
 
 export const formSchema = z.object({
     label: z
@@ -128,19 +130,19 @@ export function CreateThemeForm({
                 currentTheme.colorScheme === 'light'
                     ? data.themeId
                     : currentTheme.colorScheme === 'system'
-                    ? !isThemeDark(data.theme)
-                        ? data.themeId
-                        : currentTheme.lightThemeId
-                    : null
+                      ? !isThemeDark(data.theme)
+                          ? data.themeId
+                          : currentTheme.lightThemeId
+                      : null
 
             nextDarkThemeId =
                 currentTheme.colorScheme === 'dark'
                     ? data.themeId
                     : currentTheme.colorScheme === 'system'
-                    ? isThemeDark(data.theme)
-                        ? data.themeId
-                        : currentTheme.darkThemeId
-                    : null
+                      ? isThemeDark(data.theme)
+                          ? data.themeId
+                          : currentTheme.darkThemeId
+                      : null
 
             setTheme({
                 colorScheme: currentTheme.colorScheme,

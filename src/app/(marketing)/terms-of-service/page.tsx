@@ -1,5 +1,6 @@
-import { EmailLink } from '~/components/emailLink'
 import { Metadata } from 'next'
+
+import { EmailLink } from '~/components/emailLink'
 
 export const metadata: Metadata = {
     title: 'Type the Word - Terms of Service',

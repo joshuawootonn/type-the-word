@@ -1,7 +1,8 @@
-import * as schema from '~/server/db/schema'
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import { and, eq, sql } from 'drizzle-orm'
+import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
+
 import { getBibleMetadata, BookMetadata } from '~/server/bibleMetadata'
+import * as schema from '~/server/db/schema'
 
 // Use Drizzle's inferred types to avoid casting
 export type BookProgressRow = typeof schema.userBookProgress.$inferSelect
@@ -167,7 +168,10 @@ export class UserProgressRepository {
             })
 
         // Check if the book is now complete (all chapters at 100%)
-        const isBookComplete = this.isBookComplete(chapterProgress, bookMetadata)
+        const isBookComplete = this.isBookComplete(
+            chapterProgress,
+            bookMetadata,
+        )
 
         if (isBookComplete) {
             await this.prestigeBook(userId, book, translation)
@@ -308,11 +312,11 @@ export class UserProgressRepository {
                     ],
                     set: {
                         typedVerses: chapterRow.typedVerses,
-                        typedVerseCount: Object.keys(chapterRow.typedVerses).length,
+                        typedVerseCount: Object.keys(chapterRow.typedVerses)
+                            .length,
                         updatedAt: new Date(),
                     },
                 })
         }
     }
 }
-

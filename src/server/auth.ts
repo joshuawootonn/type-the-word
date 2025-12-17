@@ -1,15 +1,15 @@
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
+import { eq } from 'drizzle-orm'
 import { type GetServerSidePropsContext } from 'next'
 import { getServerSession, type NextAuthOptions } from 'next-auth'
-import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import GoogleProvider from 'next-auth/providers/google'
 
 import { env } from '~/env.mjs'
+import { verifyPassword } from '~/lib/auth/password'
 import { createSubscription } from '~/lib/convert-kit.service'
 import { db } from '~/server/db'
 import { users, accounts } from '~/server/db/schema'
-import { eq } from 'drizzle-orm'
-import { verifyPassword } from '~/lib/auth/password'
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`

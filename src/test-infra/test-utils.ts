@@ -1,3 +1,16 @@
+import { Sema } from 'async-sema'
+import { parse } from 'csv-parse/sync'
+import fs from 'fs'
+import path from 'path'
+
+import { chunk } from '~/lib/chunk'
+import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
+import {
+    TypedVerse,
+    TypingSession,
+    TypingSessionRepository,
+} from '~/server/repositories/typingSession.repository'
+
 import { db } from '../server/db'
 import {
     typedVerses,
@@ -6,18 +19,6 @@ import {
     users,
 } from '../server/db/schema'
 import { User, UserRepository } from '../server/repositories/user.repository'
-
-import fs from 'fs'
-import path from 'path'
-import { parse } from 'csv-parse/sync'
-import {
-    TypedVerse,
-    TypingSession,
-    TypingSessionRepository,
-} from '~/server/repositories/typingSession.repository'
-import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
-import { Sema } from 'async-sema'
-import { chunk } from '~/lib/chunk'
 
 export async function truncateTables() {
     await db.delete(typingSessions).execute()

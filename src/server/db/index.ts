@@ -1,8 +1,9 @@
 import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
+
 import { env } from '~/env.mjs'
 
 import * as schema from './schema'
-import postgres from 'postgres'
 
 console.log('env.POSTGRES_DATABASE_URL', env.POSTGRES_DATABASE_URL)
 

@@ -1,14 +1,16 @@
 import { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import Link from 'next/link'
+
 import { Passage } from '~/components/passage'
+import { PassageSelector } from '~/components/passageSelector'
 import { fetchPassage } from '~/lib/api'
 import { segmentToPassageObject } from '~/lib/passageObject'
+import { passageSegmentSchema } from '~/lib/passageSegment'
 import { authOptions } from '~/server/auth'
+
 import { getChapterHistory } from '../api/chapter-history/[passage]/getChapterHistory'
 import { getOrCreateTypingSession } from '../api/typing-session/getOrCreateTypingSession'
-import { passageSegmentSchema } from '~/lib/passageSegment'
-import { PassageSelector } from '~/components/passageSelector'
 
 export const metadata: Metadata = {
     title: 'Type the Word',

@@ -1,10 +1,11 @@
+import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
+
+import { sendPasswordResetEmail } from '~/lib/auth/mailpace'
+import { createResetToken } from '~/lib/auth/reset-token'
 import { db } from '~/server/db'
 import { users } from '~/server/db/schema'
-import { eq } from 'drizzle-orm'
-import { createResetToken } from '~/lib/auth/reset-token'
-import { sendPasswordResetEmail } from '~/lib/auth/mailpace'
 
 const forgotPasswordSchema = z.object({
     email: z.string().email('Invalid email address'),
@@ -17,7 +18,11 @@ export async function POST(request: Request) {
 
         if (!validation.success) {
             return NextResponse.json(
-                { error: validation.error.errors[0]?.message ?? 'Validation failed' },
+                {
+                    error:
+                        validation.error.errors[0]?.message ??
+                        'Validation failed',
+                },
                 { status: 400 },
             )
         }
@@ -35,7 +40,8 @@ export async function POST(request: Request) {
         if (existingUser.length === 0) {
             return NextResponse.json({
                 success: true,
-                message: 'If an account exists with that email, a password reset link has been sent.',
+                message:
+                    'If an account exists with that email, a password reset link has been sent.',
             })
         }
 
@@ -45,7 +51,8 @@ export async function POST(request: Request) {
         if (!user?.hashedPassword) {
             return NextResponse.json({
                 success: true,
-                message: 'If an account exists with that email, a password reset link has been sent.',
+                message:
+                    'If an account exists with that email, a password reset link has been sent.',
             })
         }
 
@@ -57,7 +64,8 @@ export async function POST(request: Request) {
 
         return NextResponse.json({
             success: true,
-            message: 'If an account exists with that email, a password reset link has been sent.',
+            message:
+                'If an account exists with that email, a password reset link has been sent.',
         })
     } catch (error) {
         console.error('Forgot password error:', error)
@@ -67,4 +75,3 @@ export async function POST(request: Request) {
         )
     }
 }
-

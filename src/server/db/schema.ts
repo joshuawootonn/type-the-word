@@ -1,8 +1,4 @@
 import { relations, sql } from 'drizzle-orm'
-import { type AdapterAccount } from 'next-auth/adapters'
-import { createSelectSchema } from 'drizzle-zod'
-import { z } from 'zod'
-import { bookSchema } from '~/lib/types/book'
 import {
     index,
     integer,
@@ -18,6 +14,11 @@ import {
     pgEnum,
     pgTable,
 } from 'drizzle-orm/pg-core'
+import { createSelectSchema } from 'drizzle-zod'
+import { type AdapterAccount } from 'next-auth/adapters'
+import { z } from 'zod'
+
+import { bookSchema } from '~/lib/types/book'
 
 export const passageResponseBook = pgEnum(
     'passageResponse_book',
@@ -246,8 +247,12 @@ export const typingDataSchema = z.object({
             datetime: z.string(),
         }),
     ),
-    userNodes: z.array(z.object({ type: z.literal('word'), letters: z.array(z.string()) })),
-    correctNodes: z.array(z.object({ type: z.literal('word'), letters: z.array(z.string()) })),
+    userNodes: z.array(
+        z.object({ type: z.literal('word'), letters: z.array(z.string()) }),
+    ),
+    correctNodes: z.array(
+        z.object({ type: z.literal('word'), letters: z.array(z.string()) }),
+    ),
 })
 
 export type TypingData = z.infer<typeof typingDataSchema>
@@ -286,7 +291,8 @@ export const chaptersSchema = createSelectSchema(typedVerses).shape.chapter
 export type Chapter = z.infer<typeof chaptersSchema>
 export const booksSchema = createSelectSchema(typedVerses).shape.book
 export type Book = z.infer<typeof booksSchema>
-export const translationsSchema = createSelectSchema(typedVerses).shape.translation
+export const translationsSchema =
+    createSelectSchema(typedVerses).shape.translation
 export type Translation = z.infer<typeof translationsSchema>
 
 export const typedVerseRelations = relations(typedVerses, ({ one }) => ({
@@ -350,7 +356,12 @@ export const userChapterProgress = pgTable(
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
     },
     table => ({
-        pk: primaryKey(table.userId, table.book, table.chapter, table.translation),
+        pk: primaryKey(
+            table.userId,
+            table.book,
+            table.chapter,
+            table.translation,
+        ),
         userIdIdx: index('userChapterProgress_userId_idx').on(table.userId),
         userIdBookIdx: index('userChapterProgress_userId_book_idx').on(
             table.userId,

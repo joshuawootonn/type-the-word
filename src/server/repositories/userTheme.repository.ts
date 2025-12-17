@@ -1,8 +1,10 @@
-import * as schema from '~/server/db/schema'
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import { eq } from 'drizzle-orm'
+import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import { createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
+
+import * as schema from '~/server/db/schema'
+
 import { ThemeRecord, themeRecordSchema } from './builtinTheme.repository'
 
 export const userThemeRecordSchema = createSelectSchema(schema.userTheme).merge(

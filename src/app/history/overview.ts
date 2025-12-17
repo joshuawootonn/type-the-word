@@ -247,7 +247,8 @@ export function getBookOverviewFromCache(
     type ChapterRow = (typeof progressData.chapters)[number]
     const chaptersByBook = new Map<Book, Map<number, ChapterRow>>()
     for (const chapterRow of progressData.chapters) {
-        const bookChapters = chaptersByBook.get(chapterRow.book) ?? new Map<number, ChapterRow>()
+        const bookChapters =
+            chaptersByBook.get(chapterRow.book) ?? new Map<number, ChapterRow>()
         bookChapters.set(chapterRow.chapter, chapterRow)
         chaptersByBook.set(chapterRow.book, bookChapters)
     }
@@ -262,7 +263,8 @@ export function getBookOverviewFromCache(
         const bookMetadata = bibleMetadata[bookRow.book]
         if (!bookMetadata) continue
 
-        const chapterProgressMap = chaptersByBook.get(bookRow.book) ?? new Map<number, ChapterRow>()
+        const chapterProgressMap =
+            chaptersByBook.get(bookRow.book) ?? new Map<number, ChapterRow>()
 
         // Create chapter overviews for ALL chapters in the book
         const chapterOverviews: ChapterOverview[] = bookMetadata.chapters.map(

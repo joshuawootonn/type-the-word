@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+
 import { EmailLink } from '~/components/emailLink'
 
 export const metadata: Metadata = {

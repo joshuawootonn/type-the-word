@@ -6,11 +6,11 @@ export const passwordSchema = z
     .min(8, 'Password must be at least 8 characters')
     .max(100, 'Password must be less than 100 characters')
     .refine(
-        (password) => /[A-Z]/.test(password),
+        password => /[A-Z]/.test(password),
         'Password must contain at least one uppercase letter',
     )
     .refine(
-        (password) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+        password => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
         'Password must contain at least one special character',
     )
 
@@ -30,4 +30,3 @@ export async function verifyPassword(
 ): Promise<boolean> {
     return bcrypt.compare(password, hash)
 }
-

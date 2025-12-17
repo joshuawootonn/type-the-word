@@ -1,4 +1,4 @@
-import { ChapterHistory } from './route'
+import { typingSessionToString } from '~/app/history/typingSessionToString'
 import { PassageObject } from '~/lib/passageObject'
 import { getBibleMetadata } from '~/server/bibleMetadata'
 import { db } from '~/server/db'
@@ -6,7 +6,8 @@ import {
     TypingSession,
     TypingSessionRepository,
 } from '~/server/repositories/typingSession.repository'
-import { typingSessionToString } from '~/app/history/typingSessionToString'
+
+import { ChapterHistory } from './route'
 
 export async function getChapterHistory(
     userId: string,

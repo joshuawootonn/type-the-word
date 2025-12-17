@@ -1,12 +1,14 @@
+import { JSDOM } from 'jsdom'
 import { parseFragment } from 'parse5'
 import { ChildNode } from 'parse5/dist/tree-adapters/default'
+
 import { isAtomTyped } from '~/lib/isEqual'
 import { isAtomComplete } from '~/lib/keystroke'
-import { JSDOM } from 'jsdom'
 import { Book, bookSchema } from '~/lib/types/book'
 import { getBibleMetadata } from '~/server/bibleMetadata'
-import { PassageSegment, toPassageSegment } from './passageSegment'
+
 import { PassageReference, passageReferenceSchema } from './passageReference'
+import { PassageSegment, toPassageSegment } from './passageSegment'
 import { splitLineBySpaceOrNewLine } from './splitBySpaceOrNewLine'
 
 export type Translation = 'esv'

@@ -1,5 +1,6 @@
-import { Inline, Paragraph } from './parseEsv'
 import { isAtomComplete } from '~/lib/keystroke'
+
+import { Inline, Paragraph } from './parseEsv'
 
 export const validQuotes = [
     '“', // U+201c

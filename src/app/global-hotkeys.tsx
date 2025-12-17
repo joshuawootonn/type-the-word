@@ -1,6 +1,8 @@
 'use client'
+
 import { useRouter } from 'next/navigation'
 import { useHotkeys } from 'react-hotkeys-hook'
+
 import { PASSAGE_BOOK_INPUT_ID } from '~/components/passageSelector'
 
 export function GlobalHotkeys() {

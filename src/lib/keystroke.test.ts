@@ -1,8 +1,13 @@
 import { test, expect, describe } from 'vitest'
-import { isValidKeystroke, Keystroke, getPosition } from './keystroke'
+
 import { KnownNativeInputEvent } from '~/components/currentVerse'
 
-function createKeystroke(key: string, type: Keystroke['type'] = 'insertText'): Keystroke {
+import { isValidKeystroke, Keystroke, getPosition } from './keystroke'
+
+function createKeystroke(
+    key: string,
+    type: Keystroke['type'] = 'insertText',
+): Keystroke {
     return {
         type,
         key,
@@ -15,7 +20,10 @@ function createInsertEvent(data: string): KnownNativeInputEvent {
 }
 
 function createDeleteEvent(
-    inputType: 'deleteContentBackward' | 'deleteWordBackward' | 'deleteSoftLineBackward',
+    inputType:
+        | 'deleteContentBackward'
+        | 'deleteWordBackward'
+        | 'deleteSoftLineBackward',
 ): KnownNativeInputEvent {
     return { inputType, data: null }
 }
@@ -97,10 +105,7 @@ describe('isValidKeystroke - character insertion', () => {
     })
 
     test('WHEN inserting newline THEN valid', () => {
-        const prev: Keystroke[] = [
-            createKeystroke('H'),
-            createKeystroke('i'),
-        ]
+        const prev: Keystroke[] = [createKeystroke('H'), createKeystroke('i')]
 
         const result = isValidKeystroke(createInsertEvent('\n'), prev)
 
@@ -117,7 +122,10 @@ describe('isValidKeystroke - delete handling', () => {
             createKeystroke('l'),
         ]
 
-        const result = isValidKeystroke(createDeleteEvent('deleteContentBackward'), prev)
+        const result = isValidKeystroke(
+            createDeleteEvent('deleteContentBackward'),
+            prev,
+        )
 
         expect(result).toBeDefined()
         expect(result?.at(-1)?.type).toBe('deleteContentBackward')
@@ -132,7 +140,10 @@ describe('isValidKeystroke - delete handling', () => {
             createKeystroke('o'),
         ]
 
-        const result = isValidKeystroke(createDeleteEvent('deleteWordBackward'), prev)
+        const result = isValidKeystroke(
+            createDeleteEvent('deleteWordBackward'),
+            prev,
+        )
 
         expect(result).toBeDefined()
         expect(result?.at(-1)?.type).toBe('deleteWordBackward')
@@ -150,7 +161,10 @@ describe('isValidKeystroke - delete handling', () => {
             createKeystroke('e'),
         ]
 
-        const result = isValidKeystroke(createDeleteEvent('deleteSoftLineBackward'), prev)
+        const result = isValidKeystroke(
+            createDeleteEvent('deleteSoftLineBackward'),
+            prev,
+        )
 
         expect(result).toBeDefined()
         expect(result?.at(-1)?.type).toBe('deleteSoftLineBackward')
@@ -279,6 +293,9 @@ describe('getPosition - builds position from keystrokes', () => {
         const result = getPosition(keystrokes)
 
         expect(result).toHaveLength(1)
-        expect(result[0]).toEqual({ type: 'word', letters: ['"', 'H', 'i', '"'] })
+        expect(result[0]).toEqual({
+            type: 'word',
+            letters: ['"', 'H', 'i', '"'],
+        })
     })
 })

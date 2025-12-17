@@ -1,7 +1,8 @@
 import { randomBytes } from 'crypto'
+import { eq, and, gt } from 'drizzle-orm'
+
 import { db } from '~/server/db'
 import { verificationTokens } from '~/server/db/schema'
-import { eq, and, gt } from 'drizzle-orm'
 
 const TOKEN_EXPIRY_HOURS = 24
 
@@ -29,9 +30,7 @@ export async function createResetToken(email: string): Promise<string> {
     return token
 }
 
-export async function verifyResetToken(
-    token: string,
-): Promise<string | null> {
+export async function verifyResetToken(token: string): Promise<string | null> {
     const result = await db
         .select()
         .from(verificationTokens)
@@ -57,6 +56,7 @@ export async function verifyResetToken(
 }
 
 export async function deleteResetToken(token: string): Promise<void> {
-    await db.delete(verificationTokens).where(eq(verificationTokens.token, token))
+    await db
+        .delete(verificationTokens)
+        .where(eq(verificationTokens.token, token))
 }
-

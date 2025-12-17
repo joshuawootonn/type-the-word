@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'vitest'
+
 import { stringToPassageObject } from '~/lib/passageObject'
+
 import { passageReferenceSchema } from './passageReference'
 
 describe('passageObject parsing', () => {

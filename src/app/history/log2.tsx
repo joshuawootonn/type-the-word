@@ -1,9 +1,11 @@
+import { format, startOfMonth } from 'date-fns'
+
 import {
     TypedVerse,
     TypingSession,
 } from '~/server/repositories/typingSession.repository'
+
 import { typingSessionToString } from './typingSessionToString'
-import { format, startOfMonth } from 'date-fns'
 
 type DayLog = {
     typedVerses: TypedVerse[]

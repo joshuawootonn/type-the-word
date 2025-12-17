@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
-import { passageReferenceSchema } from '~/lib/passageReference'
+
 import { PassageSelector } from '~/components/passageSelector'
+import { passageReferenceSchema } from '~/lib/passageReference'
 
 const DEFAULT_PASSAGE_REFERENCE = 'psalm_23'
 

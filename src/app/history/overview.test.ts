@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
+
+import { Book } from '~/lib/types/book'
 import { db } from '~/server/db'
 import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
 import { createUser, truncateTables } from '~/test-infra/test-utils'
+
 import { aggregateBookData } from './overview'
-import { Book } from '~/lib/types/book'
 
 describe('History Overview', () => {
     it('janet 2_timothy', async () => {

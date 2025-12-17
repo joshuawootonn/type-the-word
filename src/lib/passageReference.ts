@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import toProperCase from '~/lib/toProperCase'
 
 export const passageReferenceSchema = z

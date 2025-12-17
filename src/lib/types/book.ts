@@ -71,4 +71,3 @@ export const bookSchema = z.enum([
 
 export const Book = bookSchema.enum
 export type Book = z.infer<typeof bookSchema>
-

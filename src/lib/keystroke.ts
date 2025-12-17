@@ -1,6 +1,6 @@
-import { Inline } from '~/lib/parseEsv'
-import { validEnter, validQuotes, validSingleQuotes } from '~/lib/isEqual'
 import { KnownNativeInputEvent } from '~/components/currentVerse'
+import { validEnter, validQuotes, validSingleQuotes } from '~/lib/isEqual'
+import { Inline } from '~/lib/parseEsv'
 
 export type Keystroke = {
     type:

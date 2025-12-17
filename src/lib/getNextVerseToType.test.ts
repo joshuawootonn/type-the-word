@@ -1,7 +1,9 @@
 import { describe, expect, test } from 'vitest'
+
+import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
+
 import { getNextVerseToType } from './getNextVerseToType'
 import { ParsedPassage, Verse, VerseNumber } from './parseEsv'
-import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 
 // Helper to create a mock verse
 function createMockVerse(verseNum: number): Verse {
@@ -265,4 +267,3 @@ describe('getNextVerseToType', () => {
         expect(result).toBe('1')
     })
 })
-

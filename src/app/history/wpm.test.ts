@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest'
+
+import { TypingData } from '~/server/db/schema'
+import { TypedVerse } from '~/server/repositories/typingSession.repository'
+
 import {
     calculateEffectiveDuration,
     getValidActionsAfterReset,
     calculateAccuracy,
     calculateStatsForVerse,
 } from './wpm'
-import { TypingData } from '~/server/db/schema'
-import { TypedVerse } from '~/server/repositories/typingSession.repository'
 
 // Helper to create action with datetime
 function createAction(
@@ -193,7 +195,9 @@ describe('calculateAccuracy', () => {
         const typingData: TypingData = {
             userActions: [],
             userNodes: [{ type: 'word', letters: ['h', 'e', 'l', 'l', 'o'] }],
-            correctNodes: [{ type: 'word', letters: ['h', 'e', 'l', 'l', 'o'] }],
+            correctNodes: [
+                { type: 'word', letters: ['h', 'e', 'l', 'l', 'o'] },
+            ],
         }
 
         expect(calculateAccuracy(typingData)).toBe(100)
@@ -203,7 +207,9 @@ describe('calculateAccuracy', () => {
         const typingData: TypingData = {
             userActions: [],
             userNodes: [{ type: 'word', letters: ['x', 'x', 'x', 'x', 'x'] }],
-            correctNodes: [{ type: 'word', letters: ['h', 'e', 'l', 'l', 'o'] }],
+            correctNodes: [
+                { type: 'word', letters: ['h', 'e', 'l', 'l', 'o'] },
+            ],
         }
 
         expect(calculateAccuracy(typingData)).toBe(0)
@@ -213,7 +219,9 @@ describe('calculateAccuracy', () => {
         const typingData: TypingData = {
             userActions: [],
             userNodes: [{ type: 'word', letters: ['h', 'e', 'x', 'x', 'o'] }],
-            correctNodes: [{ type: 'word', letters: ['h', 'e', 'l', 'l', 'o'] }],
+            correctNodes: [
+                { type: 'word', letters: ['h', 'e', 'l', 'l', 'o'] },
+            ],
         }
 
         // 3 out of 5 correct = 60%
@@ -282,7 +290,10 @@ describe('calculateStatsForVerse', () => {
             userActions: [
                 createAction('insertText', '2024-01-01T00:00:00.000Z'),
                 createAction('insertText', '2024-01-01T00:00:01.000Z'),
-                createAction('deleteSoftLineBackward', '2024-01-01T00:00:02.000Z'),
+                createAction(
+                    'deleteSoftLineBackward',
+                    '2024-01-01T00:00:02.000Z',
+                ),
                 createAction('insertText', '2024-01-01T00:00:03.000Z'),
             ],
             userNodes: [{ type: 'word', letters: ['h', 'i'] }],
@@ -302,7 +313,10 @@ describe('calculateStatsForVerse', () => {
             userActions: [
                 createAction('insertText', '2024-01-01T00:00:00.000Z'),
                 createAction('insertText', '2024-01-01T00:00:01.000Z'),
-                createAction('deleteSoftLineBackward', '2024-01-01T00:00:02.000Z'),
+                createAction(
+                    'deleteSoftLineBackward',
+                    '2024-01-01T00:00:02.000Z',
+                ),
                 // After reset - these are the only actions that count
                 createAction('insertText', '2024-01-01T00:00:03.000Z'),
                 createAction('insertText', '2024-01-01T00:00:04.000Z'),
@@ -381,4 +395,3 @@ describe('calculateStatsForVerse', () => {
         expect(result).toBeNull()
     })
 })
-

@@ -1,5 +1,7 @@
 import { z } from 'zod'
+
 import { bookSchema } from '~/lib/types/book'
+
 import { passageReferenceSchema } from './passageReference'
 import { passageSegmentSchema } from './passageSegment'
 

@@ -1,5 +1,6 @@
 import { animate } from 'motion'
 import { useEffect, useRef } from 'react'
+
 function pythagorean(x1: number, x2: number, y1: number, y2: number): number {
     return Math.sqrt(
         Math.pow(Math.abs(x2 - x1), 2) + Math.pow(Math.abs(y2 - y1), 2),

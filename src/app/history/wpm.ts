@@ -1,8 +1,4 @@
 import {
-    TypedVerse,
-    TypingSession,
-} from '~/server/repositories/typingSession.repository'
-import {
     format,
     subDays,
     subMonths,
@@ -15,7 +11,12 @@ import {
     eachMonthOfInterval,
     isWithinInterval,
 } from 'date-fns'
+
 import { TypingData, typingDataSchema } from '~/server/db/schema'
+import {
+    TypedVerse,
+    TypingSession,
+} from '~/server/repositories/typingSession.repository'
 
 export type TimeRange = 'week' | 'month' | '3months' | 'year'
 export type Interval = 'daily' | 'weekly' | 'monthly'

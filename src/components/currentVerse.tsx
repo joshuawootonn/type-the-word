@@ -1,6 +1,14 @@
-import { Block, Inline, ParsedPassage, Verse } from '~/lib/parseEsv'
-import React, { FormEvent, KeyboardEvent, useEffect, useRef } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import clsx from 'clsx'
+import { trackEvent } from 'fathom-client'
 import { useAtom } from 'jotai'
+import { useSession } from 'next-auth/react'
+import React, { FormEvent, KeyboardEvent, useEffect, useRef } from 'react'
+import { z } from 'zod'
+
+import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
+import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
+import { getOS } from '~/app/global-hotkeys'
 import {
     passageIdAtom,
     autofocusAtom,
@@ -10,22 +18,15 @@ import {
     keystrokesAtom,
     positionAtom,
 } from '~/components/passage'
-import { useSession } from 'next-auth/react'
-import { getPosition, isAtomComplete, isValidKeystroke } from '~/lib/keystroke'
-import { isAtomTyped, isVerseSameShape } from '~/lib/isEqual'
-import clsx from 'clsx'
 import { Word } from '~/components/word'
-import { usePassageRect, useVerseRect } from '~/lib/hooks/passageRectContext'
-import { trackEvent } from 'fathom-client'
-import { useAnalytics } from '~/lib/hooks/useAnalytics'
-import { z } from 'zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { TypingSession } from '~/server/repositories/typingSession.repository'
 import { fetchAddVerseToTypingSession } from '~/lib/api'
-import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
-import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
-import { getOS } from '~/app/global-hotkeys'
+import { usePassageRect, useVerseRect } from '~/lib/hooks/passageRectContext'
+import { useAnalytics } from '~/lib/hooks/useAnalytics'
+import { isAtomTyped, isVerseSameShape } from '~/lib/isEqual'
+import { getPosition, isAtomComplete, isValidKeystroke } from '~/lib/keystroke'
+import { Block, Inline, ParsedPassage, Verse } from '~/lib/parseEsv'
 import { PassageSegment } from '~/lib/passageSegment'
+import { TypingSession } from '~/server/repositories/typingSession.repository'
 
 const knownInputEventSchema = z.discriminatedUnion('inputType', [
     z.object({

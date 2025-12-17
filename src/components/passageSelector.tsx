@@ -1,6 +1,10 @@
 'use client'
 
+import { Combobox } from '@headlessui/react'
+import * as ScrollArea from '@radix-ui/react-scroll-area'
+import clsx from 'clsx'
 import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import React, {
     ComponentPropsWithoutRef,
     forwardRef,
@@ -9,22 +13,20 @@ import React, {
     useRef,
     useState,
 } from 'react'
-
-export const PASSAGE_BOOK_INPUT_ID = 'passage-book-input'
-import { Combobox } from '@headlessui/react'
-import metadata from '../lib/simple-bible-metadata.json'
 import { z } from 'zod'
-import clsx from 'clsx'
-import * as ScrollArea from '@radix-ui/react-scroll-area'
+
+import { useIsFirstRender } from '~/lib/hooks/useIsFirstRender'
+import { stringToPassageObject } from '~/lib/passageObject'
 import {
     PassageReference,
     passageReferenceSchema,
 } from '~/lib/passageReference'
-import { stringToPassageObject } from '~/lib/passageObject'
-import { Book, bookSchema } from '~/lib/types/book'
 import { toPassageSegment } from '~/lib/passageSegment'
-import { usePathname } from 'next/navigation'
-import { useIsFirstRender } from '~/lib/hooks/useIsFirstRender'
+import { Book, bookSchema } from '~/lib/types/book'
+
+import metadata from '../lib/simple-bible-metadata.json'
+
+export const PASSAGE_BOOK_INPUT_ID = 'passage-book-input'
 
 const simpleBibleMetadataSchema = z.record(
     bookSchema,
@@ -197,9 +199,8 @@ export function PassageSelector({
                                                         : 'bg-secondary text-primary ',
                                                 )}
                                                 onClick={() => {
-                                                    setTimeout(
-                                                        () =>
-                                                            chapterRef.current?.focus(),
+                                                    setTimeout(() =>
+                                                        chapterRef.current?.focus(),
                                                     )
                                                 }}
                                             >

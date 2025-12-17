@@ -1,5 +1,5 @@
-import { ParsedPassage } from '~/lib/parseEsv'
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
+import { ParsedPassage } from '~/lib/parseEsv'
 
 export function getNextVerseToType(
     passage: ParsedPassage,

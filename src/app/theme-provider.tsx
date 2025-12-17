@@ -9,22 +9,24 @@ import {
     useMemo,
     useRef,
 } from 'react'
+
 import {
     fetchBuiltinThemes,
     fetchCurrentTheme,
     fetchSetCurrentTheme,
     fetchUserThemes,
 } from '~/lib/api'
-import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
-import { CurrentTheme } from '~/server/repositories/currentTheme.repository'
-import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
-import { getCurrentThemeOrFallback } from '../lib/theme/get-current-theme-or-fallback'
 import {
     cleanUpdateDocumentStyles,
     uuidToThemeClassname,
     isThemeClassname,
 } from '~/lib/theme/dom'
 import { isThemeDark } from '~/lib/theme/lch'
+import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
+import { CurrentTheme } from '~/server/repositories/currentTheme.repository'
+import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
+
+import { getCurrentThemeOrFallback } from '../lib/theme/get-current-theme-or-fallback'
 import { themeCSS } from './theme-styles'
 
 const ThemeContext = createContext<{

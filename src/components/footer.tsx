@@ -1,14 +1,15 @@
 'use client'
 
-import Link from 'next/link'
-import { EmailLink } from '~/components/emailLink'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { useQuery } from '@tanstack/react-query'
-import { fetchUserChangelog } from '~/lib/api'
-import { useSession } from 'next-auth/react'
-import { isBefore, parseISO } from 'date-fns'
-import { changelogUpdatedAt } from '~/app/(marketing)/changelog/updated-at'
 import clsx from 'clsx'
+import { isBefore, parseISO } from 'date-fns'
+import { useSession } from 'next-auth/react'
+import Link from 'next/link'
+
+import { changelogUpdatedAt } from '~/app/(marketing)/changelog/updated-at'
+import { EmailLink } from '~/components/emailLink'
+import { fetchUserChangelog } from '~/lib/api'
 
 export function Footer() {
     const { data: sessionData } = useSession()

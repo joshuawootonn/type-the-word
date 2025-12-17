@@ -1,4 +1,8 @@
+import clsx from 'clsx'
+import { useAtom, useSetAtom } from 'jotai'
 import React, { useRef } from 'react'
+
+import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 import {
     currentVerseAtom,
     isPassageActiveAtom,
@@ -6,11 +10,8 @@ import {
     positionAtom,
 } from '~/components/passage'
 import { usePassageRect, useVerseRect } from '~/lib/hooks/passageRectContext'
-import { useAtom, useSetAtom } from 'jotai'
-import clsx from 'clsx'
 import { Verse } from '~/lib/parseEsv'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
-import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 
 export function ReadonlyVerse({
     isCurrentVerse,

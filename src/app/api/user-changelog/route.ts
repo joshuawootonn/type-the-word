@@ -1,8 +1,10 @@
 import { getServerSession } from 'next-auth'
 import { NextRequest } from 'next/server'
+
 import { authOptions } from '~/server/auth'
 import { db } from '~/server/db'
 import { UserChangelogRepository } from '~/server/repositories/userChangelog.repository'
+
 import { DTOToRecordSchema } from './dto'
 
 export const dynamic = 'force-dynamic' // defaults to auto

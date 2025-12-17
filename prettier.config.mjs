@@ -9,7 +9,7 @@ const config = {
     jsxSingleQuote: false,
     trailingComma: 'all',
     bracketSpacing: true,
-    jsxBracketSameLine: false,
+    bracketSameLine: false,
     arrowParens: 'avoid',
     requirePragma: false,
     insertPragma: false,
@@ -20,11 +20,9 @@ const config = {
     importOrderSeparation: true,
     importOrderCaseInsensitive: true,
     plugins: [
-        'prettier-plugin-tailwindcss',
-        // this is broken right now. find another solution or update when there is something available.
-        // '@trivago/prettier-plugin-sort-imports',
+        '@trivago/prettier-plugin-sort-imports',
+        'prettier-plugin-tailwindcss', // must be last
     ],
-    
 }
 
 export default config

@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next'
+
 import { getBaseUrl } from '~/lib/api'
 
 export default function sitemap(): MetadataRoute.Sitemap {

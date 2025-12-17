@@ -1,10 +1,11 @@
-import { Metadata } from 'next'
-import { fetchTotalDonationsCents } from '~/server/stripe'
 import { differenceInMonths } from 'date-fns'
+import { Metadata } from 'next'
+import Link from 'next/link'
+
 import { db } from '~/server/db'
 import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
 import { UserRepository } from '~/server/repositories/user.repository'
-import Link from 'next/link'
+import { fetchTotalDonationsCents } from '~/server/stripe'
 
 export const metadata: Metadata = {
     title: 'Donate',
@@ -176,8 +177,8 @@ export default async function DonatePage() {
                 <p>
                     <strong>Q:</strong> Where will excess donations go?
                     <br />
-                    <strong>A:</strong> Scholarships for underprivileged kids from unbelieving families to go to Christian
-                    school through{' '}
+                    <strong>A:</strong> Scholarships for underprivileged kids
+                    from unbelieving families to go to Christian school through{' '}
                     <Link
                         href="https://www.faithacademyiowa.org/"
                         target="_blank"

@@ -1,11 +1,12 @@
 'use client'
 
-import { signIn } from 'next-auth/react'
+import clsx from 'clsx'
 import { Field, Formik } from 'formik'
-import { useState, useRef } from 'react'
+import { signIn } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import clsx from 'clsx'
+import { useState, useRef } from 'react'
+
 import { Loading } from '~/components/loading'
 import { cn } from '~/lib/cn'
 
@@ -19,7 +20,7 @@ export default function LogInPage() {
     const passwordRef = useRef<HTMLInputElement>(null)
 
     return (
-        <div className="flex min-h-screen items-start justify-center mt-8">
+        <div className="mt-8 flex min-h-screen items-start justify-center">
             <div className="w-full max-w-md">
                 <h1 className="mb-8 text-center text-3xl font-semibold text-primary">
                     Log in
@@ -41,14 +42,14 @@ export default function LogInPage() {
                         if (!values.password) {
                             errors.password = 'Password is required'
                         }
-                        
+
                         // Focus first field with error
                         if (errors.email && emailRef.current) {
                             emailRef.current.focus()
                         } else if (errors.password && passwordRef.current) {
                             passwordRef.current.focus()
                         }
-                        
+
                         return errors
                     }}
                     validateOnChange={false}
@@ -104,16 +105,17 @@ export default function LogInPage() {
                                         type="email"
                                         id="email"
                                         innerRef={emailRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary py-1.5 px-3 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="w-full rounded-none border-2 border-primary bg-secondary px-3 py-1.5 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Enter your email..."
                                         autoComplete="email"
                                     />
                                 </div>
-                                {props.errors.email && props.submitCount > 0 && (
-                                    <div className="mt-2 text-error">
-                                        {props.errors.email}
-                                    </div>
-                                )}
+                                {props.errors.email &&
+                                    props.submitCount > 0 && (
+                                        <div className="mt-2 text-error">
+                                            {props.errors.email}
+                                        </div>
+                                    )}
                             </div>
 
                             <div>
@@ -129,16 +131,17 @@ export default function LogInPage() {
                                         type="password"
                                         id="password"
                                         innerRef={passwordRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary py-1.5 px-3 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="w-full rounded-none border-2 border-primary bg-secondary px-3 py-1.5 font-medium text-primary outline-none placeholder:text-primary/50"
                                         placeholder="Enter your password..."
                                         autoComplete="current-password"
                                     />
                                 </div>
-                                {props.errors.password && props.submitCount > 0 && (
-                                    <div className="mt-2 text-error">
-                                        {props.errors.password}
-                                    </div>
-                                )}
+                                {props.errors.password &&
+                                    props.submitCount > 0 && (
+                                        <div className="mt-2 text-error">
+                                            {props.errors.password}
+                                        </div>
+                                    )}
                             </div>
 
                             <div className="flex justify-end">

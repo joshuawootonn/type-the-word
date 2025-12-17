@@ -1,23 +1,23 @@
 'use client'
 
-import React, { useCallback, useId, useRef, useState } from 'react'
-
-import { Inline, ParsedPassage } from '~/lib/parseEsv'
-import { getNextVerseToType } from '~/lib/getNextVerseToType'
-
-import { Paragraph } from './paragraph'
-import { Keystroke } from '~/lib/keystroke'
-import { Cursor } from '~/components/cursor'
+import { useQuery } from '@tanstack/react-query'
 import { atom, PrimitiveAtom, Provider } from 'jotai'
-import { useRect, PassageRectContext } from '~/lib/hooks/passageRectContext'
 import { useHydrateAtoms } from 'jotai/react/utils'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
-import { PassageSegment, toPassageSegment } from '~/lib/passageSegment'
-import { fetchChapterHistory, fetchTypingSessionUpsert } from '~/lib/api'
-import { TypingSession } from '~/server/repositories/typingSession.repository'
+import React, { useCallback, useId, useRef, useState } from 'react'
+
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
+import { Cursor } from '~/components/cursor'
+import { fetchChapterHistory, fetchTypingSessionUpsert } from '~/lib/api'
+import { getNextVerseToType } from '~/lib/getNextVerseToType'
+import { useRect, PassageRectContext } from '~/lib/hooks/passageRectContext'
+import { Keystroke } from '~/lib/keystroke'
+import { Inline, ParsedPassage } from '~/lib/parseEsv'
+import { PassageSegment, toPassageSegment } from '~/lib/passageSegment'
+import { TypingSession } from '~/server/repositories/typingSession.repository'
+
+import { Paragraph } from './paragraph'
 
 export const positionAtom = atom<Inline[]>([])
 export const keystrokesAtom = atom<Keystroke[]>([])

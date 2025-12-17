@@ -1,7 +1,9 @@
 import { getServerSession } from 'next-auth'
 import { NextRequest } from 'next/server'
+
 import { segmentToPassageObject } from '~/lib/passageObject'
 import { authOptions } from '~/server/auth'
+
 import { getChapterHistory } from './getChapterHistory'
 
 export type ChapterLog = {

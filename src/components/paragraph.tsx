@@ -1,13 +1,14 @@
 import clsx from 'clsx'
-import { type Paragraph, ParsedPassage } from '~/lib/parseEsv'
-import React from 'react'
-import { currentVerseAtom } from '~/components/passage'
 import { useAtom } from 'jotai'
-import { CurrentVerse } from '~/components/currentVerse'
-import { ReadonlyVerse } from '~/components/readonlyVerse'
-import { TypingSession } from '~/server/repositories/typingSession.repository'
+import React from 'react'
+
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
+import { CurrentVerse } from '~/components/currentVerse'
+import { currentVerseAtom } from '~/components/passage'
+import { ReadonlyVerse } from '~/components/readonlyVerse'
+import { type Paragraph, ParsedPassage } from '~/lib/parseEsv'
 import { PassageSegment } from '~/lib/passageSegment'
+import { TypingSession } from '~/server/repositories/typingSession.repository'
 
 export function Paragraph({
     node,

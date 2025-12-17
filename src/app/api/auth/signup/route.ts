@@ -1,10 +1,15 @@
+import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
+
+import {
+    hashPassword,
+    passwordSchema,
+    firstNameSchema,
+} from '~/lib/auth/password'
+import { createSubscription } from '~/lib/convert-kit.service'
 import { db } from '~/server/db'
 import { users } from '~/server/db/schema'
-import { eq } from 'drizzle-orm'
-import { hashPassword, passwordSchema, firstNameSchema } from '~/lib/auth/password'
-import { createSubscription } from '~/lib/convert-kit.service'
 
 const signupSchema = z.object({
     firstName: firstNameSchema,
@@ -19,7 +24,11 @@ export async function POST(request: Request) {
 
         if (!validation.success) {
             return NextResponse.json(
-                { error: validation.error.errors[0]?.message ?? 'Validation failed' },
+                {
+                    error:
+                        validation.error.errors[0]?.message ??
+                        'Validation failed',
+                },
                 { status: 400 },
             )
         }
@@ -82,4 +91,3 @@ export async function POST(request: Request) {
         )
     }
 }
-

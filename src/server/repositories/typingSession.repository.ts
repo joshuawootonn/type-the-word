@@ -1,9 +1,10 @@
-import * as schema from '~/server/db/schema'
 import { desc, eq, SQL } from 'drizzle-orm'
-import { typedVerses, typingSessions } from '~/server/db/schema'
+import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import { createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
+
+import * as schema from '~/server/db/schema'
+import { typedVerses, typingSessions } from '~/server/db/schema'
 
 export const typingSessionSchema = createSelectSchema(typingSessions).and(
     z.object({

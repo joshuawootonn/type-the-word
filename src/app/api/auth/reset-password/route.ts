@@ -1,10 +1,11 @@
+import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { db } from '~/server/db'
-import { users } from '~/server/db/schema'
-import { eq } from 'drizzle-orm'
+
 import { hashPassword, passwordSchema } from '~/lib/auth/password'
 import { verifyResetToken, deleteResetToken } from '~/lib/auth/reset-token'
+import { db } from '~/server/db'
+import { users } from '~/server/db/schema'
 
 const resetPasswordSchema = z.object({
     token: z.string(),
@@ -18,7 +19,11 @@ export async function POST(request: Request) {
 
         if (!validation.success) {
             return NextResponse.json(
-                { error: validation.error.errors[0]?.message ?? 'Validation failed' },
+                {
+                    error:
+                        validation.error.errors[0]?.message ??
+                        'Validation failed',
+                },
                 { status: 400 },
             )
         }
@@ -73,4 +78,3 @@ export async function POST(request: Request) {
         )
     }
 }
-

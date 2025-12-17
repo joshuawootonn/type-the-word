@@ -1,8 +1,7 @@
 'use client'
 
-import clsx from 'clsx'
-
 import * as Popover from '@radix-ui/react-popover'
+import clsx from 'clsx'
 import { useEffect, useState } from 'react'
 
 export function EmailLink({

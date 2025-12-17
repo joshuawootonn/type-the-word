@@ -1,10 +1,11 @@
 'use client'
 
 import { Field, Formik } from 'formik'
-import { useState, useRef } from 'react'
 import Link from 'next/link'
-import { cn } from '~/lib/cn'
+import { useState, useRef } from 'react'
+
 import { Loading } from '~/components/loading'
+import { cn } from '~/lib/cn'
 
 export default function ForgotPasswordPage() {
     const [isSubmitted, setIsSubmitted] = useState(false)

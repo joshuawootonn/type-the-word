@@ -1,7 +1,9 @@
 'use client'
+
 import { useQuery } from '@tanstack/react-query'
-import { useSession } from 'next-auth/react'
 import { format } from 'date-fns'
+import { useSession } from 'next-auth/react'
+
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 import { fetchChapterHistory } from '~/lib/api'
 import { PassageSegment } from '~/lib/passageSegment'

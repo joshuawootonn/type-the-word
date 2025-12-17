@@ -1,8 +1,9 @@
 'use client'
 
 import { load, trackPageview } from 'fathom-client'
-import { useEffect, Suspense } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
+import { useEffect, Suspense } from 'react'
+
 import { env } from '~/env.mjs'
 
 function TrackPageView() {

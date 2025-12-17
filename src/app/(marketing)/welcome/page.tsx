@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+
 import { EmailLink } from '~/components/emailLink'
 import { db } from '~/server/db'
 import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'

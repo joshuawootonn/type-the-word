@@ -1,10 +1,11 @@
-import { Passage } from '~/components/passage'
-import Link from 'next/link'
-import { EmailLink } from '~/components/emailLink'
-import { fetchPassage } from '~/lib/api'
-import { passageSegmentSchema } from '~/lib/passageSegment'
-import { ParsedPassage } from '~/lib/parseEsv'
 import { Metadata } from 'next'
+import Link from 'next/link'
+
+import { EmailLink } from '~/components/emailLink'
+import { Passage } from '~/components/passage'
+import { fetchPassage } from '~/lib/api'
+import { ParsedPassage } from '~/lib/parseEsv'
+import { passageSegmentSchema } from '~/lib/passageSegment'
 
 export const metadata: Metadata = {
     title: 'Why I created Type the Word',

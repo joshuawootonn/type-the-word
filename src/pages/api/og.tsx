@@ -1,5 +1,6 @@
 import { ImageResponse } from '@vercel/og'
 import { NextApiRequest } from 'next'
+
 import { passageReferenceSchema } from '~/lib/passageReference'
 
 export const config = {

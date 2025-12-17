@@ -1,12 +1,14 @@
 import { format } from 'date-fns'
 import { Metadata } from 'next'
+import { getServerSession } from 'next-auth/next'
 import Image from 'next/image'
+
+import { EmailLink } from '~/components/emailLink'
+import HotkeyLabel from '~/components/hotkey-label'
+import { authOptions } from '~/server/auth'
+
 import { UpdateLastVisitedChangelog } from './update-last-visited-changelog'
 import { changelogUpdatedAt } from './updated-at'
-import HotkeyLabel from '~/components/hotkey-label'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '~/server/auth'
-import { EmailLink } from '~/components/emailLink'
 
 function Link({ href, children }: { href: string; children: React.ReactNode }) {
     return (

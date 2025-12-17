@@ -1,7 +1,8 @@
-import * as schema from '~/server/db/schema'
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import { createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
+
+import * as schema from '~/server/db/schema'
 
 export const themeRecordSchema = createSelectSchema(schema.theme)
 

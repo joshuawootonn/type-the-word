@@ -1,29 +1,31 @@
 import { Analytics } from '@vercel/analytics/react'
-import { getServerSession } from 'next-auth'
-import { Providers } from './providers'
 import clsx from 'clsx'
-import '~/styles/globals.css'
+import { Metadata } from 'next'
+import { getServerSession } from 'next-auth'
+
 import { Footer } from '~/components/footer'
 import { Navigation } from '~/components/navigation/navigation'
-import { poppins } from './fonts'
 import { authOptions } from '~/server/auth'
-import Fathom from './fathom'
-import { Metadata } from 'next'
-import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
 import { db } from '~/server/db'
-import { TypedVerse } from '~/server/repositories/typingSession.repository'
-import { GlobalHotkeys } from './global-hotkeys'
 import { BuiltinThemeRepository } from '~/server/repositories/builtinTheme.repository'
 import {
     CurrentTheme,
     CurrentThemeRepository,
 } from '~/server/repositories/currentTheme.repository'
+import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
+import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import {
     UserThemeRecord,
     UserThemeRepository,
 } from '~/server/repositories/userTheme.repository'
-import { ThemeStyles } from './theme-styles'
+import '~/styles/globals.css'
+
+import Fathom from './fathom'
+import { poppins } from './fonts'
+import { GlobalHotkeys } from './global-hotkeys'
+import { Providers } from './providers'
 import { ThemeScript } from './theme-script'
+import { ThemeStyles } from './theme-styles'
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://typetheword.site'),

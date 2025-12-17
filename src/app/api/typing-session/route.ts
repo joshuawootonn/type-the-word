@@ -1,6 +1,8 @@
 import { getServerSession } from 'next-auth'
 import { NextRequest } from 'next/server'
+
 import { authOptions } from '~/server/auth'
+
 import { getOrCreateTypingSession } from './getOrCreateTypingSession'
 
 export const dynamic = 'force-dynamic' // defaults to auto
