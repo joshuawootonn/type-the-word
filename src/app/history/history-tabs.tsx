@@ -36,8 +36,6 @@ export function HistoryTabs({
     const validatedInitialTab =
         initialTab === 'wpm' && !showWpmChart ? 'overview' : initialTab
 
-    console.log('initialTab', initialTab)
-
     const [activeTab, setActiveTab] = useState<TabValue>(validatedInitialTab)
 
     const handleTabChange = (value: TabValue | null) => {
@@ -52,9 +50,9 @@ export function HistoryTabs({
             <TabsList className="mb-4">
                 <TabsTab value="overview">
                     Overview
-                    {useOptimizedHistory && (
+                    {showWpmChart && useOptimizedHistory && (
                         <div className="ml-2 inline-block -translate-y-[1px] border-1.5 border-primary px-1.5 py-0.5 text-xs font-medium text-primary">
-                            beta
+                            new
                         </div>
                     )}
                 </TabsTab>
