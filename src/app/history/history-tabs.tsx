@@ -1,15 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 
 import { Tabs, TabsList, TabsTab, TabsPanel } from '~/components/ui/tabs'
-
-import { HistoryLogV2 } from './history-log-2'
-import { HistoryOverview } from './history-overview'
-import { MonthlyLogDTO } from './log2'
-import { BookOverview } from './overview'
-import { VerseStatsWithDate } from './wpm'
-import { WPMChart } from './wpm-chart'
 
 type TabValue = 'overview' | 'wpm' | 'log'
 
@@ -18,19 +11,19 @@ function setHistoryTabCookie(tab: TabValue) {
 }
 
 export function HistoryTabs({
-    overview,
-    log2,
-    allVerseStats,
     showWpmChart,
     initialTab,
     useOptimizedHistory,
+    overviewContent,
+    logContent,
+    wpmContent,
 }: {
-    overview: BookOverview[]
-    log2: MonthlyLogDTO[]
-    allVerseStats: VerseStatsWithDate[]
     showWpmChart: boolean
     initialTab: TabValue
     useOptimizedHistory: boolean
+    overviewContent: ReactNode
+    logContent: ReactNode
+    wpmContent: ReactNode
 }) {
     // If the saved tab was 'wpm' but the feature is disabled, fall back to 'overview'
     const validatedInitialTab =
@@ -67,36 +60,19 @@ export function HistoryTabs({
                 )}
             </TabsList>
 
-            <TabsPanel value="overview">
-                <div className="flex items-center gap-2"></div>
-                {overview.length === 0 ? (
-                    <p>
-                        Once you have typed more verses this section will
-                        include details on what books of the bible you have
-                        typed through.
-                    </p>
-                ) : (
-                    <HistoryOverview overview={overview} />
-                )}
+            <TabsPanel value="overview" keepMounted={false}>
+                {overviewContent}
+            </TabsPanel>
+
+            <TabsPanel value="log" keepMounted={false}>
+                {logContent}
             </TabsPanel>
 
             {showWpmChart && (
-                <TabsPanel value="wpm">
-                    <WPMChart allStats={allVerseStats} />
+                <TabsPanel value="wpm" keepMounted={false}>
+                    {wpmContent}
                 </TabsPanel>
             )}
-
-            <TabsPanel value="log">
-                {log2.length === 0 ? (
-                    <p>
-                        Once you have typed more verses this section will
-                        include details on how often you have typed over the
-                        past few months.
-                    </p>
-                ) : (
-                    <HistoryLogV2 monthLogs={log2} />
-                )}
-            </TabsPanel>
         </Tabs>
     )
 }

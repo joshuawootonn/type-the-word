@@ -10,35 +10,35 @@ import {
 } from './overview'
 import { VerseStatsWithDate, getAllVerseStats } from './wpm'
 
-export async function getHistory(
+export async function getOverviewData(
     userId: string,
-    timezoneOffset: number,
-    useOptimizedHistory = false,
-): Promise<{
-    overview: BookOverview[]
-    log2: MonthlyLogDTO[]
-    allVerseStats: VerseStatsWithDate[]
-}> {
-    const typingSessionRepository = new TypingSessionRepository(db)
-
-    // Fetch typing sessions (still needed for log2 and wpm stats)
-    const typingSessions = await typingSessionRepository.getMany({
-        userId,
-    })
-
-    // Use cached data for overview when flag is enabled
-    let overview: BookOverview[]
+    useOptimizedHistory: boolean,
+): Promise<BookOverview[]> {
     if (useOptimizedHistory) {
         const userProgressRepository = new UserProgressRepository(db)
         const progressData = await userProgressRepository.getByUserId(userId)
-        overview = getBookOverviewFromCache(progressData)
+        return getBookOverviewFromCache(progressData)
     } else {
-        overview = getBookOverview(typingSessions)
+        const typingSessionRepository = new TypingSessionRepository(db)
+        const typingSessions = await typingSessionRepository.getMany({ userId })
+        return getBookOverview(typingSessions)
     }
+}
 
-    const log2 = getLog2(typingSessions, timezoneOffset)
+export async function getLogData(
+    userId: string,
+    timezoneOffset: number,
+): Promise<MonthlyLogDTO[]> {
+    const typingSessionRepository = new TypingSessionRepository(db)
+    const typingSessions = await typingSessionRepository.getMany({ userId })
+    return getLog2(typingSessions, timezoneOffset)
+}
 
-    const allVerseStats = getAllVerseStats(typingSessions, timezoneOffset)
-
-    return { overview, log2, allVerseStats }
+export async function getWpmData(
+    userId: string,
+    timezoneOffset: number,
+): Promise<VerseStatsWithDate[]> {
+    const typingSessionRepository = new TypingSessionRepository(db)
+    const typingSessions = await typingSessionRepository.getMany({ userId })
+    return getAllVerseStats(typingSessions, timezoneOffset)
 }

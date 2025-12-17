@@ -2,12 +2,16 @@ import { Metadata } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
 
+import { Loading } from '~/components/loading'
 import { authOptions } from '~/server/auth'
 import PostHogClient from '~/server/posthog'
 
-import { getHistory } from './getHistory'
 import { HistoryTabs } from './history-tabs'
+import { LogTabContent } from './tab-content/log-tab-content'
+import { OverviewTabContent } from './tab-content/overview-tab-content'
+import { WpmTabContent } from './tab-content/wpm-tab-content'
 
 export const metadata: Metadata = {
     title: 'Type the Word - History',
@@ -24,9 +28,6 @@ export default async function History() {
     const session = await getServerSession(authOptions)
     const cookieStore = cookies()
 
-    const timezoneOffset = parseInt(
-        cookieStore.get('timezoneOffset')?.value ?? '0',
-    )
     const historyTabCookie = cookieStore.get('historyTab')?.value
     const initialTab: TabValue = isValidTab(historyTabCookie)
         ? historyTabCookie
@@ -36,7 +37,7 @@ export default async function History() {
         redirect('/')
     }
 
-    // Check feature flags first
+    // Check feature flags
     const [useOptimizedHistory, showWpmChart] = await Promise.all([
         PostHogClient().isFeatureEnabled(
             'use-read-optimized-history',
@@ -48,21 +49,28 @@ export default async function History() {
         ),
     ])
 
-    // Then fetch history using appropriate path based on flag
-    const { overview, log2, allVerseStats } = await getHistory(
-        session.user.id,
-        timezoneOffset,
-        useOptimizedHistory ?? false,
-    )
-
     return (
         <HistoryTabs
-            overview={overview}
-            log2={log2}
-            allVerseStats={allVerseStats}
             showWpmChart={showWpmChart ?? false}
             initialTab={initialTab}
             useOptimizedHistory={useOptimizedHistory ?? false}
+            overviewContent={
+                <Suspense fallback={<Loading />}>
+                    <OverviewTabContent
+                        useOptimizedHistory={useOptimizedHistory ?? false}
+                    />
+                </Suspense>
+            }
+            logContent={
+                <Suspense fallback={<Loading initialDots={2} />}>
+                    <LogTabContent />
+                </Suspense>
+            }
+            wpmContent={
+                <Suspense fallback={<Loading initialDots={3} />}>
+                    <WpmTabContent />
+                </Suspense>
+            }
         />
     )
 }
