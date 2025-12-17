@@ -48,7 +48,6 @@ const PAUSE_PENALTY_MS = 1000 // Only count 1 second of pause time
 export function parseTypingData(data: unknown): TypingData | null {
     const result = typingDataSchema.safeParse(data)
     if (!result.success) {
-        console.log(result.error)
         return null
     }
     return result.data
@@ -109,9 +108,7 @@ export function calculateEffectiveDuration(actions: UserAction[]): number {
  * Get valid actions after filtering out those before the last deleteSoftLineBackward.
  * Returns null if there are fewer than 2 valid actions.
  */
-export function getValidActionsAfterReset(
-    actions: UserAction[],
-): UserAction[] | null {
+export function getValidActionsAfterReset(actions: UserAction[]): UserAction[] {
     // Find the last deleteSoftLineBackward action - this invalidates previous data
     const lastSoftLineBackwardIndex = actions.findLastIndex(
         action => action.type === 'deleteSoftLineBackward',

@@ -60,8 +60,8 @@ describe('getValidActionsAfterReset', () => {
         const result = getValidActionsAfterReset(actions)
 
         expect(result).toHaveLength(2)
-        expect(result![0]!.datetime).toBe('2024-01-01T00:00:03.000Z')
-        expect(result![1]!.datetime).toBe('2024-01-01T00:00:04.000Z')
+        expect(result[0]?.datetime).toBe('2024-01-01T00:00:03.000Z')
+        expect(result[1]?.datetime).toBe('2024-01-01T00:00:04.000Z')
     })
 
     it('uses only actions after the LAST deleteSoftLineBackward when multiple exist', () => {
@@ -77,10 +77,10 @@ describe('getValidActionsAfterReset', () => {
         const result = getValidActionsAfterReset(actions)
 
         expect(result).toHaveLength(2)
-        expect(result![0]!.datetime).toBe('2024-01-01T00:00:04.000Z')
+        expect(result[0]?.datetime).toBe('2024-01-01T00:00:04.000Z')
     })
 
-    it('returns null when fewer than 2 actions exist after deleteSoftLineBackward', () => {
+    it('returns 1 action when fewer than 2 actions exist after deleteSoftLineBackward', () => {
         const actions = [
             createAction('insertText', '2024-01-01T00:00:00.000Z'),
             createAction('insertText', '2024-01-01T00:00:01.000Z'),
@@ -90,10 +90,11 @@ describe('getValidActionsAfterReset', () => {
 
         const result = getValidActionsAfterReset(actions)
 
-        expect(result).toBeNull()
+        expect(result).toHaveLength(1)
+        expect(result[0]?.datetime).toBe('2024-01-01T00:00:03.000Z')
     })
 
-    it('returns null when deleteSoftLineBackward is the last action', () => {
+    it('returns empty array when deleteSoftLineBackward is the last action', () => {
         const actions = [
             createAction('insertText', '2024-01-01T00:00:00.000Z'),
             createAction('insertText', '2024-01-01T00:00:01.000Z'),
@@ -102,15 +103,15 @@ describe('getValidActionsAfterReset', () => {
 
         const result = getValidActionsAfterReset(actions)
 
-        expect(result).toBeNull()
+        expect(result).toHaveLength(0)
     })
 
-    it('returns null when fewer than 2 actions total', () => {
+    it('returns all actions when fewer than 2 actions total (no reset)', () => {
         const actions = [createAction('insertText', '2024-01-01T00:00:00.000Z')]
 
         const result = getValidActionsAfterReset(actions)
 
-        expect(result).toBeNull()
+        expect(result).toHaveLength(1)
     })
 })
 
