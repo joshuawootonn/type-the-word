@@ -7,6 +7,7 @@ import {
     calculateEffectiveDuration,
     getValidActionsAfterReset,
     calculateAccuracy,
+    calculateCorrectedAccuracy,
     calculateStatsForVerse,
 } from './wpm'
 
@@ -191,7 +192,7 @@ describe('calculateEffectiveDuration', () => {
     })
 })
 
-describe('calculateAccuracy', () => {
+describe('calculateCorrectedAccuracy', () => {
     it('returns 100% when all letters match', () => {
         const typingData: TypingData = {
             userActions: [],
@@ -201,7 +202,7 @@ describe('calculateAccuracy', () => {
             ],
         }
 
-        expect(calculateAccuracy(typingData)).toBe(100)
+        expect(calculateCorrectedAccuracy(typingData)).toBe(100)
     })
 
     it('returns 0% when no letters match', () => {
@@ -213,7 +214,7 @@ describe('calculateAccuracy', () => {
             ],
         }
 
-        expect(calculateAccuracy(typingData)).toBe(0)
+        expect(calculateCorrectedAccuracy(typingData)).toBe(0)
     })
 
     it('calculates partial accuracy correctly', () => {
@@ -226,7 +227,7 @@ describe('calculateAccuracy', () => {
         }
 
         // 3 out of 5 correct = 60%
-        expect(calculateAccuracy(typingData)).toBe(60)
+        expect(calculateCorrectedAccuracy(typingData)).toBe(60)
     })
 
     it('handles multiple words', () => {
@@ -242,7 +243,7 @@ describe('calculateAccuracy', () => {
             ],
         }
 
-        expect(calculateAccuracy(typingData)).toBe(100)
+        expect(calculateCorrectedAccuracy(typingData)).toBe(100)
     })
 
     it('returns 0 when correctNodes is empty', () => {
@@ -252,7 +253,195 @@ describe('calculateAccuracy', () => {
             correctNodes: [],
         }
 
+        expect(calculateCorrectedAccuracy(typingData)).toBe(0)
+    })
+})
+
+describe('calculateAccuracy (Monkeytype-style)', () => {
+    // @see https://github.com/monkeytypegame/monkeytype/blob/master/frontend/src/ts/test/test-stats.ts
+
+    it('returns 100% when all keystrokes are correct', () => {
+        const typingData: TypingData = {
+            userActions: [
+                createAction('insertText', '2024-01-01T00:00:00.000Z', 't'),
+                createAction('insertText', '2024-01-01T00:00:00.100Z', 'h'),
+                createAction('insertText', '2024-01-01T00:00:00.200Z', 'e'),
+            ],
+            userNodes: [{ type: 'word', letters: ['t', 'h', 'e'] }],
+            correctNodes: [{ type: 'word', letters: ['t', 'h', 'e'] }],
+        }
+
+        expect(calculateAccuracy(typingData)).toBe(100)
+    })
+
+    it('returns 0% when all keystrokes are incorrect', () => {
+        const typingData: TypingData = {
+            userActions: [
+                createAction('insertText', '2024-01-01T00:00:00.000Z', 'x'),
+                createAction('insertText', '2024-01-01T00:00:00.100Z', 'y'),
+                createAction('insertText', '2024-01-01T00:00:00.200Z', 'z'),
+            ],
+            userNodes: [{ type: 'word', letters: ['x', 'y', 'z'] }],
+            correctNodes: [{ type: 'word', letters: ['t', 'h', 'e'] }],
+        }
+
         expect(calculateAccuracy(typingData)).toBe(0)
+    })
+
+    it('counts corrected mistakes against accuracy', () => {
+        // Type "teh", backspace twice, then type "he"
+        // Keystrokes: t(correct), e(wrong), h(wrong), backspace, backspace, h(correct), e(correct)
+        // Correct: 3, Incorrect: 2, Total: 5
+        // Accuracy: 3/5 = 60%
+        const typingData: TypingData = {
+            userActions: [
+                createAction('insertText', '2024-01-01T00:00:00.000Z', 't'), // correct
+                createAction('insertText', '2024-01-01T00:00:00.100Z', 'e'), // wrong (expected 'h')
+                createAction('insertText', '2024-01-01T00:00:00.200Z', 'h'), // wrong (expected 'e')
+                createAction(
+                    'deleteContentBackward',
+                    '2024-01-01T00:00:00.300Z',
+                ),
+                createAction(
+                    'deleteContentBackward',
+                    '2024-01-01T00:00:00.400Z',
+                ),
+                createAction('insertText', '2024-01-01T00:00:00.500Z', 'h'), // correct
+                createAction('insertText', '2024-01-01T00:00:00.600Z', 'e'), // correct
+            ],
+            userNodes: [{ type: 'word', letters: ['t', 'h', 'e'] }],
+            correctNodes: [{ type: 'word', letters: ['t', 'h', 'e'] }],
+        }
+
+        expect(calculateAccuracy(typingData)).toBe(60)
+    })
+
+    it('handles single character correction', () => {
+        // Type "helo", backspace, type "lo"
+        // h(correct), e(correct), l(correct), o(wrong - expected 'l'), backspace, l(correct), o(correct)
+        // Correct: 5, Incorrect: 1, Total: 6
+        // Accuracy: 5/6 = 83%
+        const typingData: TypingData = {
+            userActions: [
+                createAction('insertText', '2024-01-01T00:00:00.000Z', 'h'),
+                createAction('insertText', '2024-01-01T00:00:00.100Z', 'e'),
+                createAction('insertText', '2024-01-01T00:00:00.200Z', 'l'),
+                createAction('insertText', '2024-01-01T00:00:00.300Z', 'o'), // wrong
+                createAction(
+                    'deleteContentBackward',
+                    '2024-01-01T00:00:00.400Z',
+                ),
+                createAction('insertText', '2024-01-01T00:00:00.500Z', 'l'),
+                createAction('insertText', '2024-01-01T00:00:00.600Z', 'o'),
+            ],
+            userNodes: [{ type: 'word', letters: ['h', 'e', 'l', 'l', 'o'] }],
+            correctNodes: [
+                { type: 'word', letters: ['h', 'e', 'l', 'l', 'o'] },
+            ],
+        }
+
+        expect(calculateAccuracy(typingData)).toBe(83)
+    })
+
+    it('handles deleteWordBackward correctly', () => {
+        // Type "the cat", delete "cat" with word delete, type "dog"
+        // deleteWordBackward deletes back to the last space
+        const typingData: TypingData = {
+            userActions: [
+                createAction('insertText', '2024-01-01T00:00:00.000Z', 't'),
+                createAction('insertText', '2024-01-01T00:00:00.100Z', 'h'),
+                createAction('insertText', '2024-01-01T00:00:00.200Z', 'e'),
+                createAction('insertText', '2024-01-01T00:00:00.300Z', ' '), // space
+                createAction('insertText', '2024-01-01T00:00:00.400Z', 'c'), // wrong (expected 'd')
+                createAction('insertText', '2024-01-01T00:00:00.500Z', 'a'), // wrong (expected 'o')
+                createAction('insertText', '2024-01-01T00:00:00.600Z', 't'), // wrong (expected 'g')
+                createAction('deleteWordBackward', '2024-01-01T00:00:00.700Z'), // deletes "cat", position goes from 7 to 4
+                createAction('insertText', '2024-01-01T00:00:00.800Z', 'd'), // position 4 (expected 'd')
+                createAction('insertText', '2024-01-01T00:00:00.900Z', 'o'), // position 5 (expected 'o')
+                createAction('insertText', '2024-01-01T00:00:01.000Z', 'g'), // position 6 (expected 'g')
+            ],
+            userNodes: [
+                { type: 'word', letters: ['t', 'h', 'e'] },
+                { type: 'word', letters: ['d', 'o', 'g'] },
+            ],
+            // correctNodes flatten to: ['t', 'h', 'e', 'd', 'o', 'g']
+            // But userActions include a space at position 3
+            correctNodes: [
+                { type: 'word', letters: ['t', 'h', 'e', ' ', 'd', 'o', 'g'] },
+            ],
+        }
+
+        // t@0(correct), h@1(correct), e@2(correct), ' '@3(correct),
+        // c@4(wrong), a@5(wrong), t@6(wrong),
+        // deleteWordBackward -> position=4, currentText="the "
+        // d@4(correct), o@5(correct), g@6(correct)
+        // Correct: 7, Incorrect: 3, Total: 10
+        // Accuracy: 7/10 = 70%
+        expect(calculateAccuracy(typingData)).toBe(70)
+    })
+
+    it('ignores actions before deleteSoftLineBackward', () => {
+        // Make lots of mistakes, reset with deleteSoftLineBackward, then type correctly
+        const typingData: TypingData = {
+            userActions: [
+                createAction('insertText', '2024-01-01T00:00:00.000Z', 'x'),
+                createAction('insertText', '2024-01-01T00:00:00.100Z', 'y'),
+                createAction('insertText', '2024-01-01T00:00:00.200Z', 'z'),
+                createAction(
+                    'deleteSoftLineBackward',
+                    '2024-01-01T00:00:00.300Z',
+                ),
+                // Only these should count
+                createAction('insertText', '2024-01-01T00:00:00.400Z', 't'),
+                createAction('insertText', '2024-01-01T00:00:00.500Z', 'h'),
+                createAction('insertText', '2024-01-01T00:00:00.600Z', 'e'),
+            ],
+            userNodes: [{ type: 'word', letters: ['t', 'h', 'e'] }],
+            correctNodes: [{ type: 'word', letters: ['t', 'h', 'e'] }],
+        }
+
+        expect(calculateAccuracy(typingData)).toBe(100)
+    })
+
+    it('returns 100 when no keystrokes', () => {
+        const typingData: TypingData = {
+            userActions: [],
+            userNodes: [],
+            correctNodes: [{ type: 'word', letters: ['t', 'h', 'e'] }],
+        }
+
+        expect(calculateAccuracy(typingData)).toBe(100)
+    })
+
+    it('returns 0 when correctNodes is empty', () => {
+        const typingData: TypingData = {
+            userActions: [
+                createAction('insertText', '2024-01-01T00:00:00.000Z', 'a'),
+            ],
+            userNodes: [{ type: 'word', letters: ['a'] }],
+            correctNodes: [],
+        }
+
+        expect(calculateAccuracy(typingData)).toBe(0)
+    })
+
+    it('handles typing beyond expected length', () => {
+        // Type "thee" when expecting "the"
+        // t(correct), h(correct), e(correct), e(no expected char - incorrect)
+        const typingData: TypingData = {
+            userActions: [
+                createAction('insertText', '2024-01-01T00:00:00.000Z', 't'),
+                createAction('insertText', '2024-01-01T00:00:00.100Z', 'h'),
+                createAction('insertText', '2024-01-01T00:00:00.200Z', 'e'),
+                createAction('insertText', '2024-01-01T00:00:00.300Z', 'e'), // extra
+            ],
+            userNodes: [{ type: 'word', letters: ['t', 'h', 'e', 'e'] }],
+            correctNodes: [{ type: 'word', letters: ['t', 'h', 'e'] }],
+        }
+
+        // Correct: 3, Incorrect: 1, Total: 4
+        // Accuracy: 3/4 = 75%
+        expect(calculateAccuracy(typingData)).toBe(75)
     })
 })
 
@@ -263,39 +452,36 @@ describe('calculateStatsForVerse', () => {
         // Use multiple actions with small gaps to avoid pause detection
         const typingData: TypingData = {
             userActions: [
-                createAction('insertText', '2024-01-01T00:00:00.000Z'),
-                createAction('insertText', '2024-01-01T00:00:00.500Z'),
-                createAction('insertText', '2024-01-01T00:00:01.000Z'),
-                createAction('insertText', '2024-01-01T00:00:01.500Z'),
-                createAction('insertText', '2024-01-01T00:00:02.000Z'),
+                createAction('insertText', '2024-01-01T00:00:00.000Z', 'a'),
+                createAction('insertText', '2024-01-01T00:00:00.500Z', 'b'),
+                createAction('insertText', '2024-01-01T00:00:01.000Z', 'c'),
+                createAction('insertText', '2024-01-01T00:00:01.500Z', 'd'),
+                createAction('insertText', '2024-01-01T00:00:02.000Z', 'e'),
             ],
-            userNodes: [
-                { type: 'word', letters: ['a', 'b', 'c', 'd', 'e'] },
-                { type: 'word', letters: ['f', 'g', 'h', 'i', 'j'] },
-            ],
+            userNodes: [{ type: 'word', letters: ['a', 'b', 'c', 'd', 'e'] }],
             correctNodes: [
                 { type: 'word', letters: ['a', 'b', 'c', 'd', 'e'] },
-                { type: 'word', letters: ['f', 'g', 'h', 'i', 'j'] },
             ],
         }
 
         const result = calculateStatsForVerse(createTypedVerse(typingData))
 
         expect(result).not.toBeNull()
-        expect(result!.wpm).toBe(60)
+        // 5 letters / 5 = 1 word in 2 seconds (0.0333 min) = 30 WPM
+        expect(result!.wpm).toBe(30)
         expect(result!.accuracy).toBe(100)
     })
 
     it('returns null when deleteSoftLineBackward invalidates most actions', () => {
         const typingData: TypingData = {
             userActions: [
-                createAction('insertText', '2024-01-01T00:00:00.000Z'),
-                createAction('insertText', '2024-01-01T00:00:01.000Z'),
+                createAction('insertText', '2024-01-01T00:00:00.000Z', 'x'),
+                createAction('insertText', '2024-01-01T00:00:01.000Z', 'y'),
                 createAction(
                     'deleteSoftLineBackward',
                     '2024-01-01T00:00:02.000Z',
                 ),
-                createAction('insertText', '2024-01-01T00:00:03.000Z'),
+                createAction('insertText', '2024-01-01T00:00:03.000Z', 'h'),
             ],
             userNodes: [{ type: 'word', letters: ['h', 'i'] }],
             correctNodes: [{ type: 'word', letters: ['h', 'i'] }],
@@ -309,63 +495,51 @@ describe('calculateStatsForVerse', () => {
 
     it('calculates WPM only from actions after deleteSoftLineBackward', () => {
         // After reset: 3 seconds of typing
-        // 10 letters / 5 = 2 words in 3/60 minutes = 40 WPM
+        // 5 letters / 5 = 1 word in 3/60 minutes = 20 WPM
         const typingData: TypingData = {
             userActions: [
-                createAction('insertText', '2024-01-01T00:00:00.000Z'),
-                createAction('insertText', '2024-01-01T00:00:01.000Z'),
+                createAction('insertText', '2024-01-01T00:00:00.000Z', 'x'),
+                createAction('insertText', '2024-01-01T00:00:01.000Z', 'y'),
                 createAction(
                     'deleteSoftLineBackward',
                     '2024-01-01T00:00:02.000Z',
                 ),
                 // After reset - these are the only actions that count
-                createAction('insertText', '2024-01-01T00:00:03.000Z'),
-                createAction('insertText', '2024-01-01T00:00:04.000Z'),
-                createAction('insertText', '2024-01-01T00:00:05.000Z'),
-                createAction('insertText', '2024-01-01T00:00:06.000Z'), // 3 seconds total
+                createAction('insertText', '2024-01-01T00:00:03.000Z', 'a'),
+                createAction('insertText', '2024-01-01T00:00:04.000Z', 'b'),
+                createAction('insertText', '2024-01-01T00:00:05.000Z', 'c'),
+                createAction('insertText', '2024-01-01T00:00:06.000Z', 'd'), // 3 seconds total
             ],
-            userNodes: [
-                { type: 'word', letters: ['a', 'b', 'c', 'd', 'e'] },
-                { type: 'word', letters: ['f', 'g', 'h', 'i', 'j'] },
-            ],
-            correctNodes: [
-                { type: 'word', letters: ['a', 'b', 'c', 'd', 'e'] },
-                { type: 'word', letters: ['f', 'g', 'h', 'i', 'j'] },
-            ],
+            userNodes: [{ type: 'word', letters: ['a', 'b', 'c', 'd'] }],
+            correctNodes: [{ type: 'word', letters: ['a', 'b', 'c', 'd'] }],
         }
 
         const result = calculateStatsForVerse(createTypedVerse(typingData))
 
         expect(result).not.toBeNull()
-        // 10 letters / 5 = 2 words in 3 seconds (0.05 min) = 40 WPM
-        expect(result!.wpm).toBe(40)
+        // 4 letters / 5 = 0.8 words in 3 seconds (0.05 min) = 16 WPM
+        expect(result!.wpm).toBe(16)
     })
 
     it('accounts for pause time correctly', () => {
-        // 10 letters, with a 10-second pause that should only count as 1 second
+        // 4 letters, with a 10-second pause that should only count as 1 second
         // Total effective time: 2 + 1 (pause) + 2 = 5 seconds
         const typingData: TypingData = {
             userActions: [
-                createAction('insertText', '2024-01-01T00:00:00.000Z'),
-                createAction('insertText', '2024-01-01T00:00:02.000Z'), // 2 sec
-                createAction('insertText', '2024-01-01T00:00:12.000Z'), // 10 sec pause -> 1 sec
-                createAction('insertText', '2024-01-01T00:00:14.000Z'), // 2 sec
+                createAction('insertText', '2024-01-01T00:00:00.000Z', 'a'),
+                createAction('insertText', '2024-01-01T00:00:02.000Z', 'b'), // 2 sec
+                createAction('insertText', '2024-01-01T00:00:12.000Z', 'c'), // 10 sec pause -> 1 sec
+                createAction('insertText', '2024-01-01T00:00:14.000Z', 'd'), // 2 sec
             ],
-            userNodes: [
-                { type: 'word', letters: ['a', 'b', 'c', 'd', 'e'] },
-                { type: 'word', letters: ['f', 'g', 'h', 'i', 'j'] },
-            ],
-            correctNodes: [
-                { type: 'word', letters: ['a', 'b', 'c', 'd', 'e'] },
-                { type: 'word', letters: ['f', 'g', 'h', 'i', 'j'] },
-            ],
+            userNodes: [{ type: 'word', letters: ['a', 'b', 'c', 'd'] }],
+            correctNodes: [{ type: 'word', letters: ['a', 'b', 'c', 'd'] }],
         }
 
         const result = calculateStatsForVerse(createTypedVerse(typingData))
 
         expect(result).not.toBeNull()
-        // 10 letters / 5 = 2 words in 5 seconds (0.0833 min) = 24 WPM
-        expect(result!.wpm).toBe(24)
+        // 4 letters / 5 = 0.8 words in 5 seconds (0.0833 min) = 9.6 -> 10 WPM
+        expect(result!.wpm).toBe(10)
     })
 
     it('returns null for null typing data', () => {
@@ -384,8 +558,8 @@ describe('calculateStatsForVerse', () => {
     it('returns null when duration is less than 1 second', () => {
         const typingData: TypingData = {
             userActions: [
-                createAction('insertText', '2024-01-01T00:00:00.000Z'),
-                createAction('insertText', '2024-01-01T00:00:00.500Z'),
+                createAction('insertText', '2024-01-01T00:00:00.000Z', 'h'),
+                createAction('insertText', '2024-01-01T00:00:00.500Z', 'i'),
             ],
             userNodes: [{ type: 'word', letters: ['h', 'i'] }],
             correctNodes: [{ type: 'word', letters: ['h', 'i'] }],

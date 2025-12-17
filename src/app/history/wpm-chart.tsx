@@ -45,6 +45,8 @@ const accessors = {
     xAccessor: (d: AggregatedStats) => d.dateLabel,
     yAccessorWpm: (d: AggregatedStats) => d.averageWpm ?? 0,
     yAccessorAccuracy: (d: AggregatedStats) => d.averageAccuracy ?? 0,
+    yAccessorCorrectedAccuracy: (d: AggregatedStats) =>
+        d.averageCorrectedAccuracy ?? 0,
 }
 // Add before the component
 const chartTheme = buildChartTheme({
@@ -54,6 +56,8 @@ const chartTheme = buildChartTheme({
         'oklch(var(--color-primary))', // wpm-points same as wpm
         'oklch(var(--color-success))',
         'oklch(var(--color-success))', // accuracy-points same as accuracy
+        'oklch(var(--color-success))',
+        'oklch(var(--color-success))', // corrected-accuracy-points same as corrected-accuracy
     ],
     gridColor: 'oklch(var(--color-primary))',
     gridColorDark: 'oklch(var(--color-primary))',
@@ -62,7 +66,10 @@ const chartTheme = buildChartTheme({
 
 function WPMChartInner({ data }: { data: AggregatedStats[] }) {
     const hasAnyData = data.some(
-        d => d.averageWpm !== null || d.averageAccuracy !== null,
+        d =>
+            d.averageWpm !== null ||
+            d.averageAccuracy !== null ||
+            d.averageCorrectedAccuracy !== null,
     )
 
     if (!hasAnyData) {
@@ -76,6 +83,9 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
     // Filter data to only include points with values for lines
     const wpmData = data.filter(d => d.averageWpm !== null)
     const accuracyData = data.filter(d => d.averageAccuracy !== null)
+    const correctedAccuracyData = data.filter(
+        d => d.averageCorrectedAccuracy !== null,
+    )
 
     return (
         <ParentSize>
@@ -168,6 +178,22 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                         yAccessor={accessors.yAccessorAccuracy}
                         colorAccessor={() => 'oklch(var(--color-success))'}
                     />
+                    <LineSeries
+                        dataKey="corrected-accuracy"
+                        data={correctedAccuracyData}
+                        xAccessor={accessors.xAccessor}
+                        yAccessor={accessors.yAccessorCorrectedAccuracy}
+                        stroke="oklch(var(--color-success))"
+                        strokeWidth={2}
+                        strokeDasharray="4 2"
+                    />
+                    <GlyphSeries
+                        dataKey="corrected-accuracy-points"
+                        data={correctedAccuracyData}
+                        xAccessor={accessors.xAccessor}
+                        yAccessor={accessors.yAccessorCorrectedAccuracy}
+                        colorAccessor={() => 'oklch(var(--color-success))'}
+                    />
                     <Tooltip
                         snapTooltipToDatumX
                         snapTooltipToDatumY
@@ -195,9 +221,19 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                                         </div>
                                     )}
                                     {datum.averageAccuracy !== null && (
-                                        <div className="flex justify-between space-x-3 font-normal">
+                                        <div className="mb-1 flex justify-between space-x-3 font-normal">
                                             <div>Accuracy:</div>
-                                            <div>{datum.averageAccuracy}</div>
+                                            <div>{datum.averageAccuracy}%</div>
+                                        </div>
+                                    )}
+                                    {datum.averageCorrectedAccuracy !==
+                                        null && (
+                                        <div className="flex justify-between space-x-3 font-normal">
+                                            <div>Corrected Accuracy:</div>
+                                            <div>
+                                                {datum.averageCorrectedAccuracy}
+                                                %
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -266,7 +302,7 @@ export function WPMChart({ allStats }: { allStats: VerseStatsWithDate[] }) {
                     />
                 </div>
             </div>
-            <div className="mb-2 mt-4 flex gap-4 text-sm">
+            <div className="mb-2 mt-4 flex flex-wrap gap-4 text-sm">
                 <div className="flex items-center gap-2">
                     <div className="h-0.5 w-4 bg-primary" />
                     <span className="text-primary">WPM</span>
@@ -274,6 +310,10 @@ export function WPMChart({ allStats }: { allStats: VerseStatsWithDate[] }) {
                 <div className="flex items-center gap-2">
                     <div className="h-0.5 w-4 bg-success" />
                     <span className="text-success">Accuracy</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="h-0.5 w-4 border-t-2 border-dashed border-success" />
+                    <span className="text-success">Corrected</span>
                 </div>
             </div>
             <div className="h-[200px] w-full">

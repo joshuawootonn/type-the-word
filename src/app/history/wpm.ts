@@ -26,18 +26,21 @@ export type AggregatedStats = {
     dateLabel: string
     averageWpm: number | null
     averageAccuracy: number | null
+    averageCorrectedAccuracy: number | null
     versesWithData: number
 }
 
 export type VerseStatsWithDate = {
     wpm: number
     accuracy: number
+    correctedAccuracy: number
     date: Date
 }
 
 export type VerseStats = {
     wpm: number
     accuracy: number
+    correctedAccuracy: number
 }
 
 type UserAction = TypingData['userActions'][number]
@@ -53,7 +56,11 @@ export function parseTypingData(data: unknown): TypingData | null {
     return result.data
 }
 
-export function calculateAccuracy(typingData: TypingData): number {
+/**
+ * Calculate corrected accuracy - compares final typed result to correct text.
+ * This allows corrections, so if you backspace and fix a mistake, it counts as correct.
+ */
+export function calculateCorrectedAccuracy(typingData: TypingData): number {
     const correctLetters = typingData.correctNodes.flatMap(node => node.letters)
     const userLetters = typingData.userNodes.flatMap(node => node.letters)
 
@@ -69,6 +76,66 @@ export function calculateAccuracy(typingData: TypingData): number {
     }
 
     return Math.round((correctCount / correctLetters.length) * 100)
+}
+
+/**
+ * Calculate accuracy using the same approach as Monkeytype:
+ * accuracy = correct keystrokes / (correct + incorrect keystrokes) * 100
+ *
+ * Each keystroke is evaluated against the expected character at that position.
+ * Backspacing and correcting still counts the original incorrect keystroke.
+ *
+ * @see https://github.com/monkeytypegame/monkeytype/blob/master/frontend/src/ts/test/test-stats.ts
+ */
+export function calculateAccuracy(typingData: TypingData): number {
+    const validActions = getValidActionsAfterReset(typingData.userActions)
+    const correctLetters = typingData.correctNodes.flatMap(node => node.letters)
+
+    if (correctLetters.length === 0) {
+        return 0
+    }
+
+    let correctCount = 0
+    let incorrectCount = 0
+    let position = 0
+    let currentText = ''
+
+    for (const action of validActions) {
+        if (action.type === 'insertText') {
+            // Check if this keystroke matches the expected character
+            const expectedChar = correctLetters[position]
+            if (action.key === expectedChar) {
+                correctCount++
+            } else {
+                incorrectCount++
+            }
+            currentText += action.key
+            position++
+        } else if (action.type === 'deleteContentBackward') {
+            // Move position back, but don't undo the accuracy counts
+            if (position > 0) {
+                position--
+                currentText = currentText.slice(0, -1)
+            }
+        } else if (action.type === 'deleteWordBackward') {
+            // Word deletion - find the last word boundary
+            const lastSpaceIndex = currentText.lastIndexOf(' ')
+            const charsToDelete =
+                lastSpaceIndex >= 0
+                    ? currentText.length - lastSpaceIndex - 1
+                    : currentText.length
+            position = Math.max(0, position - charsToDelete)
+            currentText = currentText.slice(0, -charsToDelete || undefined)
+        }
+        // deleteSoftLineBackward is already filtered out by getValidActionsAfterReset
+    }
+
+    const totalKeystrokes = correctCount + incorrectCount
+    if (totalKeystrokes === 0) {
+        return 100
+    }
+
+    return Math.round((correctCount / totalKeystrokes) * 100)
 }
 
 /**
@@ -169,10 +236,12 @@ export function calculateStatsForVerse(
     }
 
     const accuracy = calculateAccuracy(typingData)
+    const correctedAccuracy = calculateCorrectedAccuracy(typingData)
 
     return {
         wpm: Math.round(wpm),
         accuracy,
+        correctedAccuracy,
     }
 }
 
@@ -323,11 +392,22 @@ export function aggregateStats(
                   )
                 : null
 
+        const averageCorrectedAccuracy =
+            intervalStats.length > 0
+                ? Math.round(
+                      intervalStats.reduce(
+                          (a, b) => a + b.correctedAccuracy,
+                          0,
+                      ) / intervalStats.length,
+                  )
+                : null
+
         return {
             date,
             dateLabel: getDateLabel(date, interval),
             averageWpm,
             averageAccuracy,
+            averageCorrectedAccuracy,
             versesWithData: intervalStats.length,
         }
     })
