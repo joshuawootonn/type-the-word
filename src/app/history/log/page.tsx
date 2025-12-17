@@ -1,3 +1,4 @@
+import { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import { cookies } from 'next/headers'
 
@@ -6,7 +7,12 @@ import { authOptions } from '~/server/auth'
 import { getLogData } from '../getHistory'
 import { HistoryLogV2 } from '../history-log-2'
 
-export async function LogTabContent() {
+export const metadata: Metadata = {
+    title: 'Type the Word - History Log',
+    description: 'Log of all the passages you have typed.',
+}
+
+export default async function HistoryLogPage() {
     const session = await getServerSession(authOptions)
 
     if (!session) {

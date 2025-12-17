@@ -1,9 +1,42 @@
+import { getServerSession } from 'next-auth/next'
+import { redirect } from 'next/navigation'
 import { ReactNode } from 'react'
 
-export default function PassageLayout({ children }: { children: ReactNode }) {
+import { authOptions } from '~/server/auth'
+import PostHogClient from '~/server/posthog'
+
+import { HistoryTabsNav } from './history-tabs-nav'
+
+export default async function HistoryLayout({
+    children,
+}: {
+    children: ReactNode
+}) {
+    const session = await getServerSession(authOptions)
+
+    if (session == null) {
+        redirect('/')
+    }
+
+    // Check feature flags
+    const [useOptimizedHistory, showWpmChart] = await Promise.all([
+        PostHogClient().isFeatureEnabled(
+            'use-read-optimized-history',
+            session.user.id,
+        ),
+        PostHogClient().isFeatureEnabled(
+            'use-wpm-accuracy-history-chart',
+            session.user.id,
+        ),
+    ])
+
     return (
         <main className="prose mx-auto mb-8 w-full flex-grow pt-4 text-lg text-primary dark:prose-invert prose-headings:text-primary prose-p:text-primary lg:pt-8">
             <h1 className="">History</h1>
+            <HistoryTabsNav
+                showWpmChart={showWpmChart ?? false}
+                useOptimizedHistory={useOptimizedHistory ?? false}
+            />
             {children}
         </main>
     )

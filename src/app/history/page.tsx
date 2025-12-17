@@ -1,76 +1,42 @@
 import { Metadata } from 'next'
-import { getServerSession } from 'next-auth/next'
-import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
-import { Suspense } from 'react'
+import { getServerSession } from 'next-auth'
 
-import { Loading } from '~/components/loading'
 import { authOptions } from '~/server/auth'
 import PostHogClient from '~/server/posthog'
 
-import { HistoryTabs } from './history-tabs'
-import { LogTabContent } from './tab-content/log-tab-content'
-import { OverviewTabContent } from './tab-content/overview-tab-content'
-import { WpmTabContent } from './tab-content/wpm-tab-content'
+import { getOverviewData } from './getHistory'
+import { HistoryOverview } from './history-overview'
 
 export const metadata: Metadata = {
     title: 'Type the Word - History',
     description: 'History of all the passages you have typed.',
 }
 
-type TabValue = 'overview' | 'wpm' | 'log'
-
-function isValidTab(value: string | undefined): value is TabValue {
-    return value === 'overview' || value === 'wpm' || value === 'log'
-}
-
-export default async function History() {
+export default async function HistoryOverviewPage() {
     const session = await getServerSession(authOptions)
-    const cookieStore = cookies()
 
-    const historyTabCookie = cookieStore.get('historyTab')?.value
-    const initialTab: TabValue = isValidTab(historyTabCookie)
-        ? historyTabCookie
-        : 'overview'
-
-    if (session == null) {
-        redirect('/')
+    if (!session) {
+        return null
     }
 
-    // Check feature flags
-    const [useOptimizedHistory, showWpmChart] = await Promise.all([
-        PostHogClient().isFeatureEnabled(
-            'use-read-optimized-history',
-            session.user.id,
-        ),
-        PostHogClient().isFeatureEnabled(
-            'use-wpm-accuracy-history-chart',
-            session.user.id,
-        ),
-    ])
-
-    return (
-        <HistoryTabs
-            showWpmChart={showWpmChart ?? false}
-            initialTab={initialTab}
-            useOptimizedHistory={useOptimizedHistory ?? false}
-            overviewContent={
-                <Suspense fallback={<Loading />}>
-                    <OverviewTabContent
-                        useOptimizedHistory={useOptimizedHistory ?? false}
-                    />
-                </Suspense>
-            }
-            logContent={
-                <Suspense fallback={<Loading initialDots={2} />}>
-                    <LogTabContent />
-                </Suspense>
-            }
-            wpmContent={
-                <Suspense fallback={<Loading initialDots={3} />}>
-                    <WpmTabContent />
-                </Suspense>
-            }
-        />
+    const useOptimizedHistory = await PostHogClient().isFeatureEnabled(
+        'use-read-optimized-history',
+        session.user.id,
     )
+
+    const overview = await getOverviewData(
+        session.user.id,
+        useOptimizedHistory ?? false,
+    )
+
+    if (overview.length === 0) {
+        return (
+            <p>
+                Once you have typed more verses this section will include
+                details on what books of the bible you have typed through.
+            </p>
+        )
+    }
+
+    return <HistoryOverview overview={overview} />
 }
