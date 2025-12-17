@@ -7,6 +7,7 @@ import { authOptions } from '~/server/auth'
 import { db } from '~/server/db'
 import { typedVerses, typingSessions, typingDataSchema } from '~/server/db/schema'
 import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
+import { UserProgressRepository } from '~/server/repositories/userProgress.repository'
 
 export const dynamic = 'force-dynamic' // defaults to auto
 
@@ -43,6 +44,8 @@ export const POST = async function POST(
 
     const verse = addTypedVerseBodySchema.parse(body)
     const typingSessionRepository = new TypingSessionRepository(db)
+    const userProgressRepository = new UserProgressRepository(db)
+
     let typingSession = await typingSessionRepository.getOne({
         id: params.id,
     })
@@ -53,10 +56,19 @@ export const POST = async function POST(
             updatedAt: sql`CURRENT_TIMESTAMP(3)`,
         })
         .where(eq(typingSessions.id, params.id))
-    await db.insert(typedVerses).values( {
+    await db.insert(typedVerses).values({
         userId: session.user.id,
         ...verse,
     })
+
+    // Always update the book progress cache (keeps it warm for when flag is enabled)
+    await userProgressRepository.recordTypedVerse(
+        session.user.id,
+        verse.book,
+        verse.chapter,
+        verse.verse,
+        verse.translation,
+    )
 
     typingSession = await typingSessionRepository.getOne({
         userId: session.user.id,

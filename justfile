@@ -39,8 +39,7 @@ generate:
 
 # Start development server
 dev:
-    kill $(lsof -t -i:1199) || true && orb start && docker compose --project-directory ./docker up -d && pnpm dev -p 1199
-
+    kill $(lsof -t -i:1199) || true && orb start && docker compose --project-directory ./docker up -d && export $(xargs < .env) && pnpm dev -p 1199
 
 # Run tests
 test:

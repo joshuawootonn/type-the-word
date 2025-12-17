@@ -47,6 +47,8 @@ export const usersRelations = relations(users, ({ many, one }) => ({
     userChangelog: one(userChangelog),
     userThemes: many(userTheme),
     userCurrentTheme: one(userCurrentTheme),
+    bookProgress: many(userBookProgress),
+    chapterProgress: many(userChapterProgress),
 }))
 
 export const userChangelog = pgTable('userChangelog', {
@@ -284,6 +286,8 @@ export const chaptersSchema = createSelectSchema(typedVerses).shape.chapter
 export type Chapter = z.infer<typeof chaptersSchema>
 export const booksSchema = createSelectSchema(typedVerses).shape.book
 export type Book = z.infer<typeof booksSchema>
+export const translationsSchema = createSelectSchema(typedVerses).shape.translation
+export type Translation = z.infer<typeof translationsSchema>
 
 export const typedVerseRelations = relations(typedVerses, ({ one }) => ({
     user: one(users, {
@@ -295,6 +299,87 @@ export const typedVerseRelations = relations(typedVerses, ({ one }) => ({
         references: [typingSessions.id],
     }),
 }))
+
+// Cache table for book-level progress (prestige + totals) per user
+export const userBookProgress = pgTable(
+    'userBookProgress',
+    {
+        userId: varchar('userId', { length: 255 }).notNull(),
+        book: typedVerseBook('book').notNull(),
+        translation: typedVerseTranslation('translation').notNull(),
+        prestige: integer('prestige').notNull().default(0),
+        typedVerseCount: integer('typedVerseCount').notNull().default(0),
+        totalVerses: integer('totalVerses').notNull(),
+        updatedAt: timestamp('updatedAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+    },
+    table => ({
+        pk: primaryKey(table.userId, table.book, table.translation),
+        userIdIdx: index('userBookProgress_userId_idx').on(table.userId),
+    }),
+)
+
+export const userBookProgressRelations = relations(
+    userBookProgress,
+    ({ one, many }) => ({
+        user: one(users, {
+            fields: [userBookProgress.userId],
+            references: [users.id],
+        }),
+        chapters: many(userChapterProgress),
+    }),
+)
+
+// Cache table for chapter-level progress per user
+export const userChapterProgress = pgTable(
+    'userChapterProgress',
+    {
+        userId: varchar('userId', { length: 255 }).notNull(),
+        book: typedVerseBook('book').notNull(),
+        chapter: integer('chapter').notNull(),
+        translation: typedVerseTranslation('translation').notNull(),
+        typedVerses: jsonb('typedVerses')
+            .notNull()
+            .$type<Record<number, boolean>>()
+            .default({}),
+        typedVerseCount: integer('typedVerseCount').notNull().default(0),
+        totalVerses: integer('totalVerses').notNull(),
+        updatedAt: timestamp('updatedAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+    },
+    table => ({
+        pk: primaryKey(table.userId, table.book, table.chapter, table.translation),
+        userIdIdx: index('userChapterProgress_userId_idx').on(table.userId),
+        userIdBookIdx: index('userChapterProgress_userId_book_idx').on(
+            table.userId,
+            table.book,
+        ),
+    }),
+)
+
+export const userChapterProgressRelations = relations(
+    userChapterProgress,
+    ({ one }) => ({
+        user: one(users, {
+            fields: [userChapterProgress.userId],
+            references: [users.id],
+        }),
+        bookProgress: one(userBookProgress, {
+            fields: [
+                userChapterProgress.userId,
+                userChapterProgress.book,
+                userChapterProgress.translation,
+            ],
+            references: [
+                userBookProgress.userId,
+                userBookProgress.book,
+                userBookProgress.translation,
+            ],
+        }),
+    }),
+)
 
 export const passageResponse = pgTable('passageResponse', {
     id: varchar('id', { length: 255 })

@@ -2,6 +2,7 @@ import { passageReferenceSchema } from '~/lib/passageReference'
 import { Book, bookSchema } from '~/lib/types/book'
 import { BookMetadata, getBibleMetadata } from '~/server/bibleMetadata'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
+import { UserProgressData } from '~/server/repositories/userProgress.repository'
 
 function toPluralBookForm(book: Book) {
     if (book === 'psalm') {
@@ -228,4 +229,82 @@ export function getBookOverview(
 ): BookOverview[] {
     const bookData = aggregateBookData(typingSessions)
     return formatBookData(bookData)
+}
+
+/**
+ * Convert cached progress data to BookOverview format
+ * This is the optimized path that reads from the cache tables
+ *
+ * For any book with progress, we show ALL chapters (using Bible metadata),
+ * not just the chapters the user has typed. This matches the original behavior.
+ */
+export function getBookOverviewFromCache(
+    progressData: UserProgressData,
+): BookOverview[] {
+    const bibleMetadata = getBibleMetadata()
+
+    // Group chapter rows by book for quick lookup
+    type ChapterRow = (typeof progressData.chapters)[number]
+    const chaptersByBook = new Map<Book, Map<number, ChapterRow>>()
+    for (const chapterRow of progressData.chapters) {
+        const bookChapters = chaptersByBook.get(chapterRow.book) ?? new Map<number, ChapterRow>()
+        bookChapters.set(chapterRow.chapter, chapterRow)
+        chaptersByBook.set(chapterRow.book, bookChapters)
+    }
+
+    const result: BookOverview[] = []
+
+    // Process from book-level rows (which have totals)
+    for (const bookRow of progressData.books) {
+        // Only include books with progress or prestige
+        if (bookRow.typedVerseCount === 0 && bookRow.prestige === 0) continue
+
+        const bookMetadata = bibleMetadata[bookRow.book]
+        if (!bookMetadata) continue
+
+        const chapterProgressMap = chaptersByBook.get(bookRow.book) ?? new Map<number, ChapterRow>()
+
+        // Create chapter overviews for ALL chapters in the book
+        const chapterOverviews: ChapterOverview[] = bookMetadata.chapters.map(
+            (chapterMeta, index) => {
+                const chapterNumber = index + 1
+                const chapterProgress = chapterProgressMap.get(chapterNumber)
+                const totalVerses = chapterMeta.length
+                const typedVerses = chapterProgress?.typedVerseCount ?? 0
+
+                return {
+                    chapter: chapterNumber,
+                    verses: totalVerses,
+                    typedVerses,
+                    percentage: Math.round((typedVerses / totalVerses) * 100),
+                }
+            },
+        )
+
+        result.push({
+            book: bookRow.book,
+            label: passageReferenceSchema.parse(toPluralBookForm(bookRow.book)),
+            prestige: bookRow.prestige,
+            chapters: chapterOverviews,
+            typedVerses: bookRow.typedVerseCount,
+            verses: bookRow.totalVerses,
+            percentage:
+                bookRow.totalVerses > 0
+                    ? Math.floor(
+                          (bookRow.typedVerseCount / bookRow.totalVerses) *
+                              10000,
+                      ) / 100
+                    : 0,
+        })
+    }
+
+    // Sort by book order in the Bible
+    const bookOrder = bookSchema.options
+    result.sort(
+        (a, b) =>
+            bookOrder.indexOf(a.book as Book) -
+            bookOrder.indexOf(b.book as Book),
+    )
+
+    return result
 }
