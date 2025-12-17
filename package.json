@@ -20,6 +20,7 @@
     },
     "dependencies": {
         "@auth/drizzle-adapter": "0.3.2",
+        "@base-ui/react": "^1.0.0",
         "@headlessui/react": "^1.7.17",
         "@opentelemetry/api": "^1.7.0",
         "@opentelemetry/auto-instrumentations-node": "^0.41.0",
