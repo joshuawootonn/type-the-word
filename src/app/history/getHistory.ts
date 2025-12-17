@@ -1,14 +1,15 @@
 import { db } from '~/server/db'
 import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
+import { UserDailyActivityRepository } from '~/server/repositories/userDailyActivity.repository'
 import { UserProgressRepository } from '~/server/repositories/userProgress.repository'
 
-import { MonthlyLogDTO, getLog2 } from './log2'
+import { MonthlyLogDTO, getLog2, getLogFromCache } from './log2'
 import {
     BookOverview,
     getBookOverview,
     getBookOverviewFromCache,
 } from './overview'
-import { VerseStatsWithDate, getAllVerseStats } from './wpm'
+import { WpmChartData, getAllVerseStats, getDailyStatsFromCache } from './wpm'
 
 export async function getOverviewData(
     userId: string,
@@ -28,17 +29,37 @@ export async function getOverviewData(
 export async function getLogData(
     userId: string,
     timezoneOffset: number,
+    useOptimizedHistory: boolean,
 ): Promise<MonthlyLogDTO[]> {
-    const typingSessionRepository = new TypingSessionRepository(db)
-    const typingSessions = await typingSessionRepository.getMany({ userId })
-    return getLog2(typingSessions, timezoneOffset)
+    if (useOptimizedHistory) {
+        const dailyActivityRepository = new UserDailyActivityRepository(db)
+        const dailyActivity = await dailyActivityRepository.getByUserId(userId)
+        return getLogFromCache(dailyActivity, timezoneOffset)
+    } else {
+        const typingSessionRepository = new TypingSessionRepository(db)
+        const typingSessions = await typingSessionRepository.getMany({ userId })
+        return getLog2(typingSessions, timezoneOffset)
+    }
 }
 
 export async function getWpmData(
     userId: string,
     timezoneOffset: number,
-): Promise<VerseStatsWithDate[]> {
-    const typingSessionRepository = new TypingSessionRepository(db)
-    const typingSessions = await typingSessionRepository.getMany({ userId })
-    return getAllVerseStats(typingSessions, timezoneOffset)
+    useOptimizedHistory: boolean,
+): Promise<WpmChartData> {
+    if (useOptimizedHistory) {
+        const dailyActivityRepository = new UserDailyActivityRepository(db)
+        const dailyActivity = await dailyActivityRepository.getByUserId(userId)
+        return {
+            type: 'cached',
+            data: getDailyStatsFromCache(dailyActivity, timezoneOffset),
+        }
+    } else {
+        const typingSessionRepository = new TypingSessionRepository(db)
+        const typingSessions = await typingSessionRepository.getMany({ userId })
+        return {
+            type: 'raw',
+            data: getAllVerseStats(typingSessions, timezoneOffset),
+        }
+    }
 }

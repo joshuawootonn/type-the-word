@@ -4,6 +4,7 @@ import {
     TypedVerse,
     TypingSession,
 } from '~/server/repositories/typingSession.repository'
+import { DailyActivityRow } from '~/server/repositories/userDailyActivity.repository'
 
 import { typingSessionToString } from './typingSessionToString'
 
@@ -33,6 +34,77 @@ export type MonthlyLogDTO = {
     month: number
     year: number
     numberOfVersesTyped: number
+}
+
+/**
+ * Convert cached daily activity rows to MonthlyLogDTO format
+ * This is the optimized path that reads from the cache table
+ *
+ * Note: The dates in userDailyActivity are stored as "calendar dates" at UTC midnight,
+ * representing the day the activity occurred. We use UTC methods to extract the day/month/year
+ * to avoid local timezone shifting the date by a day.
+ */
+export function getLogFromCache(
+    dailyActivity: DailyActivityRow[],
+    _clientTimezoneOffset: number,
+): MonthlyLogDTO[] {
+    const monthLogs: Record<
+        string,
+        {
+            month: Date
+            numberOfVersesTyped: number
+            days: Record<string, DayLogDTO>
+        }
+    > = {}
+
+    for (const row of dailyActivity) {
+        // The date is stored at UTC midnight representing a calendar day
+        // Use UTC methods to extract the correct day without timezone shifting
+        const year = row.date.getUTCFullYear()
+        const month = row.date.getUTCMonth()
+        const day = row.date.getUTCDate()
+
+        // Create a local date from the UTC components for formatting
+        const dateForFormatting = new Date(year, month, day)
+        const monthString = format(dateForFormatting, 'yyyy-MM')
+        const dayString = format(dateForFormatting, 'dd')
+
+        const currentMonthLog = monthLogs[monthString]
+
+        if (currentMonthLog == null) {
+            // Create a UTC date for the first of the month
+            const monthDate = new Date(Date.UTC(year, month, 1))
+            monthLogs[monthString] = {
+                month: monthDate,
+                numberOfVersesTyped: row.verseCount,
+                days: {
+                    [dayString]: {
+                        numberOfVersesTyped: row.verseCount,
+                        location: row.passages,
+                        createdAt: row.date,
+                    },
+                },
+            }
+        } else {
+            currentMonthLog.numberOfVersesTyped += row.verseCount
+            currentMonthLog.days[dayString] = {
+                numberOfVersesTyped: row.verseCount,
+                location: row.passages,
+                createdAt: row.date,
+            }
+        }
+    }
+
+    return Object.entries(monthLogs)
+        .sort((a, b) => (a[0] > b[0] ? -1 : 1))
+        .map(
+            ([_, monthlyLog]): MonthlyLogDTO => ({
+                numberOfVersesTyped: monthlyLog.numberOfVersesTyped,
+                month: monthlyLog.month.getUTCMonth(),
+                year: monthlyLog.month.getUTCFullYear(),
+                days: monthlyLog.days,
+            }),
+        )
 }
 
 export function getLog2(

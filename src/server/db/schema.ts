@@ -50,6 +50,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
     userCurrentTheme: one(userCurrentTheme),
     bookProgress: many(userBookProgress),
     chapterProgress: many(userChapterProgress),
+    dailyActivity: many(userDailyActivity),
 }))
 
 export const userChangelog = pgTable('userChangelog', {
@@ -388,6 +389,43 @@ export const userChapterProgressRelations = relations(
                 userBookProgress.book,
                 userBookProgress.translation,
             ],
+        }),
+    }),
+)
+
+// Cache table for daily typing activity per user (for the log and WPM sections)
+export const userDailyActivity = pgTable(
+    'userDailyActivity',
+    {
+        userId: varchar('userId', { length: 255 }).notNull(),
+        date: timestamp('date', { mode: 'date' }).notNull(),
+        verseCount: integer('verseCount').notNull().default(0),
+        passages: jsonb('passages').notNull().$type<string[]>().default([]),
+        // WPM/Accuracy stats - nullable since not all verses have typing data
+        averageWpm: integer('averageWpm'),
+        averageAccuracy: integer('averageAccuracy'),
+        averageCorrectedAccuracy: integer('averageCorrectedAccuracy'),
+        versesWithStats: integer('versesWithStats').notNull().default(0),
+        updatedAt: timestamp('updatedAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+    },
+    table => ({
+        pk: primaryKey(table.userId, table.date),
+        userIdIdx: index('userDailyActivity_userId_idx').on(table.userId),
+        userIdDateIdx: index('userDailyActivity_userId_date_idx').on(
+            table.userId,
+            table.date,
+        ),
+    }),
+)
+
+export const userDailyActivityRelations = relations(
+    userDailyActivity,
+    ({ one }) => ({
+        user: one(users, {
+            fields: [userDailyActivity.userId],
+            references: [users.id],
         }),
     }),
 )

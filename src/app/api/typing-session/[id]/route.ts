@@ -1,9 +1,11 @@
 import { eq, sql } from 'drizzle-orm'
 import { createInsertSchema } from 'drizzle-zod'
 import { getServerSession } from 'next-auth'
+import { cookies } from 'next/headers'
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
 
+import { calculateStatsForVerse } from '~/app/history/wpm'
 import { authOptions } from '~/server/auth'
 import { db } from '~/server/db'
 import {
@@ -12,6 +14,7 @@ import {
     typingDataSchema,
 } from '~/server/db/schema'
 import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
+import { UserDailyActivityRepository } from '~/server/repositories/userDailyActivity.repository'
 import { UserProgressRepository } from '~/server/repositories/userProgress.repository'
 
 export const dynamic = 'force-dynamic' // defaults to auto
@@ -23,6 +26,18 @@ const addTypedVerseBodySchema = createInsertSchema(typedVerses, {
     id: true,
 })
 export type AddTypedVerseBody = z.infer<typeof addTypedVerseBodySchema>
+
+/**
+ * Get the client's local date based on their timezone offset
+ */
+function getClientLocalDate(clientTimezoneOffset: number): Date {
+    const now = new Date()
+    const serverUTCOffset = now.getTimezoneOffset()
+    // Convert server time to client's local time
+    return new Date(
+        now.getTime() + (serverUTCOffset - clientTimezoneOffset) * 60 * 1000,
+    )
+}
 
 const uuidSchema = z.string().uuid()
 
@@ -50,6 +65,13 @@ export const POST = async function POST(
     const verse = addTypedVerseBodySchema.parse(body)
     const typingSessionRepository = new TypingSessionRepository(db)
     const userProgressRepository = new UserProgressRepository(db)
+    const dailyActivityRepository = new UserDailyActivityRepository(db)
+
+    // Get client timezone offset from cookie
+    const cookieStore = cookies()
+    const timezoneOffset = parseInt(
+        cookieStore.get('timezoneOffset')?.value ?? '0',
+    )
 
     let typingSession = await typingSessionRepository.getOne({
         id: params.id,
@@ -73,6 +95,34 @@ export const POST = async function POST(
         verse.chapter,
         verse.verse,
         verse.translation,
+    )
+
+    // Always update the daily activity cache (keeps it warm for when flag is enabled)
+    // Use client's local date so the activity is recorded on the correct day for their timezone
+    const clientLocalDate = getClientLocalDate(timezoneOffset)
+
+    // Calculate WPM/accuracy stats if typing data is available
+    const stats = verse.typingData
+        ? calculateStatsForVerse({
+              id: '',
+              userId: session.user.id,
+              typingSessionId: params.id,
+              translation: verse.translation,
+              book: verse.book,
+              chapter: verse.chapter,
+              verse: verse.verse,
+              createdAt: new Date(),
+              typingData: verse.typingData,
+          })
+        : null
+
+    await dailyActivityRepository.recordActivity(
+        session.user.id,
+        clientLocalDate,
+        verse.book,
+        verse.chapter,
+        verse.verse,
+        stats,
     )
 
     typingSession = await typingSessionRepository.getOne({

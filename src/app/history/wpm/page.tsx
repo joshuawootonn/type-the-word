@@ -21,8 +21,10 @@ export default async function HistoryWpmPage() {
         return null
     }
 
+    const posthog = PostHogClient()
+
     // Check if user has access to WPM chart
-    const showWpmChart = await PostHogClient().isFeatureEnabled(
+    const showWpmChart = await posthog.isFeatureEnabled(
         'use-wpm-accuracy-history-chart',
         session.user.id,
     )
@@ -32,12 +34,22 @@ export default async function HistoryWpmPage() {
         redirect('/history')
     }
 
+    const useOptimizedHistory =
+        (await posthog.isFeatureEnabled(
+            'use-read-optimized-history',
+            session.user.id,
+        )) ?? false
+
     const cookieStore = cookies()
     const timezoneOffset = parseInt(
         cookieStore.get('timezoneOffset')?.value ?? '0',
     )
 
-    const wpmData = await getWpmData(session.user.id, timezoneOffset)
+    const wpmData = await getWpmData(
+        session.user.id,
+        timezoneOffset,
+        useOptimizedHistory,
+    )
 
-    return <WPMChart allStats={wpmData} />
+    return <WPMChart chartData={wpmData} />
 }

@@ -17,6 +17,7 @@ import {
     TypedVerse,
     TypingSession,
 } from '~/server/repositories/typingSession.repository'
+import { DailyActivityRow } from '~/server/repositories/userDailyActivity.repository'
 
 export type TimeRange = 'week' | 'month' | '3months' | 'year'
 export type Interval = 'daily' | 'weekly' | 'monthly'
@@ -287,6 +288,142 @@ export function getAllVerseStats(
     }
 
     return allStats
+}
+
+/**
+ * Daily stats from the cache table, converted to the format used by aggregateStats
+ * Uses year/month/day numbers instead of Date to avoid serialization issues
+ * when passing from Server Component to Client Component
+ */
+export type DailyStatsFromCache = {
+    year: number
+    month: number // 0-indexed (0 = January)
+    day: number
+    averageWpm: number | null
+    averageAccuracy: number | null
+    averageCorrectedAccuracy: number | null
+    versesWithStats: number
+}
+
+/**
+ * Discriminated union for WPM chart data
+ * Allows the chart to determine which aggregation function to use
+ */
+export type WpmChartData =
+    | { type: 'raw'; data: VerseStatsWithDate[] }
+    | { type: 'cached'; data: DailyStatsFromCache[] }
+
+/**
+ * Convert cached daily activity to DailyStatsFromCache format
+ * This is the optimized path that reads from the cache table
+ *
+ * Note: The dates in userDailyActivity are stored as "calendar dates" at UTC midnight.
+ * We extract UTC components and pass them as numbers to avoid serialization issues
+ * when the data is passed from Server Component to Client Component.
+ */
+export function getDailyStatsFromCache(
+    dailyActivity: DailyActivityRow[],
+    _clientTimezoneOffset: number,
+): DailyStatsFromCache[] {
+    return dailyActivity
+        .filter(row => row.versesWithStats > 0)
+        .map(row => {
+            // The date is stored at UTC midnight representing a calendar day
+            // Extract UTC components as numbers to avoid Date serialization issues
+            return {
+                year: row.date.getUTCFullYear(),
+                month: row.date.getUTCMonth(),
+                day: row.date.getUTCDate(),
+                averageWpm: row.averageWpm,
+                averageAccuracy: row.averageAccuracy,
+                averageCorrectedAccuracy: row.averageCorrectedAccuracy,
+                versesWithStats: row.versesWithStats,
+            }
+        })
+}
+
+/**
+ * Aggregate daily stats from cache by the given time range and interval.
+ * Uses weighted averages when combining multiple days.
+ */
+export function aggregateStatsFromCache(
+    dailyStats: DailyStatsFromCache[],
+    timeRange: TimeRange,
+    interval: Interval,
+): AggregatedStats[] {
+    const rangeInterval = getTimeRangeInterval(timeRange)
+
+    // Filter stats to the selected time range
+    // Create Date objects from year/month/day numbers for comparison
+    const filteredStats = dailyStats.filter(stat => {
+        const statDate = new Date(stat.year, stat.month, stat.day)
+        return isWithinInterval(statDate, rangeInterval)
+    })
+
+    // Group stats by interval
+    const statsByInterval: Record<string, DailyStatsFromCache[]> = {}
+
+    for (const stat of filteredStats) {
+        const statDate = new Date(stat.year, stat.month, stat.day)
+        const key = getDateKey(statDate, interval)
+        if (!statsByInterval[key]) {
+            statsByInterval[key] = []
+        }
+        statsByInterval[key].push(stat)
+    }
+
+    // Generate all intervals in the range
+    const intervalDates = getIntervalDates(rangeInterval, interval)
+
+    // Calculate weighted averages for each interval
+    return intervalDates.map(date => {
+        const key = getDateKey(date, interval)
+        const intervalStats = statsByInterval[key] ?? []
+
+        // Calculate total verses with stats
+        const totalVersesWithStats = intervalStats.reduce(
+            (sum, s) => sum + s.versesWithStats,
+            0,
+        )
+
+        // Calculate weighted averages
+        let averageWpm: number | null = null
+        let averageAccuracy: number | null = null
+        let averageCorrectedAccuracy: number | null = null
+
+        if (totalVersesWithStats > 0) {
+            const weightedWpmSum = intervalStats.reduce(
+                (sum, s) => sum + (s.averageWpm ?? 0) * s.versesWithStats,
+                0,
+            )
+            const weightedAccuracySum = intervalStats.reduce(
+                (sum, s) => sum + (s.averageAccuracy ?? 0) * s.versesWithStats,
+                0,
+            )
+            const weightedCorrectedAccuracySum = intervalStats.reduce(
+                (sum, s) =>
+                    sum + (s.averageCorrectedAccuracy ?? 0) * s.versesWithStats,
+                0,
+            )
+
+            averageWpm = Math.round(weightedWpmSum / totalVersesWithStats)
+            averageAccuracy = Math.round(
+                weightedAccuracySum / totalVersesWithStats,
+            )
+            averageCorrectedAccuracy = Math.round(
+                weightedCorrectedAccuracySum / totalVersesWithStats,
+            )
+        }
+
+        return {
+            date,
+            dateLabel: getDateLabel(date, interval),
+            averageWpm,
+            averageAccuracy,
+            averageCorrectedAccuracy,
+            versesWithData: totalVersesWithStats,
+        }
+    })
 }
 
 function getTimeRangeInterval(timeRange: TimeRange): {

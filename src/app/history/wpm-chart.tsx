@@ -22,10 +22,11 @@ import {
 
 import {
     AggregatedStats,
-    VerseStatsWithDate,
+    WpmChartData,
     TimeRange,
     Interval,
     aggregateStats,
+    aggregateStatsFromCache,
 } from './wpm'
 
 const TIME_RANGE_OPTIONS: { value: TimeRange; label: string }[] = [
@@ -276,13 +277,16 @@ function ChartSelect<T extends string>({
     )
 }
 
-export function WPMChart({ allStats }: { allStats: VerseStatsWithDate[] }) {
+export function WPMChart({ chartData }: { chartData: WpmChartData }) {
     const [timeRange, setTimeRange] = useState<TimeRange>('week')
     const [interval, setInterval] = useState<Interval>('daily')
 
     const aggregatedData = useMemo(() => {
-        return aggregateStats(allStats, timeRange, interval)
-    }, [allStats, timeRange, interval])
+        if (chartData.type === 'cached') {
+            return aggregateStatsFromCache(chartData.data, timeRange, interval)
+        }
+        return aggregateStats(chartData.data, timeRange, interval)
+    }, [chartData, timeRange, interval])
 
     return (
         <div className="mb-8">

@@ -99,6 +99,13 @@
       "when": 1765944844049,
       "tag": "0013_user-progress",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1766000000000,
+      "tag": "0014_user-daily-activity",
+      "breakpoints": true
     }
   ]
 }
