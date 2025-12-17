@@ -33,7 +33,7 @@ function TabLink({
             onClick={onClick}
             className={clsx(
                 'flex cursor-pointer',
-                'svg-outline relative outline-none',
+                'svg-outline relative no-underline outline-none',
             )}
         >
             <div
