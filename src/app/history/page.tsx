@@ -1,24 +1,30 @@
-import { HistoryOverview } from "./history-overview";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import { authOptions } from "~/server/auth";
 import { getHistory } from "./getHistory";
-import { HistoryLogV2 } from "./history-log-2";
-import { WPMChart } from "./wpm-chart";
 import { cookies } from "next/headers";
 import PostHogClient from "~/server/posthog";
+import { HistoryTabs } from "./history-tabs";
 
 export const metadata: Metadata = {
   title: "Type the Word - History",
   description: "History of all the passages you have typed.",
 };
 
+type TabValue = "overview" | "wpm" | "log";
+
+function isValidTab(value: string | undefined): value is TabValue {
+  return value === "overview" || value === "wpm" || value === "log";
+}
+
 export default async function History() {
   const session = await getServerSession(authOptions);
   const cookieStore = cookies();
 
   const timezoneOffset = parseInt(cookieStore.get("timezoneOffset")?.value ?? "0");
+  const historyTabCookie = cookieStore.get("historyTab")?.value;
+  const initialTab: TabValue = isValidTab(historyTabCookie) ? historyTabCookie : "overview";
 
   if (session == null) {
     redirect("/");
@@ -38,51 +44,13 @@ export default async function History() {
   );
 
   return (
-    <>
-      <h2>
-        Overview{" "}
-        {useOptimizedHistory ? (
-          <div className="-translate-y-1.5 inline-block border border-primary px-1.5 py-0.5 text-xs font-medium text-primary">
-            beta
-          </div>
-        ) : (
-          ""
-        )}
-      </h2>
-      {overview.length === 0 ? (
-        <p>
-          Once you have typed more verses this section will include details on what books of the
-          bible you have typed through.
-        </p>
-      ) : (
-        <HistoryOverview overview={overview} />
-      )}
-      {showWpmChart && (
-        <>
-          <hr className="mx-0 w-full border-t-2 border-primary" />
-          <WPMChart
-            allStats={allVerseStats}
-            title={
-              <div className="flex items-center gap-2">
-                <h2 className="m-0">WPM + Accuracy</h2>
-                <div className="-translate-y-0 inline-block border border-primary px-1.5 py-0.5 text-xs font-medium text-primary">
-                  beta
-                </div>
-              </div>
-            }
-          />
-        </>
-      )}
-      <hr className="mx-0 w-full border-t-2 border-primary" />
-      <h2>Log</h2>
-      {log2.length === 0 ? (
-        <p>
-          Once you have typed more verses this section will include details on how often you have
-          typed over the past few months.
-        </p>
-      ) : (
-        <HistoryLogV2 monthLogs={log2} />
-      )}
-    </>
+    <HistoryTabs
+      overview={overview}
+      log2={log2}
+      allVerseStats={allVerseStats}
+      showWpmChart={showWpmChart ?? false}
+      initialTab={initialTab}
+      useOptimizedHistory={useOptimizedHistory ?? false}
+    />
   );
 }
