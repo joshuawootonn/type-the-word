@@ -24,6 +24,7 @@ import { stringToPassageObject } from '~/lib/passageObject'
 import { Book, bookSchema } from '~/lib/types/book'
 import { toPassageSegment } from '~/lib/passageSegment'
 import { usePathname } from 'next/navigation'
+import { useIsFirstRender } from '~/lib/hooks/useIsFirstRender'
 
 const simpleBibleMetadataSchema = z.record(
     bookSchema,
@@ -132,11 +133,7 @@ export function PassageSelector({
         void router.push(`/passage/${nextUrl}`, { scroll: false })
     }
 
-    const [isFirstRender, setIsFirstRender] = useState(true)
-
-    useEffect(() => {
-        setIsFirstRender(false)
-    }, [])
+    const isFirstRender = useIsFirstRender()
 
     return (
         <>
