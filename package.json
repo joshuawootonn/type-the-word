@@ -7,6 +7,8 @@
         "dev": "next dev -p 1199",
         "lint": "next lint",
         "format": "prettier ./src/**/* --write",
+        "format:check": "prettier ./src --check",
+        "type-check": "tsc --noEmit",
         "start": "next start",
         "test": "dotenv --env-file .env.test vitest",
         "test:watch": "dotenv --env-file .env.test vitest --watch --reporter=verbose",
