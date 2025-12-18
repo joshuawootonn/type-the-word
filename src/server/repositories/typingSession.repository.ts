@@ -1,4 +1,4 @@
-import { desc, eq, SQL } from 'drizzle-orm'
+import { and, desc, eq, gte, lte, SQL } from 'drizzle-orm'
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import { createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
@@ -65,12 +65,27 @@ export class TypingSessionRepository {
         userId,
         book,
         chapter,
+        startDate,
+        endDate,
     }: {
         userId: string | SQL
         book?: schema.Book
         chapter?: number
+        startDate?: Date
+        endDate?: Date
     }): Promise<TypingSession[]> {
-        const where = eq(typingSessions.userId, userId)
+        // Build where conditions
+        const conditions = [eq(typingSessions.userId, userId)]
+
+        if (startDate) {
+            conditions.push(gte(typingSessions.createdAt, startDate))
+        }
+        if (endDate) {
+            conditions.push(lte(typingSessions.createdAt, endDate))
+        }
+
+        const where =
+            conditions.length === 1 ? conditions.at(0) : and(...conditions)
 
         const builder = this.db.query.typingSessions.findMany({
             with: {
