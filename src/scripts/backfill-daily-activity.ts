@@ -3,14 +3,16 @@
  *
  * This script:
  * 1. Fetches all users from the database
- * 2. For each user, fetches their typing sessions
+ * 2. For each user, fetches their typing sessions (optionally filtered by date range)
  * 3. Aggregates activity by day using the same logic as getLog2
  * 4. Calculates WPM/accuracy stats when typing data is available
  * 5. Inserts the computed data into the userDailyActivity table
  *
- * Run with: dotenv pnpm dlx tsx ./src/scripts/backfill-daily-activity.ts
+ * Run with:
+ *   dotenv pnpm dlx tsx ./src/scripts/backfill-daily-activity.ts
+ *   dotenv pnpm dlx tsx ./src/scripts/backfill-daily-activity.ts --start 2024-01-01 --end 2024-12-31
  */
-import { format } from 'date-fns'
+import { format, parseISO, startOfDay, endOfDay } from 'date-fns'
 
 import { typingSessionToString } from '~/app/history/typingSessionToString'
 import { calculateStatsForVerse, VerseStats } from '~/app/history/wpm'
@@ -28,8 +30,34 @@ type DayData = {
     stats: VerseStats[] // Stats for verses that have typing data
 }
 
+function parseArgs(): { startDate?: Date; endDate?: Date } {
+    const args = process.argv.slice(2)
+    let startDate: Date | undefined
+    let endDate: Date | undefined
+
+    for (let i = 0; i < args.length; i++) {
+        if (args[i] === '--start' && args[i + 1]) {
+            startDate = startOfDay(parseISO(args[i + 1]!))
+            i++
+        } else if (args[i] === '--end' && args[i + 1]) {
+            endDate = endOfDay(parseISO(args[i + 1]!))
+            i++
+        }
+    }
+
+    return { startDate, endDate }
+}
+
 async function backfillDailyActivity() {
+    const { startDate, endDate } = parseArgs()
+
     console.log('Starting backfill of daily activity table...')
+    if (startDate) {
+        console.log(`  Start date: ${format(startDate, 'yyyy-MM-dd')}`)
+    }
+    if (endDate) {
+        console.log(`  End date: ${format(endDate, 'yyyy-MM-dd')}`)
+    }
 
     // Get all users
     const allUsers = await db.select({ id: users.id }).from(users)
@@ -43,9 +71,11 @@ async function backfillDailyActivity() {
 
     for (const user of allUsers) {
         try {
-            // Fetch typing sessions for this user
+            // Fetch typing sessions for this user (filtered by date range if specified)
             const typingSessions = await typingSessionRepository.getMany({
                 userId: user.id,
+                startDate,
+                endDate,
             })
 
             if (typingSessions.length === 0) {
