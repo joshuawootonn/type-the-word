@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, lte, SQL } from 'drizzle-orm'
+import { and, desc, eq, gte, lte, sql, SQL } from 'drizzle-orm'
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import { createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
@@ -75,7 +75,7 @@ export class TypingSessionRepository {
         endDate?: Date
     }): Promise<TypingSession[]> {
         // Build where conditions
-        const conditions = [eq(typingSessions.userId, userId)]
+        const conditions: SQL[] = [eq(typingSessions.userId, userId)]
 
         if (startDate) {
             conditions.push(gte(typingSessions.createdAt, startDate))
@@ -84,30 +84,36 @@ export class TypingSessionRepository {
             conditions.push(lte(typingSessions.createdAt, endDate))
         }
 
-        const where =
-            conditions.length === 1 ? conditions.at(0) : and(...conditions)
+        // Filter by book/chapter using an EXISTS subquery
+        // Note: We use raw SQL because Drizzle's relational query API aliases the
+        // main table as "typingSessions" and we need to correlate the subquery
+        if (book != null || chapter != null) {
+            const subqueryConditions: SQL[] = [
+                // Reference the alias used by the relational query builder
+                sql`"typedVerse"."typingSessionId" = "typingSessions"."id"`,
+            ]
+            if (book != null) {
+                subqueryConditions.push(sql`"typedVerse"."book" = ${book}`)
+            }
+            if (chapter != null) {
+                subqueryConditions.push(
+                    sql`"typedVerse"."chapter" = ${chapter}`,
+                )
+            }
+            const subqueryWhere = sql.join(subqueryConditions, sql` AND `)
+            conditions.push(
+                sql`EXISTS (SELECT 1 FROM "typedVerse" WHERE ${subqueryWhere})`,
+            )
+        }
 
-        const builder = this.db.query.typingSessions.findMany({
+        const where = and(...conditions)
+
+        return this.db.query.typingSessions.findMany({
             with: {
                 typedVerses: true,
             },
             where,
             orderBy: [desc(typingSessions.createdAt)],
         })
-        const result = await builder
-
-        // https://github.com/drizzle-team/drizzle-orm/discussions/2316
-        // Once this is resolved I will be able to do this at the db level
-        if (book == null && chapter == null) {
-            return result
-        }
-
-        return result.filter(session =>
-            session.typedVerses.some(
-                typedVerse =>
-                    (chapter ? typedVerse.chapter === chapter : true) &&
-                    (book ? typedVerse.book === book : true),
-            ),
-        )
     }
 }
