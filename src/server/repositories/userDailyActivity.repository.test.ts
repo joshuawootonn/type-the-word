@@ -5,9 +5,227 @@ import { db } from '~/server/db'
 import { userDailyActivity, users } from '~/server/db/schema'
 
 import {
+    consolidatePassages,
     formatVerseReference,
+    parsePassageString,
     UserDailyActivityRepository,
 } from './userDailyActivity.repository'
+
+describe('parsePassageString', () => {
+    it('parses simple book names', () => {
+        expect(parsePassageString('Genesis 1:1')).toEqual({
+            book: 'genesis',
+            chapter: 1,
+            verses: [1],
+        })
+        expect(parsePassageString('John 3:16')).toEqual({
+            book: 'john',
+            chapter: 3,
+            verses: [16],
+        })
+    })
+
+    it('parses numbered book names', () => {
+        expect(parsePassageString('1 Corinthians 13:4')).toEqual({
+            book: '1_corinthians',
+            chapter: 13,
+            verses: [4],
+        })
+        expect(parsePassageString('2 Timothy 3:16')).toEqual({
+            book: '2_timothy',
+            chapter: 3,
+            verses: [16],
+        })
+    })
+
+    it('parses multi-word book names', () => {
+        expect(parsePassageString('Song Of Solomon 2:4')).toEqual({
+            book: 'song_of_solomon',
+            chapter: 2,
+            verses: [4],
+        })
+    })
+
+    it('parses verse ranges', () => {
+        expect(parsePassageString('Luke 7:24-36')).toEqual({
+            book: 'luke',
+            chapter: 7,
+            verses: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36],
+        })
+    })
+
+    it('parses comma-separated verses', () => {
+        expect(parsePassageString('Genesis 1:1, 3, 5')).toEqual({
+            book: 'genesis',
+            chapter: 1,
+            verses: [1, 3, 5],
+        })
+    })
+
+    it('parses mixed ranges and individual verses', () => {
+        expect(parsePassageString('Romans 8:1-3, 5, 7-9')).toEqual({
+            book: 'romans',
+            chapter: 8,
+            verses: [1, 2, 3, 5, 7, 8, 9],
+        })
+    })
+
+    it('returns null for invalid input', () => {
+        expect(parsePassageString('')).toBeNull()
+        expect(parsePassageString('Invalid Book 1:1')).toBeNull()
+        expect(parsePassageString('Genesis')).toBeNull()
+        expect(parsePassageString('Genesis 1')).toBeNull()
+    })
+})
+
+describe('consolidatePassages', () => {
+    it('creates new passage for empty existing passages', () => {
+        const result = consolidatePassages([], {
+            book: 'genesis',
+            chapter: 1,
+            verse: 1,
+        })
+        expect(result).toEqual(['Genesis 1:1'])
+    })
+
+    it('consolidates consecutive verses into a range', () => {
+        // Start with verses 1-3
+        let result = consolidatePassages([], {
+            book: 'luke',
+            chapter: 7,
+            verse: 24,
+        })
+        result = consolidatePassages(result, {
+            book: 'luke',
+            chapter: 7,
+            verse: 25,
+        })
+        result = consolidatePassages(result, {
+            book: 'luke',
+            chapter: 7,
+            verse: 26,
+        })
+
+        expect(result).toEqual(['Luke 7:24-26'])
+    })
+
+    it('consolidates when adding to existing range', () => {
+        // This is the key case from the issue
+        const result = consolidatePassages(['Luke 7:24-36', 'Luke 7:37'], {
+            book: 'luke',
+            chapter: 7,
+            verse: 38,
+        })
+
+        expect(result).toEqual(['Luke 7:24-38'])
+    })
+
+    it('handles non-consecutive verses as separate entries', () => {
+        let result = consolidatePassages([], {
+            book: 'genesis',
+            chapter: 1,
+            verse: 1,
+        })
+        result = consolidatePassages(result, {
+            book: 'genesis',
+            chapter: 1,
+            verse: 5,
+        })
+
+        expect(result).toEqual(['Genesis 1:1, 5'])
+    })
+
+    it('keeps different chapters separate', () => {
+        let result = consolidatePassages([], {
+            book: 'genesis',
+            chapter: 1,
+            verse: 1,
+        })
+        result = consolidatePassages(result, {
+            book: 'genesis',
+            chapter: 2,
+            verse: 1,
+        })
+
+        expect(result).toEqual(['Genesis 1:1', 'Genesis 2:1'])
+    })
+
+    it('keeps different books separate', () => {
+        let result = consolidatePassages([], {
+            book: 'genesis',
+            chapter: 1,
+            verse: 1,
+        })
+        result = consolidatePassages(result, {
+            book: 'exodus',
+            chapter: 1,
+            verse: 1,
+        })
+
+        expect(result).toEqual(['Genesis 1:1', 'Exodus 1:1'])
+    })
+
+    it('handles complex consolidation with gaps', () => {
+        // Verses 1, 2, 3, 5, 7, 8, 9 -> "1-3, 5, 7-9"
+        let result = consolidatePassages([], {
+            book: 'genesis',
+            chapter: 1,
+            verse: 1,
+        })
+        result = consolidatePassages(result, {
+            book: 'genesis',
+            chapter: 1,
+            verse: 2,
+        })
+        result = consolidatePassages(result, {
+            book: 'genesis',
+            chapter: 1,
+            verse: 3,
+        })
+        result = consolidatePassages(result, {
+            book: 'genesis',
+            chapter: 1,
+            verse: 5,
+        })
+        result = consolidatePassages(result, {
+            book: 'genesis',
+            chapter: 1,
+            verse: 7,
+        })
+        result = consolidatePassages(result, {
+            book: 'genesis',
+            chapter: 1,
+            verse: 8,
+        })
+        result = consolidatePassages(result, {
+            book: 'genesis',
+            chapter: 1,
+            verse: 9,
+        })
+
+        expect(result).toEqual(['Genesis 1:1-3, 5, 7-9'])
+    })
+
+    it('handles duplicate verses (idempotent)', () => {
+        let result = consolidatePassages([], {
+            book: 'john',
+            chapter: 3,
+            verse: 16,
+        })
+        result = consolidatePassages(result, {
+            book: 'john',
+            chapter: 3,
+            verse: 16,
+        })
+        result = consolidatePassages(result, {
+            book: 'john',
+            chapter: 3,
+            verse: 16,
+        })
+
+        expect(result).toEqual(['John 3:16'])
+    })
+})
 
 describe('formatVerseReference', () => {
     it('formats simple book names', () => {
@@ -278,8 +496,31 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
 
             expect(results).toHaveLength(1)
             expect(results[0]!.verseCount).toBe(4)
-            // Only unique passages
-            expect(results[0]!.passages).toEqual(['Genesis 1:1', 'Genesis 1:2'])
+            // Passages are now consolidated into ranges
+            expect(results[0]!.passages).toEqual(['Genesis 1:1-2'])
+        })
+
+        it('consolidates consecutive verses into ranges', async () => {
+            const date = new Date('2024-01-15T10:30:00Z')
+
+            // Type Luke 7:24-38 as separate verses
+            for (let verse = 24; verse <= 38; verse++) {
+                await repository.recordActivity(
+                    testUserId,
+                    date,
+                    'luke',
+                    7,
+                    verse,
+                    null,
+                )
+            }
+
+            const results = await repository.getByUserId(testUserId)
+
+            expect(results).toHaveLength(1)
+            expect(results[0]!.verseCount).toBe(15)
+            // Should be consolidated into a single range
+            expect(results[0]!.passages).toEqual(['Luke 7:24-38'])
         })
 
         it('treats different times on same day as same record', async () => {
@@ -310,6 +551,8 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
             // Both should be in the same record since same UTC day
             expect(results).toHaveLength(1)
             expect(results[0]!.verseCount).toBe(2)
+            // Consecutive verses should be consolidated
+            expect(results[0]!.passages).toEqual(['Genesis 1:1-2'])
         })
 
         it('creates separate records for different days', async () => {
@@ -379,6 +622,8 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
 
             results = await repository.getByUserId(testUserId)
             expect(results[0]!.averageWpm).toBe(50)
+            // Passages should be consolidated
+            expect(results[0]!.passages).toEqual(['Genesis 1:1-3'])
         })
 
         it('calculates running average accuracy correctly', async () => {
@@ -481,6 +726,8 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
             expect(results[0]!.averageCorrectedAccuracy).toBe(95) // (100 + 90) / 2
             expect(results[0]!.versesWithStats).toBe(2)
             expect(results[0]!.verseCount).toBe(3)
+            // Passages should be consolidated
+            expect(results[0]!.passages).toEqual(['Genesis 1:1-3'])
         })
 
         it('handles first insert without stats followed by insert with stats', async () => {
@@ -512,6 +759,8 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
             expect(results[0]!.versesWithStats).toBe(1)
             expect(results[0]!.averageWpm).toBe(60)
             expect(results[0]!.averageAccuracy).toBe(95)
+            // Passages should be consolidated
+            expect(results[0]!.passages).toEqual(['Genesis 1:1-2'])
         })
     })
 

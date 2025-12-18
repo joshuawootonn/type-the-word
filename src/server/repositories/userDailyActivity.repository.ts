@@ -1,7 +1,8 @@
-import { eq, sql } from 'drizzle-orm'
+import { and, eq, sql } from 'drizzle-orm'
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 
 import toProperCase from '~/lib/toProperCase'
+import { bookSchema } from '~/lib/types/book'
 import * as schema from '~/server/db/schema'
 
 export type DailyActivityRow = typeof schema.userDailyActivity.$inferSelect
@@ -16,6 +17,15 @@ export type VerseStats = {
 }
 
 /**
+ * Parsed passage data from a passage string
+ */
+export type ParsedPassage = {
+    book: schema.Book
+    chapter: number
+    verses: number[]
+}
+
+/**
  * Format a single verse reference for display
  * e.g., "Genesis 1:1" or "1 Corinthians 13:4"
  */
@@ -26,6 +36,152 @@ export function formatVerseReference(
 ): string {
     const bookName = toProperCase(book.split('_').join(' '))
     return `${bookName} ${chapter}:${verse}`
+}
+
+/**
+ * Parse a passage string into structured data
+ * e.g., "Genesis 1:1" -> { book: 'genesis', chapter: 1, verses: [1] }
+ * e.g., "Luke 7:24-36" -> { book: 'luke', chapter: 7, verses: [24,25,...,36] }
+ * e.g., "1 Corinthians 13:4-7, 10" -> { book: '1_corinthians', chapter: 13, verses: [4,5,6,7,10] }
+ */
+export function parsePassageString(passage: string): ParsedPassage | null {
+    // Match pattern: "Book Name Chapter:Verses"
+    // Book name can include numbers at start (1 Corinthians) and multiple words (Song Of Solomon)
+    // Verses can be single (1), range (1-5), or comma-separated (1-3, 5, 7-9)
+    const match = passage.match(/^(.+?)\s+(\d+):(.+)$/)
+    if (!match) return null
+
+    const [, bookName, chapterStr, versesStr] = match
+    if (!bookName || !chapterStr || !versesStr) return null
+
+    // Convert book name to schema format: "1 Corinthians" -> "1_corinthians"
+    const bookKey = bookName.toLowerCase().split(' ').join('_')
+
+    // Validate it's a valid book
+    const parseResult = bookSchema.safeParse(bookKey)
+    if (!parseResult.success) return null
+
+    const book = parseResult.data
+    const chapter = parseInt(chapterStr, 10)
+
+    // Parse verses - handle ranges (1-5) and individual verses (1, 3, 5)
+    const verses: number[] = []
+    const verseParts = versesStr.split(',').map(s => s.trim())
+
+    for (const part of verseParts) {
+        if (part.includes('-')) {
+            const [startStr, endStr] = part.split('-')
+            const start = parseInt(startStr!, 10)
+            const end = parseInt(endStr!, 10)
+            if (!isNaN(start) && !isNaN(end)) {
+                for (let v = start; v <= end; v++) {
+                    verses.push(v)
+                }
+            }
+        } else {
+            const v = parseInt(part, 10)
+            if (!isNaN(v)) {
+                verses.push(v)
+            }
+        }
+    }
+
+    return { book, chapter, verses }
+}
+
+/**
+ * Consolidate consecutive verses into ranges
+ * e.g., [1, 2, 3, 5, 7, 8, 9] -> [[1,2,3], [5], [7,8,9]] -> "1-3, 5, 7-9"
+ */
+function formatVerseSegments(verses: number[]): string {
+    const uniqueVerses = Array.from(new Set(verses)).sort((a, b) => a - b)
+
+    const segments = uniqueVerses.reduce<number[][]>(
+        (acc, verse) => {
+            const lastSegment = acc.at(-1)
+            const lastNumberInLastSegment = lastSegment?.at(-1)
+
+            if (lastNumberInLastSegment === undefined) {
+                return [[verse]]
+            }
+
+            if (verse === lastNumberInLastSegment + 1) {
+                lastSegment?.push(verse)
+            } else {
+                acc.push([verse])
+            }
+
+            return acc
+        },
+        [[]],
+    )
+
+    return segments
+        .filter(segment => segment.length > 0)
+        .map(segment => {
+            if (segment.length === 1) {
+                return String(segment[0])
+            }
+            return `${segment[0]}-${segment.at(-1)}`
+        })
+        .join(', ')
+}
+
+/**
+ * Consolidate passages by merging consecutive verses into ranges.
+ * Takes existing passages and a new verse, returns a consolidated array.
+ *
+ * Example:
+ * Input: ["Luke 7:24-36", "Luke 7:37"], newVerse: {book: 'luke', chapter: 7, verse: 38}
+ * Output: ["Luke 7:24-38"]
+ */
+export function consolidatePassages(
+    existingPassages: string[],
+    newVerse: { book: schema.Book; chapter: number; verse: number },
+): string[] {
+    // Build a map of book -> chapter -> verses
+    const passageMap = new Map<schema.Book, Map<number, Set<number>>>()
+
+    // Parse existing passages
+    for (const passage of existingPassages) {
+        const parsed = parsePassageString(passage)
+        if (!parsed) continue
+
+        if (!passageMap.has(parsed.book)) {
+            passageMap.set(parsed.book, new Map())
+        }
+        const bookMap = passageMap.get(parsed.book)!
+        if (!bookMap.has(parsed.chapter)) {
+            bookMap.set(parsed.chapter, new Set())
+        }
+        const chapterSet = bookMap.get(parsed.chapter)!
+        for (const v of parsed.verses) {
+            chapterSet.add(v)
+        }
+    }
+
+    // Add new verse
+    if (!passageMap.has(newVerse.book)) {
+        passageMap.set(newVerse.book, new Map())
+    }
+    const bookMap = passageMap.get(newVerse.book)!
+    if (!bookMap.has(newVerse.chapter)) {
+        bookMap.set(newVerse.chapter, new Set())
+    }
+    bookMap.get(newVerse.chapter)!.add(newVerse.verse)
+
+    // Convert back to passage strings
+    const result: string[] = []
+    for (const [book, chapters] of passageMap) {
+        const bookName = toProperCase(book.split('_').join(' '))
+        for (const [chapter, versesSet] of chapters) {
+            const versesArray = Array.from(versesSet)
+            const versesFormatted = formatVerseSegments(versesArray)
+            result.push(`${bookName} ${chapter}:${versesFormatted}`)
+        }
+    }
+
+    return result
 }
 
 export class UserDailyActivityRepository {
@@ -46,7 +202,7 @@ export class UserDailyActivityRepository {
 
     /**
      * Record activity for a single verse typed
-     * Upserts the daily activity row, incrementing verseCount and appending to passages
+     * Uses read-modify-write to consolidate passages into ranges (e.g., "Luke 7:24-38")
      * Optionally updates running averages for WPM/accuracy if stats are provided
      */
     async recordActivity(
@@ -61,7 +217,19 @@ export class UserDailyActivityRepository {
         const dayStart = new Date(date)
         dayStart.setUTCHours(0, 0, 0, 0)
 
-        const passageString = formatVerseReference(book, chapter, verse)
+        // Read existing record to get current passages
+        const existing = await this.db.query.userDailyActivity.findFirst({
+            where: and(
+                eq(schema.userDailyActivity.userId, userId),
+                eq(schema.userDailyActivity.date, dayStart),
+            ),
+        })
+
+        // Consolidate passages with the new verse
+        const consolidatedPassages = consolidatePassages(
+            existing?.passages ?? [],
+            { book, chapter, verse },
+        )
 
         if (stats) {
             // Insert with stats - update running averages on conflict
@@ -71,7 +239,7 @@ export class UserDailyActivityRepository {
                     userId,
                     date: dayStart,
                     verseCount: 1,
-                    passages: [passageString],
+                    passages: consolidatedPassages,
                     averageWpm: stats.wpm,
                     averageAccuracy: stats.accuracy,
                     averageCorrectedAccuracy: stats.correctedAccuracy,
@@ -85,13 +253,7 @@ export class UserDailyActivityRepository {
                     ],
                     set: {
                         verseCount: sql`${schema.userDailyActivity.verseCount} + 1`,
-                        passages: sql`
-                            CASE 
-                                WHEN ${schema.userDailyActivity.passages} @> ${JSON.stringify([passageString])}::jsonb 
-                                THEN ${schema.userDailyActivity.passages}
-                                ELSE ${schema.userDailyActivity.passages} || ${JSON.stringify([passageString])}::jsonb
-                            END
-                        `,
+                        passages: consolidatedPassages,
                         // Update running averages: newAvg = (oldAvg * oldCount + newValue) / (oldCount + 1)
                         averageWpm: sql`
                             ROUND(
@@ -123,7 +285,7 @@ export class UserDailyActivityRepository {
                     userId,
                     date: dayStart,
                     verseCount: 1,
-                    passages: [passageString],
+                    passages: consolidatedPassages,
                     versesWithStats: 0,
                     updatedAt: new Date(),
                 })
@@ -134,13 +296,7 @@ export class UserDailyActivityRepository {
                     ],
                     set: {
                         verseCount: sql`${schema.userDailyActivity.verseCount} + 1`,
-                        passages: sql`
-                            CASE 
-                                WHEN ${schema.userDailyActivity.passages} @> ${JSON.stringify([passageString])}::jsonb 
-                                THEN ${schema.userDailyActivity.passages}
-                                ELSE ${schema.userDailyActivity.passages} || ${JSON.stringify([passageString])}::jsonb
-                            END
-                        `,
+                        passages: consolidatedPassages,
                         updatedAt: new Date(),
                     },
                 })
