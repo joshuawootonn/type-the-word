@@ -19,24 +19,15 @@ export default async function HistoryLayout({
     }
 
     // Check feature flags
-    const [useOptimizedHistory, showWpmChart] = await Promise.all([
-        PostHogClient().isFeatureEnabled(
-            'use-read-optimized-history',
-            session.user.id,
-        ),
-        PostHogClient().isFeatureEnabled(
-            'use-wpm-accuracy-history-chart',
-            session.user.id,
-        ),
-    ])
+    const showWpmChart = await PostHogClient().isFeatureEnabled(
+        'use-wpm-accuracy-history-chart',
+        session.user.id,
+    )
 
     return (
         <main className="prose mx-auto mb-8 w-full flex-grow pt-4 text-lg text-primary dark:prose-invert prose-headings:text-primary prose-p:text-primary lg:pt-8">
             <h1 className="">History</h1>
-            <HistoryTabsNav
-                showWpmChart={showWpmChart ?? false}
-                useOptimizedHistory={useOptimizedHistory ?? false}
-            />
+            <HistoryTabsNav showWpmChart={showWpmChart ?? false} />
             {children}
         </main>
     )

@@ -48,13 +48,7 @@ function TabLink({
     )
 }
 
-export function HistoryTabsNav({
-    showWpmChart,
-    useOptimizedHistory,
-}: {
-    showWpmChart: boolean
-    useOptimizedHistory: boolean
-}) {
+export function HistoryTabsNav({ showWpmChart }: { showWpmChart: boolean }) {
     const pathname = usePathname() ?? '/history'
     const [activeTab, setActiveTab] = useState<TabValue>(() =>
         pathToTab(pathname),
@@ -68,11 +62,6 @@ export function HistoryTabsNav({
                 onClick={() => setActiveTab('overview')}
             >
                 Overview
-                {showWpmChart && useOptimizedHistory && (
-                    <div className="ml-2 inline-block -translate-y-[1px] border-1.5 border-primary px-1.5 py-0.5 text-xs font-medium text-primary">
-                        new
-                    </div>
-                )}
             </TabLink>
             <TabLink
                 href="/history/log"
