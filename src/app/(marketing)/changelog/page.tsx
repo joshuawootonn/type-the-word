@@ -67,6 +67,22 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('12/18/2025')} /> - Added an
+                    early access feature section for opting yourself into new
+                    features. The first feature that you can opt into is the
+                    recent WPM and Accuracy UI I created for the{' '}
+                    <Link href="/history">/history</Link>&nbsp; page.
+                    <Image
+                        src={'/assets/early-access-features.png'}
+                        alt={
+                            'Screenshot of the new early access features section'
+                        }
+                        className="mt-3 border-2 border-primary"
+                        width={800}
+                        height={400}
+                    />
+                </li>
+                <li>
                     <DateComponent date={new Date('12/5/2025')} /> - Started a
                     beta for WPM and accuracy stats on the history page. If
                     you&apos;re interested in joining, reach out at{' '}
