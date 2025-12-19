@@ -23,15 +23,15 @@ db-local-delete:
 
 # Run migrations on development database
 migrate:
-    pnpm exec dotenv drizzle-kit migrate
+    export $(xargs <.env) && drizzle-kit migrate
 
 # Run migrations on test database
 migrate-test:
-    pnpm exec dotenv -e .env.test -- drizzle-kit migrate
+    export $(xargs <.env.test) && drizzle-kit migrate
 
 # Run migrations on test database
 migrate-prod:
-    pnpm exec dotenv -e .env.prod -- drizzle-kit migrate
+    export $(xargs <.env.prod) && drizzle-kit migrate
 
 # Generate a new migration from schema changes
 generate:
@@ -43,11 +43,11 @@ dev:
 
 # Run tests
 test:
-    pnpm exec dotenv -e .env.test -- vitest run
+    export $(xargs <.env.test) && pnpm run test 
 
 # Run tests in watch mode
 test-watch:
-    pnpm exec dotenv -e .env.test -- vitest --watch --reporter=verbose
+    export $(xargs <.env.test) && pnpm run test:watch 
 
 # Build the project
 build:

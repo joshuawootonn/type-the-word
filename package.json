@@ -10,7 +10,7 @@
         "format:check": "prettier ./src --check",
         "type-check": "tsc --noEmit",
         "start": "next start",
-        "test": "dotenv --env-file .env.test vitest",
+        "test": "vitest --run",
         "test:watch": "dotenv --env-file .env.test vitest --watch --reporter=verbose",
         "db:generate-migration": "dotenv drizzle-kit generate",
         "migrate:dev": "dotenv drizzle-kit migrate",
