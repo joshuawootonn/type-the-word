@@ -34,6 +34,7 @@ export const env = createEnv({
         CONVERTKIT_API_KEY: z.string(),
         CONVERTKIT_SUBSCRIBE_FORM_ID: z.string(),
         MAILPACE_API_TOKEN: z.string(),
+        API_BIBLE_KEY: z.string(),
         DEPLOYED_URL:
             process.env.NODE_ENV === 'production'
                 ? z
@@ -76,6 +77,7 @@ export const env = createEnv({
         CONVERTKIT_API_KEY: process.env.CONVERTKIT_API_KEY,
         CONVERTKIT_SUBSCRIBE_FORM_ID: process.env.CONVERTKIT_SUBSCRIBE_FORM_ID,
         MAILPACE_API_TOKEN: process.env.MAILPACE_API_TOKEN,
+        API_BIBLE_KEY: process.env.API_BIBLE_KEY,
         DEPLOYED_URL: process.env.VERCEL_URL ?? process.env.DEPLOYED_URL,
         STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     },

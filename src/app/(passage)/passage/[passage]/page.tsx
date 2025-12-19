@@ -1,4 +1,4 @@
-import { Metadata, ResolvingMetadata } from 'next'
+import { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
@@ -8,6 +8,7 @@ import { getOrCreateTypingSession } from '~/app/api/typing-session/getOrCreateTy
 import { ChapterLog } from '~/components/chapter-log'
 import { Passage } from '~/components/passage'
 import { fetchPassage } from '~/lib/api'
+import { Translation } from '~/lib/parseEsv'
 import { segmentToPassageObject } from '~/lib/passageObject'
 import { passageReferenceSchema } from '~/lib/passageReference'
 import { PassageSegment, toPassageSegment } from '~/lib/passageSegment'
@@ -17,49 +18,74 @@ import { TypedVerseRepository } from '~/server/repositories/typedVerse.repositor
 
 import { DEFAULT_PASSAGE_SEGMENT } from './default-passage'
 
+function parseTranslation(value: string | undefined | null): Translation {
+    if (value === 'bsb') return 'bsb'
+    return 'esv'
+}
+
 export async function generateMetadata({
     params,
+    searchParams,
 }: {
     params: Promise<{ passage?: PassageSegment }>
+    searchParams: Promise<{ translation?: string }>
 }): Promise<Metadata> {
     const passage = (await params).passage
+    const { translation: translationParam } = await searchParams
+    const translation = parseTranslation(translationParam)
     const a = passageReferenceSchema.parse(passage)
+    const translationLabel = translation === 'bsb' ? 'BSB' : 'ESV'
 
     return {
-        title: `Type the Word - ${a}`,
-        description: `Practice typing through the Bible passage of ${a}.`,
+        title: `Type the Word - ${a} (${translationLabel})`,
+        description: `Practice typing through the Bible passage of ${a} in the ${translationLabel} translation.`,
     }
 }
 
 export default async function PassagePage(props: {
-    params: { passage?: PassageSegment }
+    params: Promise<{ passage?: PassageSegment }>
+    searchParams: Promise<{ translation?: string }>
 }) {
     const session = await getServerSession(authOptions)
+    const params = await props.params
+    const searchParams = await props.searchParams
+    const translation = parseTranslation(searchParams.translation)
 
-    if (props.params.passage == null) {
-        if (session == null) redirect(`/passage/${DEFAULT_PASSAGE_SEGMENT}`)
-        else {
+    const translationParam = translation === 'bsb' ? `?translation=bsb` : ''
+
+    if (params.passage == null) {
+        if (session == null) {
+            redirect(`/passage/${DEFAULT_PASSAGE_SEGMENT}${translationParam}`)
+        } else {
             const typedVerseRepository = new TypedVerseRepository(db)
             const verse = await typedVerseRepository.getOneOrNull({
                 userId: session.user.id,
             })
 
             if (verse == null) {
-                redirect(`/passage/${DEFAULT_PASSAGE_SEGMENT}`)
+                redirect(
+                    `/passage/${DEFAULT_PASSAGE_SEGMENT}${translationParam}`,
+                )
             }
-            redirect(`/passage/${toPassageSegment(verse.book, verse.chapter)}`)
+            redirect(
+                `/passage/${toPassageSegment(verse.book, verse.chapter)}${translationParam}`,
+            )
         }
     }
 
-    const value = props.params.passage
+    const value: PassageSegment = params.passage
 
     const [passage, typingSession, chapterHistory] = await Promise.all([
-        fetchPassage(value),
+        fetchPassage(value, translation),
         session == null ? undefined : getOrCreateTypingSession(session.user.id),
         session == null
             ? undefined
             : getChapterHistory(session.user.id, segmentToPassageObject(value)),
     ])
+
+    // Build query string for prev/next links
+    const translationQueryString =
+        translation === 'bsb' ? `?translation=bsb` : ''
 
     return (
         <>
@@ -72,7 +98,7 @@ export default async function PassagePage(props: {
             <div className="not-prose mb-24 mt-8 flex w-full justify-between">
                 {passage?.prevChapter ? (
                     <Link
-                        href={`/passage/${passage.prevChapter.url}`}
+                        href={`/passage/${passage.prevChapter.url}${translationQueryString}`}
                         className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary"
                     >
                         {passage.prevChapter.label}
@@ -82,7 +108,7 @@ export default async function PassagePage(props: {
                 )}
                 {passage?.nextChapter ? (
                     <Link
-                        href={`/passage/${passage.nextChapter.url}`}
+                        href={`/passage/${passage.nextChapter.url}${translationQueryString}`}
                         className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary"
                     >
                         {passage.nextChapter.label}

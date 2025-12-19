@@ -1,0 +1,395 @@
+import { JSDOM } from 'jsdom'
+import { parseFragment } from 'parse5'
+import { ChildNode, Element } from 'parse5/dist/tree-adapters/default'
+
+import { apiBibleIdToBook } from '~/lib/api-bible-book-id'
+import { isAtomTyped } from '~/lib/isEqual'
+import { isAtomComplete } from '~/lib/keystroke'
+import {
+    Block,
+    Inline,
+    Paragraph,
+    ParsedPassage,
+    parseNextChapter,
+    parsePrevChapter,
+    Verse,
+    VerseNumber,
+    Word,
+} from '~/lib/parseEsv'
+import { splitLineBySpaceOrNewLine } from '~/lib/splitBySpaceOrNewLine'
+import { Book } from '~/lib/types/book'
+
+/**
+ * Parses API.Bible HTML response into ParsedPassage format
+ * API.Bible HTML structure is different from ESV:
+ * - Verse numbers: <span data-number="1" data-sid="GEN 1:1" class="v">1</span>
+ * - Section headers: <p class="s1">, <p class="s2">
+ * - Paragraphs: <p class="m">, <p class="pmo">, <p class="q1">, <p class="q2">
+ * - Cross-references: <p class="r"> (skipped)
+ * - Blank paragraphs: <p class="b"> (skipped)
+ * - Continuation verses: <p data-vid="GEN 1:5"> (verse continues from previous paragraph)
+ */
+export function parseApiBibleChapter(passage: string): ParsedPassage {
+    const dom = new JSDOM(passage)
+
+    const html = parseFragment(dom.serialize())
+
+    const context: {
+        lastVerse?: Verse
+        firstVerseOfPassage?: VerseNumber
+        chapter?: number
+        book?: Book
+    } = {}
+
+    function getAttr(node: Element, name: string): string | undefined {
+        return node.attrs?.find(attr => attr.name === name)?.value
+    }
+
+    function hasClass(node: Element, className: string): boolean {
+        const classAttr = getAttr(node, 'class')
+        return classAttr?.split(' ').includes(className) ?? false
+    }
+
+    function parseInline(node: ChildNode): Inline[] {
+        if (node.nodeName === '#text' && 'value' in node) {
+            const leadingSpaces = new Array<{ type: 'space' }>(
+                node.value.length - node.value.trimStart().length,
+            ).fill({
+                type: 'space',
+            })
+
+            const wordSegments = splitLineBySpaceOrNewLine(node.value)
+            const words =
+                wordSegments.length > 0
+                    ? wordSegments.map((word): Inline => {
+                          const letters = word.split('')
+                          const atom: Word = {
+                              type: 'word',
+                              letters,
+                          }
+
+                          return isAtomComplete(atom)
+                              ? atom
+                              : { ...atom, letters: [...atom.letters, ' '] }
+                      })
+                    : []
+
+            return [...leadingSpaces, ...words]
+        }
+
+        // API.Bible verse numbers: <span data-number="1" data-sid="GEN 1:1" class="v">
+        if (node.nodeName === 'span' && 'attrs' in node) {
+            const dataSid = getAttr(node, 'data-sid')
+            const dataNumber = getAttr(node, 'data-number')
+
+            if (dataSid && dataNumber && hasClass(node, 'v')) {
+                // Parse data-sid like "GEN 1:1"
+                const parts = dataSid.split(':')
+                const bookChapter = parts[0]
+                const verseStr = parts[1]
+
+                if (!bookChapter || !verseStr) return []
+
+                const bookParts = bookChapter.split(' ')
+                const bookId = bookParts[0]
+                const chapterStr = bookParts[1]
+
+                if (!bookId || !chapterStr) return []
+
+                const book = apiBibleIdToBook[bookId]
+                const chapter = parseInt(chapterStr)
+                const verse = parseInt(verseStr)
+
+                if (book) {
+                    context.book = book
+                    context.chapter = chapter
+
+                    return [
+                        {
+                            type: 'verseNumber',
+                            value: dataNumber.trim(),
+                            text: dataNumber,
+                            verse,
+                            chapter,
+                            book,
+                            translation: 'bsb',
+                        },
+                        { type: 'space' },
+                    ]
+                }
+            }
+
+            // Regular span, parse children
+            if ('childNodes' in node) {
+                return node.childNodes.flatMap(parseInline)
+            }
+        }
+
+        if (node.nodeName === 'br') {
+            return [{ type: 'newLine' }]
+        }
+
+        // Handle other elements with children
+        if ('childNodes' in node && node.childNodes.length > 0) {
+            return node.childNodes.flatMap(parseInline)
+        }
+
+        return []
+    }
+
+    function inlineToString(inlines: Inline[]): string {
+        return inlines
+            .filter((node): node is Word => node.type === 'word')
+            .map(node => node.letters.join(''))
+            .join('')
+    }
+
+    function parseDataVid(
+        dataVid: string,
+    ): { book: Book; chapter: number; verse: number } | null {
+        // Parse data-vid like "GEN 1:5"
+        const parts = dataVid.split(':')
+        const bookChapter = parts[0]
+        const verseStr = parts[1]
+
+        if (!bookChapter || !verseStr) return null
+
+        const bookParts = bookChapter.split(' ')
+        const bookId = bookParts[0]
+        const chapterStr = bookParts[1]
+
+        if (!bookId || !chapterStr) return null
+
+        const book = apiBibleIdToBook[bookId]
+        if (book) {
+            return {
+                book,
+                chapter: parseInt(chapterStr),
+                verse: parseInt(verseStr),
+            }
+        }
+        return null
+    }
+
+    function parseBlock(node: ChildNode): Block | null {
+        if (node.nodeName !== 'p') return null
+        if (!('attrs' in node)) return null
+
+        const classAttr = getAttr(node, 'class')
+        const dataVid = getAttr(node, 'data-vid')
+
+        // Skip blank paragraphs
+        if (hasClass(node, 'b')) {
+            return null
+        }
+
+        // Skip cross-reference paragraphs
+        if (hasClass(node, 'r')) {
+            return null
+        }
+
+        // Section headers: s1 (main title), s2 (subsection)
+        if (hasClass(node, 's1')) {
+            const text = node.childNodes
+                .flatMap(parseInline)
+                .filter((node): node is Word => node.type === 'word')
+                .map(node => node.letters.join(''))
+                .join('')
+            return {
+                type: 'h2',
+                text,
+            }
+        }
+
+        if (hasClass(node, 's2')) {
+            const text = node.childNodes
+                .flatMap(parseInline)
+                .filter((node): node is Word => node.type === 'word')
+                .map(node => node.letters.join(''))
+                .join('')
+            return {
+                type: 'h3',
+                text,
+            }
+        }
+
+        // Regular paragraph or poetry (m, pmo, q1, q2)
+        if (
+            hasClass(node, 'm') ||
+            hasClass(node, 'pmo') ||
+            hasClass(node, 'q1') ||
+            hasClass(node, 'q2') ||
+            hasClass(node, 'pm') ||
+            hasClass(node, 'p')
+        ) {
+            const nodes: Inline[] = node.childNodes.flatMap(parseInline)
+
+            if (inlineToString(nodes).trim() === '') {
+                return null
+            }
+
+            const verseNumberNodes: number[] = []
+            for (const [i, node] of nodes.entries()) {
+                if (node.type === 'verseNumber') {
+                    verseNumberNodes.push(i)
+                }
+            }
+
+            const verseSections: Inline[][] = []
+
+            // Check if this is a continuation paragraph (has data-vid but no verse number)
+            if (dataVid && verseNumberNodes.length === 0) {
+                const parsedVid = parseDataVid(dataVid)
+                if (parsedVid && context.lastVerse) {
+                    // This is a continuation of a verse
+                    const verses: Verse[] = [
+                        {
+                            type: 'verse',
+                            nodes,
+                            verse: context.lastVerse.verse,
+                            text: inlineToString(nodes),
+                            metadata: {
+                                hangingVerse: true,
+                                offset:
+                                    context.lastVerse.metadata.offset +
+                                    context.lastVerse.metadata.length,
+                                length: nodes.filter(isAtomTyped).length,
+                            },
+                        },
+                    ]
+
+                    context.lastVerse = verses.at(-1)
+
+                    return {
+                        type: 'paragraph',
+                        text: inlineToString(nodes),
+                        nodes: verses,
+                        metadata: {
+                            type:
+                                hasClass(node, 'q1') || hasClass(node, 'q2')
+                                    ? 'quote'
+                                    : 'default',
+                            blockIndent:
+                                hasClass(node, 'q1') || hasClass(node, 'q2'),
+                        },
+                    }
+                }
+            }
+
+            if (verseNumberNodes.length === 0) {
+                verseSections.push(nodes)
+            } else {
+                const firstSection = nodes.slice(0, verseNumberNodes.at(0))
+                if (firstSection.length > 0) {
+                    verseSections.push(firstSection)
+                }
+                for (const [i, index] of verseNumberNodes.entries()) {
+                    verseSections.push(
+                        nodes.slice(index, verseNumberNodes.at(i + 1)),
+                    )
+                }
+            }
+
+            const verses: Verse[] = []
+            for (const [i, verseSection] of verseSections.entries()) {
+                const firstWordIndex = verseSection.findIndex(
+                    a => a.type === 'word',
+                )
+                const verseIndex = verseSection.findIndex(
+                    a => a.type === 'verseNumber',
+                )
+                const continuingVerse =
+                    i === 0 &&
+                    (verseIndex === -1 || verseIndex > firstWordIndex)
+
+                if (verseSection.every(inline => inline.type === 'space')) {
+                    // noop
+                } else if (continuingVerse && context?.lastVerse == undefined) {
+                    // Skip if we don't have a last verse to continue from
+                    continue
+                } else if (continuingVerse && context?.lastVerse) {
+                    verses.push({
+                        type: 'verse',
+                        nodes: verseSection,
+                        verse: context.lastVerse.verse,
+                        text: inlineToString(verseSection),
+                        metadata: {
+                            hangingVerse: true,
+                            offset:
+                                context.lastVerse.metadata.offset +
+                                context.lastVerse.metadata.length,
+                            length: verseSection.filter(isAtomTyped).length,
+                        },
+                    })
+                } else {
+                    verses.push({
+                        type: 'verse',
+                        nodes: verseSection,
+                        verse: verseSection.at(verseIndex) as VerseNumber,
+                        text: inlineToString(verseSection),
+                        metadata: {
+                            hangingVerse: false,
+                            offset: 0,
+                            length: verseSection.filter(isAtomTyped).length,
+                        },
+                    })
+                }
+
+                if (
+                    context.firstVerseOfPassage == undefined &&
+                    verseIndex !== -1
+                ) {
+                    context.firstVerseOfPassage = verseSection.at(
+                        verseIndex,
+                    ) as VerseNumber
+                }
+                context.lastVerse = verses.at(-1)
+            }
+
+            if (verses.length === 0) {
+                return null
+            }
+
+            return {
+                type: 'paragraph',
+                text: inlineToString(nodes),
+                nodes: verses,
+                metadata: {
+                    type:
+                        hasClass(node, 'q1') || hasClass(node, 'q2')
+                            ? 'quote'
+                            : 'default',
+                    blockIndent: hasClass(node, 'q1') || hasClass(node, 'q2'),
+                },
+            }
+        }
+
+        return null
+    }
+
+    const nodes: Block[] = []
+    for (const node of html.childNodes) {
+        const parsed = parseBlock(node)
+
+        if (parsed == null) continue
+
+        nodes.push(parsed)
+    }
+
+    if (context.book == undefined) {
+        throw new Error('book is undefined')
+    }
+    if (context.chapter == undefined) {
+        throw new Error('chapter is undefined')
+    }
+    if (context.firstVerseOfPassage == undefined) {
+        throw new Error('firstVerse is undefined')
+    }
+
+    return {
+        nodes,
+        firstVerse: context.firstVerseOfPassage,
+        prevChapter: parsePrevChapter(context.book, context.chapter),
+        nextChapter: parseNextChapter(context.book, context.chapter),
+    }
+}

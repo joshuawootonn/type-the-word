@@ -5,7 +5,7 @@ import path from 'path'
 import { z } from 'zod'
 
 import { env } from '~/env.mjs'
-import { parseChapter } from '~/lib/parseEsv'
+import { parseChapter, Translation } from '~/lib/parseEsv'
 import { PassageObject, stringToPassageObject } from '~/lib/passageObject'
 import { passageReferenceSchema } from '~/lib/passageReference'
 import {
@@ -16,9 +16,11 @@ import {
 import { db } from '~/server/db'
 import { passageResponse } from '~/server/db/schema'
 
+import { createApiBibleURL } from './create-api-bible-url'
 import { createESVURL } from './create-esv-url'
+import { parseApiBibleChapter } from './parse-api-bible'
 
-const passageSchema = z.object({
+const esvPassageSchema = z.object({
     query: z.string(),
     canonical: z.string(),
     parsed: z.array(z.array(z.number())),
@@ -36,6 +38,24 @@ const passageSchema = z.object({
     passages: z.array(z.string()),
 })
 
+const apiBiblePassageSchema = z.object({
+    data: z.object({
+        id: z.string(),
+        bibleId: z.string(),
+        orgId: z.string(),
+        bookId: z.string(),
+        chapterIds: z.array(z.string()),
+        reference: z.string(),
+        content: z.string(),
+        verseCount: z.number(),
+        copyright: z.string(),
+    }),
+    // meta is optional and we don't need to validate its structure
+    meta: z.unknown().optional(),
+})
+
+const translationSchema = z.enum(['esv', 'bsb']).default('esv')
+
 export const dynamic = 'force-dynamic' // defaults to auto
 
 function getErrorMessage(error: unknown) {
@@ -43,43 +63,13 @@ function getErrorMessage(error: unknown) {
     return String(error)
 }
 
-export async function GET(
-    _: Request,
-    { params }: { params: { passage?: string } },
+async function fetchESVPassage(
+    passageData: PassageObject,
+    reference: PassageSegment,
 ) {
-    let reference: PassageSegment
-
-    try {
-        reference = passageSegmentSchema.parse(params?.passage)
-    } catch (e: unknown) {
-        return Response.json(
-            {
-                error: getErrorMessage(e),
-            },
-            {
-                status: 400,
-            },
-        )
-    }
-    let passageData: PassageObject
-
-    try {
-        passageData = stringToPassageObject.parse(
-            passageReferenceSchema.parse(params?.passage),
-        )
-    } catch (e: unknown) {
-        return Response.json(
-            {
-                error: getErrorMessage(e),
-            },
-            {
-                status: 400,
-            },
-        )
-    }
-
     const includesVerses = passageData.lastVerse != null
 
+    // Check for local cached files (ESV only)
     if (
         !includesVerses &&
         [
@@ -105,10 +95,7 @@ export async function GET(
             const content = fs.readFileSync(filePath, {
                 encoding: 'utf8',
             })
-            return Response.json(
-                { data: parseChapter(content) },
-                { status: 200 },
-            )
+            return { data: parseChapter(content) }
         } catch (error) {
             console.warn(
                 `Tried to read passage: (${filePath}) and failed with error:`,
@@ -129,12 +116,9 @@ export async function GET(
             },
         })
         const data: unknown = await response.json()
-        const parsedData = passageSchema.parse(data)
+        const parsedData = esvPassageSchema.parse(data)
 
-        return Response.json(
-            { data: parseChapter(parsedData.passages.at(0) ?? '') },
-            { status: 200 },
-        )
+        return { data: parseChapter(parsedData.passages.at(0) ?? '') }
     }
 
     const existingPassageResponse = await db.query.passageResponse.findFirst({
@@ -153,11 +137,10 @@ export async function GET(
             'Passage route cache HIT: reference is entire chapter and less than a month old',
             { reference },
         )
-        const parsedData = passageSchema.parse(existingPassageResponse.response)
-        return Response.json(
-            { data: parseChapter(parsedData.passages.at(0) ?? '') },
-            { status: 200 },
+        const parsedData = esvPassageSchema.parse(
+            existingPassageResponse.response,
         )
+        return { data: parseChapter(parsedData.passages.at(0) ?? '') }
     }
 
     const response = await fetch(createESVURL(passageData), {
@@ -167,7 +150,7 @@ export async function GET(
     })
 
     const data: unknown = await response.json()
-    const parsedData = passageSchema.parse(data)
+    const parsedData = esvPassageSchema.parse(data)
     if (existingPassageResponse == null) {
         console.log(
             "Passage route cache MISS: reference is entire chapter but entry doesn't exist",
@@ -194,8 +177,163 @@ export async function GET(
             })
             .where(eq(passageResponse.id, existingPassageResponse.id))
     }
-    return Response.json(
-        { data: parseChapter(parsedData.passages.at(0) ?? '') },
-        { status: 200 },
-    )
+    return { data: parseChapter(parsedData.passages.at(0) ?? '') }
+}
+
+async function fetchBSBPassage(
+    passageData: PassageObject,
+    reference: PassageSegment,
+) {
+    const includesVerses = passageData.lastVerse != null
+
+    // Only optimize whole chapter fetches for caching
+    if (passageData.chapter != null && includesVerses) {
+        console.log(
+            "BSB Passage route cache MISS: reference isn't entire chapter",
+            { reference },
+        )
+        const response = await fetch(createApiBibleURL(passageData), {
+            headers: {
+                'api-key': env.API_BIBLE_KEY,
+            },
+        })
+        const data: unknown = await response.json()
+        const parsedData = apiBiblePassageSchema.parse(data)
+
+        return { data: parseApiBibleChapter(parsedData.data.content) }
+    }
+
+    const existingPassageResponse = await db.query.passageResponse.findFirst({
+        where: and(
+            eq(passageResponse.chapter, passageData.chapter),
+            eq(passageResponse.book, passageData.book),
+            eq(passageResponse.translation, 'bsb'),
+        ),
+    })
+
+    if (
+        existingPassageResponse != null &&
+        isAfter(existingPassageResponse.updatedAt, subDays(new Date(), 31))
+    ) {
+        console.log(
+            'BSB Passage route cache HIT: reference is entire chapter and less than a month old',
+            { reference },
+        )
+        const parsedData = apiBiblePassageSchema.parse(
+            existingPassageResponse.response,
+        )
+        return { data: parseApiBibleChapter(parsedData.data.content) }
+    }
+
+    const response = await fetch(createApiBibleURL(passageData), {
+        headers: {
+            'api-key': env.API_BIBLE_KEY,
+        },
+    })
+
+    const data: unknown = await response.json()
+    const parsedData = apiBiblePassageSchema.parse(data)
+    if (existingPassageResponse == null) {
+        console.log(
+            "BSB Passage route cache MISS: reference is entire chapter but entry doesn't exist",
+            { reference },
+        )
+        await db.insert(passageResponse).values({
+            response: data,
+            book: passageData.book,
+            chapter: passageData.chapter,
+            translation: 'bsb',
+        })
+    } else if (
+        isBefore(existingPassageResponse.updatedAt, subDays(new Date(), 31))
+    ) {
+        console.log(
+            'BSB Passage route cache MISS: reference is entire chapter but entry is expired',
+            { reference },
+        )
+        await db
+            .update(passageResponse)
+            .set({
+                response: data,
+                updatedAt: sql`CURRENT_TIMESTAMP(3)`,
+            })
+            .where(eq(passageResponse.id, existingPassageResponse.id))
+    }
+    return { data: parseApiBibleChapter(parsedData.data.content) }
+}
+
+export async function GET(
+    request: Request,
+    { params }: { params: { passage?: string } },
+) {
+    // Parse translation from query params
+    const url = new URL(request.url)
+    const translationParam = url.searchParams.get('translation')
+    let translation: Translation
+
+    try {
+        // Pass undefined instead of null so zod's .default() works
+        translation = translationSchema.parse(translationParam ?? undefined)
+    } catch (e: unknown) {
+        return Response.json(
+            {
+                error: `Invalid translation. Must be one of: esv, bsb`,
+            },
+            {
+                status: 400,
+            },
+        )
+    }
+
+    let reference: PassageSegment
+
+    try {
+        reference = passageSegmentSchema.parse(params?.passage)
+    } catch (e: unknown) {
+        return Response.json(
+            {
+                error: getErrorMessage(e),
+            },
+            {
+                status: 400,
+            },
+        )
+    }
+
+    let passageData: PassageObject
+
+    try {
+        passageData = stringToPassageObject.parse(
+            passageReferenceSchema.parse(params?.passage),
+        )
+    } catch (e: unknown) {
+        return Response.json(
+            {
+                error: getErrorMessage(e),
+            },
+            {
+                status: 400,
+            },
+        )
+    }
+
+    try {
+        if (translation === 'bsb') {
+            const result = await fetchBSBPassage(passageData, reference)
+            return Response.json(result, { status: 200 })
+        } else {
+            const result = await fetchESVPassage(passageData, reference)
+            return Response.json(result, { status: 200 })
+        }
+    } catch (error: unknown) {
+        console.error('Error fetching passage:', error)
+        return Response.json(
+            {
+                error: getErrorMessage(error),
+            },
+            {
+                status: 500,
+            },
+        )
+    }
 }

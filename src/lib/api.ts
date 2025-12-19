@@ -14,7 +14,7 @@ import {
 import { UserChangelogRecord } from '~/server/repositories/userChangelog.repository'
 import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
 
-import { ParsedPassage } from './parseEsv'
+import { ParsedPassage, Translation } from './parseEsv'
 import { PassageSegment } from './passageSegment'
 
 export type Body<T> = { data: T }
@@ -30,12 +30,32 @@ export function getBaseUrl() {
 
 export async function fetchPassage(
     value: PassageSegment,
+    translation: Translation = 'esv',
 ): Promise<ParsedPassage> {
-    const response = await fetch(`${getBaseUrl()}/api/passage/${value}`)
+    const params = new URLSearchParams()
+    if (translation !== 'esv') {
+        params.set('translation', translation)
+    }
+    const queryString = params.toString()
+    const url = `${getBaseUrl()}/api/passage/${value}${queryString ? `?${queryString}` : ''}`
 
-    const body: Body<ParsedPassage> = await response.json()
+    const response = await fetch(url)
 
-    return body.data
+    const body: unknown = await response.json()
+
+    if (!response.ok) {
+        const errorBody = body as { error?: string }
+        throw new Error(
+            errorBody?.error ?? `Failed to fetch passage: ${response.status}`,
+        )
+    }
+
+    const typedBody = body as Body<ParsedPassage>
+    if (!typedBody.data) {
+        throw new Error('Passage data is undefined')
+    }
+
+    return typedBody.data
 }
 
 export async function fetchTypingSessionUpsert(): Promise<TypingSession> {
