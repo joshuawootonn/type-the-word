@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth/next'
 import { redirect } from 'next/navigation'
 import { ReactNode } from 'react'
 
+import { FeatureFlags } from '~/lib/feature-flags'
 import { authOptions } from '~/server/auth'
 import PostHogClient from '~/server/posthog'
 
@@ -20,7 +21,7 @@ export default async function HistoryLayout({
 
     // Check feature flags
     const showWpmChart = await PostHogClient().isFeatureEnabled(
-        'use-wpm-accuracy-history-chart',
+        FeatureFlags.WPM_ACCURACY_CHART,
         session.user.id,
     )
 

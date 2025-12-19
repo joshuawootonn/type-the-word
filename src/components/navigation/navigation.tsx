@@ -19,6 +19,7 @@ import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
 
 import HotkeyLabel from '../hotkey-label'
 import { CreateThemeForm } from './create-theme-form'
+import { EarlyAccess } from './early-access'
 import { Settings } from './settings'
 
 export function Navigation({
@@ -246,6 +247,11 @@ export function Navigation({
                                                 }
                                                 userThemes={userThemes.data}
                                             />
+                                            <div className="-mx-3 my-3 border-t-1.5 border-primary" />
+                                            <h2 className="mb-2 text-xl">
+                                                Beta Features
+                                            </h2>
+                                            <EarlyAccess />
                                         </>
                                     ) : settingsState === 'create-theme' ? (
                                         <>

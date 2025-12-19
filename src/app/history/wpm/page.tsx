@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
+import { FeatureFlags } from '~/lib/feature-flags'
 import { authOptions } from '~/server/auth'
 import PostHogClient from '~/server/posthog'
 
@@ -25,7 +26,7 @@ export default async function HistoryWpmPage() {
 
     // Check if user has access to WPM chart
     const showWpmChart = await posthog.isFeatureEnabled(
-        'use-wpm-accuracy-history-chart',
+        FeatureFlags.WPM_ACCURACY_CHART,
         session.user.id,
     )
 
@@ -36,7 +37,7 @@ export default async function HistoryWpmPage() {
 
     const useOptimizedHistory =
         (await posthog.isFeatureEnabled(
-            'use-read-optimized-history',
+            FeatureFlags.READ_OPTIMIZED_HISTORY,
             session.user.id,
         )) ?? false
 

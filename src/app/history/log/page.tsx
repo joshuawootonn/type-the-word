@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import { cookies } from 'next/headers'
 
+import { FeatureFlags } from '~/lib/feature-flags'
 import { authOptions } from '~/server/auth'
 import PostHogClient from '~/server/posthog'
 
@@ -27,7 +28,7 @@ export default async function HistoryLogPage() {
 
     const useOptimizedHistory =
         (await PostHogClient().isFeatureEnabled(
-            'use-read-optimized-history',
+            FeatureFlags.READ_OPTIMIZED_HISTORY,
             session.user.id,
         )) ?? false
 

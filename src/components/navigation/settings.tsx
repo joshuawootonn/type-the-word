@@ -145,7 +145,7 @@ export function Settings({
     )
 
     return (
-        <div className="flex flex-col gap-2.5">
+        <div className="flex w-[380px] flex-col gap-2.5">
             <div className="flex flex-row items-center justify-between">
                 <label htmlFor="theme-selector" className="pr-4">
                     Theme:
