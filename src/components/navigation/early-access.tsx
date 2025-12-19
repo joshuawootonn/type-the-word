@@ -5,17 +5,17 @@ import { Switch } from '~/components/ui/switch'
 import { useEarlyAccessFeatures } from '~/lib/hooks/use-early-access-features'
 
 export function EarlyAccess() {
-    const { betaFeatures, isLoading, toggleFeature, isFeatureEnabled } =
+    const { earlyAccessFeatures, isLoading, toggleFeature, isFeatureEnabled } =
         useEarlyAccessFeatures()
 
     if (isLoading) {
         return <Loading className="text-sm" initialDots={1} />
     }
 
-    if (betaFeatures.length > 0) {
+    if (earlyAccessFeatures.length > 0) {
         return (
             <>
-                {betaFeatures
+                {earlyAccessFeatures
                     .filter(feature => feature.flagKey !== null)
                     .map(feature => (
                         <div
@@ -24,7 +24,7 @@ export function EarlyAccess() {
                         >
                             <div className="flex flex-col">
                                 <label
-                                    htmlFor={`beta-${feature.flagKey}`}
+                                    htmlFor={`early-access-${feature.flagKey}`}
                                     className="cursor-pointer"
                                 >
                                     {feature.name}
@@ -36,7 +36,7 @@ export function EarlyAccess() {
                                 )}
                             </div>
                             <Switch
-                                id={`beta-${feature.flagKey}`}
+                                id={`early-access-${feature.flagKey}`}
                                 checked={isFeatureEnabled(feature.flagKey!)}
                                 onCheckedChange={() =>
                                     toggleFeature(feature.flagKey!)
@@ -50,7 +50,7 @@ export function EarlyAccess() {
 
     return (
         <p className="text-sm text-primary/60">
-            There are currently no beta features available.
+            There are currently no early access features available.
         </p>
     )
 }

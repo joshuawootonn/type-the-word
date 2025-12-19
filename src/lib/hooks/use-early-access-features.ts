@@ -10,7 +10,7 @@ export type { EarlyAccessFeature }
 
 /**
  * Hook to manage early access features.
- * Allows users to opt in/out of beta features.
+ * Allows users to opt in/out of early access features.
  *
  * @see https://posthog.com/docs/feature-flags/early-access-feature-management
  */
@@ -18,7 +18,9 @@ export function useEarlyAccessFeatures() {
     const posthog = usePostHog()
     const activeFlags = useActiveFeatureFlags()
 
-    const [betaFeatures, setBetaFeatures] = useState<EarlyAccessFeature[]>([])
+    const [earlyAccessFeatures, setEarlyAccessFeatures] = useState<
+        EarlyAccessFeature[]
+    >([])
     const [enabledFeatures, setEnabledFeatures] = useState<Set<string>>(
         new Set(),
     )
@@ -27,21 +29,21 @@ export function useEarlyAccessFeatures() {
     useEffect(() => {
         posthog.getEarlyAccessFeatures(
             features => {
-                // Filter to only show beta features with valid flagKeys
-                const betas = features.filter(
+                // Filter to only show early access features with valid flagKeys
+                const earlyAccessFeatures = features.filter(
                     feature => feature.stage === 'beta' && feature.flagKey,
                 )
-                setBetaFeatures(betas)
+                setEarlyAccessFeatures(earlyAccessFeatures)
 
                 // Determine which features are currently enabled
                 const enabled = new Set<string>()
                 if (activeFlags && activeFlags.length > 0) {
-                    betas.forEach(beta => {
+                    earlyAccessFeatures.forEach(earlyAccessFeature => {
                         if (
-                            beta.flagKey &&
-                            activeFlags.includes(beta.flagKey)
+                            earlyAccessFeature.flagKey &&
+                            activeFlags.includes(earlyAccessFeature.flagKey)
                         ) {
-                            enabled.add(beta.flagKey)
+                            enabled.add(earlyAccessFeature.flagKey)
                         }
                     })
                 }
@@ -81,7 +83,7 @@ export function useEarlyAccessFeatures() {
     )
 
     return {
-        betaFeatures,
+        earlyAccessFeatures,
         isLoading,
         toggleFeature,
         isFeatureEnabled,
@@ -89,7 +91,7 @@ export function useEarlyAccessFeatures() {
 }
 
 /**
- * Descriptions for known beta features.
+ * Descriptions for known early access features.
  * Used to provide user-friendly descriptions in the UI.
  */
 export const BETA_FEATURE_DESCRIPTIONS: Record<string, string> = {

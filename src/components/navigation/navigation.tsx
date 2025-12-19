@@ -249,7 +249,7 @@ export function Navigation({
                                             />
                                             <div className="-mx-3 my-3 border-t-1.5 border-primary" />
                                             <h2 className="mb-2 text-xl">
-                                                Beta Features
+                                                Early Access Features
                                             </h2>
                                             <EarlyAccess />
                                         </>
