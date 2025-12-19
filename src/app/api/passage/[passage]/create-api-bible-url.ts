@@ -1,14 +1,34 @@
 import { bookToApiBibleId } from '~/lib/api-bible-book-id'
+import { Translation } from '~/lib/parseEsv'
 import { PassageObject } from '~/lib/passageObject'
 
-// Berean Standard Bible ID from API.Bible
-export const BSB_BIBLE_ID = 'bba9f40183526463-01'
+// API.Bible IDs for each translation
+export const API_BIBLE_IDS: Partial<Record<Translation, string>> = {
+    bsb: 'bba9f40183526463-01', // Berean Standard Bible
+    nlt: 'd6e14a625393b4da-01', // New Living Translation
+    niv: '78a9f6124f344018-01', // New International Version 2011
+    csb: 'a556c5305ee15c3f-01', // Christian Standard Bible
+    nkjv: '63097d2a0a2f7db3-01', // New King James Version
+    nasb: 'a761ca71e0b3ddcf-01', // New American Standard Bible 2020
+    ntv: '826f63861180e056-01', // Nueva Traducción Viviente
+    msg: '6f11a7de016f942e-01', // The Message
+}
 
 /**
  * Creates a URL for fetching a passage from API.Bible
  * @see https://rest.api.bible/
  */
-export function createApiBibleURL(passageData: PassageObject): string {
+export function createApiBibleURL(
+    passageData: PassageObject,
+    translation: Translation,
+): string {
+    const bibleId = API_BIBLE_IDS[translation]
+    if (!bibleId) {
+        throw new Error(
+            `No API.Bible ID configured for translation: ${translation}`,
+        )
+    }
+
     const bookId = bookToApiBibleId[passageData.book]
 
     // Build the passage ID in API.Bible format
@@ -40,5 +60,5 @@ export function createApiBibleURL(passageData: PassageObject): string {
         'use-org-id': 'false',
     })
 
-    return `https://rest.api.bible/v1/bibles/${BSB_BIBLE_ID}/passages/${passageId}?${params.toString()}`
+    return `https://rest.api.bible/v1/bibles/${bibleId}/passages/${passageId}?${params.toString()}`
 }

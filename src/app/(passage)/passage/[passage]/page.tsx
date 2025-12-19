@@ -18,8 +18,22 @@ import { TypedVerseRepository } from '~/server/repositories/typedVerse.repositor
 
 import { DEFAULT_PASSAGE_SEGMENT } from './default-passage'
 
+const validTranslations: Translation[] = [
+    'esv',
+    'bsb',
+    'nlt',
+    'niv',
+    'csb',
+    'nkjv',
+    'nasb',
+    'ntv',
+    'msg',
+]
+
 function parseTranslation(value: string | undefined | null): Translation {
-    if (value === 'bsb') return 'bsb'
+    if (value && validTranslations.includes(value as Translation)) {
+        return value as Translation
+    }
     return 'esv'
 }
 
@@ -34,7 +48,7 @@ export async function generateMetadata({
     const { translation: translationParam } = await searchParams
     const translation = parseTranslation(translationParam)
     const a = passageReferenceSchema.parse(passage)
-    const translationLabel = translation === 'bsb' ? 'BSB' : 'ESV'
+    const translationLabel = translation.toUpperCase()
 
     return {
         title: `Type the Word - ${a} (${translationLabel})`,
@@ -51,7 +65,8 @@ export default async function PassagePage(props: {
     const searchParams = await props.searchParams
     const translation = parseTranslation(searchParams.translation)
 
-    const translationParam = translation === 'bsb' ? `?translation=bsb` : ''
+    const translationParam =
+        translation !== 'esv' ? `?translation=${translation}` : ''
 
     if (params.passage == null) {
         if (session == null) {

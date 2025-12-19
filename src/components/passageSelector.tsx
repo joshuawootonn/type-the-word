@@ -44,7 +44,16 @@ const books = Object.keys(metadata) as Book[]
 const translations: { value: Translation; label: string }[] = [
     { value: 'esv', label: 'ESV' },
     { value: 'bsb', label: 'BSB' },
+    { value: 'nlt', label: 'NLT' },
+    { value: 'niv', label: 'NIV' },
+    { value: 'csb', label: 'CSB' },
+    { value: 'nkjv', label: 'NKJV' },
+    { value: 'nasb', label: 'NASB' },
+    { value: 'ntv', label: 'NTV' },
+    { value: 'msg', label: 'MSG' },
 ]
+
+const validTranslations = translations.map(t => t.value)
 
 const ForwardedRefInput = forwardRef(function InnerForwardedRefInput(
     props: ComponentPropsWithoutRef<'input'>,
@@ -112,8 +121,8 @@ export function PassageSelector({
 
     // Sync translation state with URL search params
     useEffect(() => {
-        const urlTranslation = searchParams?.get('translation')
-        if (urlTranslation === 'bsb' || urlTranslation === 'esv') {
+        const urlTranslation = searchParams?.get('translation') as Translation
+        if (urlTranslation && validTranslations.includes(urlTranslation)) {
             setTranslation(urlTranslation)
         }
     }, [searchParams])
@@ -381,7 +390,7 @@ export function PassageSelector({
                             translations.find(tr => tr.value === t)?.label ?? t
                         }
                         className={
-                            'w-16 -translate-x-1 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none'
+                            'w-20 -translate-x-1 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none'
                         }
                         autoComplete="false"
                         data-1p-ignore={true}

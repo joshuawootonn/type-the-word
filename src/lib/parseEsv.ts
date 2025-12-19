@@ -11,7 +11,16 @@ import { PassageReference, passageReferenceSchema } from './passageReference'
 import { PassageSegment, toPassageSegment } from './passageSegment'
 import { splitLineBySpaceOrNewLine } from './splitBySpaceOrNewLine'
 
-export type Translation = 'esv' | 'bsb'
+export type Translation =
+    | 'esv'
+    | 'bsb'
+    | 'nlt'
+    | 'niv'
+    | 'csb'
+    | 'nkjv'
+    | 'nasb'
+    | 'ntv'
+    | 'msg'
 
 export type VerseNumber = {
     type: 'verseNumber'

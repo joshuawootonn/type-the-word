@@ -113,6 +113,13 @@
       "when": 1766100000000,
       "tag": "0015_add-bsb-translation",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1766200000000,
+      "tag": "0016_add-more-translations",
+      "breakpoints": true
     }
   ]
 }

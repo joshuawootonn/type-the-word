@@ -26,12 +26,19 @@ export const passageResponseBook = pgEnum(
 )
 export const passageResponseTranslation = pgEnum(
     'passageResponse_translation',
-    ['esv', 'bsb'],
+    ['esv', 'bsb', 'nlt', 'niv', 'csb', 'nkjv', 'nasb', 'ntv', 'msg'],
 )
 export const typedVerseBook = pgEnum('typedVerse_book', bookSchema.options)
 export const typedVerseTranslation = pgEnum('typedVerse_translation', [
     'esv',
     'bsb',
+    'nlt',
+    'niv',
+    'csb',
+    'nkjv',
+    'nasb',
+    'ntv',
+    'msg',
 ])
 
 export const users = pgTable('user', {

@@ -54,7 +54,9 @@ const apiBiblePassageSchema = z.object({
     meta: z.unknown().optional(),
 })
 
-const translationSchema = z.enum(['esv', 'bsb']).default('esv')
+const translationSchema = z
+    .enum(['esv', 'bsb', 'nlt', 'niv', 'csb', 'nkjv', 'nasb', 'ntv', 'msg'])
+    .default('esv')
 
 export const dynamic = 'force-dynamic' // defaults to auto
 
@@ -180,23 +182,27 @@ async function fetchESVPassage(
     return { data: parseChapter(parsedData.passages.at(0) ?? '') }
 }
 
-async function fetchBSBPassage(
+async function fetchApiBiblePassage(
     passageData: PassageObject,
     reference: PassageSegment,
+    translation: Translation,
 ) {
     const includesVerses = passageData.lastVerse != null
 
     // Only optimize whole chapter fetches for caching
     if (passageData.chapter != null && includesVerses) {
         console.log(
-            "BSB Passage route cache MISS: reference isn't entire chapter",
+            `${translation.toUpperCase()} Passage route cache MISS: reference isn't entire chapter`,
             { reference },
         )
-        const response = await fetch(createApiBibleURL(passageData), {
-            headers: {
-                'api-key': env.API_BIBLE_KEY,
+        const response = await fetch(
+            createApiBibleURL(passageData, translation),
+            {
+                headers: {
+                    'api-key': env.API_BIBLE_KEY,
+                },
             },
-        })
+        )
         const data: unknown = await response.json()
         const parsedData = apiBiblePassageSchema.parse(data)
 
@@ -207,7 +213,7 @@ async function fetchBSBPassage(
         where: and(
             eq(passageResponse.chapter, passageData.chapter),
             eq(passageResponse.book, passageData.book),
-            eq(passageResponse.translation, 'bsb'),
+            eq(passageResponse.translation, translation),
         ),
     })
 
@@ -216,7 +222,7 @@ async function fetchBSBPassage(
         isAfter(existingPassageResponse.updatedAt, subDays(new Date(), 31))
     ) {
         console.log(
-            'BSB Passage route cache HIT: reference is entire chapter and less than a month old',
+            `${translation.toUpperCase()} Passage route cache HIT: reference is entire chapter and less than a month old`,
             { reference },
         )
         const parsedData = apiBiblePassageSchema.parse(
@@ -225,7 +231,7 @@ async function fetchBSBPassage(
         return { data: parseApiBibleChapter(parsedData.data.content) }
     }
 
-    const response = await fetch(createApiBibleURL(passageData), {
+    const response = await fetch(createApiBibleURL(passageData, translation), {
         headers: {
             'api-key': env.API_BIBLE_KEY,
         },
@@ -235,20 +241,20 @@ async function fetchBSBPassage(
     const parsedData = apiBiblePassageSchema.parse(data)
     if (existingPassageResponse == null) {
         console.log(
-            "BSB Passage route cache MISS: reference is entire chapter but entry doesn't exist",
+            `${translation.toUpperCase()} Passage route cache MISS: reference is entire chapter but entry doesn't exist`,
             { reference },
         )
         await db.insert(passageResponse).values({
             response: data,
             book: passageData.book,
             chapter: passageData.chapter,
-            translation: 'bsb',
+            translation: translation,
         })
     } else if (
         isBefore(existingPassageResponse.updatedAt, subDays(new Date(), 31))
     ) {
         console.log(
-            'BSB Passage route cache MISS: reference is entire chapter but entry is expired',
+            `${translation.toUpperCase()} Passage route cache MISS: reference is entire chapter but entry is expired`,
             { reference },
         )
         await db
@@ -277,7 +283,7 @@ export async function GET(
     } catch (e: unknown) {
         return Response.json(
             {
-                error: `Invalid translation. Must be one of: esv, bsb`,
+                error: `Invalid translation. Must be one of: esv, bsb, nlt, niv, csb, nkjv, nasb, ntv, msg`,
             },
             {
                 status: 400,
@@ -318,11 +324,15 @@ export async function GET(
     }
 
     try {
-        if (translation === 'bsb') {
-            const result = await fetchBSBPassage(passageData, reference)
+        if (translation === 'esv') {
+            const result = await fetchESVPassage(passageData, reference)
             return Response.json(result, { status: 200 })
         } else {
-            const result = await fetchESVPassage(passageData, reference)
+            const result = await fetchApiBiblePassage(
+                passageData,
+                reference,
+                translation,
+            )
             return Response.json(result, { status: 200 })
         }
     } catch (error: unknown) {
