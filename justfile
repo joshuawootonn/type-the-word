@@ -23,19 +23,19 @@ db-local-delete:
 
 # Run migrations on development database
 migrate:
-    export $(xargs <.env) && drizzle-kit migrate
+    export $(xargs <.env) && pnpm db:migrate
 
 # Run migrations on test database
 migrate-test:
-    export $(xargs <.env.test) && drizzle-kit migrate
+    export $(xargs <.env.test) && pnpm db:migrate
 
 # Run migrations on test database
 migrate-prod:
-    export $(xargs <.env.prod) && drizzle-kit migrate
+    export $(xargs <.env.prod) && pnpm db:migrate
 
 # Generate a new migration from schema changes
 generate:
-    pnpm exec dotenv drizzle-kit generate
+    pnpm db:generate 
 
 # Start development server
 dev:
@@ -47,7 +47,7 @@ test:
 
 # Run tests in watch mode
 test-watch:
-    export $(xargs <.env.test) && pnpm run test:watch 
+    export $(xargs <.env.test) && pnpm test-watch 
 
 # Build the project
 build:
@@ -56,6 +56,14 @@ build:
 # Format code
 format:
     pnpm format
+
+# Format code check
+format-check:
+    pnpm format-check
+
+# Type check code
+type-check:
+    pnpm type-check
 
 # Lint code
 lint:

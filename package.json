@@ -7,16 +7,13 @@
         "dev": "next dev -p 1199",
         "lint": "next lint",
         "format": "prettier ./src/ --write",
-        "format:check": "prettier ./src --check",
+        "format-check": "prettier ./src --check",
         "type-check": "tsc --noEmit",
-        "start": "next start",
+        "start": "next start -p 1199",
         "test": "vitest --run",
-        "test:watch": "dotenv --env-file .env.test vitest --watch --reporter=verbose",
-        "db:generate-migration": "dotenv drizzle-kit generate",
-        "migrate:dev": "dotenv drizzle-kit migrate",
-        "migrate:test": "dotenv --env-file .env.test drizzle-kit migrate",
-        "db:up": "docker compose --project-directory ./docker up -d",
-        "inpersonate": "dotenv pnpm dlx tsx ./src/scripts/inpersonate.ts"
+        "test-watch": "dotenv --env-file .env.test vitest --watch --reporter=verbose",
+        "db:generate": "drizzle-kit generate",
+        "db:migrate": "drizzle-kit migrate"
     },
     "dependencies": {
         "@auth/drizzle-adapter": "0.3.2",
