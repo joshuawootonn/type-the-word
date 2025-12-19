@@ -199,7 +199,7 @@ async function fetchApiBiblePassage(
             createApiBibleURL(passageData, translation),
             {
                 headers: {
-                    'api-key': env.API_BIBLE_KEY,
+                    'api-key': env.API_BIBLE_API_KEY,
                 },
             },
         )
@@ -233,7 +233,7 @@ async function fetchApiBiblePassage(
 
     const response = await fetch(createApiBibleURL(passageData, translation), {
         headers: {
-            'api-key': env.API_BIBLE_KEY,
+            'api-key': env.API_BIBLE_API_KEY,
         },
     })
 
