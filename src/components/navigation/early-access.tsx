@@ -14,7 +14,7 @@ export function EarlyAccess() {
 
     if (earlyAccessFeatures.length > 0) {
         return (
-            <>
+            <div className="space-y-2">
                 {earlyAccessFeatures
                     .filter(feature => feature.flagKey !== null)
                     .map(feature => (
@@ -44,7 +44,7 @@ export function EarlyAccess() {
                             />
                         </div>
                     ))}
-            </>
+            </div>
         )
     }
 
