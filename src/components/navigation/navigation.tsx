@@ -247,7 +247,7 @@ export function Navigation({
                                                 }
                                                 userThemes={userThemes.data}
                                             />
-                                            <div className="-mx-3 my-3 border-t-1.5 border-primary" />
+                                            <div className="-mx-3 my-3 border-t-2 border-primary" />
                                             <h2 className="mb-2 text-xl">
                                                 Early Access Features
                                             </h2>
