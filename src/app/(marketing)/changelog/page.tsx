@@ -67,7 +67,17 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
-                    <DateComponent date={new Date('12/24/2025')} /> - Added
+                    <DateComponent date={new Date('12/24/2025')} /> - Fixed a
+                    bug in Song of Solomon chapter 1 where you couldn&apos;t
+                    type past certain words. The issue was caused by text in the
+                    HTML source being split across lines, which embedded newline
+                    characters into words like &quot;Let&quot; and
+                    &quot;his&quot;. When you typed a space after these words,
+                    it didn&apos;t match the expected newline character, making
+                    it impossible to advance.
+                </li>
+                <li>
+                    <DateComponent date={new Date('12/19/2025')} /> - Added
                     support for new Bible translations! This is in super early
                     access and you can try it by toggling the &quot;New Bible
                     Translations&quot; early access flag in your settings.
