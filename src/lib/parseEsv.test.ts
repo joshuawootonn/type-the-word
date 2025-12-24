@@ -1,11 +1,52 @@
+import fs from 'fs'
+import path from 'path'
 import { describe, expect, test } from 'vitest'
 
 import {
+    Block,
     Paragraph,
     parseChapter,
     parseNextChapter,
     parsePrevChapter,
+    Word,
 } from './parseEsv'
+
+/**
+ * Helper to extract all words from a parsed passage.
+ * Used to verify no words contain embedded newlines.
+ */
+function getAllWords(blocks: Block[]): Word[] {
+    const words: Word[] = []
+
+    for (const block of blocks) {
+        if (block.type === 'paragraph') {
+            for (const verse of block.nodes) {
+                for (const node of verse.nodes) {
+                    if (node.type === 'word') {
+                        words.push(node)
+                    }
+                }
+            }
+        }
+    }
+
+    return words
+}
+
+/**
+ * Checks if any word has a newline character in the middle of it
+ * (not at the end, which is valid for line breaks).
+ * A word like "Let\n" is fine (newline at end), but "Let\n him" parsed as one word is a bug.
+ */
+function hasEmbeddedNewline(word: Word): boolean {
+    const letters = word.letters
+    for (let i = 0; i < letters.length - 1; i++) {
+        if (letters[i] === '\n') {
+            return true
+        }
+    }
+    return false
+}
 
 describe('parseEsv', () => {
     test('parse james 1:1', () => {
@@ -167,4 +208,46 @@ describe('parseNextChapter', () => {
             label: '1 Thessalonians 5',
         })
     })
+})
+
+describe('Song of Solomon HTML files - no embedded newlines in words', () => {
+    const serverDir = path.join(process.cwd(), 'src/server')
+
+    // These files had a bug where text split across lines in the HTML source
+    // caused words to contain embedded newlines (e.g., "Let\n        him" as one word).
+    // This made it impossible to type past certain words.
+    const songOfSolomonFiles = [
+        'song_of_solomon_1.html',
+        'song_of_solomon_2.html',
+        'song_of_solomon_3.html',
+        'song_of_solomon_4.html',
+        'song_of_solomon_5.html',
+        'song_of_solomon_6.html',
+        'song_of_solomon_7.html',
+        'song_of_solomon_8.html',
+    ]
+
+    test.each(songOfSolomonFiles)(
+        '%s has no words with embedded newlines',
+        filename => {
+            const filePath = path.join(serverDir, filename)
+            const content = fs.readFileSync(filePath, { encoding: 'utf8' })
+            const parsed = parseChapter(content)
+            const words = getAllWords(parsed.nodes)
+
+            const wordsWithEmbeddedNewlines = words.filter(hasEmbeddedNewline)
+
+            if (wordsWithEmbeddedNewlines.length > 0) {
+                const examples = wordsWithEmbeddedNewlines
+                    .slice(0, 3)
+                    .map(w => `"${w.letters.join('')}"`)
+                    .join(', ')
+                throw new Error(
+                    `Found ${wordsWithEmbeddedNewlines.length} word(s) with embedded newlines: ${examples}`,
+                )
+            }
+
+            expect(wordsWithEmbeddedNewlines).toHaveLength(0)
+        },
+    )
 })
