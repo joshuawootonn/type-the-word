@@ -13,7 +13,7 @@ import { changelogUpdatedAt } from './updated-at'
 function Link({ href, children }: { href: string; children: React.ReactNode }) {
     return (
         <a
-            className="svg-outline-sm relative cursor-pointer whitespace-nowrap no-underline outline-none"
+            className="svg-outline-sm relative cursor-pointer whitespace-nowrap underline outline-none"
             href={href}
             target="_blank"
             rel="noopener noreferrer"
@@ -66,6 +66,50 @@ export default async function Changelog() {
             )}
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
+                <li>
+                    <DateComponent date={new Date('12/24/2025')} /> - Added
+                    support for new Bible translations! This is in super early
+                    access and you can try it by toggling the &quot;New Bible
+                    Translations&quot; early access flag in your settings.
+                    <Image
+                        src={'/assets/2025-12-24-translation-selector.png'}
+                        alt={'Screenshot of the new translation selector'}
+                        className="mt-3 border-2 border-primary"
+                        width={800}
+                        height={400}
+                    />
+                    <ul>
+                        <li>
+                            New translations include: NIV, NLT, CSB, NKJV, NASB,
+                            MSG, BSB, and our first non-English translation NTV!
+                        </li>
+                        <li>
+                            This was made possible by integrating with{' '}
+                            <Link href="https://api.bible/">api.bible</Link>.
+                        </li>
+                        <li>
+                            Note: This is &quot;super early access&quot; - I
+                            currently don&apos;t have the right attribution
+                            being shown, and there are known issues with how
+                            I&apos;m parsing and formatting the text. Keep an
+                            eye on the changelog as I stabilize each
+                            translation.
+                        </li>
+                        <li>
+                            If you speak another language and have thoughts on
+                            what the best translations for that language are,
+                            check{' '}
+                            <Link href="https://api.bible/bibles">
+                                this list of translations
+                            </Link>{' '}
+                            and{' '}
+                            <EmailLink className="underline">
+                                email me
+                            </EmailLink>{' '}
+                            a recommendation!
+                        </li>
+                    </ul>
+                </li>
                 <li>
                     <DateComponent date={new Date('12/18/2025')} /> - Added an
                     early access feature section for opting yourself into new
