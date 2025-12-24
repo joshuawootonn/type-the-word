@@ -56,8 +56,8 @@ export default async function PassagePage() {
                     chapterHistory={chapterHistory}
                     passageSegmentOverride={value}
                 />
-                <div className="absolute bottom-0 right-0 translate-x-0.5 translate-y-0.5 border-2 border-primary px-3">
-                    Example of typing experience with Psalm 23
+                <div className="absolute bottom-[-2px] left-[-2px] right-[-2px] border-2 border-primary px-3 text-center sm:left-[unset]">
+                    Example of typing experience in PS 23
                 </div>
             </div>
 
