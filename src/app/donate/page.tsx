@@ -31,10 +31,23 @@ export default async function DonatePage() {
     ])
 
     const projectStartDate = new Date('2023-12-01')
-    const monthsSinceStart = differenceInMonths(new Date(), projectStartDate)
+    const apiIntegrationDate = new Date('2025-12-01')
+    const now = new Date()
 
-    const monthlyBurnRate = 40
-    const spentToDate = monthsSinceStart * monthlyBurnRate
+    const monthsBeforeApi = differenceInMonths(
+        apiIntegrationDate,
+        projectStartDate,
+    )
+    const monthsWithApi = differenceInMonths(now, apiIntegrationDate)
+
+    const monthlyBurnRateOld = 40
+    const monthlyBurnRateNew = 64 // $40 + $29 for api.bible
+    const oneOffCosts = 90 // DB migration issues
+
+    const spentToDate =
+        monthsBeforeApi * monthlyBurnRateOld +
+        monthsWithApi * monthlyBurnRateNew +
+        oneOffCosts
 
     return (
         <main className="prose relative mx-auto w-full flex-grow pt-4 text-lg dark:prose-invert prose-headings:text-primary prose-p:text-primary prose-a:text-primary prose-strong:text-primary prose-code:text-primary prose-table:text-primary prose-th:text-primary prose-td:text-primary lg:pt-8">
@@ -98,22 +111,19 @@ export default async function DonatePage() {
                     <tbody>
                         <tr>
                             <td>
-                                Digital Ocean Database <br />
+                                Planetscale Database <br />
                                 <br />
                                 <span className="text-xs">
                                     This is where all the data is stored for
-                                    TTW. This is a managed database which
-                                    ensures that if I accidentally delete data
-                                    it can be recovered.
+                                    TTW. This is a managed PostgreSQL database
+                                    dedicated to this project, which ensures
+                                    that if I accidentally delete data it can be
+                                    recovered. I have the 10$ a month node, and
+                                    5$ a month here is for excess egress
+                                    bandwidth that we sometimes use.
                                 </span>
                             </td>
-                            <td>
-                                $11 <br />
-                                <br />
-                                <span className="whitespace-nowrap text-xs">
-                                    (50% of $22/month) *
-                                </span>
-                            </td>
+                            <td>$15</td>
                         </tr>
                         <tr>
                             <td>
@@ -138,12 +148,7 @@ export default async function DonatePage() {
                                 <br />
                                 <span className="text-xs">
                                     This is how I communicate with you all
-                                    through josh@typetheword.site. I set this up
-                                    because I was thinking the project could
-                                    scale to multiple contributors. Long term,
-                                    if it doesn&apos;t, I&apos;m planning to
-                                    switch back to my personal email to save on
-                                    costs.{' '}
+                                    through josh@typetheword.site.
                                 </span>
                             </td>
                             <td>$8</td>
@@ -163,6 +168,19 @@ export default async function DonatePage() {
                                 <span className="text-xs">($26.48/year)</span>
                             </td>
                         </tr>
+                        <tr>
+                            <td>
+                                api.bible <br />
+                                <br />
+                                <span className="text-xs">
+                                    This is the API that provides access to
+                                    multiple Bible translations (NIV, NLT, CSB,
+                                    NKJV, NASB, MSG, BSB, NTV, and more). Added
+                                    in December 2024.
+                                </span>
+                            </td>
+                            <td>$29</td>
+                        </tr>
                     </tbody>
                 </table>
                 <p>
@@ -170,6 +188,72 @@ export default async function DonatePage() {
                     shared accross them, so that&apos;s where the 50% comes
                     from.
                 </p>
+
+                <h3>One-off costs</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th className="text-left">Item</th>
+                            <th className="text-left">Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                Database migration egress bandwidth overages{' '}
+                                <br />
+                                <br />
+                                <span className="text-xs">
+                                    In late 2025, I swapped to a new database
+                                    provider. It&apos;s faster, has better DX,
+                                    is potentially cheaper, and this change now
+                                    moved TTW to a dedicated database instance.
+                                    But I failed to see the egress bandwidth
+                                    limit they had, and some the endpoints I had
+                                    created were very inefficient. I have
+                                    optimized them now, but not before we used
+                                    over a TB of bandwidth.
+                                </span>
+                            </td>
+                            <td>$90</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Previous costs</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th className="text-left">Item</th>
+                            <th className="text-left">Monthly cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                Digital Ocean Database{' '}
+                                <span className="text-xs">
+                                    (Dec 2023 - Nov 2025)
+                                </span>
+                                <br />
+                                <br />
+                                <span className="text-xs">
+                                    This was the original managed database for
+                                    TTW, shared with other side projects.
+                                    Migrated to Planetscale for better
+                                    performance and dedicated resources.
+                                </span>
+                            </td>
+                            <td>
+                                $11 <br />
+                                <br />
+                                <span className="whitespace-nowrap text-xs">
+                                    (50% of $22/month)
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <div className="mb-40">
                 <h2>FAQ</h2>
