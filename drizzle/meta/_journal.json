@@ -120,6 +120,13 @@
       "when": 1766200000000,
       "tag": "0016_add-more-translations",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1766300000000,
+      "tag": "0017_classroom-integration",
+      "breakpoints": true
     }
   ]
 }
