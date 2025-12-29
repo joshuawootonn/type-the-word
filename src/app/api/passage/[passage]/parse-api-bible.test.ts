@@ -423,6 +423,157 @@ describe('Poetry paragraph merging', () => {
     })
 })
 
+describe('Poetry indentation', () => {
+    // API.Bible uses q1/q2 classes to indicate indentation levels.
+    // q1 = first level (2 spaces), q2 = second level (4 spaces)
+    // These should be preserved as leading space atoms.
+
+    const nivGen1Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/niv/genesis_1.html',
+        ),
+        'utf8',
+    )
+
+    const nivPsalm23Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/niv/psalm_23.html',
+        ),
+        'utf8',
+    )
+
+    /**
+     * Count leading space atoms after verse number (or at start if no verse number)
+     */
+    function countLeadingSpaces(nodes: Array<{ type: string }>): number {
+        let count = 0
+        let afterVerseNumber = false
+
+        for (const node of nodes) {
+            if (node.type === 'verseNumber') {
+                afterVerseNumber = true
+                continue
+            }
+            if (node.type === 'space' && afterVerseNumber) {
+                count++
+            } else if (node.type !== 'space') {
+                break
+            }
+        }
+
+        // If no verse number, count from start
+        if (!afterVerseNumber) {
+            count = 0
+            for (const node of nodes) {
+                if (node.type === 'space') {
+                    count++
+                } else {
+                    break
+                }
+            }
+        }
+
+        return count
+    }
+
+    test('Genesis 1:27 first line (q1) has 2 leading spaces', () => {
+        const result = parseApiBibleChapter(nivGen1Html, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Find verse 27 first occurrence (has verse number)
+        const verse27 = paragraphs
+            .flatMap(p => p.nodes)
+            .find(
+                v =>
+                    v.verse.verse === 27 &&
+                    v.nodes.some(n => n.type === 'verseNumber'),
+            )
+
+        expect(verse27).toBeDefined()
+        expect(countLeadingSpaces(verse27!.nodes)).toBe(2)
+    })
+
+    test('Genesis 1:27 continuation lines (q2) have 4 leading spaces', () => {
+        const result = parseApiBibleChapter(nivGen1Html, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Find verse 27 continuations (no verse number, hanging verse)
+        const verse27Continuations = paragraphs
+            .flatMap(p => p.nodes)
+            .filter(
+                v => v.verse.verse === 27 && v.metadata.hangingVerse === true,
+            )
+
+        expect(verse27Continuations.length).toBe(2)
+        for (const v of verse27Continuations) {
+            expect(countLeadingSpaces(v.nodes)).toBe(4)
+        }
+    })
+
+    test('Psalm 23 verse 1 (q1) has 2 leading spaces', () => {
+        const result = parseApiBibleChapter(nivPsalm23Html, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        const verse1 = paragraphs
+            .flatMap(p => p.nodes)
+            .find(
+                v =>
+                    v.verse.verse === 1 &&
+                    v.nodes.some(n => n.type === 'verseNumber'),
+            )
+
+        expect(verse1).toBeDefined()
+        expect(countLeadingSpaces(verse1!.nodes)).toBe(2)
+    })
+
+    test('Psalm 23 has mix of q1 (2 spaces) and q2 (4 spaces) indentation', () => {
+        const result = parseApiBibleChapter(nivPsalm23Html, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        const allVerses = paragraphs.flatMap(p => p.nodes)
+        const indentCounts = allVerses.map(v => countLeadingSpaces(v.nodes))
+
+        // Should have both 2-space and 4-space indentation
+        expect(indentCounts.some(c => c === 2)).toBe(true)
+        expect(indentCounts.some(c => c === 4)).toBe(true)
+    })
+
+    test('non-poetry paragraphs have no leading indent spaces', () => {
+        const result = parseApiBibleChapter(nivGen1Html, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Find a non-poetry paragraph (verse 1)
+        const verse1 = paragraphs
+            .flatMap(p => p.nodes)
+            .find(
+                v =>
+                    v.verse.verse === 1 &&
+                    v.nodes.some(n => n.type === 'verseNumber'),
+            )
+
+        expect(verse1).toBeDefined()
+        // Verse 1 is in a regular paragraph, should have 0 leading spaces
+        expect(countLeadingSpaces(verse1!.nodes)).toBe(0)
+    })
+})
+
 // ============================================================================
 // COMPREHENSIVE PARAMETERIZED TESTS FOR ALL TRANSLATIONS
 // ============================================================================
@@ -550,19 +701,30 @@ function hasEmbeddedNewline(word: Word): boolean {
 }
 
 /**
- * Checks for double spaces in the parsed inline nodes
+ * Checks for double spaces in the parsed inline nodes.
+ * Allows multiple consecutive spaces at the start of a verse (after verse number)
+ * for poetry indentation, but not elsewhere.
  */
 function hasDoubleSpaces(paragraphs: Paragraph[]): boolean {
     for (const p of paragraphs) {
         for (const verse of p.nodes) {
+            const nodes = verse.nodes
             let lastWasSpace = false
-            for (const node of verse.nodes) {
-                if (node.type === 'space') {
-                    if (lastWasSpace) {
-                        return true
+            let inLeadingSpaces = true // Track if we're in leading spaces (after verse number)
+
+            for (const node of nodes) {
+                if (node.type === 'verseNumber') {
+                    // After verse number, we may have leading indent spaces
+                    inLeadingSpaces = true
+                    lastWasSpace = false
+                } else if (node.type === 'space') {
+                    if (lastWasSpace && !inLeadingSpaces) {
+                        return true // Double space not at start
                     }
                     lastWasSpace = true
                 } else {
+                    // Hit non-space content, no longer in leading spaces
+                    inLeadingSpaces = false
                     lastWasSpace = false
                 }
             }
@@ -572,20 +734,29 @@ function hasDoubleSpaces(paragraphs: Paragraph[]): boolean {
 }
 
 /**
- * Checks that verse numbers are followed by a word (not a space atom).
- * Words have their own trailing spaces, so we don't add space atoms after verse numbers.
+ * Checks that verse numbers are followed by valid content (word or indent spaces).
+ * For poetry (block-indent paragraphs), leading spaces are allowed for indentation.
+ * For regular paragraphs, verse numbers should be followed directly by words.
  */
-function verseNumbersFollowedByWord(paragraphs: Paragraph[]): boolean {
+function verseNumbersFollowedByValidContent(paragraphs: Paragraph[]): boolean {
     for (const p of paragraphs) {
+        const isPoetry = p.metadata.blockIndent
+
         for (const verse of p.nodes) {
             const nodes = verse.nodes
             for (let i = 0; i < nodes.length; i++) {
                 const node = nodes[i]
                 if (node && node.type === 'verseNumber') {
                     const nextNode = nodes[i + 1]
-                    // After verse number should be a word (or end of nodes)
-                    if (nextNode && nextNode.type === 'space') {
-                        return false // Should not have space atom after verse number
+                    // After verse number should be:
+                    // - For poetry: spaces (indent) or word
+                    // - For prose: word
+                    if (nextNode && nextNode.type === 'space' && !isPoetry) {
+                        return false // Non-poetry should not have space atom after verse number
+                    }
+                    // Check that there IS content after verse number
+                    if (!nextNode) {
+                        return false // Verse number at end with no content
                     }
                 }
             }
@@ -804,7 +975,9 @@ describe.each(TRANSLATIONS)('Translation: %s', translation => {
                 )
 
                 if (hasVerseNumbers) {
-                    expect(verseNumbersFollowedByWord(paragraphs)).toBe(true)
+                    expect(verseNumbersFollowedByValidContent(paragraphs)).toBe(
+                        true,
+                    )
                 }
             })
 

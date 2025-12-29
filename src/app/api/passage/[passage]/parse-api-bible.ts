@@ -60,6 +60,34 @@ export function parseApiBibleChapter(
         return classAttr?.split(' ').includes(className) ?? false
     }
 
+    /**
+     * Get the number of leading spaces for poetry indentation.
+     * q1/qm1 = 2 spaces (first level), q2/qm2 = 4 spaces (second level)
+     * MSG gets double indentation for better readability
+     */
+    function getPoetryIndent(node: Element): number {
+        const offset = translation === 'msg' ? 4 : 0
+
+        if (hasClass(node, 'q2') || hasClass(node, 'qm2')) {
+            return 4 + offset
+        }
+        if (
+            hasClass(node, 'q1') ||
+            hasClass(node, 'qm1') ||
+            hasClass(node, 'q')
+        ) {
+            return 2 + offset
+        }
+        return 0
+    }
+
+    /**
+     * Create leading space atoms for poetry indentation
+     */
+    function createLeadingSpaces(count: number): Array<{ type: 'space' }> {
+        return Array.from({ length: count }, () => ({ type: 'space' }))
+    }
+
     function parseInline(node: ChildNode): Inline[] {
         if (node.nodeName === '#text' && 'value' in node) {
             // Skip leading whitespace - it will be handled by adding space after verse numbers
@@ -290,7 +318,42 @@ export function parseApiBibleChapter(
             classAttr == null // No class attribute
 
         if (isContentParagraph) {
-            const nodes: Inline[] = node.childNodes.flatMap(parseInline)
+            const isPoetryLine =
+                hasClass(node, 'q') ||
+                hasClass(node, 'q1') ||
+                hasClass(node, 'q2') ||
+                hasClass(node, 'qc') ||
+                hasClass(node, 'qm1') ||
+                hasClass(node, 'qm2')
+
+            // Get leading spaces for poetry indentation
+            const indentSpaces = isPoetryLine
+                ? createLeadingSpaces(getPoetryIndent(node))
+                : []
+
+            const parsedNodes: Inline[] = node.childNodes.flatMap(parseInline)
+
+            // For poetry lines, insert indentation after verse number (if present) or at start
+            let nodes: Inline[]
+            if (indentSpaces.length > 0 && parsedNodes.length > 0) {
+                // Find the verse number position
+                const verseNumIndex = parsedNodes.findIndex(
+                    n => n.type === 'verseNumber',
+                )
+                if (verseNumIndex !== -1) {
+                    // Insert spaces after verse number
+                    nodes = [
+                        ...parsedNodes.slice(0, verseNumIndex + 1),
+                        ...indentSpaces,
+                        ...parsedNodes.slice(verseNumIndex + 1),
+                    ]
+                } else {
+                    // No verse number, insert at start
+                    nodes = [...indentSpaces, ...parsedNodes]
+                }
+            } else {
+                nodes = parsedNodes
+            }
 
             if (inlineToString(nodes).trim() === '') {
                 return null
@@ -309,6 +372,8 @@ export function parseApiBibleChapter(
             if (dataVid && verseNumberNodes.length === 0) {
                 const parsedVid = parseDataVid(dataVid)
                 if (parsedVid && context.lastVerse) {
+                    // Note: leading spaces already added to `nodes` above for poetry lines
+
                     // This is a continuation of a verse
                     const verses: Verse[] = [
                         {
@@ -328,28 +393,20 @@ export function parseApiBibleChapter(
 
                     context.lastVerse = verses.at(-1)
 
-                    const isPoetry =
-                        hasClass(node, 'q') ||
-                        hasClass(node, 'q1') ||
-                        hasClass(node, 'q2') ||
-                        hasClass(node, 'qc') ||
-                        hasClass(node, 'qm1') ||
-                        hasClass(node, 'qm2')
-
                     const paragraph = {
                         type: 'paragraph' as const,
                         text: inlineToString(nodes),
                         nodes: verses,
                         metadata: {
-                            type: isPoetry
+                            type: isPoetryLine
                                 ? ('quote' as const)
                                 : ('default' as const),
-                            blockIndent: isPoetry,
+                            blockIndent: isPoetryLine,
                         },
                     }
 
                     // Return as poetry line to enable merging
-                    if (isPoetry) {
+                    if (isPoetryLine) {
                         return { type: 'poetryLine', paragraph }
                     }
                     return paragraph

@@ -185,7 +185,7 @@ async function fetchESVPassage(
 async function fetchApiBiblePassage(
     passageData: PassageObject,
     reference: PassageSegment,
-    translation: Translation,
+    translation: Exclude<Translation, 'esv'>,
 ) {
     const includesVerses = passageData.lastVerse != null
 
@@ -206,7 +206,9 @@ async function fetchApiBiblePassage(
         const data: unknown = await response.json()
         const parsedData = apiBiblePassageSchema.parse(data)
 
-        return { data: parseApiBibleChapter(parsedData.data.content) }
+        return {
+            data: parseApiBibleChapter(parsedData.data.content, translation),
+        }
     }
 
     const existingPassageResponse = await db.query.passageResponse.findFirst({
@@ -228,7 +230,9 @@ async function fetchApiBiblePassage(
         const parsedData = apiBiblePassageSchema.parse(
             existingPassageResponse.response,
         )
-        return { data: parseApiBibleChapter(parsedData.data.content) }
+        return {
+            data: parseApiBibleChapter(parsedData.data.content, translation),
+        }
     }
 
     const response = await fetch(createApiBibleURL(passageData, translation), {
@@ -265,7 +269,9 @@ async function fetchApiBiblePassage(
             })
             .where(eq(passageResponse.id, existingPassageResponse.id))
     }
-    return { data: parseApiBibleChapter(parsedData.data.content) }
+    return {
+        data: parseApiBibleChapter(parsedData.data.content, translation),
+    }
 }
 
 export async function GET(
