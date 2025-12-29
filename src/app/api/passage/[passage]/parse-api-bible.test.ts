@@ -498,23 +498,40 @@ describe('Poetry indentation', () => {
         expect(countLeadingSpaces(verse27!.nodes)).toBe(2)
     })
 
-    test('Genesis 1:27 continuation lines (q2) have 4 leading spaces', () => {
+    test('Genesis 1:27 continuation lines (q2) have 4 leading spaces after newLine', () => {
         const result = parseApiBibleChapter(nivGen1Html, 'niv')
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === 'paragraph',
         )
 
-        // Find verse 27 continuations (no verse number, hanging verse)
-        const verse27Continuations = paragraphs
+        // Find verse 27 (now merged into a single section)
+        const verse27 = paragraphs
             .flatMap(p => p.nodes)
-            .filter(
-                v => v.verse.verse === 27 && v.metadata.hangingVerse === true,
-            )
+            .find(v => v.verse.verse === 27)
 
-        expect(verse27Continuations.length).toBe(2)
-        for (const v of verse27Continuations) {
-            expect(countLeadingSpaces(v.nodes)).toBe(4)
+        expect(verse27).toBeDefined()
+        const nodes = verse27!.nodes
+
+        // Find newLines and check indentation after each one
+        const newLineIndices = nodes
+            .map((n, i) => (n.type === 'newLine' ? i : -1))
+            .filter(i => i >= 0)
+
+        expect(newLineIndices.length).toBe(2) // 3 poetry lines = 2 newLines
+
+        // Check each continuation line has spaces after newLine (q2 indentation)
+        for (const newLineIdx of newLineIndices) {
+            let spaceCount = 0
+            for (let i = newLineIdx + 1; i < nodes.length; i++) {
+                if (nodes[i]!.type === 'space') {
+                    spaceCount++
+                } else {
+                    break
+                }
+            }
+            // q2 = 4 spaces for continuation lines
+            expect(spaceCount).toBe(4)
         }
     })
 
@@ -704,6 +721,57 @@ describe('Speaker labels and section headers (Song of Solomon)', () => {
             expect(allVerseNumbers.has(i)).toBe(true)
         }
     })
+
+    test('verse 4 sections are split by speaker changes (h4 headers)', () => {
+        // NIV Song 1:4 has speaker changes (She -> Friends -> She)
+        // Each speaker section creates a separate verse section (3 total)
+        const result = parseApiBibleChapter(nivSongHtml, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        const verse4Sections = paragraphs
+            .flatMap(p => p.nodes)
+            .filter(v => v.verse.verse === 4)
+
+        // Should be 3 sections (one per speaker section), not 5+ raw paragraphs
+        expect(verse4Sections.length).toBe(3)
+
+        // First section should have verse number, others should be hanging
+        expect(verse4Sections[0]!.metadata.hangingVerse).toBe(false)
+        expect(verse4Sections[1]!.metadata.hangingVerse).toBe(true)
+        expect(verse4Sections[2]!.metadata.hangingVerse).toBe(true)
+    })
+
+    test('same-verse poetry lines within speaker section are merged', () => {
+        // NIV Song 1:2-3 spans multiple poetry lines with same speaker (She)
+        // They should be merged within the same paragraph
+        const result = parseApiBibleChapter(nivSongHtml, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Find the paragraph containing verses 2, 3, 4 (first speaker section)
+        const sheParagraph = paragraphs.find(p =>
+            p.nodes.some(v => v.verse.verse === 2),
+        )
+
+        expect(sheParagraph).toBeDefined()
+
+        // Verse 2 should be a single merged section (not 2 separate)
+        const verse2Sections = sheParagraph!.nodes.filter(
+            v => v.verse.verse === 2,
+        )
+        expect(verse2Sections.length).toBe(1)
+
+        // The merged verse 2 should have a newLine (from merging 2 poetry lines)
+        const newLines = verse2Sections[0]!.nodes.filter(
+            n => n.type === 'newLine',
+        )
+        expect(newLines.length).toBeGreaterThan(0)
+    })
 })
 
 // ============================================================================
@@ -848,16 +916,20 @@ function hasDoubleSpaces(paragraphs: Paragraph[]): boolean {
         for (const verse of p.nodes) {
             const nodes = verse.nodes
             let lastWasSpace = false
-            let inLeadingSpaces = true // Track if we're in leading spaces (after verse number)
+            let inLeadingSpaces = true // Track if we're in leading spaces (after verse number or newLine)
 
             for (const node of nodes) {
                 if (node.type === 'verseNumber') {
                     // After verse number, we may have leading indent spaces
                     inLeadingSpaces = true
                     lastWasSpace = false
+                } else if (node.type === 'newLine') {
+                    // After newLine, next line may have leading indent spaces
+                    inLeadingSpaces = true
+                    lastWasSpace = false
                 } else if (node.type === 'space') {
                     if (lastWasSpace && !inLeadingSpaces) {
-                        return true // Double space not at start
+                        return true // Double space not at start of line
                     }
                     lastWasSpace = true
                 } else {

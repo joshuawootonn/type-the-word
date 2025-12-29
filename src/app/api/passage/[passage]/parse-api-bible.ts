@@ -552,17 +552,35 @@ export function parseApiBibleChapter(
         if (parsed.type === 'poetryLine') {
             if (currentPoetryParagraph) {
                 // Merge into current poetry paragraph
-                // Add newline to last word of last verse in current paragraph
                 const lastVerse =
                     currentPoetryParagraph.nodes[
                         currentPoetryParagraph.nodes.length - 1
                     ]
-                if (lastVerse) {
-                    lastVerse.nodes.push({ type: 'newLine' })
-                }
+                const firstNewVerse = parsed.paragraph.nodes[0]
 
-                // Append verses from new line
-                currentPoetryParagraph.nodes.push(...parsed.paragraph.nodes)
+                // Check if we should merge with the last verse (same verse number)
+                if (
+                    lastVerse &&
+                    firstNewVerse &&
+                    lastVerse.verse.verse === firstNewVerse.verse.verse
+                ) {
+                    // Same verse - merge content into existing verse section
+                    lastVerse.nodes.push({ type: 'newLine' })
+                    lastVerse.nodes.push(...firstNewVerse.nodes)
+
+                    // Add any remaining verses from the new line
+                    for (let i = 1; i < parsed.paragraph.nodes.length; i++) {
+                        currentPoetryParagraph.nodes.push(
+                            parsed.paragraph.nodes[i]!,
+                        )
+                    }
+                } else {
+                    // Different verse - add newline and append as new verse section
+                    if (lastVerse) {
+                        lastVerse.nodes.push({ type: 'newLine' })
+                    }
+                    currentPoetryParagraph.nodes.push(...parsed.paragraph.nodes)
+                }
                 currentPoetryParagraph.text += '\n' + parsed.paragraph.text
             } else {
                 // Start new poetry paragraph
