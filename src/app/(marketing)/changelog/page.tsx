@@ -67,6 +67,37 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('12/29/2025')} /> - Improved
+                    parsing for new Bible translations:
+                    <ul>
+                        <li>
+                            Section headers and speaker labels (e.g.,
+                            &quot;She&quot;, &quot;Friends&quot;, &quot;The
+                            Banquet&quot; in Song of Solomon) are now displayed
+                            as headings instead of typeable content.
+                        </li>
+                        <li>
+                            Poetry verses split across multiple lines are now
+                            merged into single sections, reducing the number of
+                            buttons per verse.
+                        </li>
+                        <li>
+                            Indentation for poetry and quoted sections is now
+                            preserved in the parsed text.
+                        </li>
+                        <li>
+                            There are now 1000+ tests for the new parsing logic,
+                            validating all verses are shown among other things.
+                        </li>
+                    </ul>
+                    <br />
+                    If you run into any other issues with the new translations.
+                    Please <EmailLink className="underline">
+                        email me
+                    </EmailLink>{' '}
+                    and I&apos;ll be happy to take a look.
+                </li>
+                <li>
                     <DateComponent date={new Date('12/24/2025')} /> - Fixed a
                     bug in Song of Solomon chapter 1 where you couldn&apos;t
                     type past certain words. The issue was caused by text in the
