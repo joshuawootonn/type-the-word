@@ -574,8 +574,10 @@ describe('Poetry indentation', () => {
     })
 })
 
-describe('Speaker labels (Song of Solomon)', () => {
-    // Song of Solomon has speaker labels like "She", "Friends", "He"
+describe('Speaker labels and section headers (Song of Solomon)', () => {
+    // Song of Solomon has:
+    // - Speaker labels (sp class): "She", "Friends", "He"
+    // - Section headers (s class): "The Banquet", "Solomon's Love for a Shulamite Girl"
     // These should be parsed as h4 headings, not typeable content
 
     const nivSongHtml = fs.readFileSync(
@@ -586,7 +588,15 @@ describe('Speaker labels (Song of Solomon)', () => {
         'utf8',
     )
 
-    test('speaker labels are parsed as h4 headings', () => {
+    const nkjvSongHtml = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/nkjv/song_of_solomon_1.html',
+        ),
+        'utf8',
+    )
+
+    test('speaker labels are parsed as h4 headings (NIV)', () => {
         const result = parseApiBibleChapter(nivSongHtml, 'niv')
 
         const h4Headers = result.nodes.filter(n => n.type === 'h4')
@@ -595,7 +605,7 @@ describe('Speaker labels (Song of Solomon)', () => {
         expect(h4Headers.length).toBeGreaterThan(0)
     })
 
-    test('speaker labels contain expected text', () => {
+    test('speaker labels contain expected text (NIV)', () => {
         const result = parseApiBibleChapter(nivSongHtml, 'niv')
 
         const h4Headers = result.nodes.filter(n => n.type === 'h4')
@@ -609,7 +619,39 @@ describe('Speaker labels (Song of Solomon)', () => {
         expect(speakerTexts.some(t => t === 'He')).toBe(true)
     })
 
-    test('speaker labels are not included in paragraph text', () => {
+    test('section headers are parsed as h4 headings (NKJV)', () => {
+        const result = parseApiBibleChapter(nkjvSongHtml, 'nkjv')
+
+        const h4Headers = result.nodes.filter(n => n.type === 'h4')
+        const headerTexts = h4Headers.map(h =>
+            h.type === 'h4' ? h.text.trim() : '',
+        )
+
+        // NKJV has section headers like "The Banquet" and speaker labels like "The Shulamite"
+        expect(headerTexts.some(t => t === 'The Banquet')).toBe(true)
+        // Note: NKJV uses curly apostrophe (') not straight apostrophe (')
+        expect(
+            headerTexts.some(t => t.includes('Solomon') && t.includes('Love')),
+        ).toBe(true)
+    })
+
+    test('speaker labels like "The Shulamite" are parsed as h4 (NKJV)', () => {
+        const result = parseApiBibleChapter(nkjvSongHtml, 'nkjv')
+
+        const h4Headers = result.nodes.filter(n => n.type === 'h4')
+        const headerTexts = h4Headers.map(h =>
+            h.type === 'h4' ? h.text.trim() : '',
+        )
+
+        // NKJV uses qa class for speaker labels
+        expect(headerTexts.some(t => t === 'The Shulamite')).toBe(true)
+        expect(headerTexts.some(t => t === 'The Daughters of Jerusalem')).toBe(
+            true,
+        )
+        expect(headerTexts.some(t => t === 'The Beloved')).toBe(true)
+    })
+
+    test('speaker labels are not included in paragraph text (NIV)', () => {
         const result = parseApiBibleChapter(nivSongHtml, 'niv')
 
         const paragraphs = result.nodes.filter(
@@ -622,6 +664,24 @@ describe('Speaker labels (Song of Solomon)', () => {
             expect(text).not.toBe('She')
             expect(text).not.toBe('Friends')
             expect(text).not.toBe('He')
+        }
+    })
+
+    test('section headers are not included in paragraph text (NKJV)', () => {
+        const result = parseApiBibleChapter(nkjvSongHtml, 'nkjv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Check that no paragraph contains section headers or speaker labels
+        for (const p of paragraphs) {
+            const text = p.text.trim()
+            expect(text).not.toBe('The Banquet')
+            expect(text).not.toBe("Solomon's Love for a Shulamite Girl")
+            expect(text).not.toBe('The Shulamite')
+            expect(text).not.toBe('The Daughters of Jerusalem')
+            expect(text).not.toBe('The Beloved')
         }
     })
 

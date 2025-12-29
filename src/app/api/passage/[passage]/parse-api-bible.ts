@@ -253,7 +253,7 @@ export function parseApiBibleChapter(
             const text = node.childNodes
                 .flatMap(parseInline)
                 .filter((n): n is Word => n.type === 'word')
-                .map(n => n.letters.join(''))
+                .map(n => n.letters.join('').trim())
                 .join(' ')
             return {
                 type: 'h4',
@@ -292,12 +292,13 @@ export function parseApiBibleChapter(
         }
 
         // Speaker labels: sp (e.g., "She", "Friends" in Song of Solomon)
-        // These are headings indicating who is speaking, not typeable content
-        if (hasClass(node, 'sp')) {
+        // Section headers: s (e.g., "The Banquet", "Solomon's Love for a Shulamite Girl")
+        // These are headings indicating who is speaking or section titles, not typeable content
+        if (hasClass(node, 'sp') || hasClass(node, 's')) {
             const text = node.childNodes
                 .flatMap(parseInline)
                 .filter((n): n is Word => n.type === 'word')
-                .map(n => n.letters.join(''))
+                .map(n => n.letters.join('').trim())
                 .join(' ')
             return {
                 type: 'h4',
