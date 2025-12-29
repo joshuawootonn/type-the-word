@@ -255,6 +255,7 @@ export function parseApiBibleChapter(
         const isContentParagraph =
             hasClass(node, 'm') ||
             hasClass(node, 'pmo') ||
+            hasClass(node, 'po') || // Opening paragraph (NIV epistles)
             hasClass(node, 'q') || // Poetry (NASB)
             hasClass(node, 'q1') ||
             hasClass(node, 'q2') ||

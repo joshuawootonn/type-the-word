@@ -175,6 +175,99 @@ describe('parseApiBibleChapter', () => {
     })
 })
 
+describe('Opening paragraph handling (po class)', () => {
+    // NIV epistles use <p class="po"> for opening paragraphs
+    // This is common in letters like Romans, James, etc.
+
+    const nivRomans1Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/niv/romans_1.html',
+        ),
+        'utf8',
+    )
+
+    const nivJames1Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/niv/james_1.html',
+        ),
+        'utf8',
+    )
+
+    test('parses NIV Romans 1 verse 1 from opening paragraph', () => {
+        const result = parseApiBibleChapter(nivRomans1Html, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Find verse 1
+        const verse1 = paragraphs
+            .flatMap(p => p.nodes)
+            .find(v => v.verse.verse === 1)
+
+        expect(verse1).toBeDefined()
+        expect(verse1?.text).toContain('Paul')
+        expect(verse1?.text).toContain('servant')
+    })
+
+    test('parses NIV James 1 verse 1 from opening paragraph', () => {
+        const result = parseApiBibleChapter(nivJames1Html, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Find verse 1
+        const verse1 = paragraphs
+            .flatMap(p => p.nodes)
+            .find(v => v.verse.verse === 1)
+
+        expect(verse1).toBeDefined()
+        expect(verse1?.text).toContain('James')
+        expect(verse1?.text).toContain('servant')
+    })
+
+    test('parses all 32 verses in NIV Romans 1', () => {
+        const result = parseApiBibleChapter(nivRomans1Html, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        const verseNumbers = new Set<number>()
+        for (const p of paragraphs) {
+            for (const verse of p.nodes) {
+                verseNumbers.add(verse.verse.verse)
+            }
+        }
+
+        expect(verseNumbers.size).toBe(32)
+        // Verify verse 1 is included (this was the bug)
+        expect(verseNumbers.has(1)).toBe(true)
+    })
+
+    test('parses all 27 verses in NIV James 1', () => {
+        const result = parseApiBibleChapter(nivJames1Html, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        const verseNumbers = new Set<number>()
+        for (const p of paragraphs) {
+            for (const verse of p.nodes) {
+                verseNumbers.add(verse.verse.verse)
+            }
+        }
+
+        expect(verseNumbers.size).toBe(27)
+        // Verify verse 1 is included (this was the bug)
+        expect(verseNumbers.has(1)).toBe(true)
+    })
+})
+
 // ============================================================================
 // COMPREHENSIVE PARAMETERIZED TESTS FOR ALL TRANSLATIONS
 // ============================================================================
@@ -246,9 +339,21 @@ const CHAPTERS: Array<{
     },
     {
         book: 'romans',
+        chapter: 1,
+        expectedVerses: 32,
+        bookSlug: 'romans',
+    },
+    {
+        book: 'romans',
         chapter: 8,
         expectedVerses: 39,
         bookSlug: 'romans',
+    },
+    {
+        book: 'james',
+        chapter: 1,
+        expectedVerses: 27,
+        bookSlug: 'james',
     },
     {
         book: 'revelation',
