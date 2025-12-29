@@ -130,17 +130,18 @@ export function parseApiBibleChapter(
                     context.book = book
                     context.chapter = chapter
 
+                    // Include trailing space in text to match ESV output format
+                    // (renders as "<b>1 </b>" like ESV does)
                     return [
                         {
                             type: 'verseNumber',
                             value: dataNumber.trim(),
-                            text: dataNumber,
+                            text: dataNumber + ' ',
                             verse,
                             chapter,
                             book,
                             translation: context.translation,
                         },
-                        { type: 'space' },
                     ]
                 }
             }

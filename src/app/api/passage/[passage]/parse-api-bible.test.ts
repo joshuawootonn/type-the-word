@@ -312,9 +312,10 @@ function hasDoubleSpaces(paragraphs: Paragraph[]): boolean {
 }
 
 /**
- * Checks that verse numbers have exactly one space after them
+ * Checks that verse numbers are followed by a word (not a space atom).
+ * Words have their own trailing spaces, so we don't add space atoms after verse numbers.
  */
-function verseNumbersHaveSpaceAfter(paragraphs: Paragraph[]): boolean {
+function verseNumbersFollowedByWord(paragraphs: Paragraph[]): boolean {
     for (const p of paragraphs) {
         for (const verse of p.nodes) {
             const nodes = verse.nodes
@@ -322,9 +323,9 @@ function verseNumbersHaveSpaceAfter(paragraphs: Paragraph[]): boolean {
                 const node = nodes[i]
                 if (node && node.type === 'verseNumber') {
                     const nextNode = nodes[i + 1]
-                    // After verse number should be a space
-                    if (!nextNode || nextNode.type !== 'space') {
-                        return false
+                    // After verse number should be a word (or end of nodes)
+                    if (nextNode && nextNode.type === 'space') {
+                        return false // Should not have space atom after verse number
                     }
                 }
             }
@@ -424,6 +425,40 @@ describe.each(TRANSLATIONS)('Translation: %s', translation => {
                 expect(result.firstVerse.translation).toBe(translation)
             })
 
+            test('verse number text includes trailing space (matches ESV format)', () => {
+                const result = parseApiBibleChapter(html, translation)
+                const paragraphs = result.nodes.filter(
+                    (n): n is Paragraph => n.type === 'paragraph',
+                )
+
+                // Check all verse numbers have trailing space in their text
+                const verseNumbersWithoutTrailingSpace: string[] = []
+                for (const p of paragraphs) {
+                    for (const verse of p.nodes) {
+                        const verseNumNode = verse.nodes.find(
+                            n => n.type === 'verseNumber',
+                        )
+                        if (
+                            verseNumNode &&
+                            verseNumNode.type === 'verseNumber'
+                        ) {
+                            if (!verseNumNode.text.endsWith(' ')) {
+                                verseNumbersWithoutTrailingSpace.push(
+                                    `v${verseNumNode.verse}: "${verseNumNode.text}"`,
+                                )
+                            }
+                        }
+                    }
+                }
+
+                if (verseNumbersWithoutTrailingSpace.length > 0) {
+                    throw new Error(
+                        `Verse numbers without trailing space: ${verseNumbersWithoutTrailingSpace.slice(0, 5).join(', ')}`,
+                    )
+                }
+                expect(verseNumbersWithoutTrailingSpace).toHaveLength(0)
+            })
+
             test('parses all expected verses', () => {
                 const result = parseApiBibleChapter(html, translation)
                 const paragraphs = result.nodes.filter(
@@ -495,7 +530,7 @@ describe.each(TRANSLATIONS)('Translation: %s', translation => {
                 expect(problems).toHaveLength(0)
             })
 
-            test('verse numbers have space after them', () => {
+            test('verse numbers are followed by words not space atoms', () => {
                 const result = parseApiBibleChapter(html, translation)
                 const paragraphs = result.nodes.filter(
                     (n): n is Paragraph => n.type === 'paragraph',
@@ -509,7 +544,7 @@ describe.each(TRANSLATIONS)('Translation: %s', translation => {
                 )
 
                 if (hasVerseNumbers) {
-                    expect(verseNumbersHaveSpaceAfter(paragraphs)).toBe(true)
+                    expect(verseNumbersFollowedByWord(paragraphs)).toBe(true)
                 }
             })
 
