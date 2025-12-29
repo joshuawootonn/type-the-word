@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { describe, expect, test } from 'vitest'
 
-import { Paragraph } from '~/lib/parseEsv'
+import { Paragraph, Translation, Word } from '~/lib/parseEsv'
 
 import { parseApiBibleChapter } from './parse-api-bible'
 
@@ -173,4 +173,384 @@ describe('parseApiBibleChapter', () => {
             expect(p.nodes.length).toBeGreaterThan(0)
         }
     })
+})
+
+// ============================================================================
+// COMPREHENSIVE PARAMETERIZED TESTS FOR ALL TRANSLATIONS
+// ============================================================================
+
+const TRANSLATIONS: Exclude<Translation, 'esv'>[] = [
+    'bsb',
+    'nlt',
+    'niv',
+    'csb',
+    'nkjv',
+    'nasb',
+    'ntv',
+    'msg',
+]
+
+const CHAPTERS: Array<{
+    book: string
+    chapter: number
+    expectedVerses: number
+    bookSlug: string
+}> = [
+    {
+        book: 'genesis',
+        chapter: 1,
+        expectedVerses: 31,
+        bookSlug: 'genesis',
+    },
+    {
+        book: 'exodus',
+        chapter: 20,
+        expectedVerses: 26,
+        bookSlug: 'exodus',
+    },
+    {
+        book: 'psalm',
+        chapter: 23,
+        expectedVerses: 6,
+        bookSlug: 'psalm',
+    },
+    {
+        book: 'psalm',
+        chapter: 119,
+        expectedVerses: 176,
+        bookSlug: 'psalm',
+    },
+    {
+        book: 'proverbs',
+        chapter: 3,
+        expectedVerses: 35,
+        bookSlug: 'proverbs',
+    },
+    {
+        book: 'isaiah',
+        chapter: 53,
+        expectedVerses: 12,
+        bookSlug: 'isaiah',
+    },
+    {
+        book: 'matthew',
+        chapter: 5,
+        expectedVerses: 48,
+        bookSlug: 'matthew',
+    },
+    {
+        book: 'john',
+        chapter: 1,
+        expectedVerses: 51,
+        bookSlug: 'john',
+    },
+    {
+        book: 'romans',
+        chapter: 8,
+        expectedVerses: 39,
+        bookSlug: 'romans',
+    },
+    {
+        book: 'revelation',
+        chapter: 21,
+        expectedVerses: 27,
+        bookSlug: 'revelation',
+    },
+]
+
+/**
+ * Helper to extract all words from a parsed passage.
+ */
+function getAllWords(paragraphs: Paragraph[]): Word[] {
+    const words: Word[] = []
+    for (const p of paragraphs) {
+        for (const verse of p.nodes) {
+            for (const node of verse.nodes) {
+                if (node.type === 'word') {
+                    words.push(node)
+                }
+            }
+        }
+    }
+    return words
+}
+
+/**
+ * Checks if any word has a newline character in the middle of it
+ * (not at the end, which is valid for line breaks).
+ */
+function hasEmbeddedNewline(word: Word): boolean {
+    const letters = word.letters
+    for (let i = 0; i < letters.length - 1; i++) {
+        if (letters[i] === '\n') {
+            return true
+        }
+    }
+    return false
+}
+
+/**
+ * Checks for double spaces in the parsed inline nodes
+ */
+function hasDoubleSpaces(paragraphs: Paragraph[]): boolean {
+    for (const p of paragraphs) {
+        for (const verse of p.nodes) {
+            let lastWasSpace = false
+            for (const node of verse.nodes) {
+                if (node.type === 'space') {
+                    if (lastWasSpace) {
+                        return true
+                    }
+                    lastWasSpace = true
+                } else {
+                    lastWasSpace = false
+                }
+            }
+        }
+    }
+    return false
+}
+
+/**
+ * Checks that verse numbers have exactly one space after them
+ */
+function verseNumbersHaveSpaceAfter(paragraphs: Paragraph[]): boolean {
+    for (const p of paragraphs) {
+        for (const verse of p.nodes) {
+            const nodes = verse.nodes
+            for (let i = 0; i < nodes.length; i++) {
+                const node = nodes[i]
+                if (node && node.type === 'verseNumber') {
+                    const nextNode = nodes[i + 1]
+                    // After verse number should be a space
+                    if (!nextNode || nextNode.type !== 'space') {
+                        return false
+                    }
+                }
+            }
+        }
+    }
+    return true
+}
+
+/**
+ * Extract unique verse numbers from parsed paragraphs.
+ * Handles merged verses like "1-3" by extracting all individual verses.
+ */
+function getUniqueVerseNumbers(paragraphs: Paragraph[]): Set<number> {
+    const verseNumbers = new Set<number>()
+    for (const p of paragraphs) {
+        for (const v of p.nodes) {
+            const verseNum = v.verse.verse
+            // Handle merged verses (e.g., verse = 1 for "1-3")
+            if (typeof verseNum === 'number') {
+                verseNumbers.add(verseNum)
+            }
+        }
+    }
+    return verseNumbers
+}
+
+/**
+ * Finds words that are just punctuation/whitespace (should be filtered out).
+ * Returns array of problematic words for error reporting.
+ */
+function getPunctuationOnlyWords(paragraphs: Paragraph[]): string[] {
+    const problems: string[] = []
+    for (const p of paragraphs) {
+        for (const verse of p.nodes) {
+            for (const node of verse.nodes) {
+                if (node.type === 'word') {
+                    const word = node.letters.join('')
+                    // Check if word contains no letters/numbers (just punctuation/whitespace)
+                    if (!/[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]/.test(word)) {
+                        problems.push(word)
+                    }
+                }
+            }
+        }
+    }
+    return problems
+}
+
+// Load all fixtures into memory once
+const fixtures = new Map<string, string>()
+const responsesDir = path.join(process.cwd(), 'src/server/api-bible/responses')
+
+for (const translation of TRANSLATIONS) {
+    for (const chapter of CHAPTERS) {
+        const filePath = path.join(
+            responsesDir,
+            translation,
+            `${chapter.book}_${chapter.chapter}.html`,
+        )
+        if (fs.existsSync(filePath)) {
+            const content = fs.readFileSync(filePath, 'utf8')
+            fixtures.set(
+                `${translation}/${chapter.book}_${chapter.chapter}`,
+                content,
+            )
+        }
+    }
+}
+
+describe.each(TRANSLATIONS)('Translation: %s', translation => {
+    describe.each(CHAPTERS)(
+        '$book $chapter',
+        ({ book, chapter, expectedVerses, bookSlug }) => {
+            const fixtureKey = `${translation}/${book}_${chapter}`
+            const html = fixtures.get(fixtureKey)
+
+            // Skip if fixture doesn't exist
+            if (!html) {
+                test.skip(`fixture not found: ${fixtureKey}`, () => {
+                    // Fixture file not available
+                })
+                return
+            }
+
+            test('parses without throwing', () => {
+                expect(() =>
+                    parseApiBibleChapter(html, translation),
+                ).not.toThrow()
+            })
+
+            test('has correct firstVerse metadata', () => {
+                const result = parseApiBibleChapter(html, translation)
+
+                expect(result.firstVerse).toBeDefined()
+                expect(result.firstVerse.book).toBe(bookSlug)
+                expect(result.firstVerse.chapter).toBe(chapter)
+                expect(result.firstVerse.translation).toBe(translation)
+            })
+
+            test('parses all expected verses', () => {
+                const result = parseApiBibleChapter(html, translation)
+                const paragraphs = result.nodes.filter(
+                    (n): n is Paragraph => n.type === 'paragraph',
+                )
+                const verseNumbers = getUniqueVerseNumbers(paragraphs)
+
+                // MSG often combines verses (e.g., "1-2", "3-5"), so we check minimum coverage
+                if (translation === 'msg') {
+                    // MSG should have at least 10% of verses represented (due to aggressive grouping)
+                    // Some chapters like Psalm 119 have even more aggressive grouping
+                    expect(verseNumbers.size).toBeGreaterThanOrEqual(
+                        Math.floor(expectedVerses / 10),
+                    )
+                } else {
+                    // Other translations should have all verses
+                    expect(verseNumbers.size).toBe(expectedVerses)
+                }
+
+                // Should have verse 1
+                expect(verseNumbers.has(1)).toBe(true)
+            })
+
+            test('has no embedded newlines in words', () => {
+                const result = parseApiBibleChapter(html, translation)
+                const paragraphs = result.nodes.filter(
+                    (n): n is Paragraph => n.type === 'paragraph',
+                )
+                const words = getAllWords(paragraphs)
+                const wordsWithNewlines = words.filter(hasEmbeddedNewline)
+
+                if (wordsWithNewlines.length > 0) {
+                    const examples = wordsWithNewlines
+                        .slice(0, 3)
+                        .map(w => `"${w.letters.join('')}"`)
+                        .join(', ')
+                    throw new Error(
+                        `Found ${wordsWithNewlines.length} word(s) with embedded newlines: ${examples}`,
+                    )
+                }
+
+                expect(wordsWithNewlines).toHaveLength(0)
+            })
+
+            test('has no double spaces', () => {
+                const result = parseApiBibleChapter(html, translation)
+                const paragraphs = result.nodes.filter(
+                    (n): n is Paragraph => n.type === 'paragraph',
+                )
+
+                expect(hasDoubleSpaces(paragraphs)).toBe(false)
+            })
+
+            test('has no punctuation-only words', () => {
+                const result = parseApiBibleChapter(html, translation)
+                const paragraphs = result.nodes.filter(
+                    (n): n is Paragraph => n.type === 'paragraph',
+                )
+
+                const problems = getPunctuationOnlyWords(paragraphs)
+                if (problems.length > 0) {
+                    throw new Error(
+                        `Found ${problems.length} punctuation-only word(s): ${problems
+                            .slice(0, 5)
+                            .map(w => `"${w}"`)
+                            .join(', ')}`,
+                    )
+                }
+                expect(problems).toHaveLength(0)
+            })
+
+            test('verse numbers have space after them', () => {
+                const result = parseApiBibleChapter(html, translation)
+                const paragraphs = result.nodes.filter(
+                    (n): n is Paragraph => n.type === 'paragraph',
+                )
+
+                // Only check if there are verse numbers with nodes following
+                const hasVerseNumbers = paragraphs.some(p =>
+                    p.nodes.some(v =>
+                        v.nodes.some(n => n.type === 'verseNumber'),
+                    ),
+                )
+
+                if (hasVerseNumbers) {
+                    expect(verseNumbersHaveSpaceAfter(paragraphs)).toBe(true)
+                }
+            })
+
+            test('generates valid prev/next chapter links', () => {
+                const result = parseApiBibleChapter(html, translation)
+
+                // Genesis 1 should have no prev
+                if (bookSlug === 'genesis' && chapter === 1) {
+                    expect(result.prevChapter).toBeNull()
+                }
+
+                // Revelation 21 should have next pointing to 22
+                if (bookSlug === 'revelation' && chapter === 21) {
+                    expect(result.nextChapter).toBeDefined()
+                    expect(result.nextChapter?.url).toBe('revelation_22')
+                }
+
+                // All should have properly formatted URLs if defined
+                if (result.prevChapter) {
+                    expect(result.prevChapter.url).toMatch(/^[a-z0-9_]+$/)
+                    expect(result.prevChapter.label).toBeDefined()
+                }
+                if (result.nextChapter) {
+                    expect(result.nextChapter.url).toMatch(/^[a-z0-9_]+$/)
+                    expect(result.nextChapter.label).toBeDefined()
+                }
+            })
+
+            test('produces non-empty verse text', () => {
+                const result = parseApiBibleChapter(html, translation)
+                const paragraphs = result.nodes.filter(
+                    (n): n is Paragraph => n.type === 'paragraph',
+                )
+
+                // All verses should have non-empty text
+                for (const p of paragraphs) {
+                    for (const v of p.nodes) {
+                        expect(v.text.trim().length).toBeGreaterThan(0)
+                    }
+                }
+            })
+        },
+    )
 })

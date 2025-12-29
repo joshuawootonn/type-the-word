@@ -8,10 +8,10 @@ import { isAtomComplete } from '~/lib/keystroke'
 import {
     Block,
     Inline,
-    Paragraph,
     ParsedPassage,
     parseNextChapter,
     parsePrevChapter,
+    Translation,
     Verse,
     VerseNumber,
     Word,
@@ -24,12 +24,19 @@ import { Book } from '~/lib/types/book'
  * API.Bible HTML structure is different from ESV:
  * - Verse numbers: <span data-number="1" data-sid="GEN 1:1" class="v">1</span>
  * - Section headers: <p class="s1">, <p class="s2">
- * - Paragraphs: <p class="m">, <p class="pmo">, <p class="q1">, <p class="q2">
+ * - Paragraphs: <p class="m">, <p class="pmo">, <p class="q1">, <p class="q2">, <p class="li1">, etc.
  * - Cross-references: <p class="r"> (skipped)
  * - Blank paragraphs: <p class="b"> (skipped)
+ * - Hebrew letter headers: <p class="qa"> (skipped as headings)
+ * - Chapter labels: <p class="cl"> (skipped)
  * - Continuation verses: <p data-vid="GEN 1:5"> (verse continues from previous paragraph)
+ * - Verse spans: <span class="verse-span"> (content wrapper, parse children)
+ * - Divine names: <span class="nd"> (content, parse children)
  */
-export function parseApiBibleChapter(passage: string): ParsedPassage {
+export function parseApiBibleChapter(
+    passage: string,
+    translation: Exclude<Translation, 'esv'> = 'bsb',
+): ParsedPassage {
     const dom = new JSDOM(passage)
 
     const html = parseFragment(dom.serialize())
@@ -39,7 +46,10 @@ export function parseApiBibleChapter(passage: string): ParsedPassage {
         firstVerseOfPassage?: VerseNumber
         chapter?: number
         book?: Book
-    } = {}
+        translation: Exclude<Translation, 'esv'>
+    } = {
+        translation,
+    }
 
     function getAttr(node: Element, name: string): string | undefined {
         return node.attrs?.find(attr => attr.name === name)?.value
@@ -52,38 +62,48 @@ export function parseApiBibleChapter(passage: string): ParsedPassage {
 
     function parseInline(node: ChildNode): Inline[] {
         if (node.nodeName === '#text' && 'value' in node) {
-            const leadingSpaces = new Array<{ type: 'space' }>(
-                node.value.length - node.value.trimStart().length,
-            ).fill({
-                type: 'space',
-            })
-
+            // Skip leading whitespace - it will be handled by adding space after verse numbers
+            // or by other spacing logic
             const wordSegments = splitLineBySpaceOrNewLine(node.value)
             const words =
                 wordSegments.length > 0
-                    ? wordSegments.map((word): Inline => {
-                          const letters = word.split('')
-                          const atom: Word = {
-                              type: 'word',
-                              letters,
-                          }
+                    ? wordSegments
+                          .filter(word => {
+                              // Filter out segments that are just punctuation or whitespace
+                              // (e.g., commas from footnote markers)
+                              return /[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]/.test(
+                                  word,
+                              )
+                          })
+                          .map((word): Inline => {
+                              const letters = word.split('')
+                              const atom: Word = {
+                                  type: 'word',
+                                  letters,
+                              }
 
-                          return isAtomComplete(atom)
-                              ? atom
-                              : { ...atom, letters: [...atom.letters, ' '] }
-                      })
+                              return isAtomComplete(atom)
+                                  ? atom
+                                  : { ...atom, letters: [...atom.letters, ' '] }
+                          })
                     : []
 
-            return [...leadingSpaces, ...words]
+            return words
         }
 
         // API.Bible verse numbers: <span data-number="1" data-sid="GEN 1:1" class="v">
+        // Also handles verse ranges like: <span data-number="1-2" data-sid="GEN 1:1-2" class="v">
         if (node.nodeName === 'span' && 'attrs' in node) {
+            // Skip footnote markers (sup class contains commas/references)
+            if (hasClass(node, 'sup')) {
+                return []
+            }
+
             const dataSid = getAttr(node, 'data-sid')
             const dataNumber = getAttr(node, 'data-number')
 
             if (dataSid && dataNumber && hasClass(node, 'v')) {
-                // Parse data-sid like "GEN 1:1"
+                // Parse data-sid like "GEN 1:1" or "GEN 1:1-2"
                 const parts = dataSid.split(':')
                 const bookChapter = parts[0]
                 const verseStr = parts[1]
@@ -98,7 +118,13 @@ export function parseApiBibleChapter(passage: string): ParsedPassage {
 
                 const book = apiBibleIdToBook[bookId]
                 const chapter = parseInt(chapterStr)
-                const verse = parseInt(verseStr)
+
+                // Handle verse ranges like "1-2" - extract first verse number
+                const verseMatch = verseStr.match(/^(\d+)/)
+                const verse =
+                    verseMatch?.[1] != null
+                        ? parseInt(verseMatch[1])
+                        : parseInt(verseStr)
 
                 if (book) {
                     context.book = book
@@ -112,7 +138,7 @@ export function parseApiBibleChapter(passage: string): ParsedPassage {
                             verse,
                             chapter,
                             book,
-                            translation: 'bsb',
+                            translation: context.translation,
                         },
                         { type: 'space' },
                     ]
@@ -188,6 +214,16 @@ export function parseApiBibleChapter(passage: string): ParsedPassage {
             return null
         }
 
+        // Skip Hebrew letter headers (qa)
+        if (hasClass(node, 'qa')) {
+            return null
+        }
+
+        // Skip chapter labels (cl)
+        if (hasClass(node, 'cl')) {
+            return null
+        }
+
         // Section headers: s1 (main title), s2 (subsection)
         if (hasClass(node, 's1')) {
             const text = node.childNodes
@@ -213,15 +249,32 @@ export function parseApiBibleChapter(passage: string): ParsedPassage {
             }
         }
 
-        // Regular paragraph or poetry (m, pmo, q1, q2)
-        if (
+        // Regular paragraph or poetry (m, pmo, q1, q2, li1, qm1, qm2, mi, etc.)
+        // Also match paragraphs with no class or just data-vid
+        const isContentParagraph =
             hasClass(node, 'm') ||
             hasClass(node, 'pmo') ||
+            hasClass(node, 'q') || // Poetry (NASB)
             hasClass(node, 'q1') ||
             hasClass(node, 'q2') ||
+            hasClass(node, 'qc') || // Centered poetry (CSB)
             hasClass(node, 'pm') ||
-            hasClass(node, 'p')
-        ) {
+            hasClass(node, 'p') ||
+            hasClass(node, 'lh') || // List header (NIV)
+            hasClass(node, 'li1') ||
+            hasClass(node, 'li2') ||
+            hasClass(node, 'qm1') ||
+            hasClass(node, 'qm2') ||
+            hasClass(node, 'mi') ||
+            hasClass(node, 'pi') ||
+            hasClass(node, 'd') || // Descriptive title
+            hasClass(node, 'ms2') || // Manuscript section header (NASB treats as content)
+            hasClass(node, 's') || // Simple section header (may contain content)
+            dataVid != null || // Continuation paragraph
+            classAttr === '' || // Empty class
+            classAttr == null // No class attribute
+
+        if (isContentParagraph) {
             const nodes: Inline[] = node.childNodes.flatMap(parseInline)
 
             if (inlineToString(nodes).trim() === '') {
@@ -260,17 +313,21 @@ export function parseApiBibleChapter(passage: string): ParsedPassage {
 
                     context.lastVerse = verses.at(-1)
 
+                    const isPoetry =
+                        hasClass(node, 'q') ||
+                        hasClass(node, 'q1') ||
+                        hasClass(node, 'q2') ||
+                        hasClass(node, 'qc') ||
+                        hasClass(node, 'qm1') ||
+                        hasClass(node, 'qm2')
+
                     return {
                         type: 'paragraph',
                         text: inlineToString(nodes),
                         nodes: verses,
                         metadata: {
-                            type:
-                                hasClass(node, 'q1') || hasClass(node, 'q2')
-                                    ? 'quote'
-                                    : 'default',
-                            blockIndent:
-                                hasClass(node, 'q1') || hasClass(node, 'q2'),
+                            type: isPoetry ? 'quote' : 'default',
+                            blockIndent: isPoetry,
                         },
                     }
                 }
@@ -350,16 +407,21 @@ export function parseApiBibleChapter(passage: string): ParsedPassage {
                 return null
             }
 
+            const isPoetryBlock =
+                hasClass(node, 'q') ||
+                hasClass(node, 'q1') ||
+                hasClass(node, 'q2') ||
+                hasClass(node, 'qc') ||
+                hasClass(node, 'qm1') ||
+                hasClass(node, 'qm2')
+
             return {
                 type: 'paragraph',
                 text: inlineToString(nodes),
                 nodes: verses,
                 metadata: {
-                    type:
-                        hasClass(node, 'q1') || hasClass(node, 'q2')
-                            ? 'quote'
-                            : 'default',
-                    blockIndent: hasClass(node, 'q1') || hasClass(node, 'q2'),
+                    type: isPoetryBlock ? 'quote' : 'default',
+                    blockIndent: isPoetryBlock,
                 },
             }
         }
