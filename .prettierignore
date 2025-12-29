@@ -1,2 +1,2 @@
-/src/server/*.html
+/src/server/**/*.html
 /src/app/favicon.ico
