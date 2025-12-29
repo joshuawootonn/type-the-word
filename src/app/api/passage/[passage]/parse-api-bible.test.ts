@@ -268,6 +268,161 @@ describe('Opening paragraph handling (po class)', () => {
     })
 })
 
+describe('Poetry paragraph merging', () => {
+    // Poetry lines (q1, q2, etc.) should be merged into single paragraphs
+    // to avoid excessive margin between lines. Stanza breaks (<p class="b">)
+    // and Hebrew letter headers (<p class="qa">) should create new paragraphs.
+
+    const nivPsalm23Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/niv/psalm_23.html',
+        ),
+        'utf8',
+    )
+
+    const nivPsalm119Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/niv/psalm_119.html',
+        ),
+        'utf8',
+    )
+
+    test('Psalm 23 merges poetry lines into few paragraphs (not one per line)', () => {
+        const result = parseApiBibleChapter(nivPsalm23Html, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Should have far fewer paragraphs than 20 (which was one per line)
+        // Stanza break after verse 4 creates 2 paragraphs
+        expect(paragraphs.length).toBeLessThanOrEqual(3)
+        expect(paragraphs.length).toBeGreaterThanOrEqual(1)
+    })
+
+    test('Psalm 23 respects stanza breaks', () => {
+        const result = parseApiBibleChapter(nivPsalm23Html, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Should have 2 paragraphs due to stanza break between v4 and v5
+        expect(paragraphs.length).toBe(2)
+
+        // First paragraph should contain verses 1-4
+        const firstParagraphVerses = new Set(
+            paragraphs[0]!.nodes.map(v => v.verse.verse),
+        )
+        expect(firstParagraphVerses.has(1)).toBe(true)
+        expect(firstParagraphVerses.has(4)).toBe(true)
+        expect(firstParagraphVerses.has(5)).toBe(false)
+
+        // Second paragraph should contain verses 5-6
+        const secondParagraphVerses = new Set(
+            paragraphs[1]!.nodes.map(v => v.verse.verse),
+        )
+        expect(secondParagraphVerses.has(5)).toBe(true)
+        expect(secondParagraphVerses.has(6)).toBe(true)
+    })
+
+    test('Psalm 23 poetry paragraphs contain newLine elements between lines', () => {
+        const result = parseApiBibleChapter(nivPsalm23Html, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Each paragraph should have newLine elements between verses
+        for (const p of paragraphs) {
+            const hasNewLines = p.nodes.some(verse =>
+                verse.nodes.some(node => node.type === 'newLine'),
+            )
+            // Paragraphs with multiple verses should have newlines
+            if (p.nodes.length > 1) {
+                expect(hasNewLines).toBe(true)
+            }
+        }
+    })
+
+    test('Psalm 119 splits into sections by Hebrew letter headers', () => {
+        const result = parseApiBibleChapter(nivPsalm119Html, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Should have 22 paragraphs (one per Hebrew letter section)
+        // Each section has 8 verses, 22 sections × 8 = 176 verses
+        expect(paragraphs.length).toBe(22)
+    })
+
+    test('Psalm 119 each section contains 8 verses', () => {
+        const result = parseApiBibleChapter(nivPsalm119Html, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Each section should have exactly 8 unique verse numbers
+        for (const p of paragraphs) {
+            const verseNumbers = new Set(p.nodes.map(v => v.verse.verse))
+            expect(verseNumbers.size).toBe(8)
+        }
+    })
+
+    test('Psalm 119 Hebrew letter headers are converted to h4', () => {
+        const result = parseApiBibleChapter(nivPsalm119Html, 'niv')
+
+        const h4Headers = result.nodes.filter(n => n.type === 'h4')
+
+        // Should have 22 Hebrew letter headers (Aleph through Tav)
+        expect(h4Headers.length).toBe(22)
+    })
+
+    test('all 6 verses in Psalm 23 are preserved after merging', () => {
+        const result = parseApiBibleChapter(nivPsalm23Html, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        const allVerseNumbers = new Set<number>()
+        for (const p of paragraphs) {
+            for (const v of p.nodes) {
+                allVerseNumbers.add(v.verse.verse)
+            }
+        }
+
+        expect(allVerseNumbers.size).toBe(6)
+        for (let i = 1; i <= 6; i++) {
+            expect(allVerseNumbers.has(i)).toBe(true)
+        }
+    })
+
+    test('all 176 verses in Psalm 119 are preserved after merging', () => {
+        const result = parseApiBibleChapter(nivPsalm119Html, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        const allVerseNumbers = new Set<number>()
+        for (const p of paragraphs) {
+            for (const v of p.nodes) {
+                allVerseNumbers.add(v.verse.verse)
+            }
+        }
+
+        expect(allVerseNumbers.size).toBe(176)
+        for (let i = 1; i <= 176; i++) {
+            expect(allVerseNumbers.has(i)).toBe(true)
+        }
+    })
+})
+
 // ============================================================================
 // COMPREHENSIVE PARAMETERIZED TESTS FOR ALL TRANSLATIONS
 // ============================================================================

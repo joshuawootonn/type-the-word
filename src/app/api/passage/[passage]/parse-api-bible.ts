@@ -198,16 +198,21 @@ export function parseApiBibleChapter(
         return null
     }
 
-    function parseBlock(node: ChildNode): Block | null {
+    type ParsedBlock =
+        | Block
+        | { type: 'stanzaBreak' }
+        | { type: 'poetryLine'; paragraph: Block & { type: 'paragraph' } }
+
+    function parseBlock(node: ChildNode): ParsedBlock | null {
         if (node.nodeName !== 'p') return null
         if (!('attrs' in node)) return null
 
         const classAttr = getAttr(node, 'class')
         const dataVid = getAttr(node, 'data-vid')
 
-        // Skip blank paragraphs
+        // Blank paragraphs indicate stanza breaks in poetry
         if (hasClass(node, 'b')) {
-            return null
+            return { type: 'stanzaBreak' }
         }
 
         // Skip cross-reference paragraphs
@@ -215,9 +220,17 @@ export function parseApiBibleChapter(
             return null
         }
 
-        // Skip Hebrew letter headers (qa)
+        // Hebrew letter headers (qa) - treat as section headers (h4)
         if (hasClass(node, 'qa')) {
-            return null
+            const text = node.childNodes
+                .flatMap(parseInline)
+                .filter((n): n is Word => n.type === 'word')
+                .map(n => n.letters.join(''))
+                .join(' ')
+            return {
+                type: 'h4',
+                text,
+            }
         }
 
         // Skip chapter labels (cl)
@@ -323,15 +336,23 @@ export function parseApiBibleChapter(
                         hasClass(node, 'qm1') ||
                         hasClass(node, 'qm2')
 
-                    return {
-                        type: 'paragraph',
+                    const paragraph = {
+                        type: 'paragraph' as const,
                         text: inlineToString(nodes),
                         nodes: verses,
                         metadata: {
-                            type: isPoetry ? 'quote' : 'default',
+                            type: isPoetry
+                                ? ('quote' as const)
+                                : ('default' as const),
                             blockIndent: isPoetry,
                         },
                     }
+
+                    // Return as poetry line to enable merging
+                    if (isPoetry) {
+                        return { type: 'poetryLine', paragraph }
+                    }
+                    return paragraph
                 }
             }
 
@@ -417,27 +438,79 @@ export function parseApiBibleChapter(
                 hasClass(node, 'qm1') ||
                 hasClass(node, 'qm2')
 
-            return {
-                type: 'paragraph',
+            const paragraph = {
+                type: 'paragraph' as const,
                 text: inlineToString(nodes),
                 nodes: verses,
                 metadata: {
-                    type: isPoetryBlock ? 'quote' : 'default',
+                    type: isPoetryBlock
+                        ? ('quote' as const)
+                        : ('default' as const),
                     blockIndent: isPoetryBlock,
                 },
             }
+
+            // Return as poetry line to enable merging
+            if (isPoetryBlock) {
+                return { type: 'poetryLine', paragraph }
+            }
+            return paragraph
         }
 
         return null
     }
 
     const nodes: Block[] = []
+    let currentPoetryParagraph: (Block & { type: 'paragraph' }) | null = null
+
     for (const node of html.childNodes) {
         const parsed = parseBlock(node)
 
         if (parsed == null) continue
 
+        if (parsed.type === 'stanzaBreak') {
+            // Stanza break - finalize current poetry paragraph and start fresh
+            if (currentPoetryParagraph) {
+                nodes.push(currentPoetryParagraph)
+                currentPoetryParagraph = null
+            }
+            continue
+        }
+
+        if (parsed.type === 'poetryLine') {
+            if (currentPoetryParagraph) {
+                // Merge into current poetry paragraph
+                // Add newline to last word of last verse in current paragraph
+                const lastVerse =
+                    currentPoetryParagraph.nodes[
+                        currentPoetryParagraph.nodes.length - 1
+                    ]
+                if (lastVerse) {
+                    lastVerse.nodes.push({ type: 'newLine' })
+                }
+
+                // Append verses from new line
+                currentPoetryParagraph.nodes.push(...parsed.paragraph.nodes)
+                currentPoetryParagraph.text += '\n' + parsed.paragraph.text
+            } else {
+                // Start new poetry paragraph
+                currentPoetryParagraph = parsed.paragraph
+            }
+            continue
+        }
+
+        // Non-poetry block - finalize any current poetry paragraph first
+        if (currentPoetryParagraph) {
+            nodes.push(currentPoetryParagraph)
+            currentPoetryParagraph = null
+        }
+
         nodes.push(parsed)
+    }
+
+    // Don't forget to add the last poetry paragraph if we ended with one
+    if (currentPoetryParagraph) {
+        nodes.push(currentPoetryParagraph)
     }
 
     if (context.book == undefined) {
