@@ -291,6 +291,20 @@ export function parseApiBibleChapter(
             }
         }
 
+        // Speaker labels: sp (e.g., "She", "Friends" in Song of Solomon)
+        // These are headings indicating who is speaking, not typeable content
+        if (hasClass(node, 'sp')) {
+            const text = node.childNodes
+                .flatMap(parseInline)
+                .filter((n): n is Word => n.type === 'word')
+                .map(n => n.letters.join(''))
+                .join(' ')
+            return {
+                type: 'h4',
+                text,
+            }
+        }
+
         // Regular paragraph or poetry (m, pmo, q1, q2, li1, qm1, qm2, mi, etc.)
         // Also match paragraphs with no class or just data-vid
         const isContentParagraph =

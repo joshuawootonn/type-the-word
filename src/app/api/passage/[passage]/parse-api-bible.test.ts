@@ -574,6 +574,78 @@ describe('Poetry indentation', () => {
     })
 })
 
+describe('Speaker labels (Song of Solomon)', () => {
+    // Song of Solomon has speaker labels like "She", "Friends", "He"
+    // These should be parsed as h4 headings, not typeable content
+
+    const nivSongHtml = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/niv/song_of_solomon_1.html',
+        ),
+        'utf8',
+    )
+
+    test('speaker labels are parsed as h4 headings', () => {
+        const result = parseApiBibleChapter(nivSongHtml, 'niv')
+
+        const h4Headers = result.nodes.filter(n => n.type === 'h4')
+
+        // NIV Song of Solomon 1 has several speaker labels
+        expect(h4Headers.length).toBeGreaterThan(0)
+    })
+
+    test('speaker labels contain expected text', () => {
+        const result = parseApiBibleChapter(nivSongHtml, 'niv')
+
+        const h4Headers = result.nodes.filter(n => n.type === 'h4')
+        const speakerTexts = h4Headers.map(h =>
+            h.type === 'h4' ? h.text.trim() : '',
+        )
+
+        // Should have speakers like "She", "Friends", "He"
+        expect(speakerTexts.some(t => t === 'She')).toBe(true)
+        expect(speakerTexts.some(t => t === 'Friends')).toBe(true)
+        expect(speakerTexts.some(t => t === 'He')).toBe(true)
+    })
+
+    test('speaker labels are not included in paragraph text', () => {
+        const result = parseApiBibleChapter(nivSongHtml, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Check that no paragraph contains just "She", "Friends", or "He"
+        for (const p of paragraphs) {
+            const text = p.text.trim()
+            expect(text).not.toBe('She')
+            expect(text).not.toBe('Friends')
+            expect(text).not.toBe('He')
+        }
+    })
+
+    test('all 17 verses are still parsed correctly', () => {
+        const result = parseApiBibleChapter(nivSongHtml, 'niv')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        const allVerseNumbers = new Set<number>()
+        for (const p of paragraphs) {
+            for (const v of p.nodes) {
+                allVerseNumbers.add(v.verse.verse)
+            }
+        }
+
+        expect(allVerseNumbers.size).toBe(17)
+        for (let i = 1; i <= 17; i++) {
+            expect(allVerseNumbers.has(i)).toBe(true)
+        }
+    })
+})
+
 // ============================================================================
 // COMPREHENSIVE PARAMETERIZED TESTS FOR ALL TRANSLATIONS
 // ============================================================================
@@ -666,6 +738,12 @@ const CHAPTERS: Array<{
         chapter: 21,
         expectedVerses: 27,
         bookSlug: 'revelation',
+    },
+    {
+        book: 'song_of_solomon',
+        chapter: 1,
+        expectedVerses: 17,
+        bookSlug: 'song_of_solomon',
     },
 ]
 
