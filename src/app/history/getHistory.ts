@@ -1,4 +1,5 @@
 import { db } from '~/server/db'
+import { Translation } from '~/server/db/schema'
 import { UserDailyActivityRepository } from '~/server/repositories/userDailyActivity.repository'
 import { UserProgressRepository } from '~/server/repositories/userProgress.repository'
 
@@ -6,9 +7,15 @@ import { MonthlyLogDTO, getLogFromCache } from './log2'
 import { BookOverview, getBookOverviewFromCache } from './overview'
 import { WpmChartData, getDailyStatsFromCache } from './wpm'
 
-export async function getOverviewData(userId: string): Promise<BookOverview[]> {
+export async function getOverviewData(
+    userId: string,
+    translation: Translation,
+): Promise<BookOverview[]> {
     const userProgressRepository = new UserProgressRepository(db)
-    const progressData = await userProgressRepository.getByUserId(userId)
+    const progressData = await userProgressRepository.getByUserId(
+        userId,
+        translation,
+    )
     return getBookOverviewFromCache(progressData)
 }
 

@@ -23,6 +23,7 @@ export type ParsedPassage = {
     book: schema.Book
     chapter: number
     verses: number[]
+    translation?: schema.Translation
 }
 
 /**
@@ -43,12 +44,24 @@ export function formatVerseReference(
  * e.g., "Genesis 1:1" -> { book: 'genesis', chapter: 1, verses: [1] }
  * e.g., "Luke 7:24-36" -> { book: 'luke', chapter: 7, verses: [24,25,...,36] }
  * e.g., "1 Corinthians 13:4-7, 10" -> { book: '1_corinthians', chapter: 13, verses: [4,5,6,7,10] }
+ * e.g., "Genesis 1:1 (ESV)" -> { book: 'genesis', chapter: 1, verses: [1], translation: 'esv' }
  */
 export function parsePassageString(passage: string): ParsedPassage | null {
+    // Extract translation suffix if present: "Genesis 1:1 (ESV)" -> translation = "esv"
+    let translation: schema.Translation | undefined
+    let passageWithoutTranslation = passage
+    const translationMatch = passage.match(/\s+\(([A-Z]+)\)$/)
+    if (translationMatch?.[1]) {
+        translation = translationMatch[1].toLowerCase() as schema.Translation
+        passageWithoutTranslation = passage
+            .slice(0, -translationMatch[0].length)
+            .trim()
+    }
+
     // Match pattern: "Book Name Chapter:Verses"
     // Book name can include numbers at start (1 Corinthians) and multiple words (Song Of Solomon)
     // Verses can be single (1), range (1-5), or comma-separated (1-3, 5, 7-9)
-    const match = passage.match(/^(.+?)\s+(\d+):(.+)$/)
+    const match = passageWithoutTranslation.match(/^(.+?)\s+(\d+):(.+)$/)
     if (!match) return null
 
     const [, bookName, chapterStr, versesStr] = match
@@ -86,7 +99,7 @@ export function parsePassageString(passage: string): ParsedPassage | null {
         }
     }
 
-    return { book, chapter, verses }
+    return { book, chapter, verses, translation }
 }
 
 /**
@@ -128,57 +141,67 @@ function formatVerseSegments(verses: number[]): string {
 }
 
 /**
+ * Key for grouping passages by book, chapter, and translation
+ */
+type PassageKey = `${schema.Book}:${number}:${schema.Translation}`
+
+/**
  * Consolidate passages by merging consecutive verses into ranges.
- * Takes existing passages and a new verse, returns a consolidated array.
+ * Takes existing passages and a new verse with translation, returns a consolidated array.
+ * Each passage includes the translation suffix (e.g., "Genesis 1:1-5 (ESV)").
  *
  * Example:
- * Input: ["Luke 7:24-36", "Luke 7:37"], newVerse: {book: 'luke', chapter: 7, verse: 38}
- * Output: ["Luke 7:24-38"]
+ * Input: ["Luke 7:24-36 (ESV)", "Luke 7:37 (ESV)"], newVerse: {book: 'luke', chapter: 7, verse: 38}, translation: 'esv'
+ * Output: ["Luke 7:24-38 (ESV)"]
  */
 export function consolidatePassages(
     existingPassages: string[],
     newVerse: { book: schema.Book; chapter: number; verse: number },
+    translation: schema.Translation,
 ): string[] {
-    // Build a map of book -> chapter -> verses
-    const passageMap = new Map<schema.Book, Map<number, Set<number>>>()
+    // Build a map of (book, chapter, translation) -> verses
+    const passageMap = new Map<PassageKey, Set<number>>()
 
     // Parse existing passages
     for (const passage of existingPassages) {
         const parsed = parsePassageString(passage)
         if (!parsed) continue
 
-        if (!passageMap.has(parsed.book)) {
-            passageMap.set(parsed.book, new Map())
+        // Use the parsed translation or default to 'esv' for legacy passages
+        const passageTranslation = parsed.translation ?? 'esv'
+        const key: PassageKey = `${parsed.book}:${parsed.chapter}:${passageTranslation}`
+
+        if (!passageMap.has(key)) {
+            passageMap.set(key, new Set())
         }
-        const bookMap = passageMap.get(parsed.book)!
-        if (!bookMap.has(parsed.chapter)) {
-            bookMap.set(parsed.chapter, new Set())
-        }
-        const chapterSet = bookMap.get(parsed.chapter)!
+        const versesSet = passageMap.get(key)!
         for (const v of parsed.verses) {
-            chapterSet.add(v)
+            versesSet.add(v)
         }
     }
 
-    // Add new verse
-    if (!passageMap.has(newVerse.book)) {
-        passageMap.set(newVerse.book, new Map())
+    // Add new verse with the given translation
+    const newKey: PassageKey = `${newVerse.book}:${newVerse.chapter}:${translation}`
+    if (!passageMap.has(newKey)) {
+        passageMap.set(newKey, new Set())
     }
-    const bookMap = passageMap.get(newVerse.book)!
-    if (!bookMap.has(newVerse.chapter)) {
-        bookMap.set(newVerse.chapter, new Set())
-    }
-    bookMap.get(newVerse.chapter)!.add(newVerse.verse)
+    passageMap.get(newKey)!.add(newVerse.verse)
 
-    // Convert back to passage strings
+    // Convert back to passage strings with translation suffix
     const result: string[] = []
-    for (const [book, chapters] of passageMap) {
+    for (const [key, versesSet] of passageMap) {
+        const [book, chapterStr, trans] = key.split(':') as [
+            schema.Book,
+            string,
+            schema.Translation,
+        ]
         const bookName = toProperCase(book.split('_').join(' '))
-        for (const [chapter, versesSet] of chapters) {
-            const versesArray = Array.from(versesSet)
-            const versesFormatted = formatVerseSegments(versesArray)
-            result.push(`${bookName} ${chapter}:${versesFormatted}`)
-        }
+        const chapter = parseInt(chapterStr, 10)
+        const versesArray = Array.from(versesSet)
+        const versesFormatted = formatVerseSegments(versesArray)
+        result.push(
+            `${bookName} ${chapter}:${versesFormatted} (${trans.toUpperCase()})`,
+        )
     }
 
     return result
@@ -202,7 +225,7 @@ export class UserDailyActivityRepository {
 
     /**
      * Record activity for a single verse typed
-     * Uses read-modify-write to consolidate passages into ranges (e.g., "Luke 7:24-38")
+     * Uses read-modify-write to consolidate passages into ranges (e.g., "Luke 7:24-38 (ESV)")
      * Optionally updates running averages for WPM/accuracy if stats are provided
      */
     async recordActivity(
@@ -211,6 +234,7 @@ export class UserDailyActivityRepository {
         book: schema.Book,
         chapter: number,
         verse: number,
+        translation: schema.Translation,
         stats?: VerseStats | null,
     ): Promise<void> {
         // Normalize to start of day (UTC)
@@ -225,10 +249,11 @@ export class UserDailyActivityRepository {
             ),
         })
 
-        // Consolidate passages with the new verse
+        // Consolidate passages with the new verse and translation
         const consolidatedPassages = consolidatePassages(
             existing?.passages ?? [],
             { book, chapter, verse },
+            translation,
         )
 
         if (stats) {
@@ -323,13 +348,25 @@ export class UserDailyActivityRepository {
             const dayStart = new Date(row.date)
             dayStart.setUTCHours(0, 0, 0, 0)
 
+            // Normalize passages to include translation suffix (default to ESV for legacy passages)
+            const normalizedPassages = row.passages.map(passage => {
+                const parsed = parsePassageString(passage)
+                if (!parsed) return passage
+
+                // If no translation suffix, assume ESV
+                const translation = parsed.translation ?? 'esv'
+                const bookName = toProperCase(parsed.book.split('_').join(' '))
+                const versesFormatted = formatVerseSegments(parsed.verses)
+                return `${bookName} ${parsed.chapter}:${versesFormatted} (${translation.toUpperCase()})`
+            })
+
             await this.db
                 .insert(schema.userDailyActivity)
                 .values({
                     userId: row.userId,
                     date: dayStart,
                     verseCount: row.verseCount,
-                    passages: row.passages,
+                    passages: normalizedPassages,
                     averageWpm: row.averageWpm ?? null,
                     averageAccuracy: row.averageAccuracy ?? null,
                     averageCorrectedAccuracy:
@@ -344,7 +381,7 @@ export class UserDailyActivityRepository {
                     ],
                     set: {
                         verseCount: row.verseCount,
-                        passages: row.passages,
+                        passages: normalizedPassages,
                         averageWpm: row.averageWpm ?? null,
                         averageAccuracy: row.averageAccuracy ?? null,
                         averageCorrectedAccuracy:

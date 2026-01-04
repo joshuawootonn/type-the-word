@@ -122,6 +122,7 @@ export const POST = async function POST(
         verse.book,
         verse.chapter,
         verse.verse,
+        verse.translation,
         stats,
     )
 

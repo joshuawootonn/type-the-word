@@ -21,15 +21,24 @@ export class UserProgressRepository {
     }
 
     /**
-     * Get all progress for a user (books and chapters)
+     * Get all progress for a user (books and chapters) filtered by translation
      */
-    async getByUserId(userId: string): Promise<UserProgressData> {
+    async getByUserId(
+        userId: string,
+        translation: schema.Translation,
+    ): Promise<UserProgressData> {
         const [books, chapters] = await Promise.all([
             this.db.query.userBookProgress.findMany({
-                where: eq(schema.userBookProgress.userId, userId),
+                where: and(
+                    eq(schema.userBookProgress.userId, userId),
+                    eq(schema.userBookProgress.translation, translation),
+                ),
             }),
             this.db.query.userChapterProgress.findMany({
-                where: eq(schema.userChapterProgress.userId, userId),
+                where: and(
+                    eq(schema.userChapterProgress.userId, userId),
+                    eq(schema.userChapterProgress.translation, translation),
+                ),
             }),
         ])
 

@@ -25,6 +25,11 @@ import {
     passageReferenceSchema,
 } from '~/lib/passageReference'
 import { toPassageSegment } from '~/lib/passageSegment'
+import {
+    allTranslations,
+    defaultTranslations,
+    validTranslations,
+} from '~/lib/translations'
 import { Book, bookSchema } from '~/lib/types/book'
 
 import metadata from '../lib/simple-bible-metadata.json'
@@ -42,24 +47,6 @@ const simpleBibleMetadataSchema = z.record(
 const simpleBibleMetadata = simpleBibleMetadataSchema.parse(metadata)
 
 const books = Object.keys(metadata) as Book[]
-
-const allTranslations: { value: Translation; label: string }[] = [
-    { value: 'esv', label: 'ESV' },
-    { value: 'bsb', label: 'BSB' },
-    { value: 'nlt', label: 'NLT' },
-    { value: 'niv', label: 'NIV' },
-    { value: 'csb', label: 'CSB' },
-    { value: 'nkjv', label: 'NKJV' },
-    { value: 'nasb', label: 'NASB' },
-    { value: 'ntv', label: 'NTV' },
-    { value: 'msg', label: 'MSG' },
-]
-
-const defaultTranslations: { value: Translation; label: string }[] = [
-    { value: 'esv', label: 'ESV' },
-]
-
-const validTranslations = allTranslations.map(t => t.value)
 
 const ForwardedRefInput = forwardRef(function InnerForwardedRefInput(
     props: ComponentPropsWithoutRef<'input'>,

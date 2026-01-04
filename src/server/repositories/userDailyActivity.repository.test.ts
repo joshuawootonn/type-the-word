@@ -80,150 +80,274 @@ describe('parsePassageString', () => {
 
 describe('consolidatePassages', () => {
     it('creates new passage for empty existing passages', () => {
-        const result = consolidatePassages([], {
-            book: 'genesis',
-            chapter: 1,
-            verse: 1,
-        })
-        expect(result).toEqual(['Genesis 1:1'])
+        const result = consolidatePassages(
+            [],
+            {
+                book: 'genesis',
+                chapter: 1,
+                verse: 1,
+            },
+            'esv',
+        )
+        expect(result).toEqual(['Genesis 1:1 (ESV)'])
     })
 
     it('consolidates consecutive verses into a range', () => {
         // Start with verses 1-3
-        let result = consolidatePassages([], {
-            book: 'luke',
-            chapter: 7,
-            verse: 24,
-        })
-        result = consolidatePassages(result, {
-            book: 'luke',
-            chapter: 7,
-            verse: 25,
-        })
-        result = consolidatePassages(result, {
-            book: 'luke',
-            chapter: 7,
-            verse: 26,
-        })
+        let result = consolidatePassages(
+            [],
+            {
+                book: 'luke',
+                chapter: 7,
+                verse: 24,
+            },
+            'esv',
+        )
+        result = consolidatePassages(
+            result,
+            {
+                book: 'luke',
+                chapter: 7,
+                verse: 25,
+            },
+            'esv',
+        )
+        result = consolidatePassages(
+            result,
+            {
+                book: 'luke',
+                chapter: 7,
+                verse: 26,
+            },
+            'esv',
+        )
 
-        expect(result).toEqual(['Luke 7:24-26'])
+        expect(result).toEqual(['Luke 7:24-26 (ESV)'])
     })
 
     it('consolidates when adding to existing range', () => {
         // This is the key case from the issue
-        const result = consolidatePassages(['Luke 7:24-36', 'Luke 7:37'], {
-            book: 'luke',
-            chapter: 7,
-            verse: 38,
-        })
+        const result = consolidatePassages(
+            ['Luke 7:24-36 (ESV)', 'Luke 7:37 (ESV)'],
+            {
+                book: 'luke',
+                chapter: 7,
+                verse: 38,
+            },
+            'esv',
+        )
 
-        expect(result).toEqual(['Luke 7:24-38'])
+        expect(result).toEqual(['Luke 7:24-38 (ESV)'])
     })
 
     it('handles non-consecutive verses as separate entries', () => {
-        let result = consolidatePassages([], {
-            book: 'genesis',
-            chapter: 1,
-            verse: 1,
-        })
-        result = consolidatePassages(result, {
-            book: 'genesis',
-            chapter: 1,
-            verse: 5,
-        })
+        let result = consolidatePassages(
+            [],
+            {
+                book: 'genesis',
+                chapter: 1,
+                verse: 1,
+            },
+            'esv',
+        )
+        result = consolidatePassages(
+            result,
+            {
+                book: 'genesis',
+                chapter: 1,
+                verse: 5,
+            },
+            'esv',
+        )
 
-        expect(result).toEqual(['Genesis 1:1, 5'])
+        expect(result).toEqual(['Genesis 1:1, 5 (ESV)'])
     })
 
     it('keeps different chapters separate', () => {
-        let result = consolidatePassages([], {
-            book: 'genesis',
-            chapter: 1,
-            verse: 1,
-        })
-        result = consolidatePassages(result, {
-            book: 'genesis',
-            chapter: 2,
-            verse: 1,
-        })
+        let result = consolidatePassages(
+            [],
+            {
+                book: 'genesis',
+                chapter: 1,
+                verse: 1,
+            },
+            'esv',
+        )
+        result = consolidatePassages(
+            result,
+            {
+                book: 'genesis',
+                chapter: 2,
+                verse: 1,
+            },
+            'esv',
+        )
 
-        expect(result).toEqual(['Genesis 1:1', 'Genesis 2:1'])
+        expect(result).toEqual(['Genesis 1:1 (ESV)', 'Genesis 2:1 (ESV)'])
     })
 
     it('keeps different books separate', () => {
-        let result = consolidatePassages([], {
-            book: 'genesis',
-            chapter: 1,
-            verse: 1,
-        })
-        result = consolidatePassages(result, {
-            book: 'exodus',
-            chapter: 1,
-            verse: 1,
-        })
+        let result = consolidatePassages(
+            [],
+            {
+                book: 'genesis',
+                chapter: 1,
+                verse: 1,
+            },
+            'esv',
+        )
+        result = consolidatePassages(
+            result,
+            {
+                book: 'exodus',
+                chapter: 1,
+                verse: 1,
+            },
+            'esv',
+        )
 
-        expect(result).toEqual(['Genesis 1:1', 'Exodus 1:1'])
+        expect(result).toEqual(['Genesis 1:1 (ESV)', 'Exodus 1:1 (ESV)'])
     })
 
     it('handles complex consolidation with gaps', () => {
         // Verses 1, 2, 3, 5, 7, 8, 9 -> "1-3, 5, 7-9"
-        let result = consolidatePassages([], {
-            book: 'genesis',
-            chapter: 1,
-            verse: 1,
-        })
-        result = consolidatePassages(result, {
-            book: 'genesis',
-            chapter: 1,
-            verse: 2,
-        })
-        result = consolidatePassages(result, {
-            book: 'genesis',
-            chapter: 1,
-            verse: 3,
-        })
-        result = consolidatePassages(result, {
-            book: 'genesis',
-            chapter: 1,
-            verse: 5,
-        })
-        result = consolidatePassages(result, {
-            book: 'genesis',
-            chapter: 1,
-            verse: 7,
-        })
-        result = consolidatePassages(result, {
-            book: 'genesis',
-            chapter: 1,
-            verse: 8,
-        })
-        result = consolidatePassages(result, {
-            book: 'genesis',
-            chapter: 1,
-            verse: 9,
-        })
+        let result = consolidatePassages(
+            [],
+            {
+                book: 'genesis',
+                chapter: 1,
+                verse: 1,
+            },
+            'esv',
+        )
+        result = consolidatePassages(
+            result,
+            {
+                book: 'genesis',
+                chapter: 1,
+                verse: 2,
+            },
+            'esv',
+        )
+        result = consolidatePassages(
+            result,
+            {
+                book: 'genesis',
+                chapter: 1,
+                verse: 3,
+            },
+            'esv',
+        )
+        result = consolidatePassages(
+            result,
+            {
+                book: 'genesis',
+                chapter: 1,
+                verse: 5,
+            },
+            'esv',
+        )
+        result = consolidatePassages(
+            result,
+            {
+                book: 'genesis',
+                chapter: 1,
+                verse: 7,
+            },
+            'esv',
+        )
+        result = consolidatePassages(
+            result,
+            {
+                book: 'genesis',
+                chapter: 1,
+                verse: 8,
+            },
+            'esv',
+        )
+        result = consolidatePassages(
+            result,
+            {
+                book: 'genesis',
+                chapter: 1,
+                verse: 9,
+            },
+            'esv',
+        )
 
-        expect(result).toEqual(['Genesis 1:1-3, 5, 7-9'])
+        expect(result).toEqual(['Genesis 1:1-3, 5, 7-9 (ESV)'])
     })
 
     it('handles duplicate verses (idempotent)', () => {
-        let result = consolidatePassages([], {
-            book: 'john',
-            chapter: 3,
-            verse: 16,
-        })
-        result = consolidatePassages(result, {
-            book: 'john',
-            chapter: 3,
-            verse: 16,
-        })
-        result = consolidatePassages(result, {
-            book: 'john',
-            chapter: 3,
-            verse: 16,
-        })
+        let result = consolidatePassages(
+            [],
+            {
+                book: 'john',
+                chapter: 3,
+                verse: 16,
+            },
+            'esv',
+        )
+        result = consolidatePassages(
+            result,
+            {
+                book: 'john',
+                chapter: 3,
+                verse: 16,
+            },
+            'esv',
+        )
+        result = consolidatePassages(
+            result,
+            {
+                book: 'john',
+                chapter: 3,
+                verse: 16,
+            },
+            'esv',
+        )
 
-        expect(result).toEqual(['John 3:16'])
+        expect(result).toEqual(['John 3:16 (ESV)'])
+    })
+
+    it('keeps different translations separate', () => {
+        let result = consolidatePassages(
+            [],
+            {
+                book: 'genesis',
+                chapter: 1,
+                verse: 1,
+            },
+            'esv',
+        )
+        result = consolidatePassages(
+            result,
+            {
+                book: 'genesis',
+                chapter: 1,
+                verse: 1,
+            },
+            'niv',
+        )
+
+        expect(result).toContain('Genesis 1:1 (ESV)')
+        expect(result).toContain('Genesis 1:1 (NIV)')
+        expect(result).toHaveLength(2)
+    })
+
+    it('handles legacy passages without translation suffix', () => {
+        // Legacy passages without translation are assumed to be ESV
+        const result = consolidatePassages(
+            ['Genesis 1:1'],
+            {
+                book: 'genesis',
+                chapter: 1,
+                verse: 2,
+            },
+            'esv',
+        )
+
+        expect(result).toEqual(['Genesis 1:1-2 (ESV)'])
     })
 })
 
@@ -296,6 +420,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 1,
+                'esv',
                 null,
             )
 
@@ -303,7 +428,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
 
             expect(results).toHaveLength(1)
             expect(results[0]!.verseCount).toBe(1)
-            expect(results[0]!.passages).toEqual(['Genesis 1:1'])
+            expect(results[0]!.passages).toEqual(['Genesis 1:1 (ESV)'])
             expect(results[0]!.versesWithStats).toBe(0)
             expect(results[0]!.averageWpm).toBeNull()
         })
@@ -318,6 +443,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 1,
+                'esv',
                 stats,
             )
 
@@ -325,7 +451,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
 
             expect(results).toHaveLength(1)
             expect(results[0]!.verseCount).toBe(1)
-            expect(results[0]!.passages).toEqual(['Genesis 1:1'])
+            expect(results[0]!.passages).toEqual(['Genesis 1:1 (ESV)'])
             expect(results[0]!.versesWithStats).toBe(1)
             expect(results[0]!.averageWpm).toBe(60)
             expect(results[0]!.averageAccuracy).toBe(95)
@@ -341,6 +467,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 1,
+                'esv',
                 null,
             )
 
@@ -365,6 +492,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 1,
+                'esv',
                 null,
             )
             // Second insert - same user/date (conflict)
@@ -374,6 +502,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 2,
+                'esv',
                 null,
             )
             // Third insert
@@ -383,6 +512,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 3,
+                'esv',
                 null,
             )
 
@@ -401,6 +531,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 1,
+                'esv',
                 null,
             )
             await repository.recordActivity(
@@ -409,13 +540,17 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'exodus',
                 20,
                 3,
+                'esv',
                 null,
             )
 
             const results = await repository.getByUserId(testUserId)
 
             expect(results).toHaveLength(1)
-            expect(results[0]!.passages).toEqual(['Genesis 1:1', 'Exodus 20:3'])
+            expect(results[0]!.passages).toEqual([
+                'Genesis 1:1 (ESV)',
+                'Exodus 20:3 (ESV)',
+            ])
         })
 
         it('does NOT add duplicate passages', async () => {
@@ -428,6 +563,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'john',
                 3,
                 16,
+                'esv',
                 null,
             )
             await repository.recordActivity(
@@ -436,6 +572,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'john',
                 3,
                 16,
+                'esv',
                 null,
             )
             await repository.recordActivity(
@@ -444,6 +581,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'john',
                 3,
                 16,
+                'esv',
                 null,
             )
 
@@ -453,7 +591,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
             // verseCount should be 3 (counts each time)
             expect(results[0]!.verseCount).toBe(3)
             // But passages should only have the verse once
-            expect(results[0]!.passages).toEqual(['John 3:16'])
+            expect(results[0]!.passages).toEqual(['John 3:16 (ESV)'])
         })
 
         it('handles mix of duplicate and unique passages', async () => {
@@ -465,6 +603,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 1,
+                'esv',
                 null,
             )
             await repository.recordActivity(
@@ -473,6 +612,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 1,
+                'esv',
                 null,
             ) // duplicate
             await repository.recordActivity(
@@ -481,6 +621,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 2,
+                'esv',
                 null,
             )
             await repository.recordActivity(
@@ -489,6 +630,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 1,
+                'esv',
                 null,
             ) // duplicate
 
@@ -497,7 +639,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
             expect(results).toHaveLength(1)
             expect(results[0]!.verseCount).toBe(4)
             // Passages are now consolidated into ranges
-            expect(results[0]!.passages).toEqual(['Genesis 1:1-2'])
+            expect(results[0]!.passages).toEqual(['Genesis 1:1-2 (ESV)'])
         })
 
         it('consolidates consecutive verses into ranges', async () => {
@@ -511,6 +653,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                     'luke',
                     7,
                     verse,
+                    'esv',
                     null,
                 )
             }
@@ -520,7 +663,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
             expect(results).toHaveLength(1)
             expect(results[0]!.verseCount).toBe(15)
             // Should be consolidated into a single range
-            expect(results[0]!.passages).toEqual(['Luke 7:24-38'])
+            expect(results[0]!.passages).toEqual(['Luke 7:24-38 (ESV)'])
         })
 
         it('treats different times on same day as same record', async () => {
@@ -535,6 +678,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 1,
+                'esv',
                 null,
             )
             await repository.recordActivity(
@@ -543,6 +687,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 2,
+                'esv',
                 null,
             )
 
@@ -552,7 +697,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
             expect(results).toHaveLength(1)
             expect(results[0]!.verseCount).toBe(2)
             // Consecutive verses should be consolidated
-            expect(results[0]!.passages).toEqual(['Genesis 1:1-2'])
+            expect(results[0]!.passages).toEqual(['Genesis 1:1-2 (ESV)'])
         })
 
         it('creates separate records for different days', async () => {
@@ -565,6 +710,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 1,
+                'esv',
                 null,
             )
             await repository.recordActivity(
@@ -573,6 +719,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 2,
+                'esv',
                 null,
             )
 
@@ -594,36 +741,60 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
             const date = new Date('2024-01-15T10:30:00Z')
 
             // First verse: 60 WPM
-            await repository.recordActivity(testUserId, date, 'genesis', 1, 1, {
-                wpm: 60,
-                accuracy: 100,
-                correctedAccuracy: 100,
-            })
+            await repository.recordActivity(
+                testUserId,
+                date,
+                'genesis',
+                1,
+                1,
+                'esv',
+                {
+                    wpm: 60,
+                    accuracy: 100,
+                    correctedAccuracy: 100,
+                },
+            )
 
             let results = await repository.getByUserId(testUserId)
             expect(results[0]!.averageWpm).toBe(60)
 
             // Second verse: 40 WPM -> average should be (60 + 40) / 2 = 50
-            await repository.recordActivity(testUserId, date, 'genesis', 1, 2, {
-                wpm: 40,
-                accuracy: 100,
-                correctedAccuracy: 100,
-            })
+            await repository.recordActivity(
+                testUserId,
+                date,
+                'genesis',
+                1,
+                2,
+                'esv',
+                {
+                    wpm: 40,
+                    accuracy: 100,
+                    correctedAccuracy: 100,
+                },
+            )
 
             results = await repository.getByUserId(testUserId)
             expect(results[0]!.averageWpm).toBe(50)
 
             // Third verse: 50 WPM -> average should be (60 + 40 + 50) / 3 = 50
-            await repository.recordActivity(testUserId, date, 'genesis', 1, 3, {
-                wpm: 50,
-                accuracy: 100,
-                correctedAccuracy: 100,
-            })
+            await repository.recordActivity(
+                testUserId,
+                date,
+                'genesis',
+                1,
+                3,
+                'esv',
+                {
+                    wpm: 50,
+                    accuracy: 100,
+                    correctedAccuracy: 100,
+                },
+            )
 
             results = await repository.getByUserId(testUserId)
             expect(results[0]!.averageWpm).toBe(50)
             // Passages should be consolidated
-            expect(results[0]!.passages).toEqual(['Genesis 1:1-3'])
+            expect(results[0]!.passages).toEqual(['Genesis 1:1-3 (ESV)'])
         })
 
         it('calculates running average accuracy correctly', async () => {
@@ -631,21 +802,45 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
 
             // Three verses with different accuracies: 90, 100, 95
             // Running averages: 90 -> (90+100)/2=95 -> (90+100+95)/3=95
-            await repository.recordActivity(testUserId, date, 'genesis', 1, 1, {
-                wpm: 60,
-                accuracy: 90,
-                correctedAccuracy: 92,
-            })
-            await repository.recordActivity(testUserId, date, 'genesis', 1, 2, {
-                wpm: 60,
-                accuracy: 100,
-                correctedAccuracy: 100,
-            })
-            await repository.recordActivity(testUserId, date, 'genesis', 1, 3, {
-                wpm: 60,
-                accuracy: 95,
-                correctedAccuracy: 97,
-            })
+            await repository.recordActivity(
+                testUserId,
+                date,
+                'genesis',
+                1,
+                1,
+                'esv',
+                {
+                    wpm: 60,
+                    accuracy: 90,
+                    correctedAccuracy: 92,
+                },
+            )
+            await repository.recordActivity(
+                testUserId,
+                date,
+                'genesis',
+                1,
+                2,
+                'esv',
+                {
+                    wpm: 60,
+                    accuracy: 100,
+                    correctedAccuracy: 100,
+                },
+            )
+            await repository.recordActivity(
+                testUserId,
+                date,
+                'genesis',
+                1,
+                3,
+                'esv',
+                {
+                    wpm: 60,
+                    accuracy: 95,
+                    correctedAccuracy: 97,
+                },
+            )
 
             const results = await repository.getByUserId(testUserId)
 
@@ -657,11 +852,19 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
             const date = new Date('2024-01-15T10:30:00Z')
 
             // First: with stats
-            await repository.recordActivity(testUserId, date, 'genesis', 1, 1, {
-                wpm: 60,
-                accuracy: 100,
-                correctedAccuracy: 100,
-            })
+            await repository.recordActivity(
+                testUserId,
+                date,
+                'genesis',
+                1,
+                1,
+                'esv',
+                {
+                    wpm: 60,
+                    accuracy: 100,
+                    correctedAccuracy: 100,
+                },
+            )
 
             let results = await repository.getByUserId(testUserId)
             expect(results[0]!.versesWithStats).toBe(1)
@@ -674,6 +877,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 2,
+                'esv',
                 null,
             )
 
@@ -682,11 +886,19 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
             expect(results[0]!.verseCount).toBe(2)
 
             // Third: with stats
-            await repository.recordActivity(testUserId, date, 'genesis', 1, 3, {
-                wpm: 40,
-                accuracy: 90,
-                correctedAccuracy: 95,
-            })
+            await repository.recordActivity(
+                testUserId,
+                date,
+                'genesis',
+                1,
+                3,
+                'esv',
+                {
+                    wpm: 40,
+                    accuracy: 90,
+                    correctedAccuracy: 95,
+                },
+            )
 
             results = await repository.getByUserId(testUserId)
             expect(results[0]!.versesWithStats).toBe(2) // incremented
@@ -697,16 +909,32 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
             const date = new Date('2024-01-15T10:30:00Z')
 
             // Add two verses with stats
-            await repository.recordActivity(testUserId, date, 'genesis', 1, 1, {
-                wpm: 60,
-                accuracy: 100,
-                correctedAccuracy: 100,
-            })
-            await repository.recordActivity(testUserId, date, 'genesis', 1, 2, {
-                wpm: 40,
-                accuracy: 80,
-                correctedAccuracy: 90,
-            })
+            await repository.recordActivity(
+                testUserId,
+                date,
+                'genesis',
+                1,
+                1,
+                'esv',
+                {
+                    wpm: 60,
+                    accuracy: 100,
+                    correctedAccuracy: 100,
+                },
+            )
+            await repository.recordActivity(
+                testUserId,
+                date,
+                'genesis',
+                1,
+                2,
+                'esv',
+                {
+                    wpm: 40,
+                    accuracy: 80,
+                    correctedAccuracy: 90,
+                },
+            )
 
             // Add verse without stats
             await repository.recordActivity(
@@ -715,6 +943,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 3,
+                'esv',
                 null,
             )
 
@@ -727,7 +956,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
             expect(results[0]!.versesWithStats).toBe(2)
             expect(results[0]!.verseCount).toBe(3)
             // Passages should be consolidated
-            expect(results[0]!.passages).toEqual(['Genesis 1:1-3'])
+            expect(results[0]!.passages).toEqual(['Genesis 1:1-3 (ESV)'])
         })
 
         it('handles first insert without stats followed by insert with stats', async () => {
@@ -740,6 +969,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 1,
+                'esv',
                 null,
             )
 
@@ -748,11 +978,19 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
             expect(results[0]!.averageWpm).toBeNull()
 
             // Second: with stats - this is where conflict handling needs to work correctly
-            await repository.recordActivity(testUserId, date, 'genesis', 1, 2, {
-                wpm: 60,
-                accuracy: 95,
-                correctedAccuracy: 98,
-            })
+            await repository.recordActivity(
+                testUserId,
+                date,
+                'genesis',
+                1,
+                2,
+                'esv',
+                {
+                    wpm: 60,
+                    accuracy: 95,
+                    correctedAccuracy: 98,
+                },
+            )
 
             results = await repository.getByUserId(testUserId)
             // The running average formula: (0 * 0 + 60) / (0 + 1) = 60
@@ -760,7 +998,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
             expect(results[0]!.averageWpm).toBe(60)
             expect(results[0]!.averageAccuracy).toBe(95)
             // Passages should be consolidated
-            expect(results[0]!.passages).toEqual(['Genesis 1:1-2'])
+            expect(results[0]!.passages).toEqual(['Genesis 1:1-2 (ESV)'])
         })
     })
 
@@ -796,11 +1034,19 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
             const date = new Date('2024-01-15')
 
             // Insert initial record
-            await repository.recordActivity(testUserId, date, 'genesis', 1, 1, {
-                wpm: 30,
-                accuracy: 70,
-                correctedAccuracy: 75,
-            })
+            await repository.recordActivity(
+                testUserId,
+                date,
+                'genesis',
+                1,
+                1,
+                'esv',
+                {
+                    wpm: 30,
+                    accuracy: 70,
+                    correctedAccuracy: 75,
+                },
+            )
 
             // Batch upsert should OVERWRITE (not increment)
             await repository.batchUpsert([
@@ -819,7 +1065,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
 
             expect(results).toHaveLength(1)
             expect(results[0]!.verseCount).toBe(10) // Overwrites, not increments
-            expect(results[0]!.passages).toEqual(['John 3:16'])
+            expect(results[0]!.passages).toEqual(['John 3:16 (ESV)'])
             expect(results[0]!.averageWpm).toBe(60)
             expect(results[0]!.averageAccuracy).toBe(95)
             expect(results[0]!.versesWithStats).toBe(10)
@@ -857,6 +1103,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 1,
+                'esv',
                 null,
             )
             await repository.recordActivity(
@@ -865,6 +1112,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 2,
+                'esv',
                 null,
             )
             await repository.recordActivity(
@@ -873,6 +1121,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 3,
+                'esv',
                 null,
             )
             await repository.recordActivity(
@@ -881,6 +1130,7 @@ describe('UserDailyActivityRepository - Integration Tests', () => {
                 'genesis',
                 1,
                 4,
+                'esv',
                 null,
             )
 
