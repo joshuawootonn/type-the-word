@@ -67,6 +67,13 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('01/03/2026')} /> - Added{' '}
+                    <a href="/copyright" className="underline">
+                        copyright information
+                    </a>{' '}
+                    for all new Bible translations.
+                </li>
+                <li>
                     <DateComponent date={new Date('12/29/2025')} /> - Improved
                     parsing for new Bible translations:
                     <ul>
