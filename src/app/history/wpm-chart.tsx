@@ -25,7 +25,6 @@ import {
     WpmChartData,
     TimeRange,
     Interval,
-    aggregateStats,
     aggregateStatsFromCache,
 } from './wpm'
 
@@ -282,10 +281,7 @@ export function WPMChart({ chartData }: { chartData: WpmChartData }) {
     const [interval, setInterval] = useState<Interval>('daily')
 
     const aggregatedData = useMemo(() => {
-        if (chartData.type === 'cached') {
-            return aggregateStatsFromCache(chartData.data, timeRange, interval)
-        }
-        return aggregateStats(chartData.data, timeRange, interval)
+        return aggregateStatsFromCache(chartData.data, timeRange, interval)
     }, [chartData, timeRange, interval])
 
     return (

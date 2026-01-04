@@ -1,9 +1,7 @@
 import { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 
-import { FeatureFlags } from '~/lib/feature-flags'
 import { authOptions } from '~/server/auth'
-import PostHogClient from '~/server/posthog'
 
 import { getOverviewData } from './getHistory'
 import { HistoryOverview } from './history-overview'
@@ -20,15 +18,7 @@ export default async function HistoryOverviewPage() {
         return null
     }
 
-    const useOptimizedHistory = await PostHogClient().isFeatureEnabled(
-        FeatureFlags.READ_OPTIMIZED_HISTORY,
-        session.user.id,
-    )
-
-    const overview = await getOverviewData(
-        session.user.id,
-        useOptimizedHistory ?? false,
-    )
+    const overview = await getOverviewData(session.user.id)
 
     if (overview.length === 0) {
         return (

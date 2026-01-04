@@ -306,12 +306,9 @@ export type DailyStatsFromCache = {
 }
 
 /**
- * Discriminated union for WPM chart data
- * Allows the chart to determine which aggregation function to use
+ * WPM chart data from cached daily activity
  */
-export type WpmChartData =
-    | { type: 'raw'; data: VerseStatsWithDate[] }
-    | { type: 'cached'; data: DailyStatsFromCache[] }
+export type WpmChartData = { type: 'cached'; data: DailyStatsFromCache[] }
 
 /**
  * Convert cached daily activity to DailyStatsFromCache format

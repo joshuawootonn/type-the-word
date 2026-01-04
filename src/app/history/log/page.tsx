@@ -2,9 +2,7 @@ import { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import { cookies } from 'next/headers'
 
-import { FeatureFlags } from '~/lib/feature-flags'
 import { authOptions } from '~/server/auth'
-import PostHogClient from '~/server/posthog'
 
 import { getLogData } from '../getHistory'
 import { HistoryLogV2 } from '../history-log-2'
@@ -26,17 +24,7 @@ export default async function HistoryLogPage() {
         cookieStore.get('timezoneOffset')?.value ?? '0',
     )
 
-    const useOptimizedHistory =
-        (await PostHogClient().isFeatureEnabled(
-            FeatureFlags.READ_OPTIMIZED_HISTORY,
-            session.user.id,
-        )) ?? false
-
-    const log = await getLogData(
-        session.user.id,
-        timezoneOffset,
-        useOptimizedHistory,
-    )
+    const log = await getLogData(session.user.id, timezoneOffset)
 
     if (log.length === 0) {
         return (
