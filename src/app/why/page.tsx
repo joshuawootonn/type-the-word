@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 
+import { CopyrightCitation } from '~/components/copyright-citation'
 import { EmailLink } from '~/components/emailLink'
 import { Passage } from '~/components/passage'
 import { fetchPassage } from '~/lib/api'
@@ -120,6 +121,8 @@ export default async function Home() {
                     passage={passages[6]}
                     key={JSON.stringify(passages[6])}
                 />
+
+                <CopyrightCitation copyright={passages[6].copyright} />
             </div>
         </>
     )

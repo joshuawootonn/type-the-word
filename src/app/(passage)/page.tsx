@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import Link from 'next/link'
 
+import { CopyrightCitation } from '~/components/copyright-citation'
 import { Passage } from '~/components/passage'
 import { PassageSelector } from '~/components/passageSelector'
 import { fetchPassage } from '~/lib/api'
@@ -88,6 +89,8 @@ export default async function PassagePage() {
                 </li>
                 <li>and start typing!</li>
             </ol>
+
+            <CopyrightCitation copyright={passage.copyright} />
         </div>
     )
 }

@@ -30,15 +30,6 @@ export function Footer() {
         <>
             <footer className="flex w-full flex-col items-center justify-between py-2 text-sm text-primary sm:flex-row">
                 <div className="mb-3 flex items-center justify-between space-x-3 sm:mb-0">
-                    <a
-                        className="svg-outline relative no-underline"
-                        href="https://www.esv.org/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        (ESV)
-                    </a>
-                    <div>/</div>
                     <DropdownMenu.Root>
                         <DropdownMenu.Trigger asChild>
                             <button

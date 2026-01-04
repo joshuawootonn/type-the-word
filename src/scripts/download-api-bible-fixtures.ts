@@ -11,19 +11,7 @@ import path from 'path'
 
 import { env } from '~/env.mjs'
 import { bookToApiBibleId } from '~/lib/api-bible-book-id'
-import { Translation } from '~/lib/parseEsv'
-
-// API.Bible IDs for each translation (excluding ESV which uses a different API)
-const API_BIBLE_IDS: Record<Exclude<Translation, 'esv'>, string> = {
-    bsb: 'bba9f40183526463-01', // Berean Standard Bible
-    nlt: 'd6e14a625393b4da-01', // New Living Translation
-    niv: '78a9f6124f344018-01', // New International Version 2011
-    csb: 'a556c5305ee15c3f-01', // Christian Standard Bible
-    nkjv: '63097d2a0a2f7db3-01', // New King James Version
-    nasb: 'a761ca71e0b3ddcf-01', // New American Standard Bible 2020
-    ntv: '826f63861180e056-01', // Nueva Traducción Viviente
-    msg: '6f11a7de016f942e-01', // The Message
-}
+import { API_BIBLE_IDS, ApiBibleTranslation } from '~/lib/api-bible-ids'
 
 // 10 diverse chapters to test different Bible genres and formatting
 const CHAPTERS_TO_DOWNLOAD: Array<{
@@ -104,7 +92,7 @@ function sleep(ms: number): Promise<void> {
 }
 
 async function fetchPassage(
-    translation: Exclude<Translation, 'esv'>,
+    translation: ApiBibleTranslation,
     book: keyof typeof bookToApiBibleId,
     chapter: number,
 ): Promise<string> {
@@ -143,7 +131,7 @@ async function fetchPassage(
 }
 
 function getFilePath(
-    translation: Exclude<Translation, 'esv'>,
+    translation: ApiBibleTranslation,
     book: string,
     chapter: number,
 ): string {
@@ -165,9 +153,9 @@ async function downloadFixtures() {
     console.log('API.Bible Fixture Download Script')
     console.log('==================================\n')
 
-    const translations = Object.keys(API_BIBLE_IDS) as Array<
-        Exclude<Translation, 'esv'>
-    >
+    const translations = Object.keys(
+        API_BIBLE_IDS,
+    ) as Array<ApiBibleTranslation>
     const totalDownloads = translations.length * CHAPTERS_TO_DOWNLOAD.length
     let completed = 0
     let skipped = 0

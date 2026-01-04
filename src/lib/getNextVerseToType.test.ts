@@ -57,6 +57,11 @@ function createMockPassage(verseNumbers: number[]): ParsedPassage {
         },
         prevChapter: null,
         nextChapter: null,
+        copyright: {
+            text: 'Mock copyright',
+            abbreviation: 'ESV',
+            translation: 'esv',
+        },
     }
 }
 
@@ -192,6 +197,11 @@ describe('getNextVerseToType', () => {
             },
             prevChapter: null,
             nextChapter: null,
+            copyright: {
+                text: 'Mock copyright',
+                abbreviation: 'ESV',
+                translation: 'esv',
+            },
         }
         const chapterHistory: ChapterHistory = {
             verses: { 1: true },
@@ -218,6 +228,11 @@ describe('getNextVerseToType', () => {
             },
             prevChapter: null,
             nextChapter: null,
+            copyright: {
+                text: 'Mock copyright',
+                abbreviation: 'ESV',
+                translation: 'esv',
+            },
         }
         const chapterHistory: ChapterHistory = {
             verses: {},

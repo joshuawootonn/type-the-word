@@ -95,6 +95,12 @@ function inlineToString(inlines: Inline[]): string {
         .join('')
 }
 
+export type CopyrightMetadata = {
+    text: string
+    abbreviation: string
+    translation: Translation
+}
+
 export type ParsedPassage = {
     nodes: Block[]
     firstVerse: VerseNumber
@@ -106,6 +112,7 @@ export type ParsedPassage = {
         url: string
         label: string
     } | null
+    copyright: CopyrightMetadata
 }
 
 const metadata = getBibleMetadata()
@@ -449,5 +456,10 @@ export function parseChapter(passage: string): ParsedPassage {
         firstVerse: context.firstVerseOfPassage,
         prevChapter: parsePrevChapter(context.book, context.chapter),
         nextChapter: parseNextChapter(context.book, context.chapter),
+        copyright: {
+            text: 'Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved.',
+            abbreviation: 'ESV',
+            translation: 'esv',
+        },
     }
 }

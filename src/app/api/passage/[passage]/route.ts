@@ -207,7 +207,11 @@ async function fetchApiBiblePassage(
         const parsedData = apiBiblePassageSchema.parse(data)
 
         return {
-            data: parseApiBibleChapter(parsedData.data.content, translation),
+            data: parseApiBibleChapter(
+                parsedData.data.content,
+                translation,
+                parsedData.data.copyright,
+            ),
         }
     }
 
@@ -231,7 +235,11 @@ async function fetchApiBiblePassage(
             existingPassageResponse.response,
         )
         return {
-            data: parseApiBibleChapter(parsedData.data.content, translation),
+            data: parseApiBibleChapter(
+                parsedData.data.content,
+                translation,
+                parsedData.data.copyright,
+            ),
         }
     }
 
@@ -270,7 +278,11 @@ async function fetchApiBiblePassage(
             .where(eq(passageResponse.id, existingPassageResponse.id))
     }
     return {
-        data: parseApiBibleChapter(parsedData.data.content, translation),
+        data: parseApiBibleChapter(
+            parsedData.data.content,
+            translation,
+            parsedData.data.copyright,
+        ),
     }
 }
 

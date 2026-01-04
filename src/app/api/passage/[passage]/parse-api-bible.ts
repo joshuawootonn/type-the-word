@@ -36,6 +36,7 @@ import { Book } from '~/lib/types/book'
 export function parseApiBibleChapter(
     passage: string,
     translation: Exclude<Translation, 'esv'> = 'bsb',
+    copyrightText = '',
 ): ParsedPassage {
     const dom = new JSDOM(passage)
 
@@ -618,5 +619,10 @@ export function parseApiBibleChapter(
         firstVerse: context.firstVerseOfPassage,
         prevChapter: parsePrevChapter(context.book, context.chapter),
         nextChapter: parseNextChapter(context.book, context.chapter),
+        copyright: {
+            text: copyrightText,
+            abbreviation: translation.toUpperCase(),
+            translation,
+        },
     }
 }

@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation'
 import { getChapterHistory } from '~/app/api/chapter-history/[passage]/getChapterHistory'
 import { getOrCreateTypingSession } from '~/app/api/typing-session/getOrCreateTypingSession'
 import { ChapterLog } from '~/components/chapter-log'
+import { CopyrightCitation } from '~/components/copyright-citation'
 import { Passage } from '~/components/passage'
 import { fetchPassage } from '~/lib/api'
 import { Translation } from '~/lib/parseEsv'
@@ -139,6 +140,8 @@ export default async function PassagePage(props: {
                     chapterHistory={chapterHistory}
                 />
             )}
+
+            <CopyrightCitation copyright={passage.copyright} />
         </>
     )
 }
