@@ -91,9 +91,19 @@ export function parseApiBibleChapter(
 
     function parseInline(node: ChildNode): Inline[] {
         if (node.nodeName === '#text' && 'value' in node) {
+            const result: Inline[] = []
+            let textValue = node.value
+
+            // Check for pilcrow (¶) at the start - emit as decoration atom
+            // This appears in some NASB Psalms as a paragraph marker
+            if (textValue.startsWith('¶')) {
+                result.push({ type: 'decoration', text: '¶' })
+                textValue = textValue.slice(1)
+            }
+
             // Skip leading whitespace - it will be handled by adding space after verse numbers
             // or by other spacing logic
-            const wordSegments = splitLineBySpaceOrNewLine(node.value)
+            const wordSegments = splitLineBySpaceOrNewLine(textValue)
             const words =
                 wordSegments.length > 0
                     ? wordSegments
@@ -141,7 +151,7 @@ export function parseApiBibleChapter(
                           })
                     : []
 
-            return words
+            return [...result, ...words]
         }
 
         // API.Bible verse numbers: <span data-number="1" data-sid="GEN 1:1" class="v">

@@ -494,6 +494,9 @@ export function CurrentVerse({
                         </span>
                     )
                 }
+                if (atom.type === 'decoration') {
+                    return null
+                }
                 if (
                     atom.type === 'word' &&
                     (typedAtom == null || typedAtom.type === 'word')

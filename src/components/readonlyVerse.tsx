@@ -89,6 +89,10 @@ export function ReadonlyVerse({
                     )
                 }
 
+                if (atom.type === 'decoration') {
+                    return null
+                }
+
                 if (atom.type === 'word') {
                     return (
                         <span key={aIndexPrime} className="word">

@@ -32,6 +32,7 @@ export function isAtomTyped(atom: Inline | Paragraph): boolean {
         case 'paragraph':
         case 'space':
         case 'newLine':
+        case 'decoration':
             return false
 
         default:

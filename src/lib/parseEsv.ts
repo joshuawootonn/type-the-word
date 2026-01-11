@@ -34,9 +34,12 @@ export type VerseNumber = {
 
 export type Word = { type: 'word'; letters: string[] }
 
+export type Decoration = { type: 'decoration'; text: string }
+
 export type Inline =
     | VerseNumber
     | Word
+    | Decoration
     | { type: 'space' }
     | { type: 'newLine' }
 

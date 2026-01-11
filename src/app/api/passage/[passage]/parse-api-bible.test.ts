@@ -2,7 +2,8 @@ import fs from 'fs'
 import path from 'path'
 import { describe, expect, test } from 'vitest'
 
-import { Paragraph, Translation, Word } from '~/lib/parseEsv'
+import { isAtomTyped } from '~/lib/isEqual'
+import { Decoration, Paragraph, Translation, Word } from '~/lib/parseEsv'
 
 import { parseApiBibleChapter } from './parse-api-bible'
 
@@ -1732,5 +1733,136 @@ describe('Luke 7:5-10 NASB - Spacing and quote rendering', () => {
         expect(fullText).not.toContain('Ialso ')
         expect(fullText).not.toContain('Isay ')
         expect(fullText).not.toContain('Ifound ')
+    })
+})
+
+// ============================================================================
+// PSALM 6 NASB - PILCROW (¶) DECORATION HANDLING
+// ============================================================================
+describe('Psalm 6 NASB - Pilcrow decoration handling', () => {
+    const nasbPsalm6Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/nasb/psalm_6.html',
+        ),
+        'utf8',
+    )
+
+    test('parses Psalm 6 successfully', () => {
+        const result = parseApiBibleChapter(nasbPsalm6Html, 'nasb')
+        expect(result.nodes.length).toBeGreaterThan(0)
+        expect(result.firstVerse.book).toBe('psalm')
+        expect(result.firstVerse.chapter).toBe(6)
+    })
+
+    test('pilcrow is parsed as decoration atom', () => {
+        const result = parseApiBibleChapter(nasbPsalm6Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Find all decoration atoms
+        const decorations: Decoration[] = []
+        for (const p of paragraphs) {
+            for (const verse of p.nodes) {
+                for (const node of verse.nodes) {
+                    if (node.type === 'decoration') {
+                        decorations.push(node)
+                    }
+                }
+            }
+        }
+
+        // Should have pilcrow decorations
+        expect(decorations.length).toBeGreaterThan(0)
+
+        // All should be pilcrow characters
+        for (const dec of decorations) {
+            expect(dec.text).toBe('¶')
+        }
+    })
+
+    test('decoration atoms are NOT typable', () => {
+        const result = parseApiBibleChapter(nasbPsalm6Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Find all decoration atoms and verify they are not typable
+        for (const p of paragraphs) {
+            for (const verse of p.nodes) {
+                for (const node of verse.nodes) {
+                    if (node.type === 'decoration') {
+                        expect(isAtomTyped(node)).toBe(false)
+                    }
+                }
+            }
+        }
+    })
+
+    test('verse 4 has pilcrow decoration before "Return"', () => {
+        const result = parseApiBibleChapter(nasbPsalm6Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Verse 4 should have pilcrow at start
+        const verse4 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 4),
+        )
+        expect(verse4.length).toBeGreaterThan(0)
+
+        // Check first verse section has decoration
+        const verse4Nodes = verse4[0]!.nodes
+        const hasDecoration = verse4Nodes.some(n => n.type === 'decoration')
+        expect(hasDecoration).toBe(true)
+
+        // The text should still contain "Return" (pilcrow not part of typable text)
+        const verse4Text = verse4.map(v => v.text).join('')
+        expect(verse4Text).toContain('Return')
+    })
+
+    test('pilcrow does not affect verse text content', () => {
+        const result = parseApiBibleChapter(nasbPsalm6Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Get all verse text
+        const allText = paragraphs
+            .flatMap(p => p.nodes.map(v => v.text))
+            .join('')
+
+        // Should NOT contain the pilcrow in the text output (it's a decoration)
+        // Note: The verse.text concatenates only typed atoms
+        expect(allText).not.toContain('¶')
+
+        // But should contain the actual verse content
+        expect(allText).toContain('Lord')
+        expect(allText).toContain('Return')
+        expect(allText).toContain('weary')
+    })
+
+    test('verse lengths do not include decoration atoms', () => {
+        const result = parseApiBibleChapter(nasbPsalm6Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // For each verse with a decoration, the metadata.length should not count it
+        for (const p of paragraphs) {
+            for (const verse of p.nodes) {
+                const hasDecoration = verse.nodes.some(
+                    n => n.type === 'decoration',
+                )
+                if (hasDecoration) {
+                    // Count typable atoms
+                    const typableCount = verse.nodes.filter(isAtomTyped).length
+
+                    // Verify the length matches typable atoms
+                    expect(verse.metadata.length).toBe(typableCount)
+                }
+            }
+        }
     })
 })
