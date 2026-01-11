@@ -329,16 +329,26 @@ export function parseApiBibleChapter(
                 }
 
                 // Check if current word is a closing quote that should attach to previous word
-                // Pattern: previous word ends with punctuation + space, current is quote-only
+                // Two patterns:
+                // 1. Previous word ends with punctuation + space (e.g., "it. "), current is quote-only
+                // 2. Previous word ends with letter + space (e.g., "yourself "), current is punct+quote (e.g., ".")
                 const currentWordStr = current.letters.join('')
-                const isClosingQuote =
-                    /^[\u201D\u2019"']+$/.test(currentWordStr.trim()) &&
+                const currentTrimmed = currentWordStr.trim()
+
+                // Pattern 1: quote-only after punctuation (e.g., it. + " → it.")
+                const isQuoteOnlyAfterPunct =
+                    /^[\u201D\u2019"']+$/.test(currentTrimmed) &&
                     lastLetter === ' ' &&
                     /[.!?,;:]/.test(secondToLastLetter ?? '')
 
-                if (isClosingQuote) {
+                // Pattern 2: punct+quote after word (e.g., yourself + ." → yourself.")
+                const isPunctPlusQuote =
+                    /^[.!?,;:]+[\u201D\u2019"']+$/.test(currentTrimmed) &&
+                    lastLetter === ' '
+
+                if (isQuoteOnlyAfterPunct || isPunctPlusQuote) {
                     // Remove the trailing space, append the closing quote, then add space back
-                    // This ensures the merged word (e.g., "it.") is still complete for typing
+                    // This ensures the merged word is still complete for typing
                     lastResult.letters.pop()
                     lastResult.letters.push(...current.letters)
                     lastResult.letters.push(' ')

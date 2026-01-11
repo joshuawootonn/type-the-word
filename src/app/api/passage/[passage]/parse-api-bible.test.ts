@@ -1912,3 +1912,59 @@ describe('Luke 8:21 NASB - Closing quote completeness', () => {
         expect(lastLetter).toBe(' ')
     })
 })
+
+// ============================================================================
+// LUKE 10:27 NASB - PUNCTUATION+QUOTE MERGED WITH PREVIOUS WORD
+// ============================================================================
+describe('Luke 10:27 NASB - Punct+quote merging', () => {
+    const nasbLuke10Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/nasb/luke_10.html',
+        ),
+        'utf8',
+    )
+
+    test('parses Luke 10 successfully', () => {
+        const result = parseApiBibleChapter(nasbLuke10Html, 'nasb')
+        expect(result.nodes.length).toBeGreaterThan(0)
+    })
+
+    test('verse 27 "yourself" has punct+quote attached (no space before .")', () => {
+        const result = parseApiBibleChapter(nasbLuke10Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse27 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 27),
+        )
+
+        expect(verse27.length).toBeGreaterThan(0)
+        const verse27Text = verse27.map(v => v.text).join('')
+
+        // Should have "yourself." with no space before the period+quote
+        expect(verse27Text).toContain('yourself.\u201D')
+        expect(verse27Text).not.toContain('yourself .\u201D')
+        expect(verse27Text).not.toContain('yourself ."')
+    })
+
+    test('verse 27 last word is complete (ends with space)', () => {
+        const result = parseApiBibleChapter(nasbLuke10Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse27 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 27),
+        )
+
+        const verse27Words = verse27.flatMap(v =>
+            v.nodes.filter((n): n is Word => n.type === 'word'),
+        )
+        const lastWord = verse27Words[verse27Words.length - 1]
+        expect(lastWord).toBeDefined()
+
+        // Verify it's complete (ends with space)
+        const lastLetter = lastWord!.letters[lastWord!.letters.length - 1]
+        expect(lastLetter).toBe(' ')
+    })
+})
