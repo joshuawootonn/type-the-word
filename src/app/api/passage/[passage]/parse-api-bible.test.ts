@@ -1914,6 +1914,43 @@ describe('Luke 8:21 NASB - Closing quote completeness', () => {
 })
 
 // ============================================================================
+// JOHN 1:15 NASB - NESTED QUOTES (single quote followed by double quote)
+// ============================================================================
+describe('John 1:15 NASB - Nested quote handling', () => {
+    const nasbJohn1Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/nasb/john_1.html',
+        ),
+        'utf8',
+    )
+
+    test('parses John 1 successfully', () => {
+        const result = parseApiBibleChapter(nasbJohn1Html, 'nasb')
+        expect(result.nodes.length).toBeGreaterThan(0)
+    })
+
+    test('verse 15 nested quotes have no space between them', () => {
+        const result = parseApiBibleChapter(nasbJohn1Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse15 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 15),
+        )
+
+        expect(verse15.length).toBeGreaterThan(0)
+        const verse15Text = verse15.map(v => v.text).join('')
+
+        // Should have closing quotes together without space: .'" or .'\"
+        // The text ends with: before me.'"
+        expect(verse15Text).toMatch(/me\.['\u2019]["\u201D]\s*$/)
+        // Should NOT have space between the quotes
+        expect(verse15Text).not.toMatch(/me\.['\u2019]\s+["\u201D]/)
+    })
+})
+
+// ============================================================================
 // LUKE 10:27 NASB - PUNCTUATION+QUOTE MERGED WITH PREVIOUS WORD
 // ============================================================================
 describe('Luke 10:27 NASB - Punct+quote merging', () => {

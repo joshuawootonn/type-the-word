@@ -9,14 +9,27 @@ export function splitLineBySpaceOrNewLine(str: string): string[] {
 }
 
 function numberOfSpaces(str: string, startIndex = 0) {
-    let numberOfSpaces = 1
+    let count = 1
     let i = startIndex + 1
 
-    while (str[i] === ' ') {
-        numberOfSpaces += 1
+    while (i < str.length && isWhitespace(str[i]!)) {
+        count += 1
         i += 1
     }
-    return numberOfSpaces
+    return count
+}
+
+// Whitespace characters that should be treated as word separators
+// Includes regular space, thin space, hair space, narrow no-break space, etc.
+function isWhitespace(char: string): boolean {
+    const code = char.charCodeAt(0)
+    return (
+        code === 32 || // Regular space
+        code === 8201 || // Thin space \u2009
+        code === 8202 || // Hair space \u200A
+        code === 8239 || // Narrow no-break space \u202F
+        code === 160 // Non-breaking space \u00A0
+    )
 }
 
 const splitBySpaceOrNewLine = {
@@ -24,9 +37,12 @@ const splitBySpaceOrNewLine = {
         let pos = 0
         const result = []
         while (pos < str.length) {
-            if (str[pos] === ' ') {
+            if (isWhitespace(str[pos]!)) {
                 result.push(' ')
-                pos += numberOfSpaces(str, pos)
+                // Skip consecutive whitespace
+                while (pos < str.length && isWhitespace(str[pos]!)) {
+                    pos++
+                }
             } else if (str[pos] === '\n') {
                 result.push('\n')
                 pos += 1
@@ -39,7 +55,14 @@ const splitBySpaceOrNewLine = {
                 }
             } else {
                 const indexOfNewLine = str.indexOf('\n', pos)
-                const indexOfSpace = str.indexOf(' ', pos)
+                // Find the next whitespace character
+                let indexOfSpace = -1
+                for (let i = pos; i < str.length; i++) {
+                    if (isWhitespace(str[i]!)) {
+                        indexOfSpace = i
+                        break
+                    }
+                }
                 const endOfWord =
                     indexOfSpace === -1
                         ? indexOfNewLine
@@ -52,8 +75,18 @@ const splitBySpaceOrNewLine = {
                     result.push(str.substring(pos))
                     pos = str.length
                 } else {
-                    result.push(str.substring(pos, endOfWord + 1))
-                    pos = endOfWord + 1
+                    // For regular space, include it in the word (original behavior)
+                    // For other whitespace (thin space, etc.), don't include it
+                    const whitespaceChar = str[endOfWord]!
+                    if (whitespaceChar === ' ') {
+                        // Include trailing regular space in word
+                        result.push(str.substring(pos, endOfWord + 1))
+                        pos = endOfWord + 1
+                    } else {
+                        // Don't include special whitespace - it will be handled as separator
+                        result.push(str.substring(pos, endOfWord))
+                        pos = endOfWord
+                    }
                 }
             }
         }

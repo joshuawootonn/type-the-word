@@ -335,11 +335,14 @@ export function parseApiBibleChapter(
                 const currentWordStr = current.letters.join('')
                 const currentTrimmed = currentWordStr.trim()
 
-                // Pattern 1: quote-only after punctuation (e.g., it. + " → it.")
+                // Pattern 1: quote-only after punctuation (e.g., it. + " → it." or me.' + " → me.'")
+                // Include quotes in punctuation check to handle nested quotes like 'word.'" or "word.'"
                 const isQuoteOnlyAfterPunct =
                     /^[\u201D\u2019"']+$/.test(currentTrimmed) &&
                     lastLetter === ' ' &&
-                    /[.!?,;:]/.test(secondToLastLetter ?? '')
+                    /[.!?,;:'"'\u2018\u2019\u201C\u201D]/.test(
+                        secondToLastLetter ?? '',
+                    )
 
                 // Pattern 2: punct+quote after word (e.g., yourself + ." → yourself.")
                 const isPunctPlusQuote =
@@ -347,11 +350,15 @@ export function parseApiBibleChapter(
                     lastLetter === ' '
 
                 if (isQuoteOnlyAfterPunct || isPunctPlusQuote) {
-                    // Remove the trailing space, append the closing quote, then add space back
-                    // This ensures the merged word is still complete for typing
+                    // Remove the trailing space, append the closing quote
                     lastResult.letters.pop()
                     lastResult.letters.push(...current.letters)
-                    lastResult.letters.push(' ')
+                    // Only add trailing space if the merged word doesn't already have one
+                    const lastChar =
+                        lastResult.letters[lastResult.letters.length - 1]
+                    if (lastChar !== ' ' && lastChar !== '\n') {
+                        lastResult.letters.push(' ')
+                    }
                     continue
                 }
             }
