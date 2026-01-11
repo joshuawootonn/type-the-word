@@ -1626,6 +1626,32 @@ describe('Luke 7:5-10 NASB - Spacing and quote rendering', () => {
         expect(verse6Text).toMatch(/[\u0022\u201C]Lord, do not trouble/)
     })
 
+    test('verse 6 opening quote is grouped with "Lord" as one word', () => {
+        const result = parseApiBibleChapter(nasbLuke7Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse6 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 6),
+        )
+
+        // Get all words from verse 6
+        const words = verse6.flatMap(v =>
+            v.nodes.filter((n): n is Word => n.type === 'word'),
+        )
+
+        // Find the word that contains "Lord"
+        const lordWord = words.find(w => w.letters.join('').includes('Lord'))
+        expect(lordWord).toBeDefined()
+
+        // The opening quote should be part of the same word as "Lord"
+        // i.e., the word should be '"Lord, ' not just 'Lord, '
+        const lordWordText = lordWord!.letters.join('')
+
+        // Should start with a quote character
+        expect(lordWordText).toMatch(/^[\u0022\u201C]Lord/)
+    })
+
     test('verse 7 "I did" is rendered with proper spacing', () => {
         const result = parseApiBibleChapter(nasbLuke7Html, 'nasb')
         const paragraphs = result.nodes.filter(
