@@ -337,9 +337,11 @@ export function parseApiBibleChapter(
                     /[.!?,;:]/.test(secondToLastLetter ?? '')
 
                 if (isClosingQuote) {
-                    // Remove the trailing space and append the closing quote
+                    // Remove the trailing space, append the closing quote, then add space back
+                    // This ensures the merged word (e.g., "it.") is still complete for typing
                     lastResult.letters.pop()
                     lastResult.letters.push(...current.letters)
+                    lastResult.letters.push(' ')
                     continue
                 }
             }

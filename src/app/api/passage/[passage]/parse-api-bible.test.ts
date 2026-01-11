@@ -1866,3 +1866,49 @@ describe('Psalm 6 NASB - Pilcrow decoration handling', () => {
         }
     })
 })
+
+// ============================================================================
+// LUKE 8:21 NASB - CLOSING QUOTE WITH TRAILING SPACE
+// ============================================================================
+describe('Luke 8:21 NASB - Closing quote completeness', () => {
+    const nasbLuke8Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/nasb/luke_8.html',
+        ),
+        'utf8',
+    )
+
+    test('parses Luke 8 successfully', () => {
+        const result = parseApiBibleChapter(nasbLuke8Html, 'nasb')
+        expect(result.nodes.length).toBeGreaterThan(0)
+    })
+
+    test('verse 21 last word ends with trailing space (is complete)', () => {
+        const result = parseApiBibleChapter(nasbLuke8Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse21 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 21),
+        )
+
+        expect(verse21.length).toBeGreaterThan(0)
+
+        // Get the last word of verse 21
+        const verse21Words = verse21.flatMap(v =>
+            v.nodes.filter((n): n is Word => n.type === 'word'),
+        )
+        const lastWord = verse21Words[verse21Words.length - 1]
+        expect(lastWord).toBeDefined()
+
+        const lastWordText = lastWord!.letters.join('')
+
+        // Should end with closing quote and trailing space
+        expect(lastWordText).toMatch(/it\.\u201D\s$/)
+
+        // Verify it's complete (ends with space)
+        const lastLetter = lastWord!.letters[lastWord!.letters.length - 1]
+        expect(lastLetter).toBe(' ')
+    })
+})
