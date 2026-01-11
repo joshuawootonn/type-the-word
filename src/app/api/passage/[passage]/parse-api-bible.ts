@@ -200,6 +200,75 @@ export function parseApiBibleChapter(
             .join('')
     }
 
+    /**
+     * Merge adjacent Word atoms that should be a single word.
+     * This handles cases like NASB small caps where "B" and "lessed" are in separate spans.
+     *
+     * The HTML structure looks like: <span>"B</span><span class="sc">lessed is</span>
+     * This gets parsed as: ['"B '] and ['lessed ', 'is ', ...]
+     *
+     * We detect the small caps pattern specifically:
+     * - Previous word is SHORT (1-2 letters, possibly with leading punctuation)
+     * - Previous word ends with an UPPERCASE letter + artificial trailing space
+     * - Current word starts with a lowercase letter (continuation)
+     *
+     * Examples to merge:
+     * - "B " + "lessed " → "Blessed " (small caps split)
+     * - "O " + "ne " → "One "
+     * - "L " + "ord " → "Lord "
+     *
+     * Examples NOT to merge:
+     * - "lessed " + "is " → keep separate (normal word boundary)
+     */
+    function mergeAdjacentWords(nodes: Inline[]): Inline[] {
+        const result: Inline[] = []
+
+        for (const current of nodes) {
+            if (current.type !== 'word') {
+                result.push(current)
+                continue
+            }
+
+            // Check if this word should be merged with the previous word
+            const lastResult = result[result.length - 1]
+            if (lastResult?.type === 'word' && lastResult.letters.length >= 2) {
+                const lastLetter =
+                    lastResult.letters[lastResult.letters.length - 1]
+                const secondToLastLetter =
+                    lastResult.letters[lastResult.letters.length - 2]
+                const firstLetter = current.letters[0]
+
+                // Count actual letters (not punctuation or space) in previous word
+                const actualLetters = lastResult.letters.filter(l =>
+                    /[a-zA-Z]/.test(l),
+                )
+
+                // Merge if:
+                // 1. Previous word ends with space (artificial trailing space)
+                // 2. Previous word's second-to-last char is an UPPERCASE letter
+                // 3. Previous word has only 1-2 actual letters (short prefix)
+                // 4. Current word starts with a lowercase letter (continuation)
+                if (
+                    lastLetter === ' ' &&
+                    secondToLastLetter &&
+                    /[A-Z]/.test(secondToLastLetter) &&
+                    actualLetters.length <= 2 &&
+                    firstLetter &&
+                    /^[a-z]/.test(firstLetter)
+                ) {
+                    // Remove the artificial trailing space and merge
+                    lastResult.letters.pop()
+                    lastResult.letters.push(...current.letters)
+                    continue
+                }
+            }
+
+            result.push(current)
+        }
+
+        return result
+    }
+
     function parseDataVid(
         dataVid: string,
     ): { book: Book; chapter: number; verse: number } | null {
@@ -347,7 +416,9 @@ export function parseApiBibleChapter(
                 ? createLeadingSpaces(getPoetryIndent(node))
                 : []
 
-            const parsedNodes: Inline[] = node.childNodes.flatMap(parseInline)
+            const parsedNodes: Inline[] = mergeAdjacentWords(
+                node.childNodes.flatMap(parseInline),
+            )
 
             // For poetry lines, insert indentation after verse number (if present) or at start
             let nodes: Inline[]
@@ -568,6 +639,11 @@ export function parseApiBibleChapter(
                     // Same verse - merge content into existing verse section
                     lastVerse.nodes.push({ type: 'newLine' })
                     lastVerse.nodes.push(...firstNewVerse.nodes)
+                    // Update the verse text to include the merged content
+                    lastVerse.text += '\n' + firstNewVerse.text
+                    // Update the length to include merged nodes
+                    lastVerse.metadata.length =
+                        lastVerse.nodes.filter(isAtomTyped).length
 
                     // Add any remaining verses from the new line
                     for (let i = 1; i < parsed.paragraph.nodes.length; i++) {

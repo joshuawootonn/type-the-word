@@ -775,6 +775,183 @@ describe('Speaker labels and section headers (Song of Solomon)', () => {
 })
 
 // ============================================================================
+// LUKE 19:38 - POETRY CONTINUATION WITH SMALL CAPS (NASB)
+// ============================================================================
+
+describe('Luke 19:38 poetry continuation (NASB)', () => {
+    // Luke 19:38 in NASB has:
+    // - Verse 38 starts in a regular paragraph with "38 shouting:"
+    // - Then two <p class="q" data-vid="LUK 19:38"> poetry lines follow:
+    //   1. "Blessed is the King, the One who comes in the name of the Lord;
+    //   2. Peace in heaven and glory in the highest!"
+    // - The text contains <span class="sc"> small caps elements
+    // - Both poetry lines should be typeable as part of verse 38
+
+    const nasbLuke19Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/nasb/luke_19.html',
+        ),
+        'utf8',
+    )
+
+    test('verse 38 is parsed correctly with all content', () => {
+        const result = parseApiBibleChapter(nasbLuke19Html, 'nasb')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Find all verse 38 sections
+        const verse38Sections = paragraphs
+            .flatMap(p => p.nodes)
+            .filter(v => v.verse.verse === 38)
+
+        expect(verse38Sections.length).toBeGreaterThan(0)
+    })
+
+    test('verse 38 contains "Blessed" text (small caps merged correctly)', () => {
+        const result = parseApiBibleChapter(nasbLuke19Html, 'nasb')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        const verse38Sections = paragraphs
+            .flatMap(p => p.nodes)
+            .filter(v => v.verse.verse === 38)
+
+        // Get all words from verse 38
+        const allWords = verse38Sections.flatMap(section =>
+            section.nodes.filter((n): n is Word => n.type === 'word'),
+        )
+        const wordTexts = allWords.map(w => w.letters.join('').trim())
+
+        // Small caps words should be merged (not split like "B" + "lessed")
+        // The actual word includes the opening quote: "Blessed
+        expect(wordTexts.some(w => w.includes('Blessed'))).toBe(true)
+        expect(wordTexts).not.toContain('"B')
+        expect(wordTexts).not.toContain('lessed')
+        expect(wordTexts.some(w => w.includes('One'))).toBe(true)
+        expect(wordTexts).not.toContain('O')
+        expect(wordTexts).not.toContain('ne')
+        expect(wordTexts.some(w => w.includes('Lord'))).toBe(true)
+        expect(wordTexts).not.toContain('L')
+        expect(wordTexts).not.toContain('ord;')
+    })
+
+    test('verse 38 contains "Peace" text (second poetry line)', () => {
+        const result = parseApiBibleChapter(nasbLuke19Html, 'nasb')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        const verse38Sections = paragraphs
+            .flatMap(p => p.nodes)
+            .filter(v => v.verse.verse === 38)
+
+        const allText = verse38Sections.map(v => v.text).join(' ')
+
+        // The second poetry line "Peace in heaven..." must be included
+        expect(allText).toContain('Peace')
+        expect(allText).toContain('heaven')
+        expect(allText).toContain('highest')
+    })
+
+    test('verse 38 has no empty word atoms', () => {
+        const result = parseApiBibleChapter(nasbLuke19Html, 'nasb')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        const verse38Sections = paragraphs
+            .flatMap(p => p.nodes)
+            .filter(v => v.verse.verse === 38)
+
+        for (const section of verse38Sections) {
+            for (const node of section.nodes) {
+                if (node.type === 'word') {
+                    const wordText = node.letters.join('').trim()
+                    expect(wordText.length).toBeGreaterThan(0)
+                }
+            }
+        }
+    })
+
+    test('all verse 38 words are typeable (have letters)', () => {
+        const result = parseApiBibleChapter(nasbLuke19Html, 'nasb')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        const verse38Sections = paragraphs
+            .flatMap(p => p.nodes)
+            .filter(v => v.verse.verse === 38)
+
+        const allWords = verse38Sections.flatMap(section =>
+            section.nodes.filter((n): n is Word => n.type === 'word'),
+        )
+
+        // Each word should have at least one letter character
+        for (const word of allWords) {
+            const hasLetter = word.letters.some(letter =>
+                /[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]/.test(letter),
+            )
+            expect(hasLetter).toBe(true)
+        }
+    })
+
+    test('poetry lines are merged (verse 38 has newLine atoms)', () => {
+        const result = parseApiBibleChapter(nasbLuke19Html, 'nasb')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        const verse38Sections = paragraphs
+            .flatMap(p => p.nodes)
+            .filter(v => v.verse.verse === 38)
+
+        // At least one section should have newLine atoms (from merging poetry lines)
+        const hasNewLine = verse38Sections.some(section =>
+            section.nodes.some(n => n.type === 'newLine'),
+        )
+
+        expect(hasNewLine).toBe(true)
+    })
+
+    test('hanging verse metadata.length includes all merged words', () => {
+        const result = parseApiBibleChapter(nasbLuke19Html, 'nasb')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Find the hanging verse section (poetry content)
+        const hangingSection = paragraphs
+            .flatMap(p => p.nodes)
+            .find(v => v.verse.verse === 38 && v.metadata.hangingVerse === true)
+
+        expect(hangingSection).toBeDefined()
+        if (!hangingSection) return
+
+        // Count actual words
+        const actualWordCount = hangingSection.nodes.filter(
+            (n): n is Word => n.type === 'word',
+        ).length
+
+        // metadata.length should match actual word count
+        expect(hangingSection.metadata.length).toBe(actualWordCount)
+
+        // Should include words from both poetry lines (22 words total)
+        expect(actualWordCount).toBe(22)
+    })
+})
+
+// ============================================================================
 // COMPREHENSIVE PARAMETERIZED TESTS FOR ALL TRANSLATIONS
 // ============================================================================
 
@@ -872,6 +1049,12 @@ const CHAPTERS: Array<{
         chapter: 1,
         expectedVerses: 17,
         bookSlug: 'song_of_solomon',
+    },
+    {
+        book: 'luke',
+        chapter: 19,
+        expectedVerses: 48,
+        bookSlug: 'luke',
     },
 ]
 
@@ -1231,4 +1414,157 @@ describe.each(TRANSLATIONS)('Translation: %s', translation => {
             })
         },
     )
+})
+
+// ============================================================================
+// LUKE 19 NASB - SPECIFIC REGRESSION TESTS
+// ============================================================================
+// Issue: Verse 38 has poetry continuation paragraphs that weren't typeable.
+// The verse starts in a regular paragraph ("shouting:") then continues in
+// poetry lines ("Blessed is the King..." and "Peace in heaven...").
+
+describe('Luke 19 NASB - Poetry continuation typing', () => {
+    const nasbLuke19Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/nasb/luke_19.html',
+        ),
+        'utf8',
+    )
+
+    test('parses all 48 verses', () => {
+        const result = parseApiBibleChapter(nasbLuke19Html, 'nasb')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        const verseNumbers = new Set<number>()
+        for (const p of paragraphs) {
+            for (const v of p.nodes) {
+                verseNumbers.add(v.verse.verse)
+            }
+        }
+
+        expect(verseNumbers.size).toBe(48)
+        for (let i = 1; i <= 48; i++) {
+            expect(verseNumbers.has(i)).toBe(true)
+        }
+    })
+
+    test('verse 38 has all content including poetry continuation', () => {
+        const result = parseApiBibleChapter(nasbLuke19Html, 'nasb')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Find all verse 38 sections
+        const verse38Sections = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 38),
+        )
+
+        // Should have content from "shouting:" AND the poetry lines
+        // Note: "Blessed" appears as "B lessed" due to small caps span splitting
+        const allText = verse38Sections.map(v => v.text).join(' ')
+        expect(allText).toContain('shouting')
+        expect(allText).toContain('lessed') // Part of "Blessed" (after small caps split)
+        expect(allText).toContain('King')
+        expect(allText).toContain('Peace')
+        expect(allText).toContain('heaven')
+        expect(allText).toContain('glory')
+    })
+
+    test('all verse 38 sections have typeable words', () => {
+        const result = parseApiBibleChapter(nasbLuke19Html, 'nasb')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Find all verse 38 sections
+        const verse38Sections = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 38),
+        )
+
+        // Each section should have at least one word
+        for (const section of verse38Sections) {
+            const words = section.nodes.filter(
+                (n): n is Word => n.type === 'word',
+            )
+            expect(words.length).toBeGreaterThan(0)
+        }
+    })
+
+    test('verse 38 poetry continuation is properly typed as hanging verse', () => {
+        const result = parseApiBibleChapter(nasbLuke19Html, 'nasb')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Find all verse 38 sections
+        const verse38Sections = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 38),
+        )
+
+        // First section should not be a hanging verse (has verse number)
+        expect(verse38Sections[0]?.metadata.hangingVerse).toBe(false)
+
+        // If there are continuation sections, they should be hanging verses
+        for (let i = 1; i < verse38Sections.length; i++) {
+            expect(verse38Sections[i]?.metadata.hangingVerse).toBe(true)
+        }
+    })
+
+    test('can type through entire verse 38 including all poetry lines', () => {
+        const result = parseApiBibleChapter(nasbLuke19Html, 'nasb')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Collect all words for verse 38 in order
+        const verse38Words: Word[] = []
+        for (const p of paragraphs) {
+            for (const verse of p.nodes) {
+                if (verse.verse.verse === 38) {
+                    for (const node of verse.nodes) {
+                        if (node.type === 'word') {
+                            verse38Words.push(node)
+                        }
+                    }
+                }
+            }
+        }
+
+        // Should have words
+        expect(verse38Words.length).toBeGreaterThan(5)
+
+        // Verify key words from all parts of verse 38 are present
+        // Note: "Blessed" is now correctly merged with small caps spans
+        const allLetters = verse38Words.map(w => w.letters.join('')).join(' ')
+        expect(allLetters).toContain('shouting')
+        expect(allLetters).toContain('Blessed')
+        expect(allLetters).toContain('King')
+        expect(allLetters).toContain('Peace')
+        expect(allLetters).toContain('heaven')
+    })
+
+    test('no verse 38 section has empty nodes array', () => {
+        const result = parseApiBibleChapter(nasbLuke19Html, 'nasb')
+
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        // Find all verse 38 sections
+        const verse38Sections = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 38),
+        )
+
+        for (const section of verse38Sections) {
+            expect(section.nodes.length).toBeGreaterThan(0)
+        }
+    })
 })
