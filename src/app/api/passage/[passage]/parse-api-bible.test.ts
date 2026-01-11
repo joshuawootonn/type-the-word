@@ -1190,11 +1190,13 @@ function getPunctuationOnlyWords(paragraphs: Paragraph[]): string[] {
                     const word = node.letters.join('')
                     // Check if word contains no letters/numbers (just punctuation/whitespace)
                     if (!/[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]/.test(word)) {
-                        // Allow punctuation that includes quotes (e.g., ", ', ,', .', etc.)
-                        // These are needed for proper rendering of quoted text
-                        const hasQuote =
-                            /[\u0022\u0027\u201C\u201D\u2018\u2019]/.test(word)
-                        if (!hasQuote) {
+                        // Allow punctuation that includes quotes or parentheses
+                        // These are needed for proper rendering of quoted/parenthetical text
+                        const hasQuoteOrParen =
+                            /[\u0022\u0027\u201C\u201D\u2018\u2019()\[\]]/.test(
+                                word,
+                            )
+                        if (!hasQuoteOrParen) {
                             problems.push(word)
                         }
                     }
@@ -1910,6 +1912,42 @@ describe('Luke 8:21 NASB - Closing quote completeness', () => {
         // Verify it's complete (ends with space)
         const lastLetter = lastWord!.letters[lastWord!.letters.length - 1]
         expect(lastLetter).toBe(' ')
+    })
+})
+
+// ============================================================================
+// JOHN 4:2 NASB - PARENTHESES HANDLING
+// ============================================================================
+describe('John 4:2 NASB - Parentheses handling', () => {
+    const nasbJohn4Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/nasb/john_4.html',
+        ),
+        'utf8',
+    )
+
+    test('parses John 4 successfully', () => {
+        const result = parseApiBibleChapter(nasbJohn4Html, 'nasb')
+        expect(result.nodes.length).toBeGreaterThan(0)
+    })
+
+    test('verse 2 contains closing parenthesis', () => {
+        const result = parseApiBibleChapter(nasbJohn4Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse2 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 2),
+        )
+
+        expect(verse2.length).toBeGreaterThan(0)
+        const verse2Text = verse2.map(v => v.text).join('')
+
+        // Should contain closing parenthesis merged with previous word
+        expect(verse2Text).toContain(')')
+        // Should end with ), or ).
+        expect(verse2Text).toMatch(/\)\s*[,.]?\s*$/)
     })
 })
 

@@ -118,13 +118,14 @@ export function parseApiBibleChapter(
                                   return true
                               }
 
-                              // No alphanumeric: only keep if it contains quote characters
-                              // This preserves opening quotes like " but filters out markers like *
-                              const hasQuote =
-                                  /[\u0022\u0027\u201C\u201D\u2018\u2019]/.test(
+                              // No alphanumeric: keep if it contains quotes or parentheses/brackets
+                              // This preserves opening quotes like " and parenthetical text like )
+                              // but filters out markers like *
+                              const hasQuoteOrParen =
+                                  /[\u0022\u0027\u201C\u201D\u2018\u2019()\[\]]/.test(
                                       word,
                                   )
-                              return hasQuote
+                              return hasQuoteOrParen
                           })
                           .map((word): Inline => {
                               const letters = word.split('')
@@ -349,7 +350,17 @@ export function parseApiBibleChapter(
                     /^[.!?,;:]+[\u201D\u2019"']+$/.test(currentTrimmed) &&
                     lastLetter === ' '
 
-                if (isQuoteOnlyAfterPunct || isPunctPlusQuote) {
+                // Pattern 3: closing paren/bracket after word (e.g., were + ), → were),)
+                // Matches ), ]. ): etc.
+                const isClosingParen =
+                    /^[)\]][.!?,;:]*$/.test(currentTrimmed) &&
+                    lastLetter === ' '
+
+                if (
+                    isQuoteOnlyAfterPunct ||
+                    isPunctPlusQuote ||
+                    isClosingParen
+                ) {
                     // Remove the trailing space, append the closing quote
                     lastResult.letters.pop()
                     lastResult.letters.push(...current.letters)
