@@ -1189,7 +1189,13 @@ function getPunctuationOnlyWords(paragraphs: Paragraph[]): string[] {
                     const word = node.letters.join('')
                     // Check if word contains no letters/numbers (just punctuation/whitespace)
                     if (!/[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]/.test(word)) {
-                        problems.push(word)
+                        // Allow punctuation that includes quotes (e.g., ", ', ,', .', etc.)
+                        // These are needed for proper rendering of quoted text
+                        const hasQuote =
+                            /[\u0022\u0027\u201C\u201D\u2018\u2019]/.test(word)
+                        if (!hasQuote) {
+                            problems.push(word)
+                        }
                     }
                 }
             }
@@ -1566,5 +1572,139 @@ describe('Luke 19 NASB - Poetry continuation typing', () => {
         for (const section of verse38Sections) {
             expect(section.nodes.length).toBeGreaterThan(0)
         }
+    })
+})
+
+// ============================================================================
+// LUKE 7:5-10 NASB - SPACING AND QUOTE ISSUES
+// ============================================================================
+describe('Luke 7:5-10 NASB - Spacing and quote rendering', () => {
+    const nasbLuke7Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/nasb/luke_7.html',
+        ),
+        'utf8',
+    )
+
+    test('parses Luke 7 successfully', () => {
+        const result = parseApiBibleChapter(nasbLuke7Html, 'nasb')
+        expect(result.nodes.length).toBeGreaterThan(0)
+    })
+
+    test('verse 5 text is correct', () => {
+        const result = parseApiBibleChapter(nasbLuke7Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse5 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 5),
+        )
+
+        expect(verse5.length).toBeGreaterThan(0)
+        const verse5Text = verse5.map(v => v.text).join('')
+        expect(verse5Text).toContain(
+            'for he loves our nation, and it was he who built us our synagogue.',
+        )
+    })
+
+    test('verse 6 has opening quote before "Lord"', () => {
+        const result = parseApiBibleChapter(nasbLuke7Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse6 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 6),
+        )
+
+        expect(verse6.length).toBeGreaterThan(0)
+        const verse6Text = verse6.map(v => v.text).join('')
+
+        // Should have: saying to Him, [quote]Lord, do not trouble
+        // Check that there's a quote character (any quote) before Lord
+        expect(verse6Text).toMatch(/saying to Him, [\u0022\u201C]Lord/)
+        expect(verse6Text).toMatch(/[\u0022\u201C]Lord, do not trouble/)
+    })
+
+    test('verse 7 "I did" is rendered with proper spacing', () => {
+        const result = parseApiBibleChapter(nasbLuke7Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse7 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 7),
+        )
+
+        expect(verse7.length).toBeGreaterThan(0)
+        const verse7Text = verse7.map(v => v.text).join('')
+
+        // Should have: for that reason I did not even consider
+        expect(verse7Text).toContain('reason I did not')
+        expect(verse7Text).toContain('I did not even consider')
+    })
+
+    test('verse 9 "I say" is rendered with proper spacing', () => {
+        const result = parseApiBibleChapter(nasbLuke7Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse9 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 9),
+        )
+
+        expect(verse9.length).toBeGreaterThan(0)
+        const verse9Text = verse9.map(v => v.text).join('')
+
+        // Should have: was following Him, [quote]I say to you,
+        // Check that there's a quote character (any quote) before "I say"
+        expect(verse9Text).toMatch(/Him, [\u0022\u201C]I say to you/)
+        expect(verse9Text).toMatch(/[\u0022\u201C]I say to you,/)
+    })
+
+    test('verse 8 ending has no space before closing quote', () => {
+        const result = parseApiBibleChapter(nasbLuke7Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse8 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 8),
+        )
+
+        expect(verse8.length).toBeGreaterThan(0)
+        const verse8Text = verse8.map(v => v.text).join('')
+
+        // Should end with: he does it."  (no space before closing quote)
+        // Note: Uses curly quote " (U+201D) from the API
+        expect(verse8Text).toContain('he does it.\u201D')
+        expect(verse8Text).not.toContain('it. \u201D')
+        expect(verse8Text).not.toContain('it. "')
+    })
+
+    test('verses 5-10 full text has proper spacing', () => {
+        const result = parseApiBibleChapter(nasbLuke7Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+
+        const verses5to10 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse >= 5 && v.verse.verse <= 10),
+        )
+
+        const fullText = verses5to10.map(v => v.text).join('')
+
+        // Check key phrases have proper spacing (no "Iam", "Idid", "Isay", etc.)
+        expect(fullText).toContain('for I am not worthy')
+        expect(fullText).toContain('I did not even consider')
+        expect(fullText).toContain('For I also am')
+        expect(fullText).toContain('and I say to this one')
+        expect(fullText).toMatch(/[\u0022\u201C]I say to you/)
+        expect(fullText).toContain('have I found such')
+
+        // Check no merged words
+        expect(fullText).not.toContain('Iam ')
+        expect(fullText).not.toContain('Idid ')
+        expect(fullText).not.toContain('Ialso ')
+        expect(fullText).not.toContain('Isay ')
+        expect(fullText).not.toContain('Ifound ')
     })
 })

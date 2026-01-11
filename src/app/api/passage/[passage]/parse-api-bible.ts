@@ -98,17 +98,41 @@ export function parseApiBibleChapter(
                 wordSegments.length > 0
                     ? wordSegments
                           .filter(word => {
-                              // Filter out segments that are just punctuation or whitespace
-                              // (e.g., commas from footnote markers)
-                              return /[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]/.test(
-                                  word,
-                              )
+                              const hasAlphanumeric =
+                                  /[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]/.test(
+                                      word,
+                                  )
+
+                              if (hasAlphanumeric) {
+                                  // Has letters/numbers: keep it
+                                  return true
+                              }
+
+                              // No alphanumeric: only keep if it contains quote characters
+                              // This preserves opening quotes like " but filters out markers like *
+                              const hasQuote =
+                                  /[\u0022\u0027\u201C\u201D\u2018\u2019]/.test(
+                                      word,
+                                  )
+                              return hasQuote
                           })
                           .map((word): Inline => {
                               const letters = word.split('')
                               const atom: Word = {
                                   type: 'word',
                                   letters,
+                              }
+
+                              // Don't add trailing space to punctuation-only words
+                              // (quotes, etc. should attach to the following word)
+                              const hasAlphanumeric =
+                                  /[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]/.test(
+                                      word,
+                                  )
+
+                              if (!hasAlphanumeric) {
+                                  // Punctuation-only: don't add trailing space
+                                  return atom
                               }
 
                               return isAtomComplete(atom)
@@ -248,15 +272,41 @@ export function parseApiBibleChapter(
                 // 2. Previous word's second-to-last char is an UPPERCASE letter
                 // 3. Previous word has only 1-2 actual letters (short prefix)
                 // 4. Current word starts with a lowercase letter (continuation)
+                // 5. Previous word is NOT a complete English word (like "I" or "A")
+
+                // Don't merge if the second-to-last letter is "I" or "A" (complete English words)
+                // This handles cases like:
+                // - "I " + "say" → don't merge (pronoun)
+                // - '"I ' + "say" → don't merge (quoted pronoun)
+                // - "B " + "lessed" → merge (small caps divine name)
+                const isCompleteWord =
+                    secondToLastLetter === 'I' || secondToLastLetter === 'A'
+
                 if (
                     lastLetter === ' ' &&
                     secondToLastLetter &&
                     /[A-Z]/.test(secondToLastLetter) &&
                     actualLetters.length <= 2 &&
                     firstLetter &&
-                    /^[a-z]/.test(firstLetter)
+                    /^[a-z]/.test(firstLetter) &&
+                    !isCompleteWord
                 ) {
                     // Remove the artificial trailing space and merge
+                    lastResult.letters.pop()
+                    lastResult.letters.push(...current.letters)
+                    continue
+                }
+
+                // Check if current word is a closing quote that should attach to previous word
+                // Pattern: previous word ends with punctuation + space, current is quote-only
+                const currentWordStr = current.letters.join('')
+                const isClosingQuote =
+                    /^[\u201D\u2019"']+$/.test(currentWordStr.trim()) &&
+                    lastLetter === ' ' &&
+                    /[.!?,;:]/.test(secondToLastLetter ?? '')
+
+                if (isClosingQuote) {
+                    // Remove the trailing space and append the closing quote
                     lastResult.letters.pop()
                     lastResult.letters.push(...current.letters)
                     continue
