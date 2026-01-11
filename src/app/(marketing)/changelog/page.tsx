@@ -67,6 +67,31 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('01/11/2026')} /> - Fixed
+                    several NASB parsing issues:
+                    <ul>
+                        <li>
+                            Nested quotes (e.g., in John 1:15) now render
+                            correctly without extra spaces between closing
+                            single and double quotes.
+                        </li>
+                        <li>
+                            Fixed closing punctuation followed by quotes (e.g.,
+                            &quot;yourself.&quot; in Luke 10:27) not attaching
+                            properly to the previous word.
+                        </li>
+                        <li>
+                            Fixed parenthetical text (e.g., in John 4:2) being
+                            stripped out, and ensured closing parentheses merge
+                            with the previous word.
+                        </li>
+                        <li>
+                            Fixed handling of Unicode thin spaces that were
+                            causing unexpected word breaks.
+                        </li>
+                    </ul>
+                </li>
+                <li>
                     <DateComponent date={new Date('01/03/2026')} /> - Added{' '}
                     <a href="/copyright" className="underline">
                         copyright information
