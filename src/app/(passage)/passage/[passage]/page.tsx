@@ -99,10 +99,6 @@ export default async function PassagePage(props: {
             : getChapterHistory(session.user.id, segmentToPassageObject(value)),
     ])
 
-    // Build query string for prev/next links
-    const translationQueryString =
-        translation === 'bsb' ? `?translation=bsb` : ''
-
     return (
         <>
             <Passage
@@ -114,7 +110,7 @@ export default async function PassagePage(props: {
             <div className="not-prose mb-24 mt-8 flex w-full justify-between">
                 {passage?.prevChapter ? (
                     <Link
-                        href={`/passage/${passage.prevChapter.url}${translationQueryString}`}
+                        href={`/passage/${passage.prevChapter.url}${translationParam}`}
                         className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary"
                     >
                         {passage.prevChapter.label}
@@ -124,7 +120,7 @@ export default async function PassagePage(props: {
                 )}
                 {passage?.nextChapter ? (
                     <Link
-                        href={`/passage/${passage.nextChapter.url}${translationQueryString}`}
+                        href={`/passage/${passage.nextChapter.url}${translationParam}`}
                         className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary"
                     >
                         {passage.nextChapter.label}
