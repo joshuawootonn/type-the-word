@@ -1192,10 +1192,10 @@ function getPunctuationOnlyWords(paragraphs: Paragraph[]): string[] {
                     // Check if word contains no letters/numbers (just punctuation/whitespace)
                     if (!/[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]/.test(word)) {
                         // Allow punctuation that includes quotes, parentheses, or
-                        // standalone punctuation like semicolons/colons/commas
+                        // standalone punctuation like semicolons/colons/commas/periods/question/exclamation
                         // These are needed for proper rendering of quoted/parenthetical text
                         const hasAllowedPunct =
-                            /[\u0022\u0027\u201C\u201D\u2018\u2019()\[\];:,]/.test(
+                            /[\u0022\u0027\u201C\u201D\u2018\u2019()\[\];:,.?!]/.test(
                                 word,
                             )
                         if (!hasAllowedPunct) {
@@ -2170,6 +2170,37 @@ describe('John 10:34 NASB - Quote+punctuation merge', () => {
         expect(verse34Text).toMatch(/gods['\u2019]\?/)
         // Should NOT have space before '?
         expect(verse34Text).not.toMatch(/gods\s+['\u2019]\?/)
+    })
+})
+
+// ============================================================================
+// JOHN 12:38 NASB - STANDALONE QUESTION MARK
+// ============================================================================
+describe('John 12:38 NASB - Standalone question mark', () => {
+    const nasbJohn12Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/nasb/john_12.html',
+        ),
+        'utf-8',
+    )
+
+    test('verse 38 has question mark after "report" (no space before ?)', () => {
+        const result = parseApiBibleChapter(nasbJohn12Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse38 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 38),
+        )
+
+        expect(verse38.length).toBeGreaterThan(0)
+        const verse38Text = verse38.map(v => v.text).join('')
+
+        // Should have "report?" with no space before the question mark
+        expect(verse38Text).toContain('report?')
+        // Should NOT have space before ?
+        expect(verse38Text).not.toMatch(/report\s+\?/)
     })
 })
 

@@ -118,11 +118,11 @@ export function parseApiBibleChapter(
                               }
 
                               // No alphanumeric: keep if it contains quotes, parentheses, or
-                              // standalone punctuation like semicolons that can follow quotes
-                              // This preserves opening quotes like " and punctuation like ;
+                              // standalone punctuation that can appear between words
+                              // This preserves opening quotes like " and punctuation like ; ? !
                               // but filters out markers like *
                               const hasQuoteParenOrPunct =
-                                  /[\u0022\u0027\u201C\u201D\u2018\u2019()\[\];:,]/.test(
+                                  /[\u0022\u0027\u201C\u201D\u2018\u2019()\[\];:,.?!]/.test(
                                       word,
                                   )
                               return hasQuoteParenOrPunct
@@ -346,8 +346,8 @@ export function parseApiBibleChapter(
                 // Pattern 4: closing paren/bracket (e.g., were + ), → were), or longer." + ]] → longer."]])
                 const isClosingParen = /^[)\]]+[.!?,;:]*$/.test(currentTrimmed)
 
-                // Pattern 5: standalone punctuation (e.g., Lord + ; → Lord;)
-                const isStandalonePunct = /^[;:,]+$/.test(currentTrimmed)
+                // Pattern 5: standalone punctuation (e.g., Lord + ; → Lord; or report + ? → report?)
+                const isStandalonePunct = /^[;:,.?!]+$/.test(currentTrimmed)
 
                 if (
                     isClosingQuote ||
