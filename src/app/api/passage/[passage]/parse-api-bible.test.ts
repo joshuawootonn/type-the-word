@@ -1969,6 +1969,53 @@ describe('John 4:2 NASB - Parentheses handling', () => {
 })
 
 // ============================================================================
+// JOHN 6:1 NASB - OPENING PARENTHESIS HANDLING
+// ============================================================================
+describe('John 6:1 NASB - Opening parenthesis', () => {
+    const nasbJohn6Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/nasb/john_6.html',
+        ),
+        'utf8',
+    )
+
+    test('parses John 6 successfully', () => {
+        const result = parseApiBibleChapter(nasbJohn6Html, 'nasb')
+        expect(result.nodes.length).toBeGreaterThan(0)
+    })
+
+    test('verse 1 contains opening parenthesis', () => {
+        const result = parseApiBibleChapter(nasbJohn6Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse1 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 1),
+        )
+
+        expect(verse1.length).toBeGreaterThan(0)
+        const verse1Text = verse1.map(v => v.text).join('')
+
+        // Should contain both opening and closing parenthesis
+        expect(verse1Text).toContain('(')
+        expect(verse1Text).toContain(')')
+
+        // Opening paren should be merged with following word "(or"
+        const verse1Words = verse1.flatMap(v =>
+            v.nodes.filter((n): n is Word => n.type === 'word'),
+        )
+        const openParenWord = verse1Words.find(w => w.letters[0] === '(')
+        expect(openParenWord).toBeDefined()
+        expect(openParenWord!.letters.join('')).toBe('(or ')
+        // Should be complete (ends with space)
+        expect(openParenWord!.letters[openParenWord!.letters.length - 1]).toBe(
+            ' ',
+        )
+    })
+})
+
+// ============================================================================
 // JOHN 1:15 NASB - NESTED QUOTES (single quote followed by double quote)
 // ============================================================================
 describe('John 1:15 NASB - Nested quote handling', () => {

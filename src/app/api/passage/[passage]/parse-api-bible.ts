@@ -269,20 +269,21 @@ export function parseApiBibleChapter(
             const lastResult = result[result.length - 1]
             const firstLetter = current.letters[0]
 
-            // Check if previous word is an opening quote that should attach to current word
-            // Pattern: previous word is quote-only, current word starts with a letter
+            // Check if previous word is an opening quote/paren that should attach to current word
+            // Pattern: previous word is quote/paren-only, current word starts with a letter
             // This check runs even for single-character previous words
             if (lastResult?.type === 'word' && lastResult.letters.length >= 1) {
                 const lastResultStr = lastResult.letters.join('')
-                const isOpeningQuote =
-                    /^[\u201C\u2018"']+$/.test(lastResultStr.trim()) &&
+                // Match opening quotes AND opening parentheses/brackets
+                const isOpeningQuoteOrParen =
+                    /^[\u201C\u2018"'(\[]+$/.test(lastResultStr.trim()) &&
                     firstLetter &&
                     /[a-zA-Z]/.test(firstLetter)
 
-                if (isOpeningQuote) {
-                    // Prepend the opening quote to the current word
+                if (isOpeningQuoteOrParen) {
+                    // Prepend the opening quote/paren to the current word
                     current.letters.unshift(...lastResult.letters)
-                    // Remove the opening quote from result (it's now merged)
+                    // Remove the opening quote/paren from result (it's now merged)
                     result.pop()
                     result.push(current)
                     continue
