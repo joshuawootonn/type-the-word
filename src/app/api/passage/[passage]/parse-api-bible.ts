@@ -4,7 +4,6 @@ import { ChildNode, Element } from 'parse5/dist/tree-adapters/default'
 
 import { apiBibleIdToBook } from '~/lib/api-bible-book-id'
 import { isAtomTyped } from '~/lib/isEqual'
-import { isAtomComplete } from '~/lib/keystroke'
 import {
     Block,
     Inline,
@@ -130,26 +129,14 @@ export function parseApiBibleChapter(
                           })
                           .map((word): Inline => {
                               const letters = word.split('')
-                              const atom: Word = {
+                              // Don't add trailing spaces here - we'll add them after merging
+                              // This allows merge logic to distinguish between:
+                              // - Words that originally had trailing space (from source)
+                              // - Words that need artificial trailing space (incomplete)
+                              return {
                                   type: 'word',
                                   letters,
                               }
-
-                              // Don't add trailing space to punctuation-only words
-                              // (quotes, etc. should attach to the following word)
-                              const hasAlphanumeric =
-                                  /[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]/.test(
-                                      word,
-                                  )
-
-                              if (!hasAlphanumeric) {
-                                  // Punctuation-only: don't add trailing space
-                                  return atom
-                              }
-
-                              return isAtomComplete(atom)
-                                  ? atom
-                                  : { ...atom, letters: [...atom.letters, ' '] }
                           })
                     : []
 
@@ -290,94 +277,84 @@ export function parseApiBibleChapter(
                 }
             }
 
-            if (lastResult?.type === 'word' && lastResult.letters.length >= 2) {
+            if (lastResult?.type === 'word' && lastResult.letters.length >= 1) {
                 const lastLetter =
                     lastResult.letters[lastResult.letters.length - 1]
-                const secondToLastLetter =
-                    lastResult.letters[lastResult.letters.length - 2]
+                if (!lastLetter) continue // Safety check
 
                 // Count actual letters (not punctuation or space) in previous word
                 const actualLetters = lastResult.letters.filter(l =>
                     /[a-zA-Z]/.test(l),
                 )
 
-                // Merge if:
-                // 1. Previous word ends with space (artificial trailing space)
-                // 2. Previous word's second-to-last char is an UPPERCASE letter
-                // 3. Previous word has only 1-2 actual letters (short prefix)
-                // 4. Current word starts with a lowercase letter (continuation)
-                // 5. Previous word is NOT a complete English word (like "I" or "A")
-
-                // Don't merge if the second-to-last letter is "I" or "A" (complete English words)
-                // This handles cases like:
-                // - "I " + "say" → don't merge (pronoun)
-                // - '"I ' + "say" → don't merge (quoted pronoun)
-                // - "B " + "lessed" → merge (small caps divine name)
-                const isCompleteWord =
-                    secondToLastLetter === 'I' || secondToLastLetter === 'A'
-
-                if (
-                    lastLetter === ' ' &&
-                    secondToLastLetter &&
-                    /[A-Z]/.test(secondToLastLetter) &&
+                // Small caps merge: when words like "AND" cross HTML span boundaries,
+                // we get 'A (no trailing space) + nd (with trailing space)
+                //
+                // Key insight: words from the SAME text node have trailing spaces
+                // (from the original source). Words from DIFFERENT spans don't.
+                //
+                // So we merge when:
+                // 1. Previous word does NOT end with space (came from different span)
+                // 2. Previous word's last char is UPPERCASE
+                // 3. Previous word has only 1-2 actual letters
+                // 4. Current word starts with lowercase (continuation)
+                //
+                // This naturally handles:
+                // - 'A (no space) + nd → merge to 'And ✓
+                // - "I (has space) + say → no merge ✓ (both from same text node)
+                const shouldMergeSmallCaps =
+                    lastLetter !== ' ' &&
+                    lastLetter !== '\n' &&
+                    /[A-Z]/.test(lastLetter) &&
                     actualLetters.length <= 2 &&
                     firstLetter &&
-                    /^[a-z]/.test(firstLetter) &&
-                    !isCompleteWord
-                ) {
-                    // Remove the artificial trailing space and merge
-                    lastResult.letters.pop()
+                    /^[a-z]/.test(firstLetter)
+
+                if (shouldMergeSmallCaps) {
+                    // Merge the words
                     lastResult.letters.push(...current.letters)
                     continue
                 }
 
-                // Check if current word is a closing quote that should attach to previous word
-                // Two patterns:
-                // 1. Previous word ends with punctuation + space (e.g., "it. "), current is quote-only
-                // 2. Previous word ends with letter + space (e.g., "yourself "), current is punct+quote (e.g., ".")
+                // Check if current word is closing punctuation that should attach to previous word
                 const currentWordStr = current.letters.join('')
                 const currentTrimmed = currentWordStr.trim()
 
-                // Pattern 1: quote-only after punctuation (e.g., it. + " → it." or me.' + " → me.'")
-                // Include quotes in punctuation check to handle nested quotes like 'word.'" or "word.'"
-                const isQuoteOnlyAfterPunct =
+                // Get the last non-space character of the previous word
+                const lastNonSpaceIdx =
+                    lastLetter === ' ' || lastLetter === '\n'
+                        ? lastResult.letters.length - 2
+                        : lastResult.letters.length - 1
+                const lastNonSpace = lastResult.letters[lastNonSpaceIdx]
+
+                // Pattern 1: closing quote after punctuation (e.g., it. + " → it.")
+                const isClosingQuote =
                     /^[\u201D\u2019"']+$/.test(currentTrimmed) &&
-                    lastLetter === ' ' &&
-                    /[.!?,;:'"'\u2018\u2019\u201C\u201D]/.test(
-                        secondToLastLetter ?? '',
-                    )
+                    lastNonSpace != null &&
+                    /[.!?,;:'"'\u2018\u2019\u201C\u201D]/.test(lastNonSpace)
 
                 // Pattern 2: punct+quote after word (e.g., yourself + ." → yourself.")
-                const isPunctPlusQuote =
-                    /^[.!?,;:]+[\u201D\u2019"']+$/.test(currentTrimmed) &&
-                    lastLetter === ' '
+                const isPunctPlusQuote = /^[.!?,;:]+[\u201D\u2019"']+$/.test(
+                    currentTrimmed,
+                )
 
-                // Pattern 3: closing paren/bracket after word (e.g., were + ), → were),)
-                // Matches ), ]. ): etc.
-                const isClosingParen =
-                    /^[)\]][.!?,;:]*$/.test(currentTrimmed) &&
-                    lastLetter === ' '
+                // Pattern 3: closing paren/bracket (e.g., were + ), → were),)
+                const isClosingParen = /^[)\]][.!?,;:]*$/.test(currentTrimmed)
 
-                // Pattern 4: standalone punctuation after any word (e.g., Lord + ; → Lord;)
-                // Matches ; : , after any word ending with a letter/quote + space
-                const isStandalonePunct =
-                    /^[;:,]+$/.test(currentTrimmed) && lastLetter === ' '
+                // Pattern 4: standalone punctuation (e.g., Lord + ; → Lord;)
+                const isStandalonePunct = /^[;:,]+$/.test(currentTrimmed)
 
                 if (
-                    isQuoteOnlyAfterPunct ||
+                    isClosingQuote ||
                     isPunctPlusQuote ||
                     isClosingParen ||
                     isStandalonePunct
                 ) {
-                    // Remove the trailing space, append the closing quote
-                    lastResult.letters.pop()
-                    lastResult.letters.push(...current.letters)
-                    // Only add trailing space if the merged word doesn't already have one
-                    const lastChar =
-                        lastResult.letters[lastResult.letters.length - 1]
-                    if (lastChar !== ' ' && lastChar !== '\n') {
-                        lastResult.letters.push(' ')
+                    // Remove trailing space if present, then append
+                    if (lastLetter === ' ' || lastLetter === '\n') {
+                        lastResult.letters.pop()
                     }
+                    lastResult.letters.push(...current.letters)
                     continue
                 }
             }
@@ -385,7 +362,27 @@ export function parseApiBibleChapter(
             result.push(current)
         }
 
-        return result
+        // After merging, add trailing spaces to incomplete words
+        // This ensures all words are "complete" for typing
+        return result.map(node => {
+            if (node.type !== 'word') return node
+
+            const lastChar = node.letters[node.letters.length - 1]
+
+            // Already has trailing space or newline
+            if (lastChar === ' ' || lastChar === '\n') return node
+
+            // Punctuation-only words (quotes, parens) don't need trailing space
+            // They'll attach to adjacent words
+            const hasAlphanumeric =
+                /[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]/.test(
+                    node.letters.join(''),
+                )
+            if (!hasAlphanumeric) return node
+
+            // Add trailing space
+            return { ...node, letters: [...node.letters, ' '] }
+        })
     }
 
     function parseDataVid(

@@ -2013,6 +2013,100 @@ describe('John 6:1 NASB - Opening parenthesis', () => {
             ' ',
         )
     })
+
+    test('verse 45 "And" is not split up (small caps merge)', () => {
+        const result = parseApiBibleChapter(nasbJohn6Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse45 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 45),
+        )
+
+        expect(verse45.length).toBeGreaterThan(0)
+        const verse45Text = verse45.map(v => v.text).join('')
+
+        // Check for split "And" - should NOT have "'A nd" or similar
+        // Uses curly quote U+2018
+        expect(verse45Text).not.toMatch(/\u2018A\s+nd/)
+
+        // Should have proper "'And" with quote attached (curly quote)
+        expect(verse45Text).toContain('\u2018And')
+    })
+
+    // Test cases for "I am" and "It is" - should NOT merge when in same text node
+    test('verse 20 "It is I" - "I" is NOT merged (same text node)', () => {
+        const result = parseApiBibleChapter(nasbJohn6Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse20 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 20),
+        )
+
+        expect(verse20.length).toBeGreaterThan(0)
+        const verse20Text = verse20.map(v => v.text).join('')
+
+        // "It is I" should be properly spaced, not merged
+        expect(verse20Text).toContain('It is I')
+        // Should NOT have "Itis" or "isI" merged
+        expect(verse20Text).not.toMatch(/Itis/)
+        expect(verse20Text).not.toMatch(/isI/)
+    })
+
+    test('verse 35 "I am" - "I" is NOT merged (same text node)', () => {
+        const result = parseApiBibleChapter(nasbJohn6Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse35 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 35),
+        )
+
+        expect(verse35.length).toBeGreaterThan(0)
+        const verse35Text = verse35.map(v => v.text).join('')
+
+        // "I am" should be properly spaced
+        expect(verse35Text).toContain('I am')
+        // Should NOT have "Iam" merged
+        expect(verse35Text).not.toMatch(/Iam/)
+    })
+
+    test('verse 41 "I am" - "I" is NOT merged (same text node)', () => {
+        const result = parseApiBibleChapter(nasbJohn6Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse41 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 41),
+        )
+
+        expect(verse41.length).toBeGreaterThan(0)
+        const verse41Text = verse41.map(v => v.text).join('')
+
+        // "I am" should be properly spaced
+        expect(verse41Text).toContain('I am')
+        // Should NOT have "Iam" merged
+        expect(verse41Text).not.toMatch(/Iam/)
+    })
+
+    test('verse 42 "Is this" - properly spaced (same text node)', () => {
+        const result = parseApiBibleChapter(nasbJohn6Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse42 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 42),
+        )
+
+        expect(verse42.length).toBeGreaterThan(0)
+        const verse42Text = verse42.map(v => v.text).join('')
+
+        // "Is this not Jesus" should be properly spaced
+        expect(verse42Text).toContain('Is this not Jesus')
+        // Should NOT have "Isthis" merged
+        expect(verse42Text).not.toMatch(/Isthis/)
+    })
 })
 
 // ============================================================================
