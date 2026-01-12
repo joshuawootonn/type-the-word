@@ -2142,6 +2142,38 @@ describe('John 8:11 NASB - Double bracket merge', () => {
 })
 
 // ============================================================================
+// JOHN 10:34 NASB - QUOTE+PUNCTUATION MERGE
+// ============================================================================
+describe('John 10:34 NASB - Quote+punctuation merge', () => {
+    const nasbJohn10Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/nasb/john_10.html',
+        ),
+        'utf-8',
+    )
+
+    test("verse 34 ends with gods'? (no space before quote)", () => {
+        const result = parseApiBibleChapter(nasbJohn10Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse34 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 34),
+        )
+
+        expect(verse34.length).toBeGreaterThan(0)
+        const verse34Text = verse34.map(v => v.text).join('')
+
+        // Should have gods'? with no space before the closing quote
+        // Uses U+2019 (RIGHT SINGLE QUOTATION MARK)
+        expect(verse34Text).toMatch(/gods['\u2019]\?/)
+        // Should NOT have space before '?
+        expect(verse34Text).not.toMatch(/gods\s+['\u2019]\?/)
+    })
+})
+
+// ============================================================================
 // JOHN 1:15 NASB - NESTED QUOTES (single quote followed by double quote)
 // ============================================================================
 describe('John 1:15 NASB - Nested quote handling', () => {

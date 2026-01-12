@@ -338,15 +338,21 @@ export function parseApiBibleChapter(
                     currentTrimmed,
                 )
 
-                // Pattern 3: closing paren/bracket (e.g., were + ), → were), or longer." + ]] → longer."]])
+                // Pattern 3: quote+punct after word (e.g., gods + '? → gods'?)
+                const isQuotePlusPunct = /^[\u201D\u2019"']+[.!?,;:]+$/.test(
+                    currentTrimmed,
+                )
+
+                // Pattern 4: closing paren/bracket (e.g., were + ), → were), or longer." + ]] → longer."]])
                 const isClosingParen = /^[)\]]+[.!?,;:]*$/.test(currentTrimmed)
 
-                // Pattern 4: standalone punctuation (e.g., Lord + ; → Lord;)
+                // Pattern 5: standalone punctuation (e.g., Lord + ; → Lord;)
                 const isStandalonePunct = /^[;:,]+$/.test(currentTrimmed)
 
                 if (
                     isClosingQuote ||
                     isPunctPlusQuote ||
+                    isQuotePlusPunct ||
                     isClosingParen ||
                     isStandalonePunct
                 ) {
