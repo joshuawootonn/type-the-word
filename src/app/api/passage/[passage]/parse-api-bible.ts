@@ -118,14 +118,15 @@ export function parseApiBibleChapter(
                                   return true
                               }
 
-                              // No alphanumeric: keep if it contains quotes or parentheses/brackets
-                              // This preserves opening quotes like " and parenthetical text like )
+                              // No alphanumeric: keep if it contains quotes, parentheses, or
+                              // standalone punctuation like semicolons that can follow quotes
+                              // This preserves opening quotes like " and punctuation like ;
                               // but filters out markers like *
-                              const hasQuoteOrParen =
-                                  /[\u0022\u0027\u201C\u201D\u2018\u2019()\[\]]/.test(
+                              const hasQuoteParenOrPunct =
+                                  /[\u0022\u0027\u201C\u201D\u2018\u2019()\[\];:,]/.test(
                                       word,
                                   )
-                              return hasQuoteOrParen
+                              return hasQuoteParenOrPunct
                           })
                           .map((word): Inline => {
                               const letters = word.split('')
@@ -356,10 +357,16 @@ export function parseApiBibleChapter(
                     /^[)\]][.!?,;:]*$/.test(currentTrimmed) &&
                     lastLetter === ' '
 
+                // Pattern 4: standalone punctuation after any word (e.g., Lord + ; → Lord;)
+                // Matches ; : , after any word ending with a letter/quote + space
+                const isStandalonePunct =
+                    /^[;:,]+$/.test(currentTrimmed) && lastLetter === ' '
+
                 if (
                     isQuoteOnlyAfterPunct ||
                     isPunctPlusQuote ||
-                    isClosingParen
+                    isClosingParen ||
+                    isStandalonePunct
                 ) {
                     // Remove the trailing space, append the closing quote
                     lastResult.letters.pop()

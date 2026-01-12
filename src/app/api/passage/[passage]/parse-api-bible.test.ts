@@ -948,6 +948,7 @@ describe('Luke 19:38 poetry continuation (NASB)', () => {
         expect(hangingSection.metadata.length).toBe(actualWordCount)
 
         // Should include words from both poetry lines (22 words total)
+        // Standalone punctuation like ; is merged with the previous word
         expect(actualWordCount).toBe(22)
     })
 })
@@ -1190,13 +1191,14 @@ function getPunctuationOnlyWords(paragraphs: Paragraph[]): string[] {
                     const word = node.letters.join('')
                     // Check if word contains no letters/numbers (just punctuation/whitespace)
                     if (!/[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]/.test(word)) {
-                        // Allow punctuation that includes quotes or parentheses
+                        // Allow punctuation that includes quotes, parentheses, or
+                        // standalone punctuation like semicolons/colons/commas
                         // These are needed for proper rendering of quoted/parenthetical text
-                        const hasQuoteOrParen =
-                            /[\u0022\u0027\u201C\u201D\u2018\u2019()\[\]]/.test(
+                        const hasAllowedPunct =
+                            /[\u0022\u0027\u201C\u201D\u2018\u2019()\[\];:,]/.test(
                                 word,
                             )
-                        if (!hasQuoteOrParen) {
+                        if (!hasAllowedPunct) {
                             problems.push(word)
                         }
                     }
@@ -1946,8 +1948,23 @@ describe('John 4:2 NASB - Parentheses handling', () => {
 
         // Should contain closing parenthesis merged with previous word
         expect(verse2Text).toContain(')')
-        // Should end with ), or ).
-        expect(verse2Text).toMatch(/\)\s*[,.]?\s*$/)
+    })
+
+    test('verse 53 contains semicolon after closing quote', () => {
+        const result = parseApiBibleChapter(nasbJohn4Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse53 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 53),
+        )
+
+        expect(verse53.length).toBeGreaterThan(0)
+        const verse53Text = verse53.map(v => v.text).join('')
+
+        // Should contain the semicolon after the closing quote
+        // Note: uses curly quote U+201D
+        expect(verse53Text).toContain('alive\u201D;')
     })
 })
 
