@@ -338,8 +338,8 @@ export function parseApiBibleChapter(
                     currentTrimmed,
                 )
 
-                // Pattern 3: closing paren/bracket (e.g., were + ), → were),)
-                const isClosingParen = /^[)\]][.!?,;:]*$/.test(currentTrimmed)
+                // Pattern 3: closing paren/bracket (e.g., were + ), → were), or longer." + ]] → longer."]])
+                const isClosingParen = /^[)\]]+[.!?,;:]*$/.test(currentTrimmed)
 
                 // Pattern 4: standalone punctuation (e.g., Lord + ; → Lord;)
                 const isStandalonePunct = /^[;:,]+$/.test(currentTrimmed)

@@ -2110,6 +2110,38 @@ describe('John 6:1 NASB - Opening parenthesis', () => {
 })
 
 // ============================================================================
+// JOHN 8:11 NASB - DOUBLE BRACKET MERGE
+// ============================================================================
+describe('John 8:11 NASB - Double bracket merge', () => {
+    const nasbJohn8Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/nasb/john_8.html',
+        ),
+        'utf-8',
+    )
+
+    test('verse 11 ends with closing quote merged with brackets', () => {
+        const result = parseApiBibleChapter(nasbJohn8Html, 'nasb')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse11 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 11),
+        )
+
+        expect(verse11.length).toBeGreaterThan(0)
+        const verse11Text = verse11.map(v => v.text).join('')
+
+        // The ]] should be merged with the closing quote, not separate
+        // Should end with something like: longer."]]
+        expect(verse11Text).toMatch(/longer\.["\u201D]\]\]/)
+        // Should NOT have space before ]]
+        expect(verse11Text).not.toMatch(/\s+\]\]/)
+    })
+})
+
+// ============================================================================
 // JOHN 1:15 NASB - NESTED QUOTES (single quote followed by double quote)
 // ============================================================================
 describe('John 1:15 NASB - Nested quote handling', () => {
