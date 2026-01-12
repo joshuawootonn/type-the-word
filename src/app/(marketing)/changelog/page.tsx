@@ -67,6 +67,37 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('01/12/2026')} /> - Fixed
+                    additional NASB parsing issues and started preserving
+                    translation in prev/next chapter buttons:
+                    <ul>
+                        <li>
+                            Improved small caps word merging to correctly
+                            distinguish between words that should merge (e.g.,
+                            &apos;A + nd → &apos;And) vs words that
+                            shouldn&apos;t (e.g., &quot;I say&quot; staying as
+                            separate words).
+                        </li>
+                        <li>
+                            Fixed double brackets <code>]]</code> not merging
+                            with the previous word (John 8:11).
+                        </li>
+                        <li>
+                            Fixed quote+punctuation patterns like{' '}
+                            <code>&apos;?</code> not merging properly (John
+                            10:34).
+                        </li>
+                        <li>
+                            Fixed standalone question marks being stripped from
+                            verses (John 12:38).
+                        </li>
+                        <li>
+                            Updated the next/previous chapter buttons to
+                            preserve the selected translation.
+                        </li>
+                    </ul>
+                </li>
+                <li>
                     <DateComponent date={new Date('01/11/2026')} /> - Fixed
                     several NASB parsing issues:
                     <ul>
