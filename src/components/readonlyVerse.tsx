@@ -94,9 +94,31 @@ export function ReadonlyVerse({
                 }
 
                 if (atom.type === 'word') {
+                    const wordText = atom.letters
+                        .join('')
+                        .replace(' ', '\u00a0')
+
+                    // For divine names, split first letter from rest for styling
+                    if (atom.divineName && wordText.length > 1) {
+                        const firstLetter = wordText[0]
+                        const rest = wordText.slice(1)
+                        return (
+                            <span
+                                key={aIndexPrime}
+                                className="word divine-name"
+                            >
+                                <span className="divine-name-first">
+                                    {firstLetter}
+                                </span>
+                                <span className="divine-name-rest">{rest}</span>
+                                <span className="text-[0px]"> </span>
+                            </span>
+                        )
+                    }
+
                     return (
                         <span key={aIndexPrime} className="word">
-                            {atom.letters.join('').replace(' ', '\u00a0')}
+                            {wordText}
                             <span className="text-[0px]"> </span>
                         </span>
                     )

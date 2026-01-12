@@ -2205,6 +2205,94 @@ describe('John 12:38 NASB - Standalone question mark', () => {
 })
 
 // ============================================================================
+// PROVERBS 20 NLT - DIVINE NAME (nd class) AND POSSESSIVE MERGE
+// ============================================================================
+describe('Proverbs 20 NLT - Divine name and possessive', () => {
+    const nltProverbs20Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            'src/server/api-bible/responses/nlt/proverbs_20.html',
+        ),
+        'utf-8',
+    )
+
+    test('verse 10 has Lord marked as divine name (nd class)', () => {
+        const result = parseApiBibleChapter(nltProverbs20Html, 'nlt')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse10 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 10),
+        )
+
+        expect(verse10.length).toBeGreaterThan(0)
+
+        // Find the "Lord" word and check it has divineName flag
+        const lordWord = verse10
+            .flatMap(v => v.nodes)
+            .find(
+                n =>
+                    n.type === 'word' &&
+                    n.letters.join('').toLowerCase().startsWith('lord'),
+            )
+        expect(lordWord).toBeDefined()
+        expect(lordWord?.type === 'word' && lordWord.divineName).toBe(true)
+    })
+
+    test('verse 12 has Lord marked as divine name (nd class)', () => {
+        const result = parseApiBibleChapter(nltProverbs20Html, 'nlt')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse12 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 12),
+        )
+
+        expect(verse12.length).toBeGreaterThan(0)
+
+        // Find the "Lord" word and check it has divineName flag
+        const lordWord = verse12
+            .flatMap(v => v.nodes)
+            .find(
+                n =>
+                    n.type === 'word' &&
+                    n.letters.join('').toLowerCase().startsWith('lord'),
+            )
+        expect(lordWord).toBeDefined()
+        expect(lordWord?.type === 'word' && lordWord.divineName).toBe(true)
+    })
+
+    test("verse 27 has Lord's with possessive merged and divine name flag", () => {
+        const result = parseApiBibleChapter(nltProverbs20Html, 'nlt')
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === 'paragraph',
+        )
+        const verse27 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 27),
+        )
+
+        expect(verse27.length).toBeGreaterThan(0)
+        const verse27Text = verse27.map(v => v.text).join('')
+
+        // Should have Lord's with no space before 's (text is lowercase, CSS uppercases)
+        expect(verse27Text).toMatch(/Lord[''\u2019]s/)
+        // Should NOT have space between Lord and 's
+        expect(verse27Text).not.toMatch(/Lord\s+[''\u2019]s/)
+
+        // The merged word should have divineName flag
+        const lordWord = verse27
+            .flatMap(v => v.nodes)
+            .find(
+                n =>
+                    n.type === 'word' &&
+                    n.letters.join('').toLowerCase().startsWith('lord'),
+            )
+        expect(lordWord).toBeDefined()
+        expect(lordWord?.type === 'word' && lordWord.divineName).toBe(true)
+    })
+})
+
+// ============================================================================
 // JOHN 1:15 NASB - NESTED QUOTES (single quote followed by double quote)
 // ============================================================================
 describe('John 1:15 NASB - Nested quote handling', () => {

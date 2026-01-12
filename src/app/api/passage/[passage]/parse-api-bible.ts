@@ -88,7 +88,10 @@ export function parseApiBibleChapter(
         return Array.from({ length: count }, () => ({ type: 'space' }))
     }
 
-    function parseInline(node: ChildNode): Inline[] {
+    function parseInline(
+        node: ChildNode,
+        options?: { divineName?: boolean },
+    ): Inline[] {
         if (node.nodeName === '#text' && 'value' in node) {
             const result: Inline[] = []
             let textValue = node.value
@@ -133,10 +136,15 @@ export function parseApiBibleChapter(
                               // This allows merge logic to distinguish between:
                               // - Words that originally had trailing space (from source)
                               // - Words that need artificial trailing space (incomplete)
-                              return {
+                              const result: Word = {
                                   type: 'word',
                                   letters,
                               }
+                              // Mark divine names for CSS styling (uppercase + smaller font)
+                              if (options?.divineName) {
+                                  result.divineName = true
+                              }
+                              return result
                           })
                     : []
 
@@ -198,9 +206,19 @@ export function parseApiBibleChapter(
                 }
             }
 
+            // Handle divine name class (nd) - mark words for CSS styling
+            // This is used in NLT and other translations for "Lord" → styled as "LORD"
+            if (hasClass(node, 'nd') && 'childNodes' in node) {
+                return node.childNodes.flatMap(child =>
+                    parseInline(child, { divineName: true }),
+                )
+            }
+
             // Regular span, parse children
             if ('childNodes' in node) {
-                return node.childNodes.flatMap(parseInline)
+                return node.childNodes.flatMap(child =>
+                    parseInline(child, options),
+                )
             }
         }
 
@@ -210,7 +228,7 @@ export function parseApiBibleChapter(
 
         // Handle other elements with children
         if ('childNodes' in node && node.childNodes.length > 0) {
-            return node.childNodes.flatMap(parseInline)
+            return node.childNodes.flatMap(child => parseInline(child, options))
         }
 
         return []
@@ -319,6 +337,18 @@ export function parseApiBibleChapter(
                 // Check if current word is closing punctuation that should attach to previous word
                 const currentWordStr = current.letters.join('')
                 const currentTrimmed = currentWordStr.trim()
+
+                // Possessive merge: LORD + 's → LORD's
+                // When previous word has no trailing space and current starts with 's or similar
+                const isPossessive =
+                    lastLetter !== ' ' &&
+                    lastLetter !== '\n' &&
+                    /^[''\u2019]s\b/.test(currentTrimmed)
+
+                if (isPossessive) {
+                    lastResult.letters.push(...current.letters)
+                    continue
+                }
 
                 // Get the last non-space character of the previous word
                 const lastNonSpaceIdx =
@@ -443,7 +473,7 @@ export function parseApiBibleChapter(
         // Hebrew letter headers (qa) - treat as section headers (h4)
         if (hasClass(node, 'qa')) {
             const text = node.childNodes
-                .flatMap(parseInline)
+                .flatMap(child => parseInline(child))
                 .filter((n): n is Word => n.type === 'word')
                 .map(n => n.letters.join('').trim())
                 .join(' ')
@@ -461,7 +491,7 @@ export function parseApiBibleChapter(
         // Section headers: s1 (main title), s2 (subsection)
         if (hasClass(node, 's1')) {
             const text = node.childNodes
-                .flatMap(parseInline)
+                .flatMap(child => parseInline(child))
                 .filter((node): node is Word => node.type === 'word')
                 .map(node => node.letters.join(''))
                 .join('')
@@ -473,7 +503,7 @@ export function parseApiBibleChapter(
 
         if (hasClass(node, 's2')) {
             const text = node.childNodes
-                .flatMap(parseInline)
+                .flatMap(child => parseInline(child))
                 .filter((node): node is Word => node.type === 'word')
                 .map(node => node.letters.join(''))
                 .join('')
@@ -488,7 +518,7 @@ export function parseApiBibleChapter(
         // These are headings indicating who is speaking or section titles, not typeable content
         if (hasClass(node, 'sp') || hasClass(node, 's')) {
             const text = node.childNodes
-                .flatMap(parseInline)
+                .flatMap(child => parseInline(child))
                 .filter((n): n is Word => n.type === 'word')
                 .map(n => n.letters.join('').trim())
                 .join(' ')
@@ -539,7 +569,7 @@ export function parseApiBibleChapter(
                 : []
 
             const parsedNodes: Inline[] = mergeAdjacentWords(
-                node.childNodes.flatMap(parseInline),
+                node.childNodes.flatMap(child => parseInline(child)),
             )
 
             // For poetry lines, insert indentation after verse number (if present) or at start

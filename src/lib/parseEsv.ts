@@ -32,7 +32,7 @@ export type VerseNumber = {
     translation: Translation
 }
 
-export type Word = { type: 'word'; letters: string[] }
+export type Word = { type: 'word'; letters: string[]; divineName?: boolean }
 
 export type Decoration = { type: 'decoration'; text: string }
 
