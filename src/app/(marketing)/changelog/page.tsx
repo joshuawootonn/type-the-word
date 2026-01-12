@@ -68,8 +68,8 @@ export default async function Changelog() {
             <ul>
                 <li>
                     <DateComponent date={new Date('01/12/2026')} /> - Fixed
-                    additional NASB parsing issues and started preserving
-                    translation in prev/next chapter buttons:
+                    additional NASB parsing issues, added NLT divine name
+                    styling, and improved navigation:
                     <ul>
                         <li>
                             Improved small caps word merging to correctly
@@ -90,6 +90,21 @@ export default async function Changelog() {
                         <li>
                             Fixed standalone question marks being stripped from
                             verses (John 12:38).
+                        </li>
+                        <li>
+                            Added proper styling for divine names in NLT and
+                            other translations. The word &quot;Lord&quot; when
+                            referring to Yahweh is styled as:{' '}
+                            <span className="divine-name">
+                                <span className="divine-name-first">L</span>
+                                <span className="divine-name-rest">ord</span>
+                            </span>
+                            .
+                        </li>
+                        <li>
+                            Fixed possessive merge logic for NLT where some
+                            cases of &apos;s were not being merged with the
+                            previous word.
                         </li>
                         <li>
                             Updated the next/previous chapter buttons to
