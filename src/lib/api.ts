@@ -70,11 +70,16 @@ export async function fetchTypingSessionUpsert(): Promise<TypingSession> {
 
 export async function fetchChapterHistory(
     value: PassageSegment,
+    translation: Translation = 'esv',
 ): Promise<ChapterHistory> {
-    const response = await fetch(
-        `${getBaseUrl()}/api/chapter-history/${value}`,
-        { cache: 'no-store' },
-    )
+    const params = new URLSearchParams()
+    if (translation !== 'esv') {
+        params.set('translation', translation)
+    }
+    const queryString = params.toString()
+    const url = `${getBaseUrl()}/api/chapter-history/${value}${queryString ? `?${queryString}` : ''}`
+
+    const response = await fetch(url, { cache: 'no-store' })
 
     const body: Body<ChapterHistory> = await response.json()
 

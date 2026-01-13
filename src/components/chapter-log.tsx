@@ -6,19 +6,22 @@ import { useSession } from 'next-auth/react'
 
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 import { fetchChapterHistory } from '~/lib/api'
+import { Translation } from '~/lib/parseEsv'
 import { PassageSegment } from '~/lib/passageSegment'
 
 export function ChapterLog({
     passageSegment,
+    translation = 'esv',
     ...props
 }: {
     passageSegment: PassageSegment
+    translation?: Translation
     chapterHistory: ChapterHistory
 }) {
     const { data: sessionData } = useSession()
     const chapterHistory = useQuery({
-        queryKey: ['chapter-history', passageSegment],
-        queryFn: () => fetchChapterHistory(passageSegment),
+        queryKey: ['chapter-history', passageSegment, translation],
+        queryFn: () => fetchChapterHistory(passageSegment, translation),
         enabled: sessionData?.user?.id != null,
         initialData: props.chapterHistory,
     })

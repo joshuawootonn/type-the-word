@@ -37,6 +37,7 @@ describe('TypingSessionRepository - Integration Tests', () => {
             book: 'genesis' | 'exodus' | 'luke' | 'john'
             chapter: number
             verse: number
+            translation?: 'esv' | 'niv' | 'bsb'
         }>,
     ) {
         const sessionId = crypto.randomUUID()
@@ -52,7 +53,7 @@ describe('TypingSessionRepository - Integration Tests', () => {
                 id: crypto.randomUUID(),
                 userId,
                 typingSessionId: sessionId,
-                translation: 'esv',
+                translation: verse.translation ?? 'esv',
                 book: verse.book,
                 chapter: verse.chapter,
                 verse: verse.verse,
@@ -416,6 +417,138 @@ describe('TypingSessionRepository - Integration Tests', () => {
 
                 expect(result).toHaveLength(1)
                 expect(result[0]!.typedVerses[0]!.verse).toBe(2)
+            })
+        })
+
+        describe('translation filtering', () => {
+            it('filters sessions by translation', async () => {
+                await createTypingSession(testUserId, new Date('2024-01-01'), [
+                    {
+                        book: 'genesis',
+                        chapter: 1,
+                        verse: 1,
+                        translation: 'esv',
+                    },
+                ])
+                await createTypingSession(testUserId, new Date('2024-01-02'), [
+                    {
+                        book: 'genesis',
+                        chapter: 1,
+                        verse: 1,
+                        translation: 'niv',
+                    },
+                ])
+                await createTypingSession(testUserId, new Date('2024-01-03'), [
+                    {
+                        book: 'genesis',
+                        chapter: 1,
+                        verse: 2,
+                        translation: 'esv',
+                    },
+                ])
+
+                const result = await repository.getMany({
+                    userId: testUserId,
+                    translation: 'esv',
+                })
+
+                expect(result).toHaveLength(2)
+                expect(
+                    result.every(s =>
+                        s.typedVerses.some(v => v.translation === 'esv'),
+                    ),
+                ).toBe(true)
+            })
+
+            it('includes session if any verse matches translation', async () => {
+                await createTypingSession(testUserId, new Date('2024-01-01'), [
+                    {
+                        book: 'genesis',
+                        chapter: 1,
+                        verse: 1,
+                        translation: 'esv',
+                    },
+                    {
+                        book: 'genesis',
+                        chapter: 1,
+                        verse: 2,
+                        translation: 'niv',
+                    },
+                ])
+
+                const result = await repository.getMany({
+                    userId: testUserId,
+                    translation: 'niv',
+                })
+
+                expect(result).toHaveLength(1)
+                // Returns the full session with all verses
+                expect(result[0]!.typedVerses).toHaveLength(2)
+            })
+
+            it('returns empty when no sessions match translation', async () => {
+                await createTypingSession(testUserId, new Date('2024-01-01'), [
+                    {
+                        book: 'genesis',
+                        chapter: 1,
+                        verse: 1,
+                        translation: 'esv',
+                    },
+                ])
+
+                const result = await repository.getMany({
+                    userId: testUserId,
+                    translation: 'niv',
+                })
+
+                expect(result).toHaveLength(0)
+            })
+
+            it('filters by book, chapter, and translation', async () => {
+                await createTypingSession(testUserId, new Date('2024-01-01'), [
+                    {
+                        book: 'genesis',
+                        chapter: 1,
+                        verse: 1,
+                        translation: 'esv',
+                    },
+                ])
+                await createTypingSession(testUserId, new Date('2024-01-02'), [
+                    {
+                        book: 'genesis',
+                        chapter: 1,
+                        verse: 1,
+                        translation: 'niv',
+                    },
+                ])
+                await createTypingSession(testUserId, new Date('2024-01-03'), [
+                    {
+                        book: 'genesis',
+                        chapter: 2,
+                        verse: 1,
+                        translation: 'esv',
+                    },
+                ])
+                await createTypingSession(testUserId, new Date('2024-01-04'), [
+                    {
+                        book: 'exodus',
+                        chapter: 1,
+                        verse: 1,
+                        translation: 'esv',
+                    },
+                ])
+
+                const result = await repository.getMany({
+                    userId: testUserId,
+                    book: 'genesis',
+                    chapter: 1,
+                    translation: 'esv',
+                })
+
+                expect(result).toHaveLength(1)
+                expect(result[0]!.typedVerses[0]!.book).toBe('genesis')
+                expect(result[0]!.typedVerses[0]!.chapter).toBe(1)
+                expect(result[0]!.typedVerses[0]!.translation).toBe('esv')
             })
         })
     })

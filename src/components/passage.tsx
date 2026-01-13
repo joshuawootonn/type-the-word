@@ -13,7 +13,7 @@ import { fetchChapterHistory, fetchTypingSessionUpsert } from '~/lib/api'
 import { getNextVerseToType } from '~/lib/getNextVerseToType'
 import { useRect, PassageRectContext } from '~/lib/hooks/passageRectContext'
 import { Keystroke } from '~/lib/keystroke'
-import { Inline, ParsedPassage } from '~/lib/parseEsv'
+import { Inline, ParsedPassage, Translation } from '~/lib/parseEsv'
 import { PassageSegment, toPassageSegment } from '~/lib/passageSegment'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
 
@@ -45,9 +45,11 @@ function HydrateAtoms({
 
 export function Passage({
     passage,
+    translation = 'esv',
     ...props
 }: {
     passage: ParsedPassage
+    translation?: Translation
     autofocus?: boolean
     typingSession?: TypingSession
     chapterHistory?: ChapterHistory
@@ -77,8 +79,9 @@ export function Passage({
         initialData: props.typingSession,
     })
     const chapterHistory = useQuery({
-        queryKey: ['chapter-history', passageSegementOrOverride],
-        queryFn: () => fetchChapterHistory(passageSegementOrOverride),
+        queryKey: ['chapter-history', passageSegementOrOverride, translation],
+        queryFn: () =>
+            fetchChapterHistory(passageSegementOrOverride, translation),
         enabled: sessionData?.user?.id != null,
         initialData: props.chapterHistory,
     })

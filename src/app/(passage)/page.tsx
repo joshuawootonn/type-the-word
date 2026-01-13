@@ -29,7 +29,11 @@ export default async function PassagePage() {
         session == null ? undefined : getOrCreateTypingSession(session.user.id),
         session == null
             ? undefined
-            : getChapterHistory(session.user.id, segmentToPassageObject(value)),
+            : getChapterHistory(
+                  session.user.id,
+                  segmentToPassageObject(value),
+                  'esv',
+              ),
     ])
 
     return (

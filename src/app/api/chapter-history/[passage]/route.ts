@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth'
 import { NextRequest } from 'next/server'
 
+import { Translation } from '~/lib/parseEsv'
 import { segmentToPassageObject } from '~/lib/passageObject'
 import { authOptions } from '~/server/auth'
 
@@ -18,8 +19,27 @@ export type ChapterHistory = {
 
 export const dynamic = 'force-dynamic'
 
+const validTranslations: Translation[] = [
+    'esv',
+    'bsb',
+    'nlt',
+    'niv',
+    'csb',
+    'nkjv',
+    'nasb',
+    'ntv',
+    'msg',
+]
+
+function parseTranslation(value: string | undefined | null): Translation {
+    if (value && validTranslations.includes(value as Translation)) {
+        return value as Translation
+    }
+    return 'esv'
+}
+
 export async function GET(
-    _: NextRequest,
+    request: NextRequest,
     { params }: { params: { passage?: string } },
 ) {
     const session = await getServerSession(authOptions)
@@ -41,6 +61,14 @@ export async function GET(
         )
     }
 
-    const data = await getChapterHistory(session.user.id, passageObject)
+    const translation = parseTranslation(
+        request.nextUrl.searchParams.get('translation'),
+    )
+
+    const data = await getChapterHistory(
+        session.user.id,
+        passageObject,
+        translation,
+    )
     return Response.json({ data }, { status: 200 })
 }

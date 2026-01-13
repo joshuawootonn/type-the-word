@@ -65,12 +65,14 @@ export class TypingSessionRepository {
         userId,
         book,
         chapter,
+        translation,
         startDate,
         endDate,
     }: {
         userId: string | SQL
         book?: schema.Book
         chapter?: number
+        translation?: schema.Translation
         startDate?: Date
         endDate?: Date
     }): Promise<TypingSession[]> {
@@ -84,10 +86,10 @@ export class TypingSessionRepository {
             conditions.push(lte(typingSessions.createdAt, endDate))
         }
 
-        // Filter by book/chapter using an EXISTS subquery
+        // Filter by book/chapter/translation using an EXISTS subquery
         // Note: We use raw SQL because Drizzle's relational query API aliases the
         // main table as "typingSessions" and we need to correlate the subquery
-        if (book != null || chapter != null) {
+        if (book != null || chapter != null || translation != null) {
             const subqueryConditions: SQL[] = [
                 // Reference the alias used by the relational query builder
                 sql`"typedVerse"."typingSessionId" = "typingSessions"."id"`,
@@ -98,6 +100,11 @@ export class TypingSessionRepository {
             if (chapter != null) {
                 subqueryConditions.push(
                     sql`"typedVerse"."chapter" = ${chapter}`,
+                )
+            }
+            if (translation != null) {
+                subqueryConditions.push(
+                    sql`"typedVerse"."translation" = ${translation}`,
                 )
             }
             const subqueryWhere = sql.join(subqueryConditions, sql` AND `)

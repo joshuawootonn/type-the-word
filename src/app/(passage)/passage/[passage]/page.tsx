@@ -96,7 +96,11 @@ export default async function PassagePage(props: {
         session == null ? undefined : getOrCreateTypingSession(session.user.id),
         session == null
             ? undefined
-            : getChapterHistory(session.user.id, segmentToPassageObject(value)),
+            : getChapterHistory(
+                  session.user.id,
+                  segmentToPassageObject(value),
+                  translation,
+              ),
     ])
 
     return (
@@ -104,6 +108,7 @@ export default async function PassagePage(props: {
             <Passage
                 autofocus={true}
                 passage={passage}
+                translation={translation}
                 typingSession={typingSession}
                 chapterHistory={chapterHistory}
             />
@@ -133,6 +138,7 @@ export default async function PassagePage(props: {
             {chapterHistory && (
                 <ChapterLog
                     passageSegment={value}
+                    translation={translation}
                     chapterHistory={chapterHistory}
                 />
             )}

@@ -67,6 +67,12 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('01/13/2026')} /> - Chapter
+                    progress is now tracked per translation. The next verse
+                    selected for you and your chapter completion indicator now
+                    sync with the translation you&apos;re using.
+                </li>
+                <li>
                     <DateComponent date={new Date('01/12/2026')} /> - Fixed
                     additional NASB parsing issues, added NLT divine name
                     styling, and improved navigation:

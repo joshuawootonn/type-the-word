@@ -1,17 +1,16 @@
 import { typingSessionToString } from '~/app/history/typingSessionToString'
+import { Translation } from '~/lib/parseEsv'
 import { PassageObject } from '~/lib/passageObject'
 import { getBibleMetadata } from '~/server/bibleMetadata'
 import { db } from '~/server/db'
-import {
-    TypingSession,
-    TypingSessionRepository,
-} from '~/server/repositories/typingSession.repository'
+import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
 
 import { ChapterHistory } from './route'
 
 export async function getChapterHistory(
     userId: string,
     passageObject: PassageObject,
+    translation: Translation,
 ): Promise<ChapterHistory> {
     const typingSessionRepository = new TypingSessionRepository(db)
 
@@ -19,6 +18,7 @@ export async function getChapterHistory(
         userId,
         book: passageObject.book,
         chapter: passageObject.chapter,
+        translation,
     })
 
     const bibleMetadata = getBibleMetadata()
@@ -39,7 +39,8 @@ export async function getChapterHistory(
         for (const verse of session.typedVerses) {
             if (
                 verse.book !== passageObject.book ||
-                verse.chapter !== passageObject.chapter
+                verse.chapter !== passageObject.chapter ||
+                verse.translation !== translation
             ) {
                 continue
             }
@@ -59,7 +60,8 @@ export async function getChapterHistory(
             typingSession.typedVerses.filter(
                 typedVerse =>
                     typedVerse.chapter === passageObject.chapter &&
-                    typedVerse.book === passageObject.book,
+                    typedVerse.book === passageObject.book &&
+                    typedVerse.translation === translation,
             ),
             {
                 seperator: '\n',
