@@ -27,13 +27,7 @@ export function Word({
 
     return (
         <>
-            <span
-                className={clsx(
-                    'word',
-                    active && 'active-word',
-                    Boolean(word.divineName) && 'divine-name',
-                )}
-            >
+            <span className={clsx('word', active && 'active-word')}>
                 {wordWithoutEnder.map((letter, lIndex) => {
                     const typedLetter = typedWord?.letters.at(lIndex)
                     const isEqual = isLetterEqual(letter, typedLetter)
@@ -47,9 +41,7 @@ export function Word({
                                 isErrored &&
                                     'error underline decoration-error decoration-2',
                                 Boolean(word.divineName) &&
-                                    (lIndex === 0
-                                        ? 'divine-name-first'
-                                        : 'divine-name-rest'),
+                                    (lIndex > 0 ? 'divine-name' : ''),
                             )}
                         >
                             {letter}
@@ -71,7 +63,12 @@ export function Word({
                     )
                 })}
 
-                <span className={clsx('letter relative z-0')}>
+                <span
+                    className={clsx(
+                        'letter relative z-0',
+                        word.divineName && 'divine-name',
+                    )}
+                >
                     {ender === '\n' ? (
                         <NewLineIndicator isActive={active} />
                     ) : ender === ' ' ? (

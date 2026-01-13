@@ -100,15 +100,7 @@ body {
 }
 
 /* Divine name styling (e.g., LORD in NLT) - small caps effect */
-/* First letter is normal size, rest are smaller uppercase */
+
 .divine-name {
-    text-transform: uppercase;
-}
-
-.divine-name-first {
-    font-size: 1em;
-}
-
-.divine-name-rest {
     font-size: calc(1em - 3px);
 }

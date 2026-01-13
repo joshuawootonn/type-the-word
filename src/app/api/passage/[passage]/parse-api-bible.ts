@@ -96,6 +96,12 @@ export function parseApiBibleChapter(
             const result: Inline[] = []
             let textValue = node.value
 
+            // Uppercase divine names for correct typing validation
+            // (user must type "LORD" not "Lord")
+            if (options?.divineName) {
+                textValue = textValue.toUpperCase()
+            }
+
             // Check for pilcrow (¶) at the start - emit as decoration atom
             // This appears in some NASB Psalms as a paragraph marker
             if (textValue.startsWith('¶')) {

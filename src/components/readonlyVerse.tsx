@@ -103,14 +103,9 @@ export function ReadonlyVerse({
                         const firstLetter = wordText[0]
                         const rest = wordText.slice(1)
                         return (
-                            <span
-                                key={aIndexPrime}
-                                className="word divine-name"
-                            >
-                                <span className="divine-name-first">
-                                    {firstLetter}
-                                </span>
-                                <span className="divine-name-rest">{rest}</span>
+                            <span key={aIndexPrime} className="word">
+                                <span>{firstLetter}</span>
+                                <span className="divine-name">{rest}</span>
                                 <span className="text-[0px]"> </span>
                             </span>
                         )

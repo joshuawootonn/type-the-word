@@ -95,9 +95,9 @@ export default async function Changelog() {
                             Added proper styling for divine names in NLT and
                             other translations. The word &quot;Lord&quot; when
                             referring to Yahweh is styled as:{' '}
-                            <span className="divine-name">
-                                <span className="divine-name-first">L</span>
-                                <span className="divine-name-rest">ord</span>
+                            <span>
+                                <span>L</span>
+                                <span className="divine-name">ord</span>
                             </span>
                             .
                         </li>

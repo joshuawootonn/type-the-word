@@ -2262,7 +2262,7 @@ describe('Proverbs 20 NLT - Divine name and possessive', () => {
         expect(lordWord?.type === 'word' && lordWord.divineName).toBe(true)
     })
 
-    test("verse 27 has Lord's with possessive merged and divine name flag", () => {
+    test("verse 27 has LORD's with possessive merged and divine name flag", () => {
         const result = parseApiBibleChapter(nltProverbs20Html, 'nlt')
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === 'paragraph',
@@ -2274,10 +2274,10 @@ describe('Proverbs 20 NLT - Divine name and possessive', () => {
         expect(verse27.length).toBeGreaterThan(0)
         const verse27Text = verse27.map(v => v.text).join('')
 
-        // Should have Lord's with no space before 's (text is lowercase, CSS uppercases)
-        expect(verse27Text).toMatch(/Lord[''\u2019]s/)
-        // Should NOT have space between Lord and 's
-        expect(verse27Text).not.toMatch(/Lord\s+[''\u2019]s/)
+        // Should have LORD's (uppercase) with no space before 's
+        expect(verse27Text).toMatch(/LORD[''\u2019]s/)
+        // Should NOT have space between LORD and 's
+        expect(verse27Text).not.toMatch(/LORD\s+[''\u2019]s/)
 
         // The merged word should have divineName flag
         const lordWord = verse27
@@ -2285,7 +2285,7 @@ describe('Proverbs 20 NLT - Divine name and possessive', () => {
             .find(
                 n =>
                     n.type === 'word' &&
-                    n.letters.join('').toLowerCase().startsWith('lord'),
+                    n.letters.join('').toUpperCase().startsWith('LORD'),
             )
         expect(lordWord).toBeDefined()
         expect(lordWord?.type === 'word' && lordWord.divineName).toBe(true)
