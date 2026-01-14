@@ -2,10 +2,11 @@
 
 import clsx from 'clsx'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
 import { cn } from '~/lib/cn'
+import { tryParseTranslation } from '~/lib/translations'
 
 type TabValue = 'overview' | 'wpm' | 'log'
 
@@ -50,21 +51,27 @@ function TabLink({
 
 export function HistoryTabsNav({ showWpmChart }: { showWpmChart: boolean }) {
     const pathname = usePathname() ?? '/history'
+    const searchParams = useSearchParams()
     const [activeTab, setActiveTab] = useState<TabValue>(() =>
         pathToTab(pathname),
     )
 
+    // Get current translation from URL to preserve it across tab navigation
+    const currentTranslation =
+        tryParseTranslation(searchParams?.get('translation')) ?? 'esv'
+    const translationParam = `?translation=${currentTranslation}`
+
     return (
         <div className="relative mb-8 flex gap-1 border-b-2 border-primary">
             <TabLink
-                href="/history"
+                href={`/history${translationParam}`}
                 isActive={activeTab === 'overview'}
                 onClick={() => setActiveTab('overview')}
             >
                 Overview
             </TabLink>
             <TabLink
-                href="/history/log"
+                href={`/history/log${translationParam}`}
                 isActive={activeTab === 'log'}
                 onClick={() => setActiveTab('log')}
             >
@@ -72,7 +79,7 @@ export function HistoryTabsNav({ showWpmChart }: { showWpmChart: boolean }) {
             </TabLink>
             {showWpmChart && (
                 <TabLink
-                    href="/history/wpm"
+                    href={`/history/wpm${translationParam}`}
                     isActive={activeTab === 'wpm'}
                     onClick={() => setActiveTab('wpm')}
                 >

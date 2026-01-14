@@ -26,6 +26,14 @@ export function TranslationSelector() {
 
     const handleChange = useCallback(
         (value: string) => {
+            // Set cookie to remember translation preference
+            void fetch('/api/set-translation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ translation: value }),
+            })
+
+            // Update URL
             const params = new URLSearchParams(searchParams?.toString() ?? '')
             params.set('translation', value)
             router.push(`${pathname}?${params.toString()}`)

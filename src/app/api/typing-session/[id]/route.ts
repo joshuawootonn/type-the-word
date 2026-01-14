@@ -2,10 +2,11 @@ import { eq, sql } from 'drizzle-orm'
 import { createInsertSchema } from 'drizzle-zod'
 import { getServerSession } from 'next-auth'
 import { cookies } from 'next/headers'
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { calculateStatsForVerse } from '~/app/history/wpm'
+import { setTranslationCookie } from '~/lib/last-translation'
 import { authOptions } from '~/server/auth'
 import { db } from '~/server/db'
 import {
@@ -130,5 +131,10 @@ export const POST = async function POST(
         userId: session.user.id,
     })
 
-    return Response.json({ data: typingSession }, { status: 200 })
+    const response = NextResponse.json({ data: typingSession }, { status: 200 })
+
+    // Set the translation cookie to remember user's preferred translation
+    setTranslationCookie(response, verse.translation)
+
+    return response
 }

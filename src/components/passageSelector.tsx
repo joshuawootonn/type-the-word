@@ -166,6 +166,14 @@ export function PassageSelector({
                       .includes(translationQuery.toLowerCase()),
               )
 
+    async function updateTranslationCookie(translation: Translation) {
+        await fetch('/api/set-translation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ translation }),
+        })
+    }
+
     function onSubmit({
         book,
         chapter,
@@ -180,17 +188,17 @@ export function PassageSelector({
         setTranslation(translation)
         const nextUrl = toPassageSegment(book, chapter)
 
-        // Only add translation param if not ESV (default)
+        // Set cookie to remember translation preference
+        void updateTranslationCookie(translation)
+
+        // Always include translation param
         const params = new URLSearchParams()
-        if (translation !== 'esv') {
-            params.set('translation', translation)
-        }
+        params.set('translation', translation)
         const queryString = params.toString()
 
-        void router.push(
-            `/passage/${nextUrl}${queryString ? `?${queryString}` : ''}`,
-            { scroll: false },
-        )
+        void router.push(`/passage/${nextUrl}?${queryString}`, {
+            scroll: false,
+        })
     }
 
     const isFirstRender = useIsFirstRender()

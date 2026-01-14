@@ -1,11 +1,11 @@
 import { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
-import Link from 'next/link'
 
 import { CopyrightCitation } from '~/components/copyright-citation'
 import { Passage } from '~/components/passage'
 import { PassageSelector } from '~/components/passageSelector'
 import { fetchPassage } from '~/lib/api'
+import { getLastTranslation } from '~/lib/last-translation'
 import { segmentToPassageObject } from '~/lib/passageObject'
 import { passageSegmentSchema } from '~/lib/passageSegment'
 import { authOptions } from '~/server/auth'
@@ -21,18 +21,19 @@ export const metadata: Metadata = {
 
 export default async function PassagePage() {
     const session = await getServerSession(authOptions)
+    const lastTranslation = getLastTranslation()
 
     const value = passageSegmentSchema.parse('psalm 23:1-2')
 
     const [passage, typingSession, chapterHistory] = await Promise.all([
-        fetchPassage(value),
+        fetchPassage(value, lastTranslation),
         session == null ? undefined : getOrCreateTypingSession(session.user.id),
         session == null
             ? undefined
             : getChapterHistory(
                   session.user.id,
                   segmentToPassageObject(value),
-                  'esv',
+                  lastTranslation,
               ),
     ])
 
@@ -88,7 +89,10 @@ export default async function PassagePage() {
                 <li>Create an account so your typing history is saved</li>
                 <li>
                     <div className="flex flex-col items-start justify-start space-y-2 md:flex-row md:items-center md:space-x-2 md:space-y-0">
-                        <PassageSelector label="Find your favorite scripture: " />
+                        <PassageSelector
+                            label="Find your favorite scripture: "
+                            initialTranslation={lastTranslation}
+                        />
                     </div>
                 </li>
                 <li>and start typing!</li>

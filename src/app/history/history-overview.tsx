@@ -3,6 +3,10 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import clsx from 'clsx'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+
+import { Translation } from '~/lib/parseEsv'
+import { tryParseTranslation } from '~/lib/translations'
 
 import { BookOverview } from './overview'
 
@@ -50,6 +54,10 @@ function Box({
 }
 
 export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
+    const searchParams = useSearchParams()
+    const currentTranslation =
+        tryParseTranslation(searchParams?.get('translation')) ?? 'esv'
+
     return (
         <Tooltip.Provider delayDuration={0}>
             <div className="flex flex-col text-primary">
@@ -112,7 +120,7 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                     <Tooltip.Root key={j}>
                                         <Tooltip.Trigger asChild>
                                             <Link
-                                                href={`/passage/${book.book}_${chapterOverview.chapter}`}
+                                                href={`/passage/${book.book}_${chapterOverview.chapter}?translation=${currentTranslation}`}
                                                 prefetch={false}
                                                 className="svg-outline-xs relative aspect-square h-full p-1 outline-none"
                                             >

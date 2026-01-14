@@ -7,12 +7,14 @@ import clsx from 'clsx'
 import { signOut, useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useRef, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 
 import { fetchBuiltinThemes, fetchLastVerse, fetchUserThemes } from '~/lib/api'
+import { Translation } from '~/lib/parseEsv'
 import { toPassageSegment } from '~/lib/passageSegment'
+import { tryParseTranslation } from '~/lib/translations'
 import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
 import { TypedVerse } from '~/server/repositories/typingSession.repository'
 import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
@@ -25,14 +27,17 @@ import { Settings } from './settings'
 export function Navigation({
     builtinThemes: serverRenderedBuiltinThemes,
     userThemes: serverRenderedUserThemes,
+    lastTranslation: serverLastTranslation,
     ...props
 }: {
     userThemes: UserThemeRecord[]
     builtinThemes: BuiltinThemeRecord[]
     lastTypedVerse: TypedVerse | null
+    lastTranslation: Translation
 }) {
     const { data: sessionData } = useSession()
     const isRootPath = usePathname() === '/'
+    const searchParams = useSearchParams()
     const RootLinkComponent = isRootPath ? 'h1' : 'span'
     const dropDownTriggerRef = useRef<HTMLButtonElement>(null)
     const [isSettingsOpen, setSettingsOpen] = useState(false)
@@ -67,11 +72,28 @@ export function Navigation({
         initialData: props.lastTypedVerse,
     })
 
+    // Get current translation from URL, fallback to cookie, then server value
+    const urlTranslation = tryParseTranslation(searchParams?.get('translation'))
+
+    let cookieTranslation: Translation | null = null
+    if (typeof document !== 'undefined') {
+        const cookies = document.cookie.split('; ')
+        const translationCookie = cookies.find(row =>
+            row.startsWith('lastTranslation='),
+        )
+        cookieTranslation = tryParseTranslation(
+            translationCookie?.split('=')[1],
+        )
+    }
+
+    const currentTranslation =
+        urlTranslation ?? cookieTranslation ?? serverLastTranslation
+
     const rootPathname = lastTypedVerse
         ? `/passage/${toPassageSegment(
               lastTypedVerse.book,
               lastTypedVerse.chapter,
-          )}`
+          )}?translation=${currentTranslation}`
         : `/`
 
     return (

@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth'
 
 import { Footer } from '~/components/footer'
 import { Navigation } from '~/components/navigation/navigation'
+import { getLastTranslation } from '~/lib/last-translation'
 import { authOptions } from '~/server/auth'
 import { db } from '~/server/db'
 import { BuiltinThemeRepository } from '~/server/repositories/builtinTheme.repository'
@@ -44,6 +45,9 @@ export default async function RootLayout({
 
     const builtinThemeRepository = new BuiltinThemeRepository(db)
     const builtinThemes = await builtinThemeRepository.getMany()
+
+    // Get last translation for server-side rendering
+    const lastTranslation = getLastTranslation()
 
     if (session != null) {
         const typedVerseRepository = new TypedVerseRepository(db)
@@ -92,6 +96,7 @@ export default async function RootLayout({
                             lastTypedVerse={lastTypedVerse}
                             userThemes={userThemes}
                             builtinThemes={builtinThemes}
+                            lastTranslation={lastTranslation}
                         />
                         {children}
                         <Footer />

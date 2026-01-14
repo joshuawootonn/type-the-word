@@ -64,10 +64,12 @@ export default async function PassagePage(props: {
     const session = await getServerSession(authOptions)
     const params = await props.params
     const searchParams = await props.searchParams
+
+    // Middleware guarantees translation param exists and is valid
     const translation = parseTranslation(searchParams.translation)
 
-    const translationParam =
-        translation !== 'esv' ? `?translation=${translation}` : ''
+    // Always include translation in URL params
+    const translationParam = `?translation=${translation}`
 
     if (params.passage == null) {
         if (session == null) {
