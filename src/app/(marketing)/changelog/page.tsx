@@ -67,6 +67,13 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('01/14/2026')} /> - Your
+                    preferred translation is now remembered. When you type a
+                    verse or change the translation selector, your choice is
+                    saved. As you navigate around Type the Word, your preferred
+                    translation is automatically preserved.
+                </li>
+                <li>
                     <DateComponent date={new Date('01/13/2026')} /> - Chapter
                     progress is now tracked per translation. The next verse
                     selected for you and your chapter completion indicator now
