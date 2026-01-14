@@ -24,6 +24,7 @@ import { usePassageRect, useVerseRect } from '~/lib/hooks/passageRectContext'
 import { useAnalytics } from '~/lib/hooks/useAnalytics'
 import { isAtomTyped, isVerseSameShape } from '~/lib/isEqual'
 import { getPosition, isAtomComplete, isValidKeystroke } from '~/lib/keystroke'
+import { Translation } from '~/lib/parseEsv'
 import { Block, Inline, ParsedPassage, Verse } from '~/lib/parseEsv'
 import { PassageSegment } from '~/lib/passageSegment'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
@@ -123,6 +124,7 @@ export function CurrentVerse({
     typingSession,
     chapterHistory,
     passageSegment,
+    translation = 'esv',
 }: {
     isCurrentVerse: boolean
     isIndented: boolean
@@ -132,6 +134,7 @@ export function CurrentVerse({
     typingSession?: TypingSession
     chapterHistory?: ChapterHistory
     passageSegment: PassageSegment
+    translation?: Translation
 }) {
     const inputRef = useRef<HTMLInputElement>(null)
     const [position, setPosition] = useAtom(positionAtom)
@@ -163,6 +166,8 @@ export function CurrentVerse({
             // Snapshot the previous value
             const previousChapterHistory = queryClient.getQueryData([
                 'chapter-history',
+                passageSegment,
+                translation,
             ])
 
             // Optimistically update to the new value
@@ -189,7 +194,7 @@ export function CurrentVerse({
                 },
             )
             queryClient.setQueryData<ChapterHistory>(
-                ['chapter-history', passageSegment],
+                ['chapter-history', passageSegment, translation],
                 prevChapterHistory => {
                     if (prevChapterHistory == null) {
                         return undefined
@@ -233,7 +238,7 @@ export function CurrentVerse({
                 context?.previousTypingSession,
             )
             queryClient.setQueryData(
-                ['chapter-history'],
+                ['chapter-history', passageSegment, translation],
                 context?.previousChapterHistory,
             )
         },

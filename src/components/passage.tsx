@@ -128,6 +128,7 @@ export function Passage({
                                             passageSegment={
                                                 passageSegementOrOverride
                                             }
+                                            translation={translation}
                                         />
                                     )
 
