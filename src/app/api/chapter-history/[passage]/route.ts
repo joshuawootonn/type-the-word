@@ -40,7 +40,7 @@ function parseTranslation(value: string | undefined | null): Translation {
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { passage?: string } },
+    { params }: { params: Promise<{ passage?: string }> },
 ) {
     const session = await getServerSession(authOptions)
 
@@ -48,10 +48,11 @@ export async function GET(
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { passage } = await params
     let passageObject
 
     try {
-        passageObject = segmentToPassageObject(params.passage)
+        passageObject = segmentToPassageObject(passage)
     } catch (e) {
         return Response.json(
             {

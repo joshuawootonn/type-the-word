@@ -12,7 +12,7 @@ const uuidSchema = z.string().uuid()
 
 export const DELETE = async function DELETE(
     _request: NextRequest,
-    { params }: { params: { id: string } },
+    { params }: { params: Promise<{ id: string }> },
 ) {
     const session = await getServerSession(authOptions)
 
@@ -20,13 +20,15 @@ export const DELETE = async function DELETE(
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    if (uuidSchema.safeParse(params.id).success === false) {
+    const { id } = await params
+
+    if (uuidSchema.safeParse(id).success === false) {
         return Response.json({ error: 'Invalid id' }, { status: 400 })
     }
 
     const themeRepository = new UserThemeRepository(db)
     await themeRepository.deleteTheme({
-        id: params.id,
+        id: id,
     })
 
     const themes = await themeRepository.getMany({ userId: session.user.id })

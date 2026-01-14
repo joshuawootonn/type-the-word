@@ -146,9 +146,6 @@ export function ThemeProvider({
         queryKey: ['builtinThemes'],
         queryFn: fetchBuiltinThemes,
         initialData: serverRenderedBuiltinThemes,
-        onSuccess: data => {
-            updateThemeStyleTag(data, userThemes.data)
-        },
     })
 
     const userThemes = useQuery({
@@ -156,10 +153,12 @@ export function ThemeProvider({
         queryFn: fetchUserThemes,
         enabled: Boolean(userId),
         initialData: serverRenderedUserThemes,
-        onSuccess: data => {
-            updateThemeStyleTag(builtinThemes.data, data)
-        },
     })
+
+    // Update theme styles when builtin or user themes change (replaces v4's onSuccess)
+    useEffect(() => {
+        updateThemeStyleTag(builtinThemes.data, userThemes.data)
+    }, [builtinThemes.data, userThemes.data])
 
     const currentTheme = useQuery({
         queryKey: ['currentTheme'],

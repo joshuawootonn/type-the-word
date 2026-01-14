@@ -288,8 +288,10 @@ async function fetchApiBiblePassage(
 
 export async function GET(
     request: Request,
-    { params }: { params: { passage?: string } },
+    { params }: { params: Promise<{ passage?: string }> },
 ) {
+    const { passage } = await params
+
     // Parse translation from query params
     const url = new URL(request.url)
     const translationParam = url.searchParams.get('translation')
@@ -312,7 +314,7 @@ export async function GET(
     let reference: PassageSegment
 
     try {
-        reference = passageSegmentSchema.parse(params?.passage)
+        reference = passageSegmentSchema.parse(passage)
     } catch (e: unknown) {
         return Response.json(
             {
@@ -328,7 +330,7 @@ export async function GET(
 
     try {
         passageData = stringToPassageObject.parse(
-            passageReferenceSchema.parse(params?.passage),
+            passageReferenceSchema.parse(passage),
         )
     } catch (e: unknown) {
         return Response.json(

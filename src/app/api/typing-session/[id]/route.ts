@@ -44,7 +44,7 @@ const uuidSchema = z.string().uuid()
 
 export const POST = async function POST(
     request: NextRequest,
-    { params }: { params: { id: string } },
+    { params }: { params: Promise<{ id: string }> },
 ) {
     const session = await getServerSession(authOptions)
 
@@ -52,7 +52,9 @@ export const POST = async function POST(
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    if (uuidSchema.safeParse(params.id).success === false) {
+    const { id } = await params
+
+    if (uuidSchema.safeParse(id).success === false) {
         return Response.json({ error: 'Invalid id' }, { status: 400 })
     }
 
@@ -69,13 +71,13 @@ export const POST = async function POST(
     const dailyActivityRepository = new UserDailyActivityRepository(db)
 
     // Get client timezone offset from cookie
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const timezoneOffset = parseInt(
         cookieStore.get('timezoneOffset')?.value ?? '0',
     )
 
     let typingSession = await typingSessionRepository.getOne({
-        id: params.id,
+        id: id,
     })
 
     await db
@@ -83,7 +85,7 @@ export const POST = async function POST(
         .set({
             updatedAt: sql`CURRENT_TIMESTAMP(3)`,
         })
-        .where(eq(typingSessions.id, params.id))
+        .where(eq(typingSessions.id, id))
     await db.insert(typedVerses).values({
         userId: session.user.id,
         ...verse,
@@ -107,7 +109,7 @@ export const POST = async function POST(
         ? calculateStatsForVerse({
               id: '',
               userId: session.user.id,
-              typingSessionId: params.id,
+              typingSessionId: id,
               translation: verse.translation,
               book: verse.book,
               chapter: verse.chapter,

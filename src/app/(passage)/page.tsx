@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 
 export default async function PassagePage() {
     const session = await getServerSession(authOptions)
-    const lastTranslation = getLastTranslation()
+    const lastTranslation = await getLastTranslation()
 
     const value = passageSegmentSchema.parse('psalm 23:1-2')
 

@@ -5,15 +5,16 @@ import { passageReferenceSchema } from '~/lib/passageReference'
 
 const DEFAULT_PASSAGE_REFERENCE = 'psalm_23'
 
-export default function PassageLayout({
+export default async function PassageLayout({
     children,
     params,
 }: {
     children: ReactNode
-    params: { passage?: string }
+    params: Promise<{ passage?: string }>
 }) {
+    const { passage } = await params
     const value = passageReferenceSchema.parse(
-        params?.passage ?? DEFAULT_PASSAGE_REFERENCE,
+        passage ?? DEFAULT_PASSAGE_REFERENCE,
     )
     return (
         <>

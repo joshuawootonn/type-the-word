@@ -8,11 +8,12 @@ export const contentType = 'image/png'
 export default async function Image({
     params,
 }: {
-    params: { passage: string }
+    params: Promise<{ passage: string }>
 }) {
+    const { passage } = await params
     const search = new URLSearchParams()
-    if (params.passage) {
-        search.set('passage', passageSegmentSchema.parse(params.passage))
+    if (passage) {
+        search.set('passage', passageSegmentSchema.parse(passage))
     }
 
     return await fetch(

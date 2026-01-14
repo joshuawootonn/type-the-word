@@ -1,18 +1,18 @@
 import { withSentryConfig } from '@sentry/nextjs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
 import { env } from './src/env.mjs'
 
 await import('./src/env.mjs')
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
 /** @type {import("next").NextConfig} */
 const config = {
     reactStrictMode: true,
-    experimental: {
-        instrumentationHook: true,
-    },
-    i18n: {
-        locales: ['en'],
-        defaultLocale: 'en',
-    },
+    outputFileTracingRoot: __dirname,
+    // eslint-disable-next-line @typescript-eslint/require-await
     async rewrites() {
         return [
             {

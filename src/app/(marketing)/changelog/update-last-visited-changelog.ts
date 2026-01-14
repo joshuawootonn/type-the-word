@@ -8,8 +8,8 @@ import { useAnalytics } from '~/lib/hooks/useAnalytics'
 export function UpdateLastVisitedChangelog() {
     const queryClient = useQueryClient()
     const { trackChangelogViewed } = useAnalytics()
-    const { mutate } = useMutation(
-        async () => {
+    const { mutate } = useMutation({
+        mutationFn: async () => {
             const response = await fetch('/api/user-changelog', {
                 method: 'POST',
                 body: JSON.stringify({ lastVisitedAt: new Date() }),
@@ -19,13 +19,11 @@ export function UpdateLastVisitedChangelog() {
             }
             return response.json()
         },
-        {
-            onSuccess: () => {
-                trackChangelogViewed()
-                void queryClient.invalidateQueries(['user-changelog'])
-            },
+        onSuccess: () => {
+            trackChangelogViewed()
+            void queryClient.invalidateQueries({ queryKey: ['user-changelog'] })
         },
-    )
+    })
 
     useEffect(() => void mutate(), [mutate])
 

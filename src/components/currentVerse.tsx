@@ -279,16 +279,24 @@ export function CurrentVerse({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    const isActiveTimer = useRef<ReturnType<typeof setTimeout>>()
+    const isActiveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+        undefined,
+    )
 
     useEffect(() => {
-        clearTimeout(isActiveTimer.current)
+        if (isActiveTimer.current) {
+            clearTimeout(isActiveTimer.current)
+        }
 
         isActiveTimer.current = setTimeout(() => {
             setIsPassageActive(false)
         }, 3000)
 
-        return () => clearTimeout(isActiveTimer.current)
+        return () => {
+            if (isActiveTimer.current) {
+                clearTimeout(isActiveTimer.current)
+            }
+        }
     }, [keystrokes.length, setIsPassageActive])
 
     function handleKnownEvents(event: KnownNativeInputEvent) {

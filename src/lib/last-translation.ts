@@ -14,8 +14,8 @@ const COOKIE_MAX_AGE = 60 * 60 * 24 * 365 // 1 year in seconds
  * Note: Cookies are set by API routes when user actions occur
  * (typing verses, changing selectors).
  */
-export function getLastTranslation(): Translation {
-    const cookieStore = cookies()
+export async function getLastTranslation(): Promise<Translation> {
+    const cookieStore = await cookies()
     const value = cookieStore.get(COOKIE_NAME)?.value
 
     if (value && validTranslations.includes(value as Translation)) {

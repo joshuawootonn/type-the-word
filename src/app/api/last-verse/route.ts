@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(
     _: NextRequest,
-    { params }: { params: { passage?: string } },
+    { params }: { params: Promise<{ passage?: string }> },
 ) {
     const session = await getServerSession(authOptions)
 

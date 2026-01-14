@@ -33,7 +33,7 @@ export default async function HistoryWpmPage() {
         redirect('/history')
     }
 
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const timezoneOffset = parseInt(
         cookieStore.get('timezoneOffset')?.value ?? '0',
     )

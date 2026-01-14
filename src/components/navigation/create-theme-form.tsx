@@ -114,14 +114,14 @@ export function CreateThemeForm({
 
     const { currentTheme, setTheme } = useTheme()
     const [generalError, setGeneralError] = useState<string | null>(null)
-    const { mutate, isLoading } = useMutation({
+    const { mutate, isPending } = useMutation({
         mutationFn: fetchCreateTheme,
         onSuccess: async data => {
             trackThemeCreated({
                 theme_name: data.theme.label,
             })
             injectNewClassIntoStyle(data.theme)
-            await queryClient.invalidateQueries(['userThemes'])
+            await queryClient.invalidateQueries({ queryKey: ['userThemes'] })
 
             let nextLightThemeId: string | null = null
             let nextDarkThemeId: string | null = null
@@ -258,9 +258,9 @@ export function CreateThemeForm({
                     <button
                         type="submit"
                         className="svg-outline relative col-span-2 border-2 border-primary px-3 py-1 font-semibold text-primary"
-                        disabled={isLoading}
+                        disabled={isPending}
                     >
-                        {isLoading ? 'Loading...' : 'Save'}
+                        {isPending ? 'Loading...' : 'Save'}
                     </button>
                     <input className="hidden" type="submit" />
                 </form>

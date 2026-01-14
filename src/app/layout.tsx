@@ -47,7 +47,7 @@ export default async function RootLayout({
     const builtinThemes = await builtinThemeRepository.getMany()
 
     // Get last translation for server-side rendering
-    const lastTranslation = getLastTranslation()
+    const lastTranslation = await getLastTranslation()
 
     if (session != null) {
         const typedVerseRepository = new TypedVerseRepository(db)

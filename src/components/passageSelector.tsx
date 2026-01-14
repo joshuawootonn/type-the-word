@@ -214,7 +214,7 @@ export function PassageSelector({
                     as="div"
                     value={book}
                     onChange={next => {
-                        setBook(next)
+                        if (next !== null) setBook(next)
                     }}
                 >
                     <Combobox.Input
@@ -305,7 +305,8 @@ export function PassageSelector({
                     className="relative"
                     value={chapter}
                     onChange={next => {
-                        onSubmit({ book, chapter: next, translation })
+                        if (next !== null)
+                            onSubmit({ book, chapter: next, translation })
                     }}
                 >
                     <Combobox.Input
@@ -387,7 +388,8 @@ export function PassageSelector({
                         className="relative"
                         value={translation}
                         onChange={next => {
-                            onSubmit({ book, chapter, translation: next })
+                            if (next !== null)
+                                onSubmit({ book, chapter, translation: next })
                         }}
                     >
                         <Combobox.Input

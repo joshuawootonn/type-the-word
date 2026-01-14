@@ -27,7 +27,7 @@ export function usePassageRect() {
     return passageRect
 }
 
-export function useRect(ref: RefObject<HTMLElement>) {
+export function useRect(ref: RefObject<HTMLElement | null>) {
     const [rect, setRect] = useState<DOMRect | null>(null)
 
     useEffect(() => {
@@ -56,7 +56,10 @@ export function useRect(ref: RefObject<HTMLElement>) {
     return rect
 }
 
-export function useVerseRect(ref: RefObject<HTMLElement>, verse: string) {
+export function useVerseRect(
+    ref: RefObject<HTMLElement | null>,
+    verse: string,
+) {
     const { verseRects, updateVerseRect } = useContext(PassageRectContext)
 
     useEffect(() => {
