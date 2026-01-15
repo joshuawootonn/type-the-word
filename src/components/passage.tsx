@@ -5,7 +5,7 @@ import { atom, PrimitiveAtom, Provider } from 'jotai'
 import { useHydrateAtoms } from 'jotai/react/utils'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
-import React, { useCallback, useId, useRef, useState } from 'react'
+import React, { useCallback, useId, useMemo, useRef, useState } from 'react'
 
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
 import { Cursor } from '~/components/cursor'
@@ -18,6 +18,7 @@ import { PassageSegment, toPassageSegment } from '~/lib/passageSegment'
 import { TypingSession } from '~/server/repositories/typingSession.repository'
 
 import { Paragraph } from './paragraph'
+import { TypedVerseLines } from './typed-verse-lines'
 
 export const positionAtom = atom<Inline[]>([])
 export const keystrokesAtom = atom<Keystroke[]>([])
@@ -89,6 +90,18 @@ export function Passage({
     const isRootPath = usePathname() === '/'
     const H2Component = isRootPath ? 'h2' : 'h1'
 
+    const orderedVerses = useMemo(() => {
+        return passage.nodes.flatMap(node => {
+            if (node.type === 'paragraph') {
+                return node.nodes
+            }
+            if (node.type === 'verse') {
+                return [node]
+            }
+            return []
+        })
+    }, [passage.nodes])
+
     return (
         <Provider>
             <HydrateAtoms
@@ -115,6 +128,12 @@ export function Passage({
                             updateVerseRect,
                         }}
                     >
+                        <TypedVerseLines
+                            orderedVerses={orderedVerses}
+                            passageRect={passageRect}
+                            typedVerses={typingSession.data?.typedVerses}
+                            verseRects={verseRects}
+                        />
                         {passage.nodes.map((node, pIndex) => {
                             switch (node.type) {
                                 case 'paragraph':

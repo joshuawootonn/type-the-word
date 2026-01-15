@@ -11,21 +11,16 @@ import {
 } from '~/components/passage'
 import { usePassageRect, useVerseRect } from '~/lib/hooks/passageRectContext'
 import { Verse } from '~/lib/parseEsv'
-import { TypingSession } from '~/server/repositories/typingSession.repository'
 
 export function ReadonlyVerse({
     isCurrentVerse,
     isIndented,
-    isQuote,
     verse,
-    typingSession,
     chapterHistory,
 }: {
     isCurrentVerse: boolean
     isIndented: boolean
-    isQuote: boolean
     verse: Verse
-    typingSession?: TypingSession
     chapterHistory?: ChapterHistory
 }) {
     const passageRect = usePassageRect()
@@ -33,14 +28,6 @@ export function ReadonlyVerse({
 
     const ref = useRef<HTMLSpanElement>(null)
     const rect = useVerseRect(ref, verse.verse.text + verse.metadata.offset)
-
-    const isTypedInSession = typingSession?.typedVerses.find(
-        a =>
-            a.verse === verse.verse.verse &&
-            a.chapter === verse.verse.chapter &&
-            a.book === verse.verse.book &&
-            a.translation === verse.verse.translation,
-    )
 
     const isTypedInHistory = chapterHistory?.verses[verse.verse.verse]
 
@@ -121,37 +108,6 @@ export function ReadonlyVerse({
 
                 return null
             })}
-
-            {isTypedInSession && rect && passageRect ? (
-                <svg
-                    className={
-                        'absolute -left-3 right-full z-0 w-4 rounded-none md:-left-6'
-                    }
-                    style={
-                        isQuote
-                            ? {
-                                  height: rect.height + 48,
-                                  top: rect.top - passageRect.top - 24,
-                              }
-                            : {
-                                  height: rect.height + 20,
-                                  top: rect.top - passageRect.top - 10,
-                              }
-                    }
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <line
-                        className={'stroke-primary'}
-                        strokeWidth={'2'}
-                        strokeLinejoin={'round'}
-                        strokeLinecap={'round'}
-                        x1="5px"
-                        y1="0%"
-                        x2="5px"
-                        y2="100%"
-                    />
-                </svg>
-            ) : null}
 
             {rect && passageRect ? (
                 <button

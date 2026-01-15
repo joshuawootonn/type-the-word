@@ -52,8 +52,6 @@ export function Paragraph({
                         verse={verse}
                         isCurrentVerse={isCurrentVerse}
                         isIndented={node.metadata.blockIndent}
-                        isQuote={node.metadata.type === 'quote'}
-                        typingSession={typingSession}
                         chapterHistory={chapterHistory}
                     />
                 )
