@@ -55,21 +55,21 @@ export function Navigation({
     const builtinThemes = useQuery({
         queryKey: ['builtinThemes'],
         queryFn: fetchBuiltinThemes,
-        initialData: serverRenderedBuiltinThemes,
+        placeholderData: serverRenderedBuiltinThemes,
     })
 
     const userThemes = useQuery({
         queryKey: ['userThemes'],
         queryFn: fetchUserThemes,
         enabled: Boolean(sessionData?.user.id),
-        initialData: serverRenderedUserThemes,
+        placeholderData: serverRenderedUserThemes,
     })
 
     const { data: lastTypedVerse } = useQuery({
         queryKey: ['last-verse'],
         queryFn: fetchLastVerse,
         enabled: sessionData?.user?.id != null,
-        initialData: props.lastTypedVerse,
+        placeholderData: props.lastTypedVerse ?? undefined,
     })
 
     // Get current translation from URL, fallback to cookie, then server value
@@ -265,9 +265,11 @@ export function Navigation({
                                                     )
                                                 }
                                                 builtinThemes={
-                                                    builtinThemes.data
+                                                    builtinThemes.data ?? []
                                                 }
-                                                userThemes={userThemes.data}
+                                                userThemes={
+                                                    userThemes.data ?? []
+                                                }
                                             />
                                             <div className="-mx-3 my-3 border-t-2 border-primary" />
                                             <h2 className="mb-2 text-xl">
@@ -282,7 +284,7 @@ export function Navigation({
                                             </h2>
                                             <CreateThemeForm
                                                 builtinThemes={
-                                                    builtinThemes.data
+                                                    builtinThemes.data ?? []
                                                 }
                                                 goBackToSettings={() =>
                                                     setSettingsState('initial')

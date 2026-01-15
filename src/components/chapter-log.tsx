@@ -23,10 +23,11 @@ export function ChapterLog({
         queryKey: ['chapter-history', passageSegment, translation],
         queryFn: () => fetchChapterHistory(passageSegment, translation),
         enabled: sessionData?.user?.id != null,
-        initialData: props.chapterHistory,
+        placeholderData: props.chapterHistory,
     })
 
-    if (chapterHistory.data.chapterLogs.length === 0) return null
+    if (!chapterHistory.data || chapterHistory.data.chapterLogs.length === 0)
+        return null
 
     return (
         <div className="mb-24">

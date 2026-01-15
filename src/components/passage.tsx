@@ -76,14 +76,14 @@ export function Passage({
         queryKey: ['typing-session'],
         queryFn: fetchTypingSessionUpsert,
         enabled: sessionData?.user?.id != null,
-        initialData: props.typingSession,
+        placeholderData: props.typingSession,
     })
     const chapterHistory = useQuery({
         queryKey: ['chapter-history', passageSegementOrOverride, translation],
         queryFn: () =>
             fetchChapterHistory(passageSegementOrOverride, translation),
         enabled: sessionData?.user?.id != null,
-        initialData: props.chapterHistory,
+        placeholderData: props.chapterHistory,
     })
 
     const isRootPath = usePathname() === '/'

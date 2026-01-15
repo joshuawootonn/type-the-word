@@ -5,7 +5,7 @@ import { isValidTranslation, parseTranslation } from './lib/translations'
 
 const COOKIE_NAME = 'lastTranslation'
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
     const url = request.nextUrl.clone()
     const translation = url.searchParams.get('translation')
 

@@ -12,6 +12,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const config = {
     reactStrictMode: true,
     outputFileTracingRoot: __dirname,
+    turbopack: {},
     // eslint-disable-next-line @typescript-eslint/require-await
     async rewrites() {
         return [

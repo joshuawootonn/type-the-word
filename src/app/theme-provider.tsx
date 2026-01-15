@@ -145,26 +145,26 @@ export function ThemeProvider({
     const builtinThemes = useQuery({
         queryKey: ['builtinThemes'],
         queryFn: fetchBuiltinThemes,
-        initialData: serverRenderedBuiltinThemes,
+        placeholderData: serverRenderedBuiltinThemes,
     })
 
     const userThemes = useQuery({
         queryKey: ['userThemes'],
         queryFn: fetchUserThemes,
         enabled: Boolean(userId),
-        initialData: serverRenderedUserThemes,
+        placeholderData: serverRenderedUserThemes,
     })
 
     // Update theme styles when builtin or user themes change (replaces v4's onSuccess)
     useEffect(() => {
-        updateThemeStyleTag(builtinThemes.data, userThemes.data)
+        updateThemeStyleTag(builtinThemes.data ?? [], userThemes.data ?? [])
     }, [builtinThemes.data, userThemes.data])
 
     const currentTheme = useQuery({
         queryKey: ['currentTheme'],
         queryFn: fetchCurrentTheme,
         enabled: Boolean(userId),
-        initialData: serverRenderedCurrentTheme,
+        placeholderData: serverRenderedCurrentTheme ?? undefined,
     })
 
     const queryClient = useQueryClient()
@@ -192,7 +192,10 @@ export function ThemeProvider({
     })
 
     const currentThemeOrFallback = useMemo<CurrentTheme>(() => {
-        return getCurrentThemeOrFallback(currentTheme.data, builtinThemes.data)
+        return getCurrentThemeOrFallback(
+            currentTheme.data ?? null,
+            builtinThemes.data ?? [],
+        )
     }, [currentTheme, builtinThemes])
 
     const applyTheme = useCallback(
@@ -200,8 +203,8 @@ export function ThemeProvider({
             // If theme is system, resolve it before setting theme
             const resolvedTheme = getResolvedTheme(
                 theme,
-                userThemes.data,
-                builtinThemes.data,
+                userThemes.data ?? [],
+                builtinThemes.data ?? [],
             )
             const d = document.documentElement
 
