@@ -67,6 +67,14 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date('01/15/2026')} /> - Improved
+                    the &quot;typed&quot; indicator line on passages. If you
+                    type through consecutive verses, the left-side line is now
+                    rendered as one continuous segment even when verses wrap or
+                    span multiple paragraphs. If you have multiple separated
+                    blocks of typed verses, it renders multiple line segments.
+                </li>
+                <li>
                     <DateComponent date={new Date('01/14/2026')} /> - Your
                     preferred translation is now remembered. When you type a
                     verse or change the translation selector, your choice is
