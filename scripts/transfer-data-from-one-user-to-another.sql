@@ -1,6 +1,41 @@
 
 -- Inspect users (optional - verify IDs are correct)
-SELECT "id","name","email" FROM "type-the-word"."user" WHERE "id" IN (:source_user_id,:target_user_id);
+SELECT "id","name","email"
+FROM "type-the-word"."user"
+WHERE "id" IN (:source_user_id,:target_user_id);
+
+-- Preview what will be moved (optional)
+SELECT
+  (SELECT COUNT(*) FROM "type-the-word"."typingSession" WHERE "userId" = :source_user_id) AS source_typing_sessions,
+  (SELECT COUNT(*) FROM "type-the-word"."typedVerse" WHERE "userId" = :source_user_id) AS source_typed_verses,
+  (SELECT COUNT(*) FROM "type-the-word"."userDailyActivity" WHERE "userId" = :source_user_id) AS source_user_daily_activity,
+  (SELECT COUNT(*) FROM "type-the-word"."userBookProgress" WHERE "userId" = :source_user_id) AS source_user_book_progress,
+  (SELECT COUNT(*) FROM "type-the-word"."userChapterProgress" WHERE "userId" = :source_user_id) AS source_user_chapter_progress,
+  (SELECT COUNT(*) FROM "type-the-word"."userTheme" WHERE "userId" = :source_user_id) AS source_user_themes,
+  (SELECT COUNT(*) FROM "type-the-word"."userCurrentTheme" WHERE "userId" = :source_user_id) AS source_user_current_theme,
+  (SELECT COUNT(*) FROM "type-the-word"."userChangelog" WHERE "userId" = :source_user_id) AS source_user_changelog;
+
+SELECT
+  (SELECT COUNT(*) FROM "type-the-word"."typingSession" WHERE "userId" = :target_user_id) AS target_typing_sessions,
+  (SELECT COUNT(*) FROM "type-the-word"."typedVerse" WHERE "userId" = :target_user_id) AS target_typed_verses,
+  (SELECT COUNT(*) FROM "type-the-word"."userDailyActivity" WHERE "userId" = :target_user_id) AS target_user_daily_activity,
+  (SELECT COUNT(*) FROM "type-the-word"."userBookProgress" WHERE "userId" = :target_user_id) AS target_user_book_progress,
+  (SELECT COUNT(*) FROM "type-the-word"."userChapterProgress" WHERE "userId" = :target_user_id) AS target_user_chapter_progress,
+  (SELECT COUNT(*) FROM "type-the-word"."userTheme" WHERE "userId" = :target_user_id) AS target_user_themes,
+  (SELECT COUNT(*) FROM "type-the-word"."userCurrentTheme" WHERE "userId" = :target_user_id) AS target_user_current_theme,
+  (SELECT COUNT(*) FROM "type-the-word"."userChangelog" WHERE "userId" = :target_user_id) AS target_user_changelog;
+
+-- NOTE:
+-- This script reassigns all history + settings from source -> target.
+-- If the target already has history, consider clearing its cache rows
+-- or running the backfill scripts after the move.
+
+BEGIN TRANSACTION;
+
+-- Optional: reassign provider accounts if you want source login to map to target
+-- UPDATE "type-the-word"."account"
+-- SET "userId" = :target_user_id
+-- WHERE "userId" = :source_user_id;
 
 -- Move typing sessions
 UPDATE "type-the-word"."typingSession"
@@ -9,6 +44,21 @@ WHERE "userId" = :source_user_id;
 
 -- Move typed verses
 UPDATE "type-the-word"."typedVerse"
+SET "userId" = :target_user_id
+WHERE "userId" = :source_user_id;
+
+-- Move daily activity cache (history log + WPM stats)
+UPDATE "type-the-word"."userDailyActivity"
+SET "userId" = :target_user_id
+WHERE "userId" = :source_user_id;
+
+-- Move chapter progress cache
+UPDATE "type-the-word"."userChapterProgress"
+SET "userId" = :target_user_id
+WHERE "userId" = :source_user_id;
+
+-- Move book progress cache
+UPDATE "type-the-word"."userBookProgress"
 SET "userId" = :target_user_id
 WHERE "userId" = :source_user_id;
 
@@ -54,6 +104,8 @@ WHERE "userId" = :source_user_id;
 -- Invalidate sessions (recommended)
 DELETE FROM "type-the-word"."session"
 WHERE "userId" IN (:source_user_id,:target_user_id);
+
+COMMIT;
 
 -- Optional: delete the source user after verifying merge
 -- DELETE FROM "type-the-word"."user" WHERE "id" = :source_user_id;
