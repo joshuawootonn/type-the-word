@@ -99,6 +99,23 @@ const studentSubmissionSchema = z.object({
     alternateLink: z.string().optional(),
 })
 
+const courseStudentSchema = z.object({
+    courseId: z.string(),
+    userId: z.string(),
+    profile: z.object({
+        id: z.string(),
+        name: z
+            .object({
+                givenName: z.string().optional(),
+                familyName: z.string().optional(),
+                fullName: z.string().optional(),
+            })
+            .optional(),
+        emailAddress: z.string().optional(),
+        photoUrl: z.string().optional(),
+    }),
+})
+
 // Export types inferred from schemas
 export type GoogleTokenResponse = z.infer<typeof googleTokenResponseSchema>
 export type GoogleUserInfo = z.infer<typeof googleUserInfoSchema>
@@ -106,6 +123,7 @@ export type ClassroomCourse = z.infer<typeof classroomCourseSchema>
 export type CourseWorkMaterial = z.infer<typeof courseWorkMaterialSchema>
 export type CourseWork = z.infer<typeof courseWorkSchema>
 export type StudentSubmission = z.infer<typeof studentSubmissionSchema>
+export type CourseStudent = z.infer<typeof courseStudentSchema>
 
 /**
  * Generate the OAuth authorization URL for teachers to connect their Google Classroom
@@ -397,4 +415,57 @@ export async function getCourse(
 
     const data: unknown = await response.json()
     return classroomCourseSchema.parse(data)
+}
+
+/**
+ * List students enrolled in a course
+ */
+export async function listCourseStudents(
+    accessToken: string,
+    courseId: string,
+): Promise<CourseStudent[]> {
+    const response = await fetch(
+        `${CLASSROOM_API_BASE}/courses/${courseId}/students`,
+        {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        },
+    )
+
+    if (!response.ok) {
+        const error = await response.text()
+        throw new Error(`Failed to list students: ${error}`)
+    }
+
+    const data: unknown = await response.json()
+    const parsed = z
+        .object({ students: z.array(courseStudentSchema).optional() })
+        .parse(data)
+    return parsed.students ?? []
+}
+
+/**
+ * Turn in a student submission
+ */
+export async function turnInStudentSubmission(
+    accessToken: string,
+    courseId: string,
+    courseWorkId: string,
+    submissionId: string,
+): Promise<void> {
+    const response = await fetch(
+        `${CLASSROOM_API_BASE}/courses/${courseId}/courseWork/${courseWorkId}/studentSubmissions/${submissionId}:turnIn`,
+        {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        },
+    )
+
+    if (!response.ok) {
+        const error = await response.text()
+        throw new Error(`Failed to turn in submission: ${error}`)
+    }
 }

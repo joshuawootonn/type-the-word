@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm'
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -8,6 +9,7 @@ import { bookSchema } from '~/lib/types/book'
 import { authOptions } from '~/server/auth'
 import bibleMetadata from '~/server/bible-metadata.json'
 import { db } from '~/server/db'
+import * as schema from '~/server/db/schema'
 import { translationsSchema } from '~/server/db/schema'
 import { ClassroomRepository } from '~/server/repositories/classroom.repository'
 
@@ -102,16 +104,37 @@ export async function POST(request: NextRequest) {
             totalVerses = chapterVerseCount
         }
 
-        // Build the passage URL
+        // Save the assignment in our database first to get the ID
+        const assignment = await classroomRepo.createAssignment({
+            integrationType: 'coursework',
+            courseId: body.courseId,
+            courseWorkId: null, // Will be updated after courseWork is created
+            teacherGoogleId: teacherToken.googleId,
+            teacherUserId: session.user.id,
+            translation: body.translation,
+            book: body.book,
+            chapter: body.chapter,
+            firstVerse: body.firstVerse,
+            lastVerse: body.lastVerse,
+            title: body.title,
+            maxPoints: body.maxPoints,
+        })
+
+        // Build the passage URL with classroomAssignment param
         const passageSegment = `${body.book}_${body.chapter}`
         const verseRange = body.firstVerse
             ? body.lastVerse
                 ? `:${body.firstVerse}-${body.lastVerse}`
                 : `:${body.firstVerse}`
             : ''
-        const translationParam =
-            body.translation !== 'esv' ? `?translation=${body.translation}` : ''
-        const passageUrl = `${env.DEPLOYED_URL}/passage/${passageSegment}${verseRange}${translationParam}`
+
+        const urlParams = new URLSearchParams()
+        if (body.translation !== 'esv') {
+            urlParams.set('translation', body.translation)
+        }
+        urlParams.set('classroomAssignment', assignment.id)
+
+        const passageUrl = `${env.DEPLOYED_URL}/passage/${passageSegment}${verseRange}?${urlParams.toString()}`
 
         // Create the assignment in Google Classroom
         const courseWork = await createCourseWork(accessToken, body.courseId, {
@@ -131,25 +154,15 @@ export async function POST(request: NextRequest) {
             ],
         })
 
-        // Save the assignment in our database
-        const assignment = await classroomRepo.createAssignment({
-            integrationType: 'coursework',
-            courseId: body.courseId,
-            courseWorkId: courseWork.id,
-            teacherGoogleId: teacherToken.googleId,
-            teacherUserId: session.user.id,
-            translation: body.translation,
-            book: body.book,
-            chapter: body.chapter,
-            firstVerse: body.firstVerse,
-            lastVerse: body.lastVerse,
-            title: body.title,
-            maxPoints: body.maxPoints,
-        })
+        // Update assignment with courseWorkId
+        await db
+            .update(schema.classroomAssignment)
+            .set({ courseWorkId: courseWork.id })
+            .where(eq(schema.classroomAssignment.id, assignment.id))
 
         return NextResponse.json({
             success: true,
-            assignment,
+            assignment: { ...assignment, courseWorkId: courseWork.id },
             courseWork,
             totalVerses,
         })

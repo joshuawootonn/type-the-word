@@ -3,7 +3,14 @@ import clsx from 'clsx'
 import { trackEvent } from 'fathom-client'
 import { useAtom } from 'jotai'
 import { useSession } from 'next-auth/react'
-import React, { FormEvent, KeyboardEvent, useEffect, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
+import React, {
+    FormEvent,
+    KeyboardEvent,
+    useEffect,
+    useMemo,
+    useRef,
+} from 'react'
 import { z } from 'zod'
 
 import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
@@ -47,6 +54,10 @@ const knownInputEventSchema = z.discriminatedUnion('inputType', [
         inputType: z.literal('deleteSoftLineBackward'),
     }),
 ])
+
+function getPassageVerseNumbers(passage: ParsedPassage): number[] {
+    return getListOfVerses(passage.nodes).map(node => node.verse.verse)
+}
 
 export type KnownNativeInputEvent = z.infer<typeof knownInputEventSchema>
 
@@ -143,12 +154,25 @@ export function CurrentVerse({
     const [autoFocus] = useAtom(autofocusAtom)
     const { data: sessionData } = useSession()
     const { trackVerseCompleted } = useAnalytics()
+    const searchParams = useSearchParams()
+
+    // Add-on params (from iframe)
+    const classroomAttachment = searchParams?.get('classroomAttachment')
+    const classroomUser = searchParams?.get('classroomUser')
+    const classroomSubmission = searchParams?.get('classroomSubmission')
+
+    // CourseWork params (from shared link)
+    const classroomAssignment = searchParams?.get('classroomAssignment')
 
     const passageRect = usePassageRect()
     const [isPassageActive, setIsPassageActive] = useAtom(isPassageActiveAtom)
     const [isPassageFocused, setIsPassageFocused] =
         useAtom(isPassageFocusedAtom)
     const queryClient = useQueryClient()
+    const passageVerseNumbers = useMemo(
+        () => getPassageVerseNumbers(passage),
+        [passage],
+    )
 
     const addTypedVerseToSession = useMutation({
         mutationFn: (verse: AddTypedVerseBody) =>
@@ -253,6 +277,65 @@ export function CurrentVerse({
             await queryClient.invalidateQueries({
                 queryKey: ['last-verse'],
             })
+        },
+        onSuccess: async () => {
+            // Check for either Add-on params or CourseWork params
+            const hasAddonContext = classroomAttachment && classroomUser
+            // CourseWork relies on the session cookie server-side; no client id needed
+            const hasCourseWorkContext = Boolean(classroomAssignment)
+            if (!hasAddonContext && !hasCourseWorkContext) {
+                return
+            }
+
+            const latestChapterHistory =
+                queryClient.getQueryData<ChapterHistory>([
+                    'chapter-history',
+                    passageSegment,
+                ]) ?? chapterHistory
+
+            if (!latestChapterHistory) {
+                return
+            }
+
+            const versesCompleted = passageVerseNumbers.filter(
+                (verseNumber: number) =>
+                    latestChapterHistory.verses?.[verseNumber],
+            ).length
+            const totalVerses = passageVerseNumbers.length
+
+            if (totalVerses === 0) {
+                return
+            }
+
+            const completed = versesCompleted >= totalVerses
+
+            try {
+                const payload = hasAddonContext
+                    ? {
+                          // Add-on flow: use iframe params
+                          attachmentId: classroomAttachment,
+                          studentGoogleId: classroomUser,
+                          googleSubmissionId: classroomSubmission ?? undefined,
+                          versesCompleted,
+                          totalVerses,
+                          completed,
+                      }
+                    : {
+                          // CourseWork flow: use assignment ID
+                          assignmentId: classroomAssignment,
+                          versesCompleted,
+                          totalVerses,
+                          completed,
+                      }
+
+                const response = await fetch('/api/classroom/progress', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                })
+            } catch (error) {
+                console.warn('Failed to report classroom progress', error)
+            }
         },
         retry: 3,
     })
