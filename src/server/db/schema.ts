@@ -456,3 +456,178 @@ export const passageResponse = pgTable('passageResponse', {
         .notNull()
         .$default(() => sql`CURRENT_TIMESTAMP(3)`),
 })
+
+// ============================================================================
+// Google Classroom Integration Tables
+// Supports both CourseWork API integration and Classroom Add-on
+// ============================================================================
+
+// Enum for integration type
+export const classroomIntegrationType = pgEnum('classroom_integration_type', [
+    'coursework', // CourseWork API - works for all schools
+    'addon', // Classroom Add-on - requires Education Plus
+])
+
+// Classroom assignments created by teachers
+export const classroomAssignment = pgTable(
+    'classroomAssignment',
+    {
+        id: varchar('id', { length: 255 })
+            .notNull()
+            .$default(() => crypto.randomUUID())
+            .primaryKey(),
+        // Integration type
+        integrationType: classroomIntegrationType('integrationType').notNull(),
+        // Google Classroom identifiers
+        courseId: varchar('courseId', { length: 255 }).notNull(),
+        courseWorkId: varchar('courseWorkId', { length: 255 }), // For CourseWork API
+        attachmentId: varchar('attachmentId', { length: 255 }), // For Add-on
+        itemId: varchar('itemId', { length: 255 }), // CourseWork item ID (for Add-on)
+        // Teacher info
+        teacherGoogleId: varchar('teacherGoogleId', { length: 255 }).notNull(),
+        teacherUserId: varchar('teacherUserId', { length: 255 }), // Link to our users table
+        // Passage details
+        translation: typedVerseTranslation('translation').notNull(),
+        book: typedVerseBook('book').notNull(),
+        chapter: integer('chapter').notNull(),
+        firstVerse: integer('firstVerse'),
+        lastVerse: integer('lastVerse'),
+        // Metadata
+        title: varchar('title', { length: 500 }),
+        maxPoints: integer('maxPoints').default(100),
+        // Timestamps
+        createdAt: timestamp('createdAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+        updatedAt: timestamp('updatedAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+    },
+    table => ({
+        courseIdIdx: index('classroomAssignment_courseId_idx').on(
+            table.courseId,
+        ),
+        courseWorkIdIdx: index('classroomAssignment_courseWorkId_idx').on(
+            table.courseWorkId,
+        ),
+        attachmentIdIdx: index('classroomAssignment_attachmentId_idx').on(
+            table.attachmentId,
+        ),
+        teacherGoogleIdIdx: index('classroomAssignment_teacherGoogleId_idx').on(
+            table.teacherGoogleId,
+        ),
+    }),
+)
+
+export const classroomAssignmentRelations = relations(
+    classroomAssignment,
+    ({ one, many }) => ({
+        teacher: one(users, {
+            fields: [classroomAssignment.teacherUserId],
+            references: [users.id],
+        }),
+        submissions: many(classroomSubmission),
+    }),
+)
+
+// Student submissions/progress for classroom assignments
+export const classroomSubmission = pgTable(
+    'classroomSubmission',
+    {
+        id: varchar('id', { length: 255 })
+            .notNull()
+            .$default(() => crypto.randomUUID())
+            .primaryKey(),
+        assignmentId: varchar('assignmentId', { length: 255 }).notNull(),
+        // Student identifiers
+        studentGoogleId: varchar('studentGoogleId', { length: 255 }).notNull(),
+        studentUserId: varchar('studentUserId', { length: 255 }), // Link to our users table
+        // Google Classroom submission ID (for grade passback)
+        googleSubmissionId: varchar('googleSubmissionId', { length: 255 }),
+        // Progress tracking
+        versesCompleted: integer('versesCompleted').notNull().default(0),
+        totalVerses: integer('totalVerses').notNull(),
+        // Typing performance metrics
+        averageWpm: integer('averageWpm'),
+        averageAccuracy: integer('averageAccuracy'),
+        // Completion status
+        completedAt: timestamp('completedAt', { mode: 'date' }),
+        // Grade passback tracking
+        grade: integer('grade'), // Calculated grade (0-100 or based on maxPoints)
+        gradeSubmittedAt: timestamp('gradeSubmittedAt', { mode: 'date' }),
+        // Timestamps
+        createdAt: timestamp('createdAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+        updatedAt: timestamp('updatedAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+    },
+    table => ({
+        assignmentIdIdx: index('classroomSubmission_assignmentId_idx').on(
+            table.assignmentId,
+        ),
+        studentGoogleIdIdx: index('classroomSubmission_studentGoogleId_idx').on(
+            table.studentGoogleId,
+        ),
+        assignmentStudentIdx: index(
+            'classroomSubmission_assignment_student_idx',
+        ).on(table.assignmentId, table.studentGoogleId),
+    }),
+)
+
+export const classroomSubmissionRelations = relations(
+    classroomSubmission,
+    ({ one }) => ({
+        assignment: one(classroomAssignment, {
+            fields: [classroomSubmission.assignmentId],
+            references: [classroomAssignment.id],
+        }),
+        student: one(users, {
+            fields: [classroomSubmission.studentUserId],
+            references: [users.id],
+        }),
+    }),
+)
+
+// Store teacher's Google OAuth tokens for CourseWork API access
+export const classroomTeacherToken = pgTable(
+    'classroomTeacherToken',
+    {
+        id: varchar('id', { length: 255 })
+            .notNull()
+            .$default(() => crypto.randomUUID())
+            .primaryKey(),
+        userId: varchar('userId', { length: 255 }).notNull(),
+        googleId: varchar('googleId', { length: 255 }).notNull(),
+        accessToken: text('accessToken').notNull(),
+        refreshToken: text('refreshToken'),
+        expiresAt: timestamp('expiresAt', { mode: 'date' }),
+        scope: text('scope'),
+        createdAt: timestamp('createdAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+        updatedAt: timestamp('updatedAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+    },
+    table => ({
+        userIdIdx: index('classroomTeacherToken_userId_idx').on(table.userId),
+        googleIdIdx: index('classroomTeacherToken_googleId_idx').on(
+            table.googleId,
+        ),
+        uniqueUserId: unique('classroomTeacherToken_userId_unique').on(
+            table.userId,
+        ),
+    }),
+)
+
+export const classroomTeacherTokenRelations = relations(
+    classroomTeacherToken,
+    ({ one }) => ({
+        user: one(users, {
+            fields: [classroomTeacherToken.userId],
+            references: [users.id],
+        }),
+    }),
+)

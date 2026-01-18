@@ -191,8 +191,8 @@ export function PassageSelector({
         // Set cookie to remember translation preference
         void updateTranslationCookie(translation)
 
-        // Always include translation param
-        const params = new URLSearchParams()
+        // Preserve existing query params (especially classroom params)
+        const params = new URLSearchParams(searchParams?.toString())
         params.set('translation', translation)
         const queryString = params.toString()
 
