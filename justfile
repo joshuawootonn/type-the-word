@@ -35,7 +35,14 @@ migrate-prod:
 
 # Generate a new migration from schema changes
 generate:
-    pnpm db:generate 
+    pnpm db:generate
+
+# Check which migrations have been applied to a database
+check-migrations-dev:
+    export $(xargs <.env) && pnpm dlx tsx scripts/list-migrations.ts
+
+check-migrations-prod:
+    export $(xargs <.env.prod) && pnpm dlx tsx scripts/list-migrations.ts
 
 # Start development server
 dev:
