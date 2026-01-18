@@ -29,6 +29,8 @@ export const env = createEnv({
         // DISCORD_CLIENT_SECRET: z.string(),
         GOOGLE_CLIENT_ID: z.string(),
         GOOGLE_CLIENT_SECRET: z.string(),
+        GOOGLE_CLASSROOM_CLIENT_ID: z.string(),
+        GOOGLE_CLASSROOM_CLIENT_SECRET: z.string(),
         SENTRY_AUTH_TOKEN: z.string(),
 
         CONVERTKIT_API_KEY: z.string(),
@@ -66,6 +68,9 @@ export const env = createEnv({
         CROSSWAY_SECRET: process.env.CROSSWAY_SECRET,
         GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
         GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+        GOOGLE_CLASSROOM_CLIENT_ID: process.env.GOOGLE_CLASSROOM_CLIENT_ID,
+        GOOGLE_CLASSROOM_CLIENT_SECRET:
+            process.env.GOOGLE_CLASSROOM_CLIENT_SECRET,
         NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
         // NEXTAUTH_URL: process.env.NEXTAUTH_URL,
         // DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,

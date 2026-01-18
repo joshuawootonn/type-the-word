@@ -61,6 +61,9 @@ export const usersRelations = relations(users, ({ many, one }) => ({
     bookProgress: many(userBookProgress),
     chapterProgress: many(userChapterProgress),
     dailyActivity: many(userDailyActivity),
+    classroomTeacherToken: one(classroomTeacherToken),
+    classroomAssignments: many(classroomAssignment),
+    classroomSubmissions: many(classroomSubmission),
 }))
 
 export const userChangelog = pgTable('userChangelog', {
@@ -456,3 +459,157 @@ export const passageResponse = pgTable('passageResponse', {
         .notNull()
         .$default(() => sql`CURRENT_TIMESTAMP(3)`),
 })
+
+// Google Classroom Integration
+
+// Stores OAuth tokens for teachers who connect their Google Classroom account
+export const classroomTeacherToken = pgTable(
+    'classroomTeacherToken',
+    {
+        userId: varchar('userId', { length: 255 }).notNull().primaryKey(),
+        accessToken: text('accessToken').notNull(),
+        refreshToken: text('refreshToken').notNull(),
+        expiresAt: timestamp('expiresAt', { mode: 'date' }).notNull(),
+        scope: text('scope').notNull(),
+        createdAt: timestamp('createdAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+        updatedAt: timestamp('updatedAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+    },
+    table => ({
+        userIdIdx: index('classroomTeacherToken_userId_idx').on(table.userId),
+    }),
+)
+
+export const classroomTeacherTokenRelations = relations(
+    classroomTeacherToken,
+    ({ one }) => ({
+        user: one(users, {
+            fields: [classroomTeacherToken.userId],
+            references: [users.id],
+        }),
+    }),
+)
+
+// Stores assignments created by teachers
+export const classroomAssignment = pgTable(
+    'classroomAssignment',
+    {
+        id: varchar('id', { length: 255 })
+            .notNull()
+            .$default(() => crypto.randomUUID())
+            .primaryKey(),
+        teacherUserId: varchar('teacherUserId', { length: 255 }).notNull(),
+        // Google Classroom IDs
+        courseId: varchar('courseId', { length: 255 }).notNull(),
+        courseWorkId: varchar('courseWorkId', { length: 255 }).notNull(),
+        // Assignment details
+        title: text('title').notNull(),
+        description: text('description'),
+        // Passage details
+        translation: typedVerseTranslation('translation').notNull(),
+        book: typedVerseBook('book').notNull(),
+        startChapter: integer('startChapter').notNull(),
+        startVerse: integer('startVerse').notNull(),
+        endChapter: integer('endChapter').notNull(),
+        endVerse: integer('endVerse').notNull(),
+        // Metadata
+        maxPoints: integer('maxPoints').notNull().default(100),
+        dueDate: timestamp('dueDate', { mode: 'date' }),
+        createdAt: timestamp('createdAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+        updatedAt: timestamp('updatedAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+    },
+    table => ({
+        teacherUserIdIdx: index('classroomAssignment_teacherUserId_idx').on(
+            table.teacherUserId,
+        ),
+        courseIdIdx: index('classroomAssignment_courseId_idx').on(
+            table.courseId,
+        ),
+        courseWorkIdIdx: index('classroomAssignment_courseWorkId_idx').on(
+            table.courseWorkId,
+        ),
+    }),
+)
+
+export const classroomAssignmentRelations = relations(
+    classroomAssignment,
+    ({ one, many }) => ({
+        teacher: one(users, {
+            fields: [classroomAssignment.teacherUserId],
+            references: [users.id],
+        }),
+        submissions: many(classroomSubmission),
+    }),
+)
+
+// Tracks student progress on assignments
+export const classroomSubmission = pgTable(
+    'classroomSubmission',
+    {
+        id: varchar('id', { length: 255 })
+            .notNull()
+            .$default(() => crypto.randomUUID())
+            .primaryKey(),
+        assignmentId: varchar('assignmentId', { length: 255 }).notNull(),
+        studentUserId: varchar('studentUserId', { length: 255 }).notNull(),
+        // Google Classroom submission ID
+        submissionId: varchar('submissionId', { length: 255 }),
+        // Progress tracking
+        completedVerses: integer('completedVerses').notNull().default(0),
+        totalVerses: integer('totalVerses').notNull(),
+        // Performance metrics
+        averageWpm: integer('averageWpm'),
+        averageAccuracy: integer('averageAccuracy'),
+        // Status (0 = false, 1 = true)
+        isCompleted: integer('isCompleted').notNull().default(0),
+        isTurnedIn: integer('isTurnedIn').notNull().default(0),
+        grade: integer('grade'),
+        // Timestamps
+        startedAt: timestamp('startedAt', { mode: 'date' }),
+        completedAt: timestamp('completedAt', { mode: 'date' }),
+        turnedInAt: timestamp('turnedInAt', { mode: 'date' }),
+        createdAt: timestamp('createdAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+        updatedAt: timestamp('updatedAt', { mode: 'date' })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+    },
+    table => ({
+        assignmentIdIdx: index('classroomSubmission_assignmentId_idx').on(
+            table.assignmentId,
+        ),
+        studentUserIdIdx: index('classroomSubmission_studentUserId_idx').on(
+            table.studentUserId,
+        ),
+        submissionIdIdx: index('classroomSubmission_submissionId_idx').on(
+            table.submissionId,
+        ),
+        // Composite unique constraint - one submission per student per assignment
+        studentAssignmentUnique: unique().on(
+            table.studentUserId,
+            table.assignmentId,
+        ),
+    }),
+)
+
+export const classroomSubmissionRelations = relations(
+    classroomSubmission,
+    ({ one }) => ({
+        assignment: one(classroomAssignment, {
+            fields: [classroomSubmission.assignmentId],
+            references: [classroomAssignment.id],
+        }),
+        student: one(users, {
+            fields: [classroomSubmission.studentUserId],
+            references: [users.id],
+        }),
+    }),
+)
