@@ -123,14 +123,26 @@ export type UserChangelogClientSchema = z.infer<
     typeof userChangelogClientSchema
 >
 
-export async function fetchUserChangelog(): Promise<UserChangelogClientSchema> {
+export async function fetchUserChangelog(): Promise<UserChangelogClientSchema | null> {
     const response = await fetch(`${getBaseUrl()}/api/user-changelog`, {
         headers: {
             'Content-Type': 'application/json',
         },
     })
 
-    const body: Body<UserChangelogRecord> = await response.json()
+    const body: Body<UserChangelogRecord | null> = await response.json()
+
+    if (!response.ok) {
+        const errorBody = body as { error?: string }
+        throw new Error(
+            errorBody?.error ??
+                `Failed to fetch user changelog: ${response.status}`,
+        )
+    }
+
+    if (body.data == null) {
+        return null
+    }
 
     return userChangelogClientSchema.parse(body.data)
 }

@@ -42,7 +42,7 @@ export async function GET() {
     })
 
     if (userChangelog === null) {
-        return Response.json({ error: 'User not found' }, { status: 404 })
+        return Response.json({ data: null }, { status: 200 })
     }
 
     return Response.json({ data: userChangelog }, { status: 200 })
