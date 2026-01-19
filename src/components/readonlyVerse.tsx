@@ -1,7 +1,8 @@
 import clsx from "clsx"
 import { useAtom, useSetAtom } from "jotai"
-import React, { useRef } from "react"
+import { useRef } from "react"
 
+import { AssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
 import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
 import {
     currentVerseAtom,
@@ -16,12 +17,12 @@ export function ReadonlyVerse({
     isCurrentVerse,
     isIndented,
     verse,
-    chapterHistory,
+    history,
 }: {
     isCurrentVerse: boolean
     isIndented: boolean
     verse: Verse
-    chapterHistory?: ChapterHistory
+    history?: ChapterHistory | AssignmentHistory
 }) {
     const passageRect = usePassageRect()
     const [isPassageActive] = useAtom(isPassageActiveAtom)
@@ -29,7 +30,7 @@ export function ReadonlyVerse({
     const ref = useRef<HTMLSpanElement>(null)
     const rect = useVerseRect(ref, verse.verse.text + verse.metadata.offset)
 
-    const isTypedInHistory = chapterHistory?.verses[verse.verse.verse]
+    const isTypedInHistory = history?.verses[verse.verse.verse]
 
     const [currentVerse, setCurrentVerse] = useAtom(currentVerseAtom)
     const setPosition = useSetAtom(positionAtom)

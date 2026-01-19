@@ -1,4 +1,8 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import {
+    type QueryKey,
+    useMutation,
+    useQueryClient,
+} from "@tanstack/react-query"
 import clsx from "clsx"
 import { trackEvent } from "fathom-client"
 import { useAtom } from "jotai"
@@ -6,6 +10,7 @@ import { useSession } from "next-auth/react"
 import React, { FormEvent, KeyboardEvent, useEffect, useRef } from "react"
 import { z } from "zod"
 
+import { AssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
 import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
 import { AddTypedVerseBody } from "~/app/api/typing-session/[id]/route"
 import { getOS } from "~/app/global-hotkeys"
@@ -24,9 +29,7 @@ import { usePassageRect, useVerseRect } from "~/lib/hooks/passageRectContext"
 import { useAnalytics } from "~/lib/hooks/useAnalytics"
 import { isAtomTyped, isVerseSameShape } from "~/lib/isEqual"
 import { getPosition, isAtomComplete, isValidKeystroke } from "~/lib/keystroke"
-import { Translation } from "~/lib/parseEsv"
 import { Block, Inline, ParsedPassage, Verse } from "~/lib/parseEsv"
-import { PassageSegment } from "~/lib/passageSegment"
 import { TypingSession } from "~/server/repositories/typingSession.repository"
 
 const knownInputEventSchema = z.discriminatedUnion("inputType", [
@@ -118,23 +121,21 @@ function getNextVerse(currentVerse: string, blocks: Block[]): Verse | null {
 export function CurrentVerse({
     verse,
     isCurrentVerse,
-    isQuote,
     isIndented,
     passage,
     typingSession,
-    chapterHistory,
-    passageSegment,
-    translation = "esv",
+    history,
+    classroomAssignmentId,
+    historyQueryKey,
 }: {
     isCurrentVerse: boolean
     isIndented: boolean
-    isQuote: boolean
     verse: Verse
     passage: ParsedPassage
     typingSession?: TypingSession
-    chapterHistory?: ChapterHistory
-    passageSegment: PassageSegment
-    translation?: Translation
+    history?: ChapterHistory | AssignmentHistory
+    classroomAssignmentId?: string
+    historyQueryKey?: QueryKey
 }) {
     const inputRef = useRef<HTMLInputElement>(null)
     const [position, setPosition] = useAtom(positionAtom)
@@ -164,11 +165,9 @@ export function CurrentVerse({
                 "typing-session",
             ])
             // Snapshot the previous value
-            const previousChapterHistory = queryClient.getQueryData([
-                "chapter-history",
-                passageSegment,
-                translation,
-            ])
+            const previousHistory = historyQueryKey
+                ? queryClient.getQueryData(historyQueryKey)
+                : undefined
 
             // Optimistically update to the new value
             queryClient.setQueryData<TypingSession>(
@@ -184,6 +183,8 @@ export function CurrentVerse({
                             ...prevTypingSession.typedVerses,
                             {
                                 ...verse,
+                                classroomAssignmentId:
+                                    verse.classroomAssignmentId ?? null,
                                 id: crypto.randomUUID(),
                                 userId: crypto.randomUUID(),
                                 createdAt: new Date(),
@@ -193,22 +194,24 @@ export function CurrentVerse({
                     }
                 },
             )
-            queryClient.setQueryData<ChapterHistory>(
-                ["chapter-history", passageSegment, translation],
-                prevChapterHistory => {
-                    if (prevChapterHistory == null) {
-                        return undefined
-                    }
+            if (historyQueryKey) {
+                queryClient.setQueryData<ChapterHistory | AssignmentHistory>(
+                    historyQueryKey,
+                    prevChapterHistory => {
+                        if (prevChapterHistory == null) {
+                            return undefined
+                        }
 
-                    return {
-                        ...prevChapterHistory,
-                        verses: {
-                            ...prevChapterHistory.verses,
-                            [verse.verse]: true,
-                        },
-                    }
-                },
-            )
+                        return {
+                            ...prevChapterHistory,
+                            verses: {
+                                ...prevChapterHistory.verses,
+                                [verse.verse]: true,
+                            },
+                        }
+                    },
+                )
+            }
 
             // This waits to toggle the verse till ^ has gone through.
             // It prevents a flicker that can happen in this mutation.
@@ -228,7 +231,7 @@ export function CurrentVerse({
             })
 
             // Return a context object with the snapshotted value
-            return { previousTypingSession, previousChapterHistory }
+            return { previousTypingSession, previousHistory }
         },
         // If the mutation fails,
         // use the context returned from onMutate to roll back
@@ -237,19 +240,23 @@ export function CurrentVerse({
                 ["typing-session"],
                 context?.previousTypingSession,
             )
-            queryClient.setQueryData(
-                ["chapter-history", passageSegment, translation],
-                context?.previousChapterHistory,
-            )
+            if (historyQueryKey) {
+                queryClient.setQueryData(
+                    historyQueryKey,
+                    context?.previousHistory,
+                )
+            }
         },
         // Always refetch after error or success:
         onSettled: async () => {
             await queryClient.invalidateQueries({
                 queryKey: ["typing-session"],
             })
-            await queryClient.invalidateQueries({
-                queryKey: ["chapter-history"],
-            })
+            if (historyQueryKey) {
+                await queryClient.invalidateQueries({
+                    queryKey: historyQueryKey,
+                })
+            }
             await queryClient.invalidateQueries({
                 queryKey: ["last-verse"],
             })
@@ -334,6 +341,7 @@ export function CurrentVerse({
                     verse: verse.verse.verse,
                     translation: verse.verse.translation,
                     typingSessionId: typingSession.id,
+                    classroomAssignmentId,
                     typingData: {
                         userActions: next,
                         userNodes: position
@@ -441,15 +449,7 @@ export function CurrentVerse({
           )
         : position
 
-    const isTypedInSession = typingSession?.typedVerses.find(
-        a =>
-            a.verse === verse.verse.verse &&
-            a.chapter === verse.verse.chapter &&
-            a.book === verse.verse.book &&
-            a.translation === verse.verse.translation,
-    )
-
-    const isTypedInHistory = chapterHistory?.verses[verse.verse.verse]
+    const isTypedInHistory = history?.verses[verse.verse.verse]
 
     return (
         <span
@@ -535,37 +535,6 @@ export function CurrentVerse({
 
                 return null
             })}
-
-            {isTypedInSession && rect && passageRect ? (
-                <svg
-                    className={
-                        "absolute -bottom-1 -left-3 -top-1 right-full z-0 w-4 rounded-none md:-left-6"
-                    }
-                    style={
-                        isQuote
-                            ? {
-                                  height: rect.height + 48,
-                                  top: rect.top - passageRect.top - 24,
-                              }
-                            : {
-                                  height: rect.height + 20,
-                                  top: rect.top - passageRect.top - 10,
-                              }
-                    }
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <line
-                        className={"stroke-primary"}
-                        strokeWidth={"2"}
-                        strokeLinejoin={"round"}
-                        strokeLinecap={"round"}
-                        x1="5px"
-                        y1="0%"
-                        x2="5px"
-                        y2="100%"
-                    />
-                </svg>
-            ) : null}
 
             {rect && passageRect && !isPassageFocused ? (
                 <button

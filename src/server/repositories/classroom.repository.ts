@@ -72,6 +72,7 @@ export async function deleteTeacherToken(userId: string) {
  */
 
 export async function createAssignment(data: {
+    id?: string
     teacherUserId: string
     courseId: string
     courseWorkId: string
@@ -160,6 +161,22 @@ export async function getOrCreateSubmission(data: {
     })
 
     if (existing) {
+        if (
+            data.submissionId != null &&
+            existing.submissionId !== data.submissionId
+        ) {
+            const [updated] = await db
+                .update(classroomSubmission)
+                .set({
+                    submissionId: data.submissionId,
+                    updatedAt: new Date(),
+                })
+                .where(eq(classroomSubmission.id, existing.id))
+                .returning()
+
+            return updated ?? existing
+        }
+
         return existing
     }
 

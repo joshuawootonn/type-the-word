@@ -127,6 +127,13 @@
             "when": 1768846173995,
             "tag": "0017_abandoned_norrin_radd",
             "breakpoints": true
+        },
+        {
+            "idx": 18,
+            "version": "7",
+            "when": 1768850462624,
+            "tag": "0018_overconfident_jean_grey",
+            "breakpoints": true
         }
     ]
 }

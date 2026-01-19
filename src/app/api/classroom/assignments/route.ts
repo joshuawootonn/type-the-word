@@ -130,6 +130,8 @@ export async function POST(request: NextRequest) {
             }
         }
 
+        const assignmentId = crypto.randomUUID()
+
         // Create CourseWork in Google Classroom as DRAFT
         const courseWork = await createCourseWork(accessToken, data.courseId, {
             title: data.title,
@@ -143,7 +145,7 @@ export async function POST(request: NextRequest) {
             materials: [
                 {
                     link: {
-                        url: `${env.DEPLOYED_URL}/classroom/assignment/pending`,
+                        url: `${env.DEPLOYED_URL}/classroom/assignment/${assignmentId}`,
                         title: "Start Assignment",
                     },
                 },
@@ -152,6 +154,7 @@ export async function POST(request: NextRequest) {
 
         // Create assignment record in our database as DRAFT
         const assignment = await createAssignment({
+            id: assignmentId,
             teacherUserId: session.user.id,
             courseId: data.courseId,
             courseWorkId: courseWork.id,

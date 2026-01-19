@@ -230,6 +230,46 @@ export async function listStudents(
 }
 
 /**
+ * Gets a specific student by Google user ID
+ */
+export async function getStudent(
+    accessToken: string,
+    courseId: string,
+    userId: string,
+): Promise<Student | null> {
+    const classroom = createClassroomClient(accessToken)
+
+    try {
+        const response = await classroom.courses.students.get({
+            courseId,
+            userId,
+        })
+
+        const student = response.data
+        if (!student) {
+            return null
+        }
+
+        const result = {
+            courseId: student.courseId!,
+            userId: student.userId!,
+            profile: student.profile
+                ? {
+                      id: student.profile.id!,
+                      name: student.profile.name?.fullName,
+                      emailAddress: student.profile.emailAddress,
+                      photoUrl: student.profile.photoUrl,
+                  }
+                : undefined,
+        }
+
+        return studentSchema.parse(result)
+    } catch (_error) {
+        return null
+    }
+}
+
+/**
  * Creates a CourseWork (assignment) in Google Classroom
  */
 export async function createCourseWork(

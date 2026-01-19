@@ -1,0 +1,2 @@
+ALTER TABLE "typedVerse" ADD COLUMN IF NOT EXISTS "classroomAssignmentId" varchar(255);--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "typedVerse_classroomAssignmentId_idx" ON "typedVerse" USING btree ("classroomAssignmentId");

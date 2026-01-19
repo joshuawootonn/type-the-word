@@ -133,3 +133,12 @@ export const assignmentDetailSchema = z.object({
 
 export type StudentProgress = z.infer<typeof studentProgressSchema>
 export type AssignmentDetail = z.infer<typeof assignmentDetailSchema>
+
+// POST /api/classroom/assignments/[id]/turn-in
+export const turnInAssignmentResponseSchema = z.object({
+    success: z.boolean(),
+})
+
+export type TurnInAssignmentResponse = z.infer<
+    typeof turnInAssignmentResponseSchema
+>

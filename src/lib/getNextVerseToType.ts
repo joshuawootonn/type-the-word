@@ -1,9 +1,10 @@
+import { AssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
 import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
 import { ParsedPassage } from "~/lib/parseEsv"
 
 export function getNextVerseToType(
     passage: ParsedPassage,
-    chapterHistory?: ChapterHistory,
+    chapterHistory?: ChapterHistory | AssignmentHistory,
 ): string {
     // If no history or user not logged in, focus first verse
     if (!chapterHistory) {

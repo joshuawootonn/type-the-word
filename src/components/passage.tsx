@@ -7,9 +7,14 @@ import { useSession } from "next-auth/react"
 import { usePathname } from "next/navigation"
 import React, { useCallback, useId, useMemo, useRef, useState } from "react"
 
+import { AssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
 import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
 import { Cursor } from "~/components/cursor"
-import { fetchChapterHistory, fetchTypingSessionUpsert } from "~/lib/api"
+import {
+    fetchAssignmentHistory,
+    fetchChapterHistory,
+    fetchTypingSessionUpsert,
+} from "~/lib/api"
 import { getNextVerseToType } from "~/lib/getNextVerseToType"
 import { useRect, PassageRectContext } from "~/lib/hooks/passageRectContext"
 import { Keystroke } from "~/lib/keystroke"
@@ -54,7 +59,10 @@ export function Passage({
     autofocus?: boolean
     typingSession?: TypingSession
     chapterHistory?: ChapterHistory
+    assignmentHistory?: AssignmentHistory
     passageSegmentOverride?: PassageSegment
+    classroomAssignmentId?: string
+    historyType?: "chapter" | "assignment"
 }) {
     const passageId = useId()
 
@@ -79,13 +87,36 @@ export function Passage({
         enabled: sessionData?.user?.id != null,
         placeholderData: props.typingSession,
     })
-    const chapterHistory = useQuery({
+    const historyType = props.historyType ?? "chapter"
+    const shouldFetchChapterHistory = historyType === "chapter"
+    const chapterHistoryQuery = useQuery({
         queryKey: ["chapter-history", passageSegementOrOverride, translation],
         queryFn: () =>
             fetchChapterHistory(passageSegementOrOverride, translation),
-        enabled: sessionData?.user?.id != null,
+        enabled: sessionData?.user?.id != null && shouldFetchChapterHistory,
         placeholderData: props.chapterHistory,
     })
+    const shouldFetchAssignmentHistory = historyType === "assignment"
+    const assignmentHistoryQuery = useQuery({
+        queryKey: ["assignment-history", props.classroomAssignmentId],
+        queryFn: () =>
+            fetchAssignmentHistory(props.classroomAssignmentId ?? ""),
+        enabled:
+            sessionData?.user?.id != null &&
+            shouldFetchAssignmentHistory &&
+            props.classroomAssignmentId != null,
+        placeholderData: props.assignmentHistory,
+    })
+    const history: ChapterHistory | AssignmentHistory | undefined =
+        historyType === "assignment"
+            ? (assignmentHistoryQuery.data ?? props.assignmentHistory)
+            : (chapterHistoryQuery.data ?? props.chapterHistory)
+    const historyQueryKey =
+        historyType === "assignment"
+            ? props.classroomAssignmentId
+                ? ["assignment-history", props.classroomAssignmentId]
+                : undefined
+            : ["chapter-history", passageSegementOrOverride, translation]
 
     const isRootPath = usePathname() === "/"
     const H2Component = isRootPath ? "h2" : "h1"
@@ -109,7 +140,7 @@ export function Passage({
                     [
                         currentVerseAtom,
                         props.autofocus
-                            ? getNextVerseToType(passage, chapterHistory.data)
+                            ? getNextVerseToType(passage, history)
                             : "",
                     ],
                     [autofocusAtom, props.autofocus],
@@ -143,11 +174,11 @@ export function Passage({
                                             node={node}
                                             passage={passage}
                                             typingSession={typingSession.data}
-                                            chapterHistory={chapterHistory.data}
-                                            passageSegment={
-                                                passageSegementOrOverride
+                                            history={history}
+                                            classroomAssignmentId={
+                                                props.classroomAssignmentId
                                             }
-                                            translation={translation}
+                                            historyQueryKey={historyQueryKey}
                                         />
                                     )
 

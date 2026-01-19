@@ -54,4 +54,20 @@ export class TypedVerseRepository {
 
         return await builder
     }
+
+    async getManyByAssignment({
+        userId,
+        assignmentId,
+    }: {
+        userId: string
+        assignmentId: string
+    }): Promise<TypedVerse[]> {
+        return await this.db.query.typedVerses.findMany({
+            where: and(
+                eq(schema.typedVerses.userId, userId),
+                eq(schema.typedVerses.classroomAssignmentId, assignmentId),
+            ),
+            orderBy: [desc(schema.typedVerses.createdAt)],
+        })
+    }
 }

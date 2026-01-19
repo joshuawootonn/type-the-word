@@ -1,29 +1,28 @@
 import clsx from "clsx"
 import { useAtom } from "jotai"
-import React from "react"
 
+import { AssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
 import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
 import { CurrentVerse } from "~/components/currentVerse"
 import { currentVerseAtom } from "~/components/passage"
 import { ReadonlyVerse } from "~/components/readonlyVerse"
-import { type Paragraph, ParsedPassage, Translation } from "~/lib/parseEsv"
-import { PassageSegment } from "~/lib/passageSegment"
+import { type Paragraph, ParsedPassage } from "~/lib/parseEsv"
 import { TypingSession } from "~/server/repositories/typingSession.repository"
 
 export function Paragraph({
     node,
     passage,
     typingSession,
-    chapterHistory,
-    passageSegment,
-    translation = "esv",
+    history,
+    classroomAssignmentId,
+    historyQueryKey,
 }: {
     passage: ParsedPassage
     node: Paragraph
     typingSession?: TypingSession
-    chapterHistory?: ChapterHistory
-    passageSegment: PassageSegment
-    translation?: Translation
+    history?: ChapterHistory | AssignmentHistory
+    classroomAssignmentId?: string
+    historyQueryKey?: (string | number | boolean | null | undefined)[]
 }) {
     const [currentVerse] = useAtom(currentVerseAtom)
     return (
@@ -39,12 +38,11 @@ export function Paragraph({
                         verse={verse}
                         isCurrentVerse={isCurrentVerse}
                         isIndented={node.metadata.blockIndent}
-                        isQuote={node.metadata.type === "quote"}
                         passage={passage}
                         typingSession={typingSession}
-                        chapterHistory={chapterHistory}
-                        passageSegment={passageSegment}
-                        translation={translation}
+                        history={history}
+                        classroomAssignmentId={classroomAssignmentId}
+                        historyQueryKey={historyQueryKey}
                     />
                 ) : (
                     <ReadonlyVerse
@@ -52,7 +50,7 @@ export function Paragraph({
                         verse={verse}
                         isCurrentVerse={isCurrentVerse}
                         isIndented={node.metadata.blockIndent}
-                        chapterHistory={chapterHistory}
+                        history={history}
                     />
                 )
             })}

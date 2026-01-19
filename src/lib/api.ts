@@ -1,5 +1,6 @@
 import { z } from "zod"
 
+import { AssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
 import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
 import { AddTypedVerseBody } from "~/app/api/typing-session/[id]/route"
 import {
@@ -82,6 +83,19 @@ export async function fetchChapterHistory(
     const response = await fetch(url, { cache: "no-store" })
 
     const body: Body<ChapterHistory> = await response.json()
+
+    return body.data
+}
+
+export async function fetchAssignmentHistory(
+    assignmentId: string,
+): Promise<AssignmentHistory> {
+    const response = await fetch(
+        `${getBaseUrl()}/api/assignment-history/${assignmentId}`,
+        { cache: "no-store" },
+    )
+
+    const body: Body<AssignmentHistory> = await response.json()
 
     return body.data
 }

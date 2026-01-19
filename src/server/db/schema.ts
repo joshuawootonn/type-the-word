@@ -287,6 +287,9 @@ export const typedVerses = pgTable(
             .primaryKey(),
         userId: varchar("userId", { length: 255 }).notNull(),
         typingSessionId: varchar("typingSessionId", { length: 255 }).notNull(),
+        classroomAssignmentId: varchar("classroomAssignmentId", {
+            length: 255,
+        }),
         translation: typedVerseTranslation("translation").notNull(),
         book: typedVerseBook("book").notNull(),
         chapter: integer("chapter").notNull(),
@@ -305,6 +308,9 @@ export const typedVerses = pgTable(
         typingSessionIdIdx: index("typingSessionId_idx").on(
             typedVerse.typingSessionId,
         ),
+        classroomAssignmentIdIdx: index(
+            "typedVerse_classroomAssignmentId_idx",
+        ).on(typedVerse.classroomAssignmentId),
     }),
 )
 
@@ -324,6 +330,10 @@ export const typedVerseRelations = relations(typedVerses, ({ one }) => ({
     typingSession: one(typingSessions, {
         fields: [typedVerses.typingSessionId],
         references: [typingSessions.id],
+    }),
+    assignment: one(classroomAssignment, {
+        fields: [typedVerses.classroomAssignmentId],
+        references: [classroomAssignment.id],
     }),
 }))
 
