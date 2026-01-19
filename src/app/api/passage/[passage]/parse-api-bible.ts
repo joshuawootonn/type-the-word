@@ -1,6 +1,16 @@
 import { JSDOM } from "jsdom"
-import { parseFragment } from "parse5"
-import { ChildNode, Element } from "parse5/dist/tree-adapters/default"
+import { parseFragment, DefaultTreeAdapterTypes } from "parse5"
+
+type ChildNode = DefaultTreeAdapterTypes.ChildNode
+type Element = DefaultTreeAdapterTypes.Element
+
+// Attribute type from parse5
+interface Attribute {
+    name: string
+    namespace?: string
+    prefix?: string
+    value: string
+}
 
 import { apiBibleIdToBook } from "~/lib/api-bible-book-id"
 import { isAtomTyped } from "~/lib/isEqual"
@@ -52,7 +62,7 @@ export function parseApiBibleChapter(
     }
 
     function getAttr(node: Element, name: string): string | undefined {
-        return node.attrs?.find(attr => attr.name === name)?.value
+        return node.attrs?.find((attr: Attribute) => attr.name === name)?.value
     }
 
     function hasClass(node: Element, className: string): boolean {
@@ -215,14 +225,14 @@ export function parseApiBibleChapter(
             // Handle divine name class (nd) - mark words for CSS styling
             // This is used in NLT and other translations for "Lord" → styled as "LORD"
             if (hasClass(node, "nd") && "childNodes" in node) {
-                return node.childNodes.flatMap(child =>
+                return node.childNodes.flatMap((child: ChildNode) =>
                     parseInline(child, { divineName: true }),
                 )
             }
 
             // Regular span, parse children
             if ("childNodes" in node) {
-                return node.childNodes.flatMap(child =>
+                return node.childNodes.flatMap((child: ChildNode) =>
                     parseInline(child, options),
                 )
             }
@@ -234,7 +244,9 @@ export function parseApiBibleChapter(
 
         // Handle other elements with children
         if ("childNodes" in node && node.childNodes.length > 0) {
-            return node.childNodes.flatMap(child => parseInline(child, options))
+            return node.childNodes.flatMap((child: ChildNode) =>
+                parseInline(child, options),
+            )
         }
 
         return []
@@ -479,9 +491,9 @@ export function parseApiBibleChapter(
         // Hebrew letter headers (qa) - treat as section headers (h4)
         if (hasClass(node, "qa")) {
             const text = node.childNodes
-                .flatMap(child => parseInline(child))
+                .flatMap((child: ChildNode) => parseInline(child))
                 .filter((n): n is Word => n.type === "word")
-                .map(n => n.letters.join("").trim())
+                .map((n: Word) => n.letters.join("").trim())
                 .join(" ")
             return {
                 type: "h4",
@@ -497,9 +509,9 @@ export function parseApiBibleChapter(
         // Section headers: s1 (main title), s2 (subsection)
         if (hasClass(node, "s1")) {
             const text = node.childNodes
-                .flatMap(child => parseInline(child))
+                .flatMap((child: ChildNode) => parseInline(child))
                 .filter((node): node is Word => node.type === "word")
-                .map(node => node.letters.join(""))
+                .map((node: Word) => node.letters.join(""))
                 .join("")
             return {
                 type: "h2",
@@ -509,9 +521,9 @@ export function parseApiBibleChapter(
 
         if (hasClass(node, "s2")) {
             const text = node.childNodes
-                .flatMap(child => parseInline(child))
+                .flatMap((child: ChildNode) => parseInline(child))
                 .filter((node): node is Word => node.type === "word")
-                .map(node => node.letters.join(""))
+                .map((node: Word) => node.letters.join(""))
                 .join("")
             return {
                 type: "h3",
@@ -524,9 +536,9 @@ export function parseApiBibleChapter(
         // These are headings indicating who is speaking or section titles, not typeable content
         if (hasClass(node, "sp") || hasClass(node, "s")) {
             const text = node.childNodes
-                .flatMap(child => parseInline(child))
+                .flatMap((child: ChildNode) => parseInline(child))
                 .filter((n): n is Word => n.type === "word")
-                .map(n => n.letters.join("").trim())
+                .map((n: Word) => n.letters.join("").trim())
                 .join(" ")
             return {
                 type: "h4",
@@ -575,7 +587,9 @@ export function parseApiBibleChapter(
                 : []
 
             const parsedNodes: Inline[] = mergeAdjacentWords(
-                node.childNodes.flatMap(child => parseInline(child)),
+                node.childNodes.flatMap((child: ChildNode) =>
+                    parseInline(child),
+                ),
             )
 
             // For poetry lines, insert indentation after verse number (if present) or at start

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     siteUrl: process.env.SITE_URL ?? "https://www.typetheword.site",
     generateRobotsTxt: true, // (optional)
 }

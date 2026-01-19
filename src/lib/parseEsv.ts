@@ -1,6 +1,15 @@
 import { JSDOM } from "jsdom"
-import { parseFragment } from "parse5"
-import { ChildNode } from "parse5/dist/tree-adapters/default"
+import { parseFragment, DefaultTreeAdapterTypes } from "parse5"
+
+type ChildNode = DefaultTreeAdapterTypes.ChildNode
+
+// Attribute type from parse5
+interface Attribute {
+    name: string
+    namespace?: string
+    prefix?: string
+    value: string
+}
 
 import { isAtomTyped } from "~/lib/isEqual"
 import { isAtomComplete } from "~/lib/keystroke"
@@ -231,7 +240,7 @@ export function parseChapter(passage: string): ParsedPassage {
         if (
             node.nodeName === "b" &&
             node.attrs.find(
-                attr =>
+                (attr: Attribute) =>
                     attr.value.includes("verse-num") ||
                     attr.value.includes("chapter-num"),
             ) != undefined
@@ -239,12 +248,13 @@ export function parseChapter(passage: string): ParsedPassage {
             const numberString = node.childNodes
                 .flatMap(parseInline)
                 .filter((node): node is Word => node.type === "word")
-                .map(node => node.letters.join(""))
+                .map((node: Word) => node.letters.join(""))
                 .join("")
 
             if (
-                node.attrs.find(attr => attr.value.includes("chapter-num")) !=
-                undefined
+                node.attrs.find((attr: Attribute) =>
+                    attr.value.includes("chapter-num"),
+                ) != undefined
             ) {
                 context.chapter = parseInt(numberString.split(":").at(0) ?? "")
             }
@@ -285,10 +295,14 @@ export function parseChapter(passage: string): ParsedPassage {
             const text = node.childNodes
                 .flatMap(parseInline)
                 .filter((node): node is Word => node.type === "word")
-                .map(node => node.letters.join(""))
+                .map((node: Word) => node.letters.join(""))
                 .join("")
 
-            if (node.attrs.find(attr => attr.value.includes("extra_text"))) {
+            if (
+                node.attrs.find((attr: Attribute) =>
+                    attr.value.includes("extra_text"),
+                )
+            ) {
                 const trimmedText = text.trim().toLowerCase()
                 const book = /([0-9])*([A-Za-z ])+(?!([0-9:]))/
                     .exec(trimmedText)
@@ -311,7 +325,7 @@ export function parseChapter(passage: string): ParsedPassage {
                 text: node.childNodes
                     .flatMap(parseInline)
                     .filter((node): node is Word => node.type === "word")
-                    .map(node => node.letters.join(""))
+                    .map((node: Word) => node.letters.join(""))
                     .join(""),
             }
         }
@@ -321,7 +335,7 @@ export function parseChapter(passage: string): ParsedPassage {
                 text: node.childNodes
                     .flatMap(parseInline)
                     .filter((node): node is Word => node.type === "word")
-                    .map(node => node.letters.join(""))
+                    .map((node: Word) => node.letters.join(""))
                     .join(""),
             }
         }
@@ -419,14 +433,14 @@ export function parseChapter(passage: string): ParsedPassage {
                 metadata: {
                     type:
                         node.attrs.find(
-                            attr =>
+                            (attr: Attribute) =>
                                 attr.value.includes("block-indent") ||
                                 attr.value.includes("same-paragraph"),
                         ) != undefined
                             ? "quote"
                             : "default",
                     blockIndent:
-                        node.attrs.find(attr =>
+                        node.attrs.find((attr: Attribute) =>
                             attr.value.includes("block-indent"),
                         ) != undefined,
                 },
