@@ -1,4 +1,4 @@
-import { env } from '~/env.mjs'
+import { env } from "~/env.mjs"
 
 interface SendEmailParams {
     to: string
@@ -7,15 +7,15 @@ interface SendEmailParams {
 }
 
 async function sendEmail({ to, subject, htmlbody }: SendEmailParams) {
-    const response = await fetch('https://app.mailpace.com/api/v1/send', {
-        method: 'POST',
+    const response = await fetch("https://app.mailpace.com/api/v1/send", {
+        method: "POST",
         headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            'MailPace-Server-Token': env.MAILPACE_API_TOKEN,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "MailPace-Server-Token": env.MAILPACE_API_TOKEN,
         },
         body: JSON.stringify({
-            from: 'noreply@typetheword.site',
+            from: "noreply@typetheword.site",
             to,
             subject,
             htmlbody,
@@ -56,7 +56,7 @@ export async function sendPasswordResetEmail(
 
     await sendEmail({
         to: email,
-        subject: 'Reset Your Password - Type the Word',
+        subject: "Reset Your Password - Type the Word",
         htmlbody,
     })
 }

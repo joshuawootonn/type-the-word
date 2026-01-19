@@ -6,12 +6,12 @@
  *
  * Run with: pnpm exec dotenv -e .env -- tsx ./src/scripts/download-api-bible-fixtures.ts
  */
-import fs from 'fs'
-import path from 'path'
+import fs from "fs"
+import path from "path"
 
-import { env } from '~/env.mjs'
-import { bookToApiBibleId } from '~/lib/api-bible-book-id'
-import { API_BIBLE_IDS, ApiBibleTranslation } from '~/lib/api-bible-ids'
+import { env } from "~/env.mjs"
+import { bookToApiBibleId } from "~/lib/api-bible-book-id"
+import { API_BIBLE_IDS, ApiBibleTranslation } from "~/lib/api-bible-ids"
 
 // 10 diverse chapters to test different Bible genres and formatting
 const CHAPTERS_TO_DOWNLOAD: Array<{
@@ -21,68 +21,68 @@ const CHAPTERS_TO_DOWNLOAD: Array<{
     description: string
 }> = [
     {
-        book: 'genesis',
+        book: "genesis",
         chapter: 1,
         expectedVerses: 31,
-        description: 'Creation narrative with poetry',
+        description: "Creation narrative with poetry",
     },
     {
-        book: 'exodus',
+        book: "exodus",
         chapter: 20,
         expectedVerses: 26,
-        description: 'Ten Commandments',
+        description: "Ten Commandments",
     },
     {
-        book: 'psalm',
+        book: "psalm",
         chapter: 23,
         expectedVerses: 6,
-        description: 'Short poetry',
+        description: "Short poetry",
     },
     {
-        book: 'psalm',
+        book: "psalm",
         chapter: 119,
         expectedVerses: 176,
-        description: 'Long chapter with Hebrew letters',
+        description: "Long chapter with Hebrew letters",
     },
     {
-        book: 'proverbs',
+        book: "proverbs",
         chapter: 3,
         expectedVerses: 35,
-        description: 'Wisdom literature',
+        description: "Wisdom literature",
     },
     {
-        book: 'isaiah',
+        book: "isaiah",
         chapter: 53,
         expectedVerses: 12,
-        description: 'Prophetic poetry',
+        description: "Prophetic poetry",
     },
     {
-        book: 'matthew',
+        book: "matthew",
         chapter: 5,
         expectedVerses: 48,
-        description: 'Sermon on the Mount',
+        description: "Sermon on the Mount",
     },
     {
-        book: 'john',
+        book: "john",
         chapter: 1,
         expectedVerses: 51,
-        description: 'Gospel prologue',
+        description: "Gospel prologue",
     },
     {
-        book: 'romans',
+        book: "romans",
         chapter: 8,
         expectedVerses: 39,
-        description: 'Epistle',
+        description: "Epistle",
     },
     {
-        book: 'revelation',
+        book: "revelation",
         chapter: 21,
         expectedVerses: 27,
-        description: 'Apocalyptic',
+        description: "Apocalyptic",
     },
 ]
 
-const BASE_URL = 'https://rest.api.bible/v1'
+const BASE_URL = "https://rest.api.bible/v1"
 
 // Rate limiting: wait between requests to avoid hitting API limits
 const DELAY_MS = 500
@@ -101,20 +101,20 @@ async function fetchPassage(
     const passageId = `${bookId}.${chapter}`
 
     const params = new URLSearchParams({
-        'content-type': 'html',
-        'include-notes': 'false',
-        'include-titles': 'true',
-        'include-chapter-numbers': 'false',
-        'include-verse-numbers': 'true',
-        'include-verse-spans': 'true',
-        'use-org-id': 'false',
+        "content-type": "html",
+        "include-notes": "false",
+        "include-titles": "true",
+        "include-chapter-numbers": "false",
+        "include-verse-numbers": "true",
+        "include-verse-spans": "true",
+        "use-org-id": "false",
     })
 
     const url = `${BASE_URL}/bibles/${bibleId}/passages/${passageId}?${params.toString()}`
 
     const response = await fetch(url, {
         headers: {
-            'api-key': env.API_BIBLE_API_KEY,
+            "api-key": env.API_BIBLE_API_KEY,
         },
     })
 
@@ -137,7 +137,7 @@ function getFilePath(
 ): string {
     const responsesDir = path.join(
         process.cwd(),
-        'src/server/api-bible/responses',
+        "src/server/api-bible/responses",
         translation,
     )
 
@@ -150,8 +150,8 @@ function getFilePath(
 }
 
 async function downloadFixtures() {
-    console.log('API.Bible Fixture Download Script')
-    console.log('==================================\n')
+    console.log("API.Bible Fixture Download Script")
+    console.log("==================================\n")
 
     const translations = Object.keys(
         API_BIBLE_IDS,
@@ -163,7 +163,7 @@ async function downloadFixtures() {
 
     for (const translation of translations) {
         console.log(`\n📖 Translation: ${translation.toUpperCase()}`)
-        console.log('-'.repeat(40))
+        console.log("-".repeat(40))
 
         for (const chapter of CHAPTERS_TO_DOWNLOAD) {
             const filePath = getFilePath(
@@ -202,7 +202,7 @@ async function downloadFixtures() {
                 await sleep(DELAY_MS)
             } catch (error) {
                 console.error(
-                    `  ❌ Failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    `  ❌ Failed: ${error instanceof Error ? error.message : "Unknown error"}`,
                 )
                 failed++
                 completed++
@@ -210,8 +210,8 @@ async function downloadFixtures() {
         }
     }
 
-    console.log('\n' + '='.repeat(40))
-    console.log('Download Complete!')
+    console.log("\n" + "=".repeat(40))
+    console.log("Download Complete!")
     console.log(`  Total: ${totalDownloads}`)
     console.log(`  Downloaded: ${completed - skipped - failed}`)
     console.log(`  Skipped (already existed): ${skipped}`)
@@ -221,10 +221,10 @@ async function downloadFixtures() {
 // Run the script
 downloadFixtures()
     .then(() => {
-        console.log('\nDone!')
+        console.log("\nDone!")
         process.exit(0)
     })
     .catch(error => {
-        console.error('\nFatal error:', error)
+        console.error("\nFatal error:", error)
         process.exit(1)
     })

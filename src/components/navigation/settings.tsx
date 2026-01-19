@@ -1,23 +1,23 @@
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useRef, useEffect, useCallback } from 'react'
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useRef, useEffect, useCallback } from "react"
 
 import {
     getDarkTheme,
     getLightTheme,
     getResolvedTheme,
     useTheme,
-} from '~/app/theme-provider'
-import { fetchDeleteTheme } from '~/lib/api'
-import { useAnalytics } from '~/lib/hooks/useAnalytics'
-import { isThemeDark } from '~/lib/theme/lch'
+} from "~/app/theme-provider"
+import { fetchDeleteTheme } from "~/lib/api"
+import { useAnalytics } from "~/lib/hooks/useAnalytics"
+import { isThemeDark } from "~/lib/theme/lch"
 import {
     BuiltinThemeRecord,
     ThemeRecord,
-} from '~/server/repositories/builtinTheme.repository'
-import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
+} from "~/server/repositories/builtinTheme.repository"
+import { UserThemeRecord } from "~/server/repositories/userTheme.repository"
 
-const SELECTION_KEYS = [' ', 'Enter']
+const SELECTION_KEYS = [" ", "Enter"]
 
 export function Settings({
     builtinThemes,
@@ -37,21 +37,21 @@ export function Settings({
     }, [])
 
     const lightThemeId = builtinThemes.find(
-        t => t.theme.label === 'Light',
+        t => t.theme.label === "Light",
     )!.themeId
     const darkThemeId = builtinThemes.find(
-        t => t.theme.label === 'Dark',
+        t => t.theme.label === "Dark",
     )!.themeId
     const queryClient = useQueryClient()
     const deleteThemeQuery = useMutation({
         mutationFn: fetchDeleteTheme,
         onMutate: async id => {
-            await queryClient.cancelQueries({ queryKey: ['userThemes'] })
+            await queryClient.cancelQueries({ queryKey: ["userThemes"] })
 
-            const prevThemes = queryClient.getQueryData(['userThemes'])
+            const prevThemes = queryClient.getQueryData(["userThemes"])
 
             queryClient.setQueryData(
-                ['userThemes'],
+                ["userThemes"],
                 (prev: ThemeRecord[] | undefined) =>
                     prev?.filter(theme => theme.id !== id),
             )
@@ -59,16 +59,16 @@ export function Settings({
             return { prevThemes }
         },
         onError: (_err, _theme, context) => {
-            queryClient.setQueryData(['userThemes'], context?.prevThemes ?? [])
+            queryClient.setQueryData(["userThemes"], context?.prevThemes ?? [])
         },
         onSettled: () =>
-            queryClient.invalidateQueries({ queryKey: ['userThemes'] }),
+            queryClient.invalidateQueries({ queryKey: ["userThemes"] }),
     })
 
     const selectLightSystemTheme = useCallback(
         (theme: BuiltinThemeRecord | UserThemeRecord) => {
             return setTheme({
-                colorScheme: 'system',
+                colorScheme: "system",
                 darkThemeId: currentTheme.darkThemeId,
                 lightThemeId: theme.themeId,
             })
@@ -79,7 +79,7 @@ export function Settings({
     const selectDarkSystemTheme = useCallback(
         (theme: BuiltinThemeRecord | UserThemeRecord) => {
             return setTheme({
-                colorScheme: 'system',
+                colorScheme: "system",
                 darkThemeId: theme.themeId,
                 lightThemeId: currentTheme.lightThemeId,
             })
@@ -91,13 +91,13 @@ export function Settings({
         (theme: BuiltinThemeRecord | UserThemeRecord) => {
             if (isThemeDark(theme.theme)) {
                 return setTheme({
-                    colorScheme: 'dark',
+                    colorScheme: "dark",
                     darkThemeId: theme.themeId,
                     lightThemeId: null,
                 })
             } else {
                 return setTheme({
-                    colorScheme: 'light',
+                    colorScheme: "light",
                     darkThemeId: null,
                     lightThemeId: theme.themeId,
                 })
@@ -154,22 +154,22 @@ export function Settings({
                 <DropdownMenu.Root>
                     <DropdownMenu.Trigger
                         id="theme-selector"
-                        className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                        className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
                         ref={ref}
                     >
-                        {currentTheme.colorScheme === 'system'
-                            ? 'System'
+                        {currentTheme.colorScheme === "system"
+                            ? "System"
                             : getResolvedTheme(
                                   currentTheme,
                                   userThemes,
                                   builtinThemes,
-                              ).resolvedTheme.theme.label}{' '}
+                              ).resolvedTheme.theme.label}{" "}
                     </DropdownMenu.Trigger>
 
                     <DropdownMenu.Portal>
                         <DropdownMenu.Content
                             side="bottom"
-                            className=" z-50 w-40 border-2 border-primary bg-secondary text-primary "
+                            className="z-50 w-40 border-2 border-primary bg-secondary text-primary"
                             align="end"
                             sideOffset={-2}
                             loop
@@ -177,7 +177,7 @@ export function Settings({
                             <DropdownMenu.Item
                                 onSelect={() =>
                                     setTheme({
-                                        colorScheme: 'system',
+                                        colorScheme: "system",
                                         lightThemeId:
                                             currentTheme.lightThemeId ??
                                             lightThemeId,
@@ -186,7 +186,7 @@ export function Settings({
                                             darkThemeId,
                                     })
                                 }
-                                className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
                             >
                                 System
                             </DropdownMenu.Item>
@@ -194,14 +194,14 @@ export function Settings({
                                 <DropdownMenu.Item
                                     key={t.themeId}
                                     onSelect={() => selectTheme(t)}
-                                    className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                    className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
                                 >
                                     {t.theme.label}
                                 </DropdownMenu.Item>
                             ))}
                             {userThemes.map(t => (
                                 <DropdownMenu.Sub key={t.themeId}>
-                                    <DropdownMenu.SubTrigger className="flex cursor-pointer flex-row items-center px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary ">
+                                    <DropdownMenu.SubTrigger className="flex cursor-pointer flex-row items-center px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary">
                                         <span className="flex-grow truncate">
                                             {t.theme.label}
                                         </span>
@@ -242,7 +242,7 @@ export function Settings({
                                 </DropdownMenu.Sub>
                             ))}
                             <DropdownMenu.Item
-                                className="flex cursor-pointer flex-row items-center justify-between space-x-2 px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                className="flex cursor-pointer flex-row items-center justify-between space-x-2 px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
                                 onKeyDown={e => {
                                     if (SELECTION_KEYS.includes(e.key)) {
                                         e.preventDefault()
@@ -276,7 +276,7 @@ export function Settings({
                     </DropdownMenu.Portal>
                 </DropdownMenu.Root>
             </div>
-            {currentTheme.colorScheme === 'system' ? (
+            {currentTheme.colorScheme === "system" ? (
                 <>
                     <div className="flex flex-row items-center justify-between">
                         <label htmlFor="theme-selector" className="pr-4">
@@ -286,7 +286,7 @@ export function Settings({
                         <DropdownMenu.Root>
                             <DropdownMenu.Trigger
                                 id="theme-selector"
-                                className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
                             >
                                 {
                                     getLightTheme(
@@ -294,13 +294,13 @@ export function Settings({
                                         userThemes,
                                         builtinThemes,
                                     ).theme.label
-                                }{' '}
+                                }{" "}
                             </DropdownMenu.Trigger>
 
                             <DropdownMenu.Portal>
                                 <DropdownMenu.Content
                                     side="bottom"
-                                    className=" z-50 w-40 border-2 border-primary bg-secondary text-primary "
+                                    className="z-50 w-40 border-2 border-primary bg-secondary text-primary"
                                     align="end"
                                     sideOffset={-2}
                                     loop
@@ -311,7 +311,7 @@ export function Settings({
                                             onSelect={() =>
                                                 selectLightSystemTheme(t)
                                             }
-                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
                                         >
                                             {t.theme.label}
                                         </DropdownMenu.Item>
@@ -322,7 +322,7 @@ export function Settings({
                                             onSelect={() =>
                                                 selectLightSystemTheme(t)
                                             }
-                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
                                         >
                                             {t.theme.label}
                                         </DropdownMenu.Item>
@@ -339,7 +339,7 @@ export function Settings({
                         <DropdownMenu.Root>
                             <DropdownMenu.Trigger
                                 id="theme-selector"
-                                className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
                             >
                                 {
                                     getDarkTheme(
@@ -347,13 +347,13 @@ export function Settings({
                                         userThemes,
                                         builtinThemes,
                                     ).theme.label
-                                }{' '}
+                                }{" "}
                             </DropdownMenu.Trigger>
 
                             <DropdownMenu.Portal>
                                 <DropdownMenu.Content
                                     side="bottom"
-                                    className=" z-50 w-40 border-2 border-primary bg-secondary text-primary "
+                                    className="z-50 w-40 border-2 border-primary bg-secondary text-primary"
                                     align="end"
                                     sideOffset={-2}
                                     loop
@@ -364,7 +364,7 @@ export function Settings({
                                             onSelect={() =>
                                                 selectDarkSystemTheme(t)
                                             }
-                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
                                         >
                                             {t.theme.label}
                                         </DropdownMenu.Item>
@@ -375,7 +375,7 @@ export function Settings({
                                             onSelect={() =>
                                                 selectDarkSystemTheme(t)
                                             }
-                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary "
+                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
                                         >
                                             {t.theme.label}
                                         </DropdownMenu.Item>

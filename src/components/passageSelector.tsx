@@ -1,40 +1,41 @@
-'use client'
+"use client"
 
-import { Combobox } from '@headlessui/react'
-import * as ScrollArea from '@radix-ui/react-scroll-area'
-import clsx from 'clsx'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { usePathname } from 'next/navigation'
+import { Combobox } from "@headlessui/react"
+import * as ScrollArea from "@radix-ui/react-scroll-area"
+import clsx from "clsx"
+import { useRouter, useSearchParams } from "next/navigation"
+import { usePathname } from "next/navigation"
 import React, {
     ComponentPropsWithoutRef,
     forwardRef,
     Fragment,
+    useCallback,
     useEffect,
     useRef,
     useState,
-} from 'react'
-import { z } from 'zod'
+} from "react"
+import { z } from "zod"
 
-import { FeatureFlags } from '~/lib/feature-flags'
-import { useFeatureFlag } from '~/lib/hooks/use-feature-flag'
-import { useIsFirstRender } from '~/lib/hooks/useIsFirstRender'
-import { Translation } from '~/lib/parseEsv'
-import { stringToPassageObject } from '~/lib/passageObject'
+import { FeatureFlags } from "~/lib/feature-flags"
+import { useFeatureFlag } from "~/lib/hooks/use-feature-flag"
+import { useIsFirstRender } from "~/lib/hooks/useIsFirstRender"
+import { Translation } from "~/lib/parseEsv"
+import { stringToPassageObject } from "~/lib/passageObject"
 import {
     PassageReference,
     passageReferenceSchema,
-} from '~/lib/passageReference'
-import { toPassageSegment } from '~/lib/passageSegment'
+} from "~/lib/passageReference"
+import { toPassageSegment } from "~/lib/passageSegment"
 import {
     allTranslations,
     defaultTranslations,
     validTranslations,
-} from '~/lib/translations'
-import { Book, bookSchema } from '~/lib/types/book'
+} from "~/lib/translations"
+import { Book, bookSchema } from "~/lib/types/book"
 
-import metadata from '../lib/simple-bible-metadata.json'
+import metadata from "../lib/simple-bible-metadata.json"
 
-export const PASSAGE_BOOK_INPUT_ID = 'passage-book-input'
+export const PASSAGE_BOOK_INPUT_ID = "passage-book-input"
 
 const simpleBibleMetadataSchema = z.record(
     bookSchema,
@@ -49,7 +50,7 @@ const simpleBibleMetadata = simpleBibleMetadataSchema.parse(metadata)
 const books = Object.keys(metadata) as Book[]
 
 const ForwardedRefInput = forwardRef(function InnerForwardedRefInput(
-    props: ComponentPropsWithoutRef<'input'>,
+    props: ComponentPropsWithoutRef<"input">,
     ref: React.ForwardedRef<HTMLInputElement>,
 ) {
     return <input {...props} ref={ref} />
@@ -64,18 +65,18 @@ function getValues(text: PassageReference | undefined): {
     if (passage.success) {
         return {
             book: passage.data.book,
-            chapter: passage.data.chapter?.toString() ?? '1',
+            chapter: passage.data.chapter?.toString() ?? "1",
         }
     }
 
-    return { book: 'genesis', chapter: '1' }
+    return { book: "genesis", chapter: "1" }
 }
 
 export function PassageSelector({
     value,
     label,
     labelClassName,
-    initialTranslation = 'esv',
+    initialTranslation = "esv",
 }: {
     label?: string
     value?: PassageReference
@@ -88,9 +89,9 @@ export function PassageSelector({
     const [translation, setTranslation] =
         useState<Translation>(initialTranslation)
 
-    const [bookQuery, setBookQuery] = useState('')
-    const [chapterQuery, setChapterQuery] = useState('')
-    const [translationQuery, setTranslationQuery] = useState('')
+    const [bookQuery, setBookQuery] = useState("")
+    const [chapterQuery, setChapterQuery] = useState("")
+    const [translationQuery, setTranslationQuery] = useState("")
 
     const router = useRouter()
     const pathname = usePathname()
@@ -107,22 +108,22 @@ export function PassageSelector({
         : defaultTranslations
 
     const filteredBooks =
-        bookQuery === ''
+        bookQuery === ""
             ? books
             : books.filter(book =>
                   bookQuery
                       .toLowerCase()
-                      .split(' ')
+                      .split(" ")
                       .every(part => book.toLowerCase().includes(part)),
               )
 
     const chapters = new Array(simpleBibleMetadata[book]?.chapters ?? 0)
-        .fill('')
+        .fill("")
         .map((_, i) => `${i + 1}`)
 
     // Sync translation state with URL search params
     useEffect(() => {
-        const urlTranslation = searchParams?.get('translation') as Translation
+        const urlTranslation = searchParams?.get("translation") as Translation
         if (urlTranslation && validTranslations.includes(urlTranslation)) {
             setTranslation(urlTranslation)
         }
@@ -134,10 +135,66 @@ export function PassageSelector({
         setChapter(values.chapter)
     }, [value])
 
+    const filteredChapters =
+        chapterQuery === ""
+            ? chapters
+            : chapters.filter(chapter => {
+                  return chapter
+                      .toLowerCase()
+                      .includes(chapterQuery.toLowerCase())
+              })
+
+    const filteredTranslations =
+        translationQuery === ""
+            ? translations
+            : translations.filter(t =>
+                  t.label
+                      .toLowerCase()
+                      .includes(translationQuery.toLowerCase()),
+              )
+
+    async function updateTranslationCookie(translation: Translation) {
+        await fetch("/api/set-translation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ translation }),
+        })
+    }
+
+    const onSubmit = useCallback(
+        ({
+            book,
+            chapter,
+            translation,
+        }: {
+            book: Book
+            chapter: string
+            translation: Translation
+        }) => {
+            setBook(book)
+            setChapter(chapter)
+            setTranslation(translation)
+            const nextUrl = toPassageSegment(book, chapter)
+
+            // Set cookie to remember translation preference
+            void updateTranslationCookie(translation)
+
+            // Always include translation param
+            const params = new URLSearchParams()
+            params.set("translation", translation)
+            const queryString = params.toString()
+
+            void router.push(`/passage/${nextUrl}?${queryString}`, {
+                scroll: false,
+            })
+        },
+        [router],
+    )
+
     useEffect(() => {
         const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
         // I use `!includes` to prevent passage selector from clearing url specified verses
-        if (!pathname?.includes(nextValue) && pathname !== '/') {
+        if (!pathname?.includes(nextValue) && pathname !== "/") {
             const t = setTimeout(() => {
                 onSubmit({ book, chapter, translation })
             }, 3000)
@@ -148,67 +205,14 @@ export function PassageSelector({
         }
     }, [book, chapter, translation, onSubmit, pathname])
 
-    const filteredChapters =
-        chapterQuery === ''
-            ? chapters
-            : chapters.filter(chapter => {
-                  return chapter
-                      .toLowerCase()
-                      .includes(chapterQuery.toLowerCase())
-              })
-
-    const filteredTranslations =
-        translationQuery === ''
-            ? translations
-            : translations.filter(t =>
-                  t.label
-                      .toLowerCase()
-                      .includes(translationQuery.toLowerCase()),
-              )
-
-    async function updateTranslationCookie(translation: Translation) {
-        await fetch('/api/set-translation', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ translation }),
-        })
-    }
-
-    function onSubmit({
-        book,
-        chapter,
-        translation,
-    }: {
-        book: Book
-        chapter: string
-        translation: Translation
-    }) {
-        setBook(book)
-        setChapter(chapter)
-        setTranslation(translation)
-        const nextUrl = toPassageSegment(book, chapter)
-
-        // Set cookie to remember translation preference
-        void updateTranslationCookie(translation)
-
-        // Always include translation param
-        const params = new URLSearchParams()
-        params.set('translation', translation)
-        const queryString = params.toString()
-
-        void router.push(`/passage/${nextUrl}?${queryString}`, {
-            scroll: false,
-        })
-    }
-
     const isFirstRender = useIsFirstRender()
 
     return (
         <>
             <label htmlFor="passage" className={clsx(labelClassName)}>
-                {label ?? 'Passage:'}
+                {label ?? "Passage:"}
             </label>
-            <div className={'not-prose svg-outline relative flex flex-row'}>
+            <div className={"not-prose svg-outline relative flex flex-row"}>
                 <Combobox
                     className="relative"
                     as="div"
@@ -224,15 +228,15 @@ export function PassageSelector({
                             event.currentTarget.select()
                         }}
                         onKeyUp={e => {
-                            if (e.key === 'Enter' || e.keyCode === 13) {
+                            if (e.key === "Enter" || e.keyCode === 13) {
                                 chapterRef.current?.focus()
                             }
                         }}
                         displayValue={(book: Book) =>
-                            simpleBibleMetadata[book]?.name ?? ''
+                            simpleBibleMetadata[book]?.name ?? ""
                         }
                         className={
-                            'w-44 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none'
+                            "w-44 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none"
                         }
                         autoComplete="false"
                         data-1p-ignore={true}
@@ -240,14 +244,14 @@ export function PassageSelector({
                     {/* `ComboBox` from headlessui has to be in a client component, which is why I have to fake the SSR to prevent flickering.*/}
                     {isFirstRender && (
                         <div className="absolute left-1 top-1 translate-x-0.5 translate-y-0.5 font-medium text-primary">
-                            {simpleBibleMetadata[book]?.name ?? ''}
+                            {simpleBibleMetadata[book]?.name ?? ""}
                         </div>
                     )}
                     <ScrollArea.Root className="bg-secondary">
                         <ScrollArea.Viewport>
                             <Combobox.Options
                                 className={
-                                    'absolute z-50 max-h-60 w-full -translate-y-0.5 overflow-auto border-2 border-primary bg-secondary'
+                                    "absolute z-50 max-h-60 w-full -translate-y-0.5 overflow-auto border-2 border-primary bg-secondary"
                                 }
                             >
                                 {filteredBooks.map(book => (
@@ -259,10 +263,10 @@ export function PassageSelector({
                                         {({ active }) => (
                                             <li
                                                 className={clsx(
-                                                    'cursor-pointer px-2 py-1',
+                                                    "cursor-pointer px-2 py-1",
                                                     active
-                                                        ? 'bg-primary text-secondary '
-                                                        : 'bg-secondary text-primary ',
+                                                        ? "bg-primary text-secondary"
+                                                        : "bg-secondary text-primary",
                                                 )}
                                                 onClick={() => {
                                                     setTimeout(() =>
@@ -277,7 +281,7 @@ export function PassageSelector({
                                     </Combobox.Option>
                                 ))}
                             </Combobox.Options>
-                        </ScrollArea.Viewport>{' '}
+                        </ScrollArea.Viewport>{" "}
                         <ScrollArea.Scrollbar orientation="vertical">
                             <ScrollArea.Thumb />
                         </ScrollArea.Scrollbar>
@@ -289,7 +293,7 @@ export function PassageSelector({
                             viewBox="0 0 20 20"
                             fill="currentColor"
                             aria-hidden="true"
-                            className="h-5 w-5 text-primary "
+                            className="h-5 w-5 text-primary"
                         >
                             <path
                                 fillRule="evenodd"
@@ -315,12 +319,12 @@ export function PassageSelector({
                         onChange={event => setChapterQuery(event.target.value)}
                         onFocus={event => event.currentTarget.select()}
                         onKeyUp={event => {
-                            if (event.key === 'Enter' || event.keyCode === 13) {
+                            if (event.key === "Enter" || event.keyCode === 13) {
                                 onSubmit({ book, chapter, translation })
                             }
                         }}
                         className={
-                            'w-16 -translate-x-0.5 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none '
+                            "w-16 -translate-x-0.5 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none"
                         }
                         autoComplete="false"
                         data-1p-ignore={true}
@@ -335,7 +339,7 @@ export function PassageSelector({
                         <ScrollArea.Viewport>
                             <Combobox.Options
                                 className={
-                                    'absolute z-50 max-h-60 w-full -translate-x-0.5 -translate-y-0.5 overflow-auto border-2 border-primary bg-secondary '
+                                    "absolute z-50 max-h-60 w-full -translate-x-0.5 -translate-y-0.5 overflow-auto border-2 border-primary bg-secondary"
                                 }
                             >
                                 {filteredChapters.map((number, i) => (
@@ -347,10 +351,10 @@ export function PassageSelector({
                                         {({ active }) => (
                                             <li
                                                 className={clsx(
-                                                    'cursor-pointer px-2 py-1',
+                                                    "cursor-pointer px-2 py-1",
                                                     active
-                                                        ? 'bg-primary text-secondary '
-                                                        : 'bg-secondary text-primary ',
+                                                        ? "bg-primary text-secondary"
+                                                        : "bg-secondary text-primary",
                                                 )}
                                             >
                                                 {number}
@@ -359,7 +363,7 @@ export function PassageSelector({
                                     </Combobox.Option>
                                 ))}
                             </Combobox.Options>
-                        </ScrollArea.Viewport>{' '}
+                        </ScrollArea.Viewport>{" "}
                         <ScrollArea.Scrollbar orientation="vertical">
                             <ScrollArea.Thumb />
                         </ScrollArea.Scrollbar>
@@ -371,7 +375,7 @@ export function PassageSelector({
                             viewBox="0 0 20 20"
                             fill="currentColor"
                             aria-hidden="true"
-                            className="h-5 w-5 text-primary "
+                            className="h-5 w-5 text-primary"
                         >
                             <path
                                 fillRule="evenodd"
@@ -403,7 +407,7 @@ export function PassageSelector({
                                     ?.label ?? t
                             }
                             className={
-                                'w-20 -translate-x-1 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none'
+                                "w-20 -translate-x-1 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none"
                             }
                             autoComplete="false"
                             data-1p-ignore={true}
@@ -418,7 +422,7 @@ export function PassageSelector({
                             <ScrollArea.Viewport>
                                 <Combobox.Options
                                     className={
-                                        'absolute z-50 max-h-60 w-full -translate-x-1 -translate-y-0.5 overflow-auto border-2 border-primary bg-secondary'
+                                        "absolute z-50 max-h-60 w-full -translate-x-1 -translate-y-0.5 overflow-auto border-2 border-primary bg-secondary"
                                     }
                                 >
                                     {filteredTranslations.map(t => (
@@ -430,10 +434,10 @@ export function PassageSelector({
                                             {({ active }) => (
                                                 <li
                                                     className={clsx(
-                                                        'cursor-pointer px-2 py-1',
+                                                        "cursor-pointer px-2 py-1",
                                                         active
-                                                            ? 'bg-primary text-secondary'
-                                                            : 'bg-secondary text-primary',
+                                                            ? "bg-primary text-secondary"
+                                                            : "bg-secondary text-primary",
                                                     )}
                                                 >
                                                     {t.label}

@@ -1,19 +1,19 @@
-import { getServerSession } from 'next-auth'
-import { NextRequest } from 'next/server'
+import { getServerSession } from "next-auth"
+import { NextRequest } from "next/server"
 
-import { authOptions } from '~/server/auth'
-import { db } from '~/server/db'
-import { UserChangelogRepository } from '~/server/repositories/userChangelog.repository'
+import { authOptions } from "~/server/auth"
+import { db } from "~/server/db"
+import { UserChangelogRepository } from "~/server/repositories/userChangelog.repository"
 
-import { DTOToRecordSchema } from './dto'
+import { DTOToRecordSchema } from "./dto"
 
-export const dynamic = 'force-dynamic' // defaults to auto
+export const dynamic = "force-dynamic" // defaults to auto
 
 export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions)
 
     if (session === null) {
-        return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        return Response.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const rawBody = await request.json()
@@ -33,7 +33,7 @@ export async function GET() {
     const session = await getServerSession(authOptions)
 
     if (session === null) {
-        return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        return Response.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const userChangelogRepository = new UserChangelogRepository(db)

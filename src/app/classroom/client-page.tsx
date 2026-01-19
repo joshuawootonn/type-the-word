@@ -1,9 +1,9 @@
-'use client'
+"use client"
 
-import Link from 'next/link'
-import { useState } from 'react'
+import Link from "next/link"
+import { useState } from "react"
 
-import { disconnectClassroom, initiateOAuthConnection } from './actions'
+import { disconnectClassroom, initiateOAuthConnection } from "./actions"
 
 interface ClientPageProps {
     initialIsConnected: boolean
@@ -31,14 +31,14 @@ export function ClientPage({
             const authUrl = await initiateOAuthConnection()
             // Redirect to Google OAuth
             window.location.href = authUrl
-        } catch (err) {
-            setError('Failed to initiate connection')
+        } catch (_) {
+            setError("Failed to initiate connection")
             setIsLoading(false)
         }
     }
 
     async function handleDisconnect() {
-        if (!confirm('Are you sure you want to disconnect Google Classroom?')) {
+        if (!confirm("Are you sure you want to disconnect Google Classroom?")) {
             return
         }
 
@@ -49,8 +49,8 @@ export function ClientPage({
             await disconnectClassroom()
             setIsConnected(false)
             setSuccess(false)
-        } catch (err) {
-            setError('Failed to disconnect')
+        } catch (_) {
+            setError("Failed to disconnect")
         } finally {
             setIsLoading(false)
         }
@@ -138,7 +138,7 @@ export function ClientPage({
                                 void handleDisconnect()
                             }}
                             disabled={isLoading}
-                            className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary no-underline "
+                            className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary no-underline"
                         >
                             Disconnect Google Classroom
                         </button>
@@ -178,7 +178,7 @@ export function ClientPage({
                                     void handleConnect()
                                 }}
                                 disabled={isLoading}
-                                className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary no-underline "
+                                className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary no-underline"
                             >
                                 {isLoading ? (
                                     <>Connecting...</>
@@ -189,7 +189,7 @@ export function ClientPage({
                         ) : (
                             <Link
                                 href="/auth/login?callbackUrl=%2Fclassroom"
-                                className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary no-underline "
+                                className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary no-underline"
                             >
                                 Log in
                             </Link>

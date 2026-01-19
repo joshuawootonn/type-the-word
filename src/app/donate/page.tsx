@@ -1,14 +1,14 @@
-import { differenceInMonths } from 'date-fns'
-import { Metadata } from 'next'
-import Link from 'next/link'
+import { differenceInMonths } from "date-fns"
+import { Metadata } from "next"
+import Link from "next/link"
 
-import { db } from '~/server/db'
-import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
-import { UserRepository } from '~/server/repositories/user.repository'
-import { fetchTotalDonationsCents } from '~/server/stripe'
+import { db } from "~/server/db"
+import { TypedVerseRepository } from "~/server/repositories/typedVerse.repository"
+import { UserRepository } from "~/server/repositories/user.repository"
+import { fetchTotalDonationsCents } from "~/server/stripe"
 
 export const metadata: Metadata = {
-    title: 'Donate',
+    title: "Donate",
     description: "Donate to pay for Type the Word's operation cost.",
 }
 
@@ -17,8 +17,8 @@ export default async function DonatePage() {
     const totalDonations = (totalDonationsCents / 100).toLocaleString(
         undefined,
         {
-            style: 'currency',
-            currency: 'USD',
+            style: "currency",
+            currency: "USD",
             maximumFractionDigits: 0,
         },
     )
@@ -30,8 +30,8 @@ export default async function DonatePage() {
         typedVerseRepo.count(),
     ])
 
-    const projectStartDate = new Date('2023-12-01')
-    const apiIntegrationDate = new Date('2025-12-01')
+    const projectStartDate = new Date("2023-12-01")
+    const apiIntegrationDate = new Date("2025-12-01")
     const now = new Date()
 
     const monthsBeforeApi = differenceInMonths(
@@ -53,27 +53,27 @@ export default async function DonatePage() {
         <main className="prose relative mx-auto w-full flex-grow pt-4 text-lg dark:prose-invert prose-headings:text-primary prose-p:text-primary prose-a:text-primary prose-strong:text-primary prose-code:text-primary prose-table:text-primary prose-th:text-primary prose-td:text-primary lg:pt-8">
             <div
                 className={
-                    'prose-h2:text-3xl prose-p:text-xl prose-code:before:content-none prose-code:after:content-none'
+                    "prose-h2:text-3xl prose-p:text-xl prose-code:before:content-none prose-code:after:content-none"
                 }
             >
                 <h1>Donate</h1>
                 <p className="mt-4">
-                    Donations to date: <strong>{totalDonations}</strong>{' '}
-                    &nbsp;|&nbsp; Project costs to date:{' '}
+                    Donations to date: <strong>{totalDonations}</strong>{" "}
+                    &nbsp;|&nbsp; Project costs to date:{" "}
                     <strong>
                         {spentToDate.toLocaleString(undefined, {
-                            style: 'currency',
-                            currency: 'USD',
+                            style: "currency",
+                            currency: "USD",
                             maximumFractionDigits: 0,
                         })}
                     </strong>
                 </p>
-                <hr className="mx-0 w-full border-t-2  border-primary" />
+                <hr className="mx-0 w-full border-t-2 border-primary" />
                 <h2>Why donate?</h2>
                 <p>
                     I love typing through the Bible and when I created TTW, I
                     wanted to make it easier for myself and others to do so
-                    consistently. So far {userCount} people have typed{' '}
+                    consistently. So far {userCount} people have typed{" "}
                     {typedVerseCount} verses!
                     <br />
                     <br />
@@ -158,8 +158,8 @@ export default async function DonatePage() {
                                 Domain <br />
                                 <br />
                                 <span className="text-xs">
-                                    This is the cost of having the{' '}
-                                    <code>typetheword.site</code> domain.{' '}
+                                    This is the cost of having the{" "}
+                                    <code>typetheword.site</code> domain.{" "}
                                 </span>
                             </td>
                             <td>
@@ -200,7 +200,7 @@ export default async function DonatePage() {
                     <tbody>
                         <tr>
                             <td>
-                                Database migration egress bandwidth overages{' '}
+                                Database migration egress bandwidth overages{" "}
                                 <br />
                                 <br />
                                 <span className="text-xs">
@@ -231,7 +231,7 @@ export default async function DonatePage() {
                     <tbody>
                         <tr>
                             <td>
-                                Digital Ocean Database{' '}
+                                Digital Ocean Database{" "}
                                 <span className="text-xs">
                                     (Dec 2023 - Nov 2025)
                                 </span>
@@ -262,7 +262,7 @@ export default async function DonatePage() {
                     <strong>Q:</strong> Where will excess donations go?
                     <br />
                     <strong>A:</strong> Scholarships for underprivileged kids
-                    from unbelieving families to go to Christian school through{' '}
+                    from unbelieving families to go to Christian school through{" "}
                     <Link
                         href="https://www.faithacademyiowa.org/"
                         target="_blank"

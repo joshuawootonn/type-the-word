@@ -1,16 +1,16 @@
-import clsx from 'clsx'
-import { useAtom, useSetAtom } from 'jotai'
-import React, { useRef } from 'react'
+import clsx from "clsx"
+import { useAtom, useSetAtom } from "jotai"
+import React, { useRef } from "react"
 
-import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
+import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
 import {
     currentVerseAtom,
     isPassageActiveAtom,
     keystrokesAtom,
     positionAtom,
-} from '~/components/passage'
-import { usePassageRect, useVerseRect } from '~/lib/hooks/passageRectContext'
-import { Verse } from '~/lib/parseEsv'
+} from "~/components/passage"
+import { usePassageRect, useVerseRect } from "~/lib/hooks/passageRectContext"
+import { Verse } from "~/lib/parseEsv"
 
 export function ReadonlyVerse({
     isCurrentVerse,
@@ -38,9 +38,9 @@ export function ReadonlyVerse({
     return (
         <span
             className={clsx(
-                'verse break-spaces group inline h-3 text-balance hover:cursor-pointer',
-                isCurrentVerse && 'active-verse',
-                isTypedInHistory ? 'text-primary/50' : 'text-primary',
+                "verse break-spaces group inline h-3 text-balance hover:cursor-pointer",
+                isCurrentVerse && "active-verse",
+                isTypedInHistory ? "text-primary/50" : "text-primary",
             )}
             ref={ref}
             onClick={() => {
@@ -50,25 +50,25 @@ export function ReadonlyVerse({
             }}
         >
             {verse.nodes.map((atom, aIndexPrime) => {
-                if (atom.type === 'newLine') return <br key={aIndexPrime} />
+                if (atom.type === "newLine") return <br key={aIndexPrime} />
 
-                if (atom.type === 'verseNumber') {
+                if (atom.type === "verseNumber") {
                     return (
                         <b
-                            className={clsx(isIndented && 'absolute -left-0')}
+                            className={clsx(isIndented && "absolute -left-0")}
                             key={aIndexPrime}
                         >
-                            {atom.text.split(':').at(-1)}
+                            {atom.text.split(":").at(-1)}
                         </b>
                     )
                 }
 
-                if (atom.type === 'space') {
+                if (atom.type === "space") {
                     return (
                         <span
                             key={aIndexPrime}
                             className={clsx(
-                                'space inline-flex h-[19px] w-[1ch] translate-y-[3px]',
+                                "space inline-flex h-[19px] w-[1ch] translate-y-[3px]",
                             )}
                         >
                             &nbsp;
@@ -76,14 +76,14 @@ export function ReadonlyVerse({
                     )
                 }
 
-                if (atom.type === 'decoration') {
+                if (atom.type === "decoration") {
                     return null
                 }
 
-                if (atom.type === 'word') {
+                if (atom.type === "word") {
                     const wordText = atom.letters
-                        .join('')
-                        .replace(' ', '\u00a0')
+                        .join("")
+                        .replace(" ", "\u00a0")
 
                     // For divine names, split first letter from rest for styling
                     if (atom.divineName && wordText.length > 1) {
@@ -112,9 +112,9 @@ export function ReadonlyVerse({
             {rect && passageRect ? (
                 <button
                     className={clsx(
-                        'svg-outline absolute z-10 border-2 border-primary bg-secondary/80 text-primary opacity-0 backdrop-blur-sm transition-opacity duration-100',
-                        !isPassageActive && 'hover:opacity-100',
-                        'focus:opacity-100',
+                        "svg-outline absolute z-10 border-2 border-primary bg-secondary/80 text-primary opacity-0 backdrop-blur-sm transition-opacity duration-100",
+                        !isPassageActive && "hover:opacity-100",
+                        "focus:opacity-100",
                     )}
                     style={{
                         width: passageRect.width + 16,
@@ -123,7 +123,7 @@ export function ReadonlyVerse({
                         top: rect.top - passageRect.top - 8,
                     }}
                 >
-                    {Boolean(currentVerse) ? (
+                    {currentVerse ? (
                         <span>Switch to verse {verse.verse.value}</span>
                     ) : (
                         <span>Start typing at verse {verse.verse.value}</span>

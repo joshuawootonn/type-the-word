@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
-import * as Tooltip from '@radix-ui/react-tooltip'
-import clsx from 'clsx'
+import * as Tooltip from "@radix-ui/react-tooltip"
+import clsx from "clsx"
 import {
     eachWeekOfInterval,
     endOfMonth,
@@ -16,9 +16,9 @@ import {
     isWithinInterval,
     isSameYear,
     endOfToday,
-} from 'date-fns'
+} from "date-fns"
 
-import { MonthlyLogDTO } from './log2'
+import { MonthlyLogDTO } from "./log2"
 
 function isThisMonth(date: Date) {
     const beginningOfTheMonth = startOfMonth(new Date())
@@ -61,10 +61,10 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                             <div>
                                 <h3 className="mt-0">
                                     {isThisMonth(month)
-                                        ? 'This Month'
+                                        ? "This Month"
                                         : isInThisYear(month)
-                                          ? format(month, 'MMMM')
-                                          : format(month, 'MMMM, yyyy')}
+                                          ? format(month, "MMMM")
+                                          : format(month, "MMMM, yyyy")}
                                 </h3>
                                 <p>Verses: {monthLog.numberOfVersesTyped}</p>
                             </div>
@@ -89,12 +89,12 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                                     return (
                                         <div
                                             className={clsx(
-                                                'grid w-full grid-cols-7 gap-2 md:flex',
+                                                "grid w-full grid-cols-7 gap-2 md:flex",
                                                 isLastWeekOfMonth &&
-                                                    'justify-end',
+                                                    "justify-end",
                                                 isLastWeekOfMonth &&
                                                     !isWeekContainedInMonth &&
-                                                    'block md:absolute md:bottom-0 md:right-0 md:translate-y-[calc(100%+8px)]',
+                                                    "block md:absolute md:bottom-0 md:right-0 md:translate-y-[calc(100%+8px)]",
                                             )}
                                             key={j}
                                         >
@@ -112,7 +112,7 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                                                 const dayLog =
                                                     isInMonth &&
                                                     monthLog.days[
-                                                        format(day, 'dd')
+                                                        format(day, "dd")
                                                     ]
 
                                                 return (
@@ -122,17 +122,17 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                                                         >
                                                             <div
                                                                 className={clsx(
-                                                                    'relative flex aspect-square items-center justify-center border-2 border-primary md:size-14',
+                                                                    "relative flex aspect-square items-center justify-center border-2 border-primary md:size-14",
                                                                     dayLog &&
-                                                                        'border-primary bg-primary text-secondary',
+                                                                        "border-primary bg-primary text-secondary",
                                                                     isFuture &&
-                                                                        'opacity-20',
+                                                                        "opacity-20",
                                                                 )}
                                                             >
                                                                 <div className="absolute left-0 top-0 px-[1px] text-xs">
                                                                     {format(
                                                                         day,
-                                                                        'd',
+                                                                        "d",
                                                                     )}
                                                                 </div>
                                                                 {
@@ -146,16 +146,16 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                                                                 className="prose grid select-none grid-cols-[1fr_minmax(30px,min-content)] gap-x-3 gap-y-2 border-2 border-primary bg-secondary px-3 py-2 font-sans leading-none text-primary"
                                                             >
                                                                 <div className="font-medium">
-                                                                    Date:{' '}
+                                                                    Date:{" "}
                                                                 </div>
                                                                 <div className="space-y-2 whitespace-nowrap">
                                                                     {format(
                                                                         day,
-                                                                        'MMMM do',
+                                                                        "MMMM do",
                                                                     )}
                                                                 </div>
                                                                 <div className="font-medium">
-                                                                    Location:{' '}
+                                                                    Location:{" "}
                                                                 </div>
                                                                 <div className="space-y-2">
                                                                     {dayLog.location.map(

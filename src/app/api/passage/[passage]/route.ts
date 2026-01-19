@@ -1,24 +1,24 @@
-import { isAfter, isBefore, subDays } from 'date-fns'
-import { and, eq, sql } from 'drizzle-orm'
-import fs from 'fs'
-import path from 'path'
-import { z } from 'zod'
+import { isAfter, isBefore, subDays } from "date-fns"
+import { and, eq, sql } from "drizzle-orm"
+import fs from "fs"
+import path from "path"
+import { z } from "zod"
 
-import { env } from '~/env.mjs'
-import { parseChapter, Translation } from '~/lib/parseEsv'
-import { PassageObject, stringToPassageObject } from '~/lib/passageObject'
-import { passageReferenceSchema } from '~/lib/passageReference'
+import { env } from "~/env.mjs"
+import { parseChapter, Translation } from "~/lib/parseEsv"
+import { PassageObject, stringToPassageObject } from "~/lib/passageObject"
+import { passageReferenceSchema } from "~/lib/passageReference"
 import {
     PassageSegment,
     passageSegmentSchema,
     toPassageSegment,
-} from '~/lib/passageSegment'
-import { db } from '~/server/db'
-import { passageResponse } from '~/server/db/schema'
+} from "~/lib/passageSegment"
+import { db } from "~/server/db"
+import { passageResponse } from "~/server/db/schema"
 
-import { createApiBibleURL } from './create-api-bible-url'
-import { createESVURL } from './create-esv-url'
-import { parseApiBibleChapter } from './parse-api-bible'
+import { createApiBibleURL } from "./create-api-bible-url"
+import { createESVURL } from "./create-esv-url"
+import { parseApiBibleChapter } from "./parse-api-bible"
 
 const esvPassageSchema = z.object({
     query: z.string(),
@@ -27,12 +27,12 @@ const esvPassageSchema = z.object({
     passage_meta: z.array(
         z.object({
             canonical: z.string(),
-            ['chapter_start']: z.tuple([z.number(), z.number()]),
-            ['chapter_end']: z.tuple([z.number(), z.number()]),
-            ['prev_verse']: z.number().nullable(),
-            ['next_verse']: z.number().nullable(),
-            ['prev_chapter']: z.tuple([z.number(), z.number()]).nullable(),
-            ['next_chapter']: z.tuple([z.number(), z.number()]).nullable(),
+            ["chapter_start"]: z.tuple([z.number(), z.number()]),
+            ["chapter_end"]: z.tuple([z.number(), z.number()]),
+            ["prev_verse"]: z.number().nullable(),
+            ["next_verse"]: z.number().nullable(),
+            ["prev_chapter"]: z.tuple([z.number(), z.number()]).nullable(),
+            ["next_chapter"]: z.tuple([z.number(), z.number()]).nullable(),
         }),
     ),
     passages: z.array(z.string()),
@@ -55,10 +55,10 @@ const apiBiblePassageSchema = z.object({
 })
 
 const translationSchema = z
-    .enum(['esv', 'bsb', 'nlt', 'niv', 'csb', 'nkjv', 'nasb', 'ntv', 'msg'])
-    .default('esv')
+    .enum(["esv", "bsb", "nlt", "niv", "csb", "nkjv", "nasb", "ntv", "msg"])
+    .default("esv")
 
-export const dynamic = 'force-dynamic' // defaults to auto
+export const dynamic = "force-dynamic" // defaults to auto
 
 function getErrorMessage(error: unknown) {
     if (error instanceof Error) return error.message
@@ -75,27 +75,27 @@ async function fetchESVPassage(
     if (
         !includesVerses &&
         [
-            'genesis_1',
-            'psalm_23',
-            'james_1',
-            'song_of_solomon_1',
-            'song_of_solomon_2',
-            'song_of_solomon_3',
-            'song_of_solomon_4',
-            'song_of_solomon_5',
-            'song_of_solomon_6',
-            'song_of_solomon_7',
-            'song_of_solomon_8',
+            "genesis_1",
+            "psalm_23",
+            "james_1",
+            "song_of_solomon_1",
+            "song_of_solomon_2",
+            "song_of_solomon_3",
+            "song_of_solomon_4",
+            "song_of_solomon_5",
+            "song_of_solomon_6",
+            "song_of_solomon_7",
+            "song_of_solomon_8",
         ].includes(toPassageSegment(passageData.book, passageData.chapter))
     ) {
         const filePath = path.join(
             process.cwd(),
-            '/src/server',
+            "/src/server",
             `${toPassageSegment(passageData.book, passageData.chapter)}.html`,
         )
         try {
             const content = fs.readFileSync(filePath, {
-                encoding: 'utf8',
+                encoding: "utf8",
             })
             return { data: parseChapter(content) }
         } catch (error) {
@@ -120,14 +120,14 @@ async function fetchESVPassage(
         const data: unknown = await response.json()
         const parsedData = esvPassageSchema.parse(data)
 
-        return { data: parseChapter(parsedData.passages.at(0) ?? '') }
+        return { data: parseChapter(parsedData.passages.at(0) ?? "") }
     }
 
     const existingPassageResponse = await db.query.passageResponse.findFirst({
         where: and(
             eq(passageResponse.chapter, passageData.chapter),
             eq(passageResponse.book, passageData.book),
-            eq(passageResponse.translation, 'esv'),
+            eq(passageResponse.translation, "esv"),
         ),
     })
 
@@ -136,13 +136,15 @@ async function fetchESVPassage(
         isAfter(existingPassageResponse.updatedAt, subDays(new Date(), 31))
     ) {
         console.log(
-            'Passage route cache HIT: reference is entire chapter and less than a month old',
-            { reference },
+            "Passage route cache HIT: reference is entire chapter and less than a month old",
+            {
+                reference,
+            },
         )
         const parsedData = esvPassageSchema.parse(
             existingPassageResponse.response,
         )
-        return { data: parseChapter(parsedData.passages.at(0) ?? '') }
+        return { data: parseChapter(parsedData.passages.at(0) ?? "") }
     }
 
     const response = await fetch(createESVURL(passageData), {
@@ -156,20 +158,24 @@ async function fetchESVPassage(
     if (existingPassageResponse == null) {
         console.log(
             "Passage route cache MISS: reference is entire chapter but entry doesn't exist",
-            { reference },
+            {
+                reference,
+            },
         )
         await db.insert(passageResponse).values({
             response: data,
             book: passageData.book,
             chapter: passageData.chapter,
-            translation: 'esv',
+            translation: "esv",
         })
     } else if (
         isBefore(existingPassageResponse.updatedAt, subDays(new Date(), 31))
     ) {
         console.log(
-            'Passage route cache MISS: reference is entire chapter but entry is expired',
-            { reference },
+            "Passage route cache MISS: reference is entire chapter but entry is expired",
+            {
+                reference,
+            },
         )
         await db
             .update(passageResponse)
@@ -179,13 +185,13 @@ async function fetchESVPassage(
             })
             .where(eq(passageResponse.id, existingPassageResponse.id))
     }
-    return { data: parseChapter(parsedData.passages.at(0) ?? '') }
+    return { data: parseChapter(parsedData.passages.at(0) ?? "") }
 }
 
 async function fetchApiBiblePassage(
     passageData: PassageObject,
     reference: PassageSegment,
-    translation: Exclude<Translation, 'esv'>,
+    translation: Exclude<Translation, "esv">,
 ) {
     const includesVerses = passageData.lastVerse != null
 
@@ -199,7 +205,7 @@ async function fetchApiBiblePassage(
             createApiBibleURL(passageData, translation),
             {
                 headers: {
-                    'api-key': env.API_BIBLE_API_KEY,
+                    "api-key": env.API_BIBLE_API_KEY,
                 },
             },
         )
@@ -245,7 +251,7 @@ async function fetchApiBiblePassage(
 
     const response = await fetch(createApiBibleURL(passageData, translation), {
         headers: {
-            'api-key': env.API_BIBLE_API_KEY,
+            "api-key": env.API_BIBLE_API_KEY,
         },
     })
 
@@ -294,13 +300,13 @@ export async function GET(
 
     // Parse translation from query params
     const url = new URL(request.url)
-    const translationParam = url.searchParams.get('translation')
+    const translationParam = url.searchParams.get("translation")
     let translation: Translation
 
     try {
         // Pass undefined instead of null so zod's .default() works
         translation = translationSchema.parse(translationParam ?? undefined)
-    } catch (e: unknown) {
+    } catch (_: unknown) {
         return Response.json(
             {
                 error: `Invalid translation. Must be one of: esv, bsb, nlt, niv, csb, nkjv, nasb, ntv, msg`,
@@ -344,7 +350,7 @@ export async function GET(
     }
 
     try {
-        if (translation === 'esv') {
+        if (translation === "esv") {
             const result = await fetchESVPassage(passageData, reference)
             return Response.json(result, { status: 200 })
         } else {
@@ -356,7 +362,7 @@ export async function GET(
             return Response.json(result, { status: 200 })
         }
     } catch (error: unknown) {
-        console.error('Error fetching passage:', error)
+        console.error("Error fetching passage:", error)
         return Response.json(
             {
                 error: getErrorMessage(error),

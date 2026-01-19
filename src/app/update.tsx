@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 export function Update({ className }: { className?: string }) {
     return (

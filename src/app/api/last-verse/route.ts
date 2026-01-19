@@ -1,24 +1,23 @@
-import { getServerSession } from 'next-auth'
-import { NextRequest } from 'next/server'
+import { getServerSession } from "next-auth"
+import { NextRequest } from "next/server"
 
-import { segmentToPassageObject } from '~/lib/passageObject'
-import { authOptions } from '~/server/auth'
-import { db } from '~/server/db'
-import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
-import { TypedVerse } from '~/server/repositories/typingSession.repository'
+import { authOptions } from "~/server/auth"
+import { db } from "~/server/db"
+import { TypedVerseRepository } from "~/server/repositories/typedVerse.repository"
+import { TypedVerse } from "~/server/repositories/typingSession.repository"
 
 export type LastVerse = TypedVerse
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic"
 
 export async function GET(
     _: NextRequest,
-    { params }: { params: Promise<{ passage?: string }> },
+    { params: _params }: { params: Promise<{ passage?: string }> },
 ) {
     const session = await getServerSession(authOptions)
 
     if (session === null) {
-        return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        return Response.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const typedVerseRepository = new TypedVerseRepository(db)

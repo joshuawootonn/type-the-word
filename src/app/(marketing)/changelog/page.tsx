@@ -1,14 +1,15 @@
-import { format } from 'date-fns'
-import { Metadata } from 'next'
-import { getServerSession } from 'next-auth/next'
-import Image from 'next/image'
+import { format } from "date-fns"
+import { Metadata } from "next"
+import { getServerSession } from "next-auth/next"
+import Image from "next/image"
+import NextLink from "next/link"
 
-import { EmailLink } from '~/components/emailLink'
-import HotkeyLabel from '~/components/hotkey-label'
-import { authOptions } from '~/server/auth'
+import { EmailLink } from "~/components/emailLink"
+import HotkeyLabel from "~/components/hotkey-label"
+import { authOptions } from "~/server/auth"
 
-import { UpdateLastVisitedChangelog } from './update-last-visited-changelog'
-import { changelogUpdatedAt } from './updated-at'
+import { UpdateLastVisitedChangelog } from "./update-last-visited-changelog"
+import { changelogUpdatedAt } from "./updated-at"
 
 function Link({ href, children }: { href: string; children: React.ReactNode }) {
     return (
@@ -26,18 +27,18 @@ function Link({ href, children }: { href: string; children: React.ReactNode }) {
 function DateComponent({ date }: { date: Date }) {
     return (
         <time
-            className={'font-bold text-primary '}
-            dateTime={format(date, 'yyyy-MM-dd')}
+            className={"font-bold text-primary"}
+            dateTime={format(date, "yyyy-MM-dd")}
         >
-            {format(date, 'LLLL do')}
+            {format(date, "LLLL do")}
         </time>
     )
 }
 
 export const metadata: Metadata = {
-    title: 'Type the Word - Changelog',
+    title: "Type the Word - Changelog",
     description:
-        'All the product changes happening to Type the Word. A typing practice tool that tracks your progress through the Bible.',
+        "All the product changes happening to Type the Word. A typing practice tool that tracks your progress through the Bible.",
 }
 
 export default async function Changelog() {
@@ -46,7 +47,7 @@ export default async function Changelog() {
     return (
         <div
             className={
-                'marker:text-primary prose-h2:text-3xl prose-p:text-xl prose-a:text-primary prose-kbd:text-primary prose-code:text-primary prose-code:before:content-none prose-code:after:content-none prose-ul:text-primary prose-li:text-primary'
+                "marker:text-primary prose-h2:text-3xl prose-p:text-xl prose-a:text-primary prose-kbd:text-primary prose-code:text-primary prose-code:before:content-none prose-code:after:content-none prose-ul:text-primary prose-li:text-primary"
             }
         >
             <div className="mb-10 flex items-center justify-between">
@@ -67,7 +68,7 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
-                    <DateComponent date={new Date('01/15/2026')} /> - Improved
+                    <DateComponent date={new Date("01/15/2026")} /> - Improved
                     the &quot;typed&quot; indicator line on passages. If you
                     type through consecutive verses, the left-side line is now
                     rendered as one continuous segment even when verses wrap or
@@ -75,20 +76,20 @@ export default async function Changelog() {
                     blocks of typed verses, it renders multiple line segments.
                 </li>
                 <li>
-                    <DateComponent date={new Date('01/14/2026')} /> - Your
+                    <DateComponent date={new Date("01/14/2026")} /> - Your
                     preferred translation is now remembered. When you type a
                     verse or change the translation selector, your choice is
                     saved. As you navigate around Type the Word, your preferred
                     translation is automatically preserved.
                 </li>
                 <li>
-                    <DateComponent date={new Date('01/13/2026')} /> - Chapter
+                    <DateComponent date={new Date("01/13/2026")} /> - Chapter
                     progress is now tracked per translation. The next verse
                     selected for you and your chapter completion indicator now
                     sync with the translation you&apos;re using.
                 </li>
                 <li>
-                    <DateComponent date={new Date('01/12/2026')} /> - Fixed
+                    <DateComponent date={new Date("01/12/2026")} /> - Fixed
                     additional NASB parsing issues, added NLT divine name
                     styling, and improved navigation:
                     <ul>
@@ -104,7 +105,7 @@ export default async function Changelog() {
                             with the previous word (John 8:11).
                         </li>
                         <li>
-                            Fixed quote+punctuation patterns like{' '}
+                            Fixed quote+punctuation patterns like{" "}
                             <code>&apos;?</code> not merging properly (John
                             10:34).
                         </li>
@@ -115,7 +116,7 @@ export default async function Changelog() {
                         <li>
                             Added proper styling for divine names in NLT and
                             other translations. The word &quot;Lord&quot; when
-                            referring to Yahweh is styled as:{' '}
+                            referring to Yahweh is styled as:{" "}
                             <span>
                                 <span>L</span>
                                 <span className="divine-name">ord</span>
@@ -134,7 +135,7 @@ export default async function Changelog() {
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('01/11/2026')} /> - Fixed
+                    <DateComponent date={new Date("01/11/2026")} /> - Fixed
                     several NASB parsing issues:
                     <ul>
                         <li>
@@ -159,14 +160,14 @@ export default async function Changelog() {
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('01/03/2026')} /> - Added{' '}
-                    <a href="/copyright" className="underline">
+                    <DateComponent date={new Date("01/03/2026")} /> - Added{" "}
+                    <NextLink href="/copyright" className="underline">
                         copyright information
-                    </a>{' '}
+                    </NextLink>{" "}
                     for all new Bible translations.
                 </li>
                 <li>
-                    <DateComponent date={new Date('12/29/2025')} /> - Improved
+                    <DateComponent date={new Date("12/29/2025")} /> - Improved
                     parsing for new Bible translations:
                     <ul>
                         <li>
@@ -193,11 +194,11 @@ export default async function Changelog() {
                     If you run into any other issues with the new translations.
                     Please <EmailLink className="underline">
                         email me
-                    </EmailLink>{' '}
+                    </EmailLink>{" "}
                     and I&apos;ll be happy to take a look.
                 </li>
                 <li>
-                    <DateComponent date={new Date('12/24/2025')} /> - Fixed a
+                    <DateComponent date={new Date("12/24/2025")} /> - Fixed a
                     bug in Song of Solomon chapter 1 where you couldn&apos;t
                     type past certain words. The issue was caused by text in the
                     HTML source being split across lines, which embedded newline
@@ -207,13 +208,13 @@ export default async function Changelog() {
                     it impossible to advance.
                 </li>
                 <li>
-                    <DateComponent date={new Date('12/19/2025')} /> - Added
+                    <DateComponent date={new Date("12/19/2025")} /> - Added
                     support for new Bible translations! This is in super early
                     access and you can try it by toggling the &quot;New Bible
                     Translations&quot; early access flag in your settings.
                     <Image
-                        src={'/assets/2025-12-24-translation-selector.png'}
-                        alt={'Screenshot of the new translation selector'}
+                        src={"/assets/2025-12-24-translation-selector.png"}
+                        alt={"Screenshot of the new translation selector"}
                         className="mt-3 border-2 border-primary"
                         width={800}
                         height={400}
@@ -224,7 +225,7 @@ export default async function Changelog() {
                             MSG, BSB, and our first non-English translation NTV!
                         </li>
                         <li>
-                            This was made possible by integrating with{' '}
+                            This was made possible by integrating with{" "}
                             <Link href="https://api.bible/">api.bible</Link>.
                         </li>
                         <li>
@@ -238,28 +239,28 @@ export default async function Changelog() {
                         <li>
                             If you speak another language and have thoughts on
                             what the best translations for that language are,
-                            check{' '}
+                            check{" "}
                             <Link href="https://api.bible/bibles">
                                 this list of translations
-                            </Link>{' '}
-                            and{' '}
+                            </Link>{" "}
+                            and{" "}
                             <EmailLink className="underline">
                                 email me
-                            </EmailLink>{' '}
+                            </EmailLink>{" "}
                             a recommendation!
                         </li>
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('12/18/2025')} /> - Added an
+                    <DateComponent date={new Date("12/18/2025")} /> - Added an
                     early access feature section for opting yourself into new
                     features. The first feature that you can opt into is the
-                    recent WPM and Accuracy UI I created for the{' '}
+                    recent WPM and Accuracy UI I created for the{" "}
                     <Link href="/history">/history</Link>&nbsp; page.
                     <Image
-                        src={'/assets/early-access-features.png'}
+                        src={"/assets/early-access-features.png"}
                         alt={
-                            'Screenshot of the new early access features section'
+                            "Screenshot of the new early access features section"
                         }
                         className="mt-3 border-2 border-primary"
                         width={800}
@@ -267,25 +268,25 @@ export default async function Changelog() {
                     />
                 </li>
                 <li>
-                    <DateComponent date={new Date('12/5/2025')} /> - Started a
+                    <DateComponent date={new Date("12/5/2025")} /> - Started a
                     beta for WPM and accuracy stats on the history page. If
-                    you&apos;re interested in joining, reach out at{' '}
+                    you&apos;re interested in joining, reach out at{" "}
                     <EmailLink className="underline" />.
                     <Image
-                        src={'/assets/2025-12-05-WPM.png'}
-                        alt={'Screenshot of the new WPM and accuracy chart'}
+                        src={"/assets/2025-12-05-WPM.png"}
+                        alt={"Screenshot of the new WPM and accuracy chart"}
                         className="mt-3 border-2 border-primary"
                         width={800}
                         height={400}
                     />
                 </li>
                 <li>
-                    <DateComponent date={new Date('12/3/2025')} /> - Added a
-                    global shortcut for focusing the passage selector:{' '}
+                    <DateComponent date={new Date("12/3/2025")} /> - Added a
+                    global shortcut for focusing the passage selector:{" "}
                     <HotkeyLabel mac="⌘+P" mobile="⌘+P" nonMac="^+P" />
                 </li>
                 <li>
-                    <DateComponent date={new Date('12/1/2025')} /> - I&apos;m
+                    <DateComponent date={new Date("12/1/2025")} /> - I&apos;m
                     working on adding WPM stats to Type the Word and while I was
                     doing a small migration I accidentally ran some SQL against
                     the prod database. I restored to a backup point at 1:02pm,
@@ -294,7 +295,7 @@ export default async function Changelog() {
                     inconvenience everyone!
                 </li>
                 <li>
-                    <DateComponent date={new Date('11/23/2025')} />{' '}
+                    <DateComponent date={new Date("11/23/2025")} />{" "}
                     <ul>
                         <li>
                             When you navigate to a chapter TTW will now find and
@@ -316,7 +317,7 @@ export default async function Changelog() {
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('11/21/2025')} /> - TTW will
+                    <DateComponent date={new Date("11/21/2025")} /> - TTW will
                     be down for maintenance from 10pm to 11pm CST on Sunday,
                     11/23 for a database upgrade. Feel free to keep typing, but
                     your progress will not be saved.
@@ -326,19 +327,19 @@ export default async function Changelog() {
                     time before work. No data was lost during this attempt.
                 </li>
                 <li>
-                    <DateComponent date={new Date('10/18/2025')} /> - Added
+                    <DateComponent date={new Date("10/18/2025")} /> - Added
                     email/password auth so you no longer have to sign in with
-                    Google. You can now{' '}
+                    Google. You can now{" "}
                     <Link href="/auth/signup">create an account</Link> with just
                     your email and password.
                     <ul>
                         <li>
                             If you want to create multiple accounts with the
                             same email you can use email aliases. For example,
-                            if I wanted to create an additional account for{' '}
+                            if I wanted to create an additional account for{" "}
                             <code>josh@typetheword.site</code> I could sign up
                             with <code>josh+2@typetheword.site</code> and it
-                            would be treated as a different account. Note the{' '}
+                            would be treated as a different account. Note the{" "}
                             <code>+2</code> is just an example and you can use
                             any text after the <code>+</code>.
                         </li>
@@ -352,25 +353,25 @@ export default async function Changelog() {
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('8/14/2025')} /> - Added a new
+                    <DateComponent date={new Date("8/14/2025")} /> - Added a new
                     <Link href="/donate"> donate</Link> page and a donate link
                     in the footer. Any help paying hosting costs is greatly
                     appreciated.
                 </li>
                 <li>
-                    <DateComponent date={new Date('5/31/2025')} /> - Fixed a bug
-                    preventing you from completing{' '}
+                    <DateComponent date={new Date("5/31/2025")} /> - Fixed a bug
+                    preventing you from completing{" "}
                     <Link href="www.typetheword.site/passage/1_kings_4">
                         1 Kings 4:20
-                    </Link>{' '}
-                    and{' '}
+                    </Link>{" "}
+                    and{" "}
                     <Link href="https://www.typetheword.site/passage/2_chronicles_2">
                         2 Chronicles 2:1
                     </Link>
                     .
                 </li>
                 <li>
-                    <DateComponent date={new Date('4/18/2025')} />
+                    <DateComponent date={new Date("4/18/2025")} />
 
                     <ul>
                         <li>
@@ -381,8 +382,8 @@ export default async function Changelog() {
                             typed the entire book again.
                         </li>
                         <li>
-                            Fixed a bug where only the first verse in{' '}
-                            <Link href="/passage/2_john">2 John</Link> and{' '}
+                            Fixed a bug where only the first verse in{" "}
+                            <Link href="/passage/2_john">2 John</Link> and{" "}
                             <Link href="/passage/3_john">3 John</Link> were
                             available to be typed.
                             <br />
@@ -394,9 +395,9 @@ export default async function Changelog() {
                             verse.
                         </li>
                     </ul>
-                </li>{' '}
+                </li>{" "}
                 <li>
-                    <DateComponent date={new Date('3/11/2025')} />
+                    <DateComponent date={new Date("3/11/2025")} />
 
                     <ul>
                         <li>
@@ -404,26 +405,26 @@ export default async function Changelog() {
                             I&apos;ve seen before where I was depending on the
                             number of verses in a chapter to download the entire
                             chapter. Since many chapters skip verses this means
-                            TTW was not downloading the last verse.{' '}
-                            <Link href="/passage/mark_11">Mark 11</Link>,{' '}
-                            <Link href="/passage/mark_15">Mark 15</Link>, and{' '}
+                            TTW was not downloading the last verse.{" "}
+                            <Link href="/passage/mark_11">Mark 11</Link>,{" "}
+                            <Link href="/passage/mark_15">Mark 15</Link>, and{" "}
                             <Link href="/passage/luke_17">Luke 17</Link> were
                             the effected passages.
                         </li>
                         <li>
-                            Fixed a bug where only the first verse in{' '}
-                            <Link href="/passage/obadiah">Obadiah</Link> and{' '}
+                            Fixed a bug where only the first verse in{" "}
+                            <Link href="/passage/obadiah">Obadiah</Link> and{" "}
                             <Link href="/passage/philemon">Philemon</Link> were
                             available to be typed.
                         </li>
                     </ul>
-                </li>{' '}
+                </li>{" "}
                 <li>
-                    <DateComponent date={new Date('3/6/2025')} />
+                    <DateComponent date={new Date("3/6/2025")} />
                     <ul>
                         <li>
                             Fixed a visual bug in the &quot;Overview&quot;
-                            section within <Link href="/history">/history</Link>{' '}
+                            section within <Link href="/history">/history</Link>{" "}
                             where your book progression wasn&apos;t aligned to
                             the right on mobile or safari.
                         </li>
@@ -436,21 +437,21 @@ export default async function Changelog() {
                             day.
                         </li>
                     </ul>
-                </li>{' '}
+                </li>{" "}
                 <li>
-                    <DateComponent date={new Date('3/5/2025')} /> - Fixed a bug
-                    where only the first verse in{' '}
+                    <DateComponent date={new Date("3/5/2025")} /> - Fixed a bug
+                    where only the first verse in{" "}
                     <Link href="/passage/jude_1">Jude</Link> was being loaded
                     preventing you from typing the chapter.
-                </li>{' '}
+                </li>{" "}
                 <li>
-                    <DateComponent date={new Date('2/2/2025')} /> - Did a small
+                    <DateComponent date={new Date("2/2/2025")} /> - Did a small
                     batch of updates to optimize for retyping through sections
-                    of the Bible.{' '}
+                    of the Bible.{" "}
                     <ul>
                         <li>
                             The passage text being dimmed now means something
-                            different.{' '}
+                            different.{" "}
                             <ul>
                                 <li>
                                     Before the text was dimmed when you had
@@ -475,10 +476,10 @@ export default async function Changelog() {
                                     chapter. Unlike the Log within
                                     <Link href="/history">
                                         <code> /history</code>
-                                    </Link>{' '}
+                                    </Link>{" "}
                                     this Log is specific to this chapter.
                                     <Image
-                                        src={'/assets/chapter-log.png'}
+                                        src={"/assets/chapter-log.png"}
                                         alt={
                                             'Screen shot of the new "Log" section for each chapter'
                                         }
@@ -494,10 +495,10 @@ export default async function Changelog() {
                             </ul>
                         </li>
                         <li>
-                            I also updated the overview section within{' '}
+                            I also updated the overview section within{" "}
                             <Link href="/history">
                                 <code> /history</code>
-                            </Link>{' '}
+                            </Link>{" "}
                             to reset once you have finished typing through a
                             book.
                             <br />
@@ -507,7 +508,7 @@ export default async function Changelog() {
                             fill up until you completely type the book and then
                             it will be checked and another box will appear.
                             <Image
-                                src={'/assets/overview-with-reset.png'}
+                                src={"/assets/overview-with-reset.png"}
                                 alt={
                                     'Screen shot of the new "Log" section for each chapter'
                                 }
@@ -520,11 +521,11 @@ export default async function Changelog() {
                             Lastly I fixed some incorrect verse counts in 2
                             Timothy 3 and 4 that were allowing you to have over
                             100% completion.
-                        </li>{' '}
+                        </li>{" "}
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('1/7/2025')} />
+                    <DateComponent date={new Date("1/7/2025")} />
                     <ul>
                         <li>
                             Increased the contrast of the built in
@@ -533,7 +534,7 @@ export default async function Changelog() {
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('1/6/2024')} />
+                    <DateComponent date={new Date("1/6/2024")} />
 
                     <ul>
                         <li>
@@ -587,18 +588,18 @@ export default async function Changelog() {
                         <div>
                             If you have typed these chapters and are not seeing
                             100% completion I would navigate to them now and
-                            check the last verse.{' '}
+                            check the last verse.{" "}
                         </div>
                         <li>
-                            Fixed a bug where{' '}
-                            <Link href="/passage/2_timothy_1">2 Timothy 1</Link>{' '}
-                            was incorrectly counting the number of verses on the{' '}
+                            Fixed a bug where{" "}
+                            <Link href="/passage/2_timothy_1">2 Timothy 1</Link>{" "}
+                            was incorrectly counting the number of verses on the{" "}
                             <Link href="/history">history</Link> page.
                         </li>
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('12/25/2024')} />
+                    <DateComponent date={new Date("12/25/2024")} />
                     <ul>
                         <li>
                             Fixed an edge case in theming where changing your
@@ -608,11 +609,11 @@ export default async function Changelog() {
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('12/24/2024')} />
+                    <DateComponent date={new Date("12/24/2024")} />
                     <ul>
                         <li>
                             Fixed some parsing issues that prevented typing
-                            through{' '}
+                            through{" "}
                             <Link href="/passage/psalm_145">Psalm 145:13</Link>.
                         </li>
                         <li>
@@ -621,14 +622,14 @@ export default async function Changelog() {
                             desaturated colors.
                         </li>
                         <li>
-                            Fixed an issue where the previous verse button on{' '}
+                            Fixed an issue where the previous verse button on{" "}
                             <Link href="/passage/titus_1">Titus 1</Link> was
                             pointing to a non existent 2 Timothy 6.
                         </li>
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('12/23/2024')} />
+                    <DateComponent date={new Date("12/23/2024")} />
                     <ul>
                         <li>
                             Fixed a bug where
@@ -636,16 +637,16 @@ export default async function Changelog() {
                                 mac="⌘+←"
                                 mobile="⌘+←"
                                 nonMac="⌘+←"
-                            />{' '}
+                            />{" "}
                             was no longer restarting the verse.
                         </li>
                         <li>
-                            Fixed a bug where{' '}
+                            Fixed a bug where{" "}
                             <Link href="/passage/romans_16">Romans 16</Link> was
                             mistakenly only showing the first 26 verses.
                         </li>
                         <li>
-                            Fixed incorrect spacing in the quote within{' '}
+                            Fixed incorrect spacing in the quote within{" "}
                             <Link href="/passage/matthew_6">
                                 Matthew 6:10-13
                             </Link>
@@ -655,7 +656,7 @@ export default async function Changelog() {
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('12/20/2024')} /> - Custom
+                    <DateComponent date={new Date("12/20/2024")} /> - Custom
                     themes are live!
                     <ul>
                         <li>
@@ -669,12 +670,12 @@ export default async function Changelog() {
                                     muted
                                     loop
                                     style={{
-                                        maxWidth: '100%',
+                                        maxWidth: "100%",
                                     }}
                                 >
                                     <source
                                         src={
-                                            '/assets/themes/creating-changelog.mp4'
+                                            "/assets/themes/creating-changelog.mp4"
                                         }
                                     />
                                 </video>
@@ -697,12 +698,12 @@ export default async function Changelog() {
                                     muted
                                     loop
                                     style={{
-                                        maxWidth: '100%',
+                                        maxWidth: "100%",
                                     }}
                                 >
                                     <source
                                         src={
-                                            '/assets/themes/previewing-changelog.mp4'
+                                            "/assets/themes/previewing-changelog.mp4"
                                         }
                                     />
                                 </video>
@@ -720,12 +721,12 @@ export default async function Changelog() {
                                     muted
                                     loop
                                     style={{
-                                        maxWidth: '100%',
+                                        maxWidth: "100%",
                                     }}
                                 >
                                     <source
                                         src={
-                                            '/assets/themes/system-changelog.mp4'
+                                            "/assets/themes/system-changelog.mp4"
                                         }
                                     />
                                 </video>
@@ -743,12 +744,12 @@ export default async function Changelog() {
                                     muted
                                     loop
                                     style={{
-                                        maxWidth: '100%',
+                                        maxWidth: "100%",
                                     }}
                                 >
                                     <source
                                         src={
-                                            '/assets/themes/mirkwood-changelog.mp4'
+                                            "/assets/themes/mirkwood-changelog.mp4"
                                         }
                                     />
                                 </video>
@@ -760,14 +761,14 @@ export default async function Changelog() {
                     particularly love, share a screenshot in the Discord channel
                     or email me directly. Can&apos;t wait to see what everyone
                     comes up with! 🎨
-                </li>{' '}
+                </li>{" "}
                 <li>
-                    <DateComponent date={new Date('12/11/2024')} /> - Fixed a
+                    <DateComponent date={new Date("12/11/2024")} /> - Fixed a
                     regression where incorrect letters were not highlighted in
                     red.
-                </li>{' '}
+                </li>{" "}
                 <li>
-                    <DateComponent date={new Date('11/12/2024')} />
+                    <DateComponent date={new Date("11/12/2024")} />
                     <ul>
                         <li>
                             Fixed a bug with backspace (
@@ -776,56 +777,56 @@ export default async function Changelog() {
                             Chrome that would happen after the shortcut for
                             deleting the previous word was used (
                             <HotkeyLabel mac="⌥+←" mobile="⌥+←" nonMac="^+←" />)
-                            despite the{' '}
+                            despite the{" "}
                             <HotkeyLabel mac="⌥" mobile="⌥" nonMac="^" /> being
-                            unpressed.{' '}
+                            unpressed.{" "}
                         </li>
                         <li>
-                            Fixed some incorrect spacing in the quote within{' '}
+                            Fixed some incorrect spacing in the quote within{" "}
                             <Link href="/passage/matthew_6">
                                 Matthew 6:10-13
                             </Link>
                         </li>
                     </ul>
-                </li>{' '}
+                </li>{" "}
                 <li>
-                    <DateComponent date={new Date('11/5/2024')} /> - Fixed a
-                    long time bug that prevented access to{' '}
+                    <DateComponent date={new Date("11/5/2024")} /> - Fixed a
+                    long time bug that prevented access to{" "}
                     <Link href="/passage/song_of_solomon_4">
-                        Song of Solomon 4-6{' '}
+                        Song of Solomon 4-6{" "}
                     </Link>
-                </li>{' '}
+                </li>{" "}
                 <li>
-                    <DateComponent date={new Date('10/13/2024')} /> - Fixed a
+                    <DateComponent date={new Date("10/13/2024")} /> - Fixed a
                     long time bug where the line indicating what verses you have
-                    completed would flicker on verse completion.{' '}
-                </li>{' '}
+                    completed would flicker on verse completion.{" "}
+                </li>{" "}
                 <li>
-                    <DateComponent date={new Date('9/15/2024')} /> - I updated
+                    <DateComponent date={new Date("9/15/2024")} /> - I updated
                     the <Link href="/">home</Link> page with details about how
                     TTW works to improve SEO.
-                </li>{' '}
+                </li>{" "}
                 <li>
-                    <DateComponent date={new Date('9/9/2024')} /> - On Windows,
+                    <DateComponent date={new Date("9/9/2024")} /> - On Windows,
                     the &apos;restart the current verse&apos; keyboard shortcut
-                    never actually worked. Thanks for{' '}
+                    never actually worked. Thanks for{" "}
                     <Link href="https://discord.com/channels/1197196234595778560/1197196234595778563/1280521079865212939">
-                        pointing this out{' '}
+                        pointing this out{" "}
                     </Link>
                     @AidenC! You can now restart the current verse on Windows
                     with <HotkeyLabel value="^+↑+←" /> . The MacOS shortcut is
                     still <HotkeyLabel value="⌘+←" /> .
-                </li>{' '}
+                </li>{" "}
                 <li>
-                    <DateComponent date={new Date('8/25/2024')} />{' '}
+                    <DateComponent date={new Date("8/25/2024")} />{" "}
                     <ul>
                         <li>
-                            Updated the &quot;Log&quot; section{' '}
+                            Updated the &quot;Log&quot; section{" "}
                             <code>/history</code> so you can more visual see how
                             consistenly you are typing. If there is any summary
                             information you are dying to know. Let me know!
                             <Image
-                                src={'/assets/updated-log-v2.png'}
+                                src={"/assets/updated-log-v2.png"}
                                 alt={'Screen shot of the new "Log" section'}
                                 className="mt-3 border-2 border-primary"
                                 width={2684}
@@ -839,8 +840,8 @@ export default async function Changelog() {
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('8/23/2024')} /> - Added
-                    global shortcuts for opening settings and going to{' '}
+                    <DateComponent date={new Date("8/23/2024")} /> - Added
+                    global shortcuts for opening settings and going to{" "}
                     <code>/history</code>
                     <ul>
                         <li>
@@ -848,7 +849,7 @@ export default async function Changelog() {
                                 mac="⌘+↑+Y"
                                 mobile="⌘+↑+Y"
                                 nonMac="^+↑+Y"
-                            />{' '}
+                            />{" "}
                             navigates to history
                         </li>
                         <li>
@@ -856,13 +857,13 @@ export default async function Changelog() {
                                 mac="⌘+↑+,"
                                 mobile="⌘+↑+,"
                                 nonMac="^+↑+,"
-                            />{' '}
+                            />{" "}
                             opens settings
                         </li>
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('8/22/2024')} /> - Created
+                    <DateComponent date={new Date("8/22/2024")} /> - Created
                     &quot;Settings&quot; section so you can manually change the
                     color scheme
                     <div className="px-8 pb-8 pt-4">
@@ -873,20 +874,20 @@ export default async function Changelog() {
                             muted
                             loop
                             style={{
-                                maxWidth: '100%',
+                                maxWidth: "100%",
                             }}
                         >
-                            <source src={'/assets/theme-toggle.mp4'} />
+                            <source src={"/assets/theme-toggle.mp4"} />
                         </video>
                     </div>
                 </li>
                 <li>
-                    <DateComponent date={new Date('8/19/2024')} /> - Added
+                    <DateComponent date={new Date("8/19/2024")} /> - Added
                     keyboard shortcuts for deleting the previous word and
                     restarting the verse.
                     <ul>
                         <li>
-                            <HotkeyLabel mac="⌥+←" mobile="⌥+←" nonMac="^+←" />{' '}
+                            <HotkeyLabel mac="⌥+←" mobile="⌥+←" nonMac="^+←" />{" "}
                             deletes the previous word
                         </li>
                         <li>
@@ -894,7 +895,7 @@ export default async function Changelog() {
                                 mac="⌘+←"
                                 mobile="⌘+←"
                                 nonMac="^+↑+←"
-                            />{' '}
+                            />{" "}
                             restarts the current verse
                         </li>
                     </ul>
@@ -906,30 +907,30 @@ export default async function Changelog() {
                             muted
                             loop
                             style={{
-                                maxWidth: '100%',
+                                maxWidth: "100%",
                             }}
                         >
                             <source
-                                src={'/assets/command-option-backspace.mp4'}
+                                src={"/assets/command-option-backspace.mp4"}
                             />
                         </video>
                     </div>
                 </li>
                 <li>
-                    <DateComponent date={new Date('7/27/2024')} /> - Fixed bug
+                    <DateComponent date={new Date("7/27/2024")} /> - Fixed bug
                     in next chapter button when on the second from last chapter
                     of a book. The next chapter button was linking the next book
                     rather than the last chapter. This link now points to the
                     last chapter.
                 </li>
                 <li>
-                    <DateComponent date={new Date('7/11/2024')} /> - Added a
+                    <DateComponent date={new Date("7/11/2024")} /> - Added a
                     twinkle animation to notify users when there are new updates
                     in the changelog.
                     <Image
-                        src={'/assets/changelog-twinkle.png'}
+                        src={"/assets/changelog-twinkle.png"}
                         alt={
-                            'Small animation in the footer notifying the user that there have been updates to Type the Word.'
+                            "Small animation in the footer notifying the user that there have been updates to Type the Word."
                         }
                         className="mt-1"
                         width={2232}
@@ -942,7 +943,7 @@ export default async function Changelog() {
                     notification.
                 </li>
                 <li>
-                    <DateComponent date={new Date('7/07/2024')} /> - Updated
+                    <DateComponent date={new Date("7/07/2024")} /> - Updated
                     Type the Word to remember where you last typed.
                     <div className="px-8 pb-8 pt-4">
                         <video
@@ -952,17 +953,17 @@ export default async function Changelog() {
                             muted
                             loop
                             style={{
-                                maxWidth: '100%',
+                                maxWidth: "100%",
                             }}
                         >
-                            <source src={'/assets/remember-last-chapter.mp4'} />
+                            <source src={"/assets/remember-last-chapter.mp4"} />
                         </video>
                     </div>
                     <ul>
                         <li>
-                            When you are logged in and load the{' '}
+                            When you are logged in and load the{" "}
                             <Link href="/">home page</Link> (<code>/</code>) TTW
-                            redirects you to the last location you typed.{' '}
+                            redirects you to the last location you typed.{" "}
                         </li>
                         <li>
                             You can also navigate to your last typing location
@@ -971,7 +972,7 @@ export default async function Changelog() {
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('7/7/2024')} /> - Started
+                    <DateComponent date={new Date("7/7/2024")} /> - Started
                     managing an email list.
                     <br />
                     <br />
@@ -981,8 +982,8 @@ export default async function Changelog() {
                     having an email in the footer, I&apos;m starting a
                     newsletter that will round up changes in small batches each
                     month. New users are able to join by confirming their email
-                    after sign up (which lands them on this{' '}
-                    <Link href={'/welcome'}>snazzy new page</Link>
+                    after sign up (which lands them on this{" "}
+                    <Link href={"/welcome"}>snazzy new page</Link>
                     .)
                     <br />
                     <br />
@@ -991,9 +992,9 @@ export default async function Changelog() {
                     thing I want to be is another leech on your attention.
                 </li>
                 <li>
-                    <DateComponent date={new Date('7/5/2024')} /> - Migrated
-                    Type the Word to{' '}
-                    <Link href="https://nextjs.org/docs/app">App Router</Link>{' '}
+                    <DateComponent date={new Date("7/5/2024")} /> - Migrated
+                    Type the Word to{" "}
+                    <Link href="https://nextjs.org/docs/app">App Router</Link>{" "}
                     and REST.
                     <br />
                     <br />
@@ -1007,15 +1008,15 @@ export default async function Changelog() {
                         <li>
                             You may have noticed some short outages around this
                             time! Sorry for the disruption. I don&apos;t think
-                            there will be{' '}
+                            there will be{" "}
                             <Link href="https://github.com/joshuawootonn/type-the-word/pull/7">
                                 this big
-                            </Link>{' '}
+                            </Link>{" "}
                             of an architectural change again.
                         </li>
                         <li>
                             Type the Word is open source. If you are ever
-                            curious to see how it works, check out the{' '}
+                            curious to see how it works, check out the{" "}
                             <Link href=" https://github.com/joshuawootonn/type-the-word">
                                 Github repo here.
                             </Link>
@@ -1023,24 +1024,24 @@ export default async function Changelog() {
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('6/17/2024')} /> - Fix: At
+                    <DateComponent date={new Date("6/17/2024")} /> - Fix: At
                     some point I broke the ability to access 2 Timothy 😅. 2
-                    Timothy is now accessible!{' '}
+                    Timothy is now accessible!{" "}
                 </li>
                 <li>
-                    <DateComponent date={new Date('6/16/2024')} /> - Add links
+                    <DateComponent date={new Date("6/16/2024")} /> - Add links
                     for easily navigating to the previous and next passages.
                     <Image
-                        src={'/assets/prev-next-links.png'}
+                        src={"/assets/prev-next-links.png"}
                         alt={
-                            'The two links at the end of each passage that make navigation easier'
+                            "The two links at the end of each passage that make navigation easier"
                         }
                         width={1438}
                         height={612}
                     />
                 </li>
                 <li>
-                    <DateComponent date={new Date('6/04/2024')} />
+                    <DateComponent date={new Date("6/04/2024")} />
                     <ul>
                         <li>
                             Remove restriction preventing you from backspacing
@@ -1051,7 +1052,7 @@ export default async function Changelog() {
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('2/15/2024')} />
+                    <DateComponent date={new Date("2/15/2024")} />
                     <ul>
                         <li>
                             Fix a bug where you couldn&apos;t complete a verse
@@ -1064,19 +1065,19 @@ export default async function Changelog() {
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('2/15/2024')} /> - Add some
+                    <DateComponent date={new Date("2/15/2024")} /> - Add some
                     much needed database indexes to speed up the history page.
                     <Image
-                        src={'/assets/adding-indexes-for-history-page.png'}
+                        src={"/assets/adding-indexes-for-history-page.png"}
                         alt={
-                            'Two devtools of the before and after of adding indexes to the history page'
+                            "Two devtools of the before and after of adding indexes to the history page"
                         }
                         width={1505}
                         height={1548}
                     />
                 </li>
                 <li>
-                    <DateComponent date={new Date('2/9/2024')} /> - Update the{' '}
+                    <DateComponent date={new Date("2/9/2024")} /> - Update the{" "}
                     <code>/history</code> page with an overview section to see
                     what passages you&apos;ve typed.
                     <div className="px-8 pb-8 pt-4">
@@ -1087,21 +1088,21 @@ export default async function Changelog() {
                             muted
                             loop
                             style={{
-                                maxWidth: '100%',
+                                maxWidth: "100%",
                             }}
                         >
-                            <source src={'/assets/overview-section-3.mp4'} />
+                            <source src={"/assets/overview-section-3.mp4"} />
                         </video>
                     </div>
                     <ul>
                         <li>
                             Fixed weird gap in <i>typed</i> indicator in
-                            sections that have quotes like{' '}
-                            <Link href={'/passage/hebrews_2'}>Hebrews 2</Link>{' '}
+                            sections that have quotes like{" "}
+                            <Link href={"/passage/hebrews_2"}>Hebrews 2</Link>{" "}
                             verse 13.
                         </li>
                         <li>
-                            Fixed the small animation happening between{' '}
+                            Fixed the small animation happening between{" "}
                             <code>/passage</code> pages and other pages
                         </li>
                         <li>
@@ -1115,7 +1116,7 @@ export default async function Changelog() {
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('2/6/2024')} />
+                    <DateComponent date={new Date("2/6/2024")} />
                     <ul>
                         <li>
                             Updated the passage selection state to work with
@@ -1125,18 +1126,18 @@ export default async function Changelog() {
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date('1/15/2024')} /> - Wrote{' '}
-                    <Link href={'https://www.joshuawootonn.com/type-the-word'}>
+                    <DateComponent date={new Date("1/15/2024")} /> - Wrote{" "}
+                    <Link href={"https://www.joshuawootonn.com/type-the-word"}>
                         a blog post
-                    </Link>{' '}
+                    </Link>{" "}
                     about all the little details
                 </li>
                 <li>
-                    <DateComponent date={new Date('12/20/2023')} /> - Added Dark
-                    Mode (Thanks to{' '}
+                    <DateComponent date={new Date("12/20/2023")} /> - Added Dark
+                    Mode (Thanks to{" "}
                     <Link
                         href={
-                            'https://github.com/joshuawootonn/type-the-word/pull/2'
+                            "https://github.com/joshuawootonn/type-the-word/pull/2"
                         }
                     >
                         @IsaacHatton
@@ -1144,10 +1145,10 @@ export default async function Changelog() {
                     )
                 </li>
                 <li>
-                    <DateComponent date={new Date('12/19/2023')} /> -{' '}
+                    <DateComponent date={new Date("12/19/2023")} /> -{" "}
                     <Link
                         href={
-                            'https://github.com/joshuawootonn/type-the-word/commit/bbe35e3e3a669679f7a8669fc7cc568ffc78e50f'
+                            "https://github.com/joshuawootonn/type-the-word/commit/bbe35e3e3a669679f7a8669fc7cc568ffc78e50f"
                         }
                     >
                         Added smooth scrolling
@@ -1160,15 +1161,15 @@ export default async function Changelog() {
                             muted
                             loop
                             style={{
-                                maxWidth: '100%',
+                                maxWidth: "100%",
                             }}
                         >
-                            <source src={'/assets/smooth-scrolling.mp4'} />
+                            <source src={"/assets/smooth-scrolling.mp4"} />
                         </video>
                     </div>
                 </li>
                 <li>
-                    <DateComponent date={new Date('12/15/2023')} /> - Released
+                    <DateComponent date={new Date("12/15/2023")} /> - Released
                     Type the Word
                 </li>
             </ul>

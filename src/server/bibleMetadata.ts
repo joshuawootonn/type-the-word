@@ -1,12 +1,12 @@
-import { z } from 'zod'
+import { z } from "zod"
 
-import { bookSchema } from '~/lib/types/book'
+import { bookSchema } from "~/lib/types/book"
 
-import metadata from './bible-metadata.json'
+import metadata from "./bible-metadata.json"
 
 const bookMetadataSchema = z.object({
     chapters: z.array(z.object({ length: z.number() })),
-    testament: z.enum(['OT', 'NT']),
+    testament: z.enum(["OT", "NT"]),
     name: z.string(),
 })
 

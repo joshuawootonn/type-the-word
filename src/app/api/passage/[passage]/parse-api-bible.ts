@@ -1,9 +1,9 @@
-import { JSDOM } from 'jsdom'
-import { parseFragment } from 'parse5'
-import { ChildNode, Element } from 'parse5/dist/tree-adapters/default'
+import { JSDOM } from "jsdom"
+import { parseFragment } from "parse5"
+import { ChildNode, Element } from "parse5/dist/tree-adapters/default"
 
-import { apiBibleIdToBook } from '~/lib/api-bible-book-id'
-import { isAtomTyped } from '~/lib/isEqual'
+import { apiBibleIdToBook } from "~/lib/api-bible-book-id"
+import { isAtomTyped } from "~/lib/isEqual"
 import {
     Block,
     Inline,
@@ -14,9 +14,9 @@ import {
     Verse,
     VerseNumber,
     Word,
-} from '~/lib/parseEsv'
-import { splitLineBySpaceOrNewLine } from '~/lib/splitBySpaceOrNewLine'
-import { Book } from '~/lib/types/book'
+} from "~/lib/parseEsv"
+import { splitLineBySpaceOrNewLine } from "~/lib/splitBySpaceOrNewLine"
+import { Book } from "~/lib/types/book"
 
 /**
  * Parses API.Bible HTML response into ParsedPassage format
@@ -34,8 +34,8 @@ import { Book } from '~/lib/types/book'
  */
 export function parseApiBibleChapter(
     passage: string,
-    translation: Exclude<Translation, 'esv'> = 'bsb',
-    copyrightText = '',
+    translation: Exclude<Translation, "esv"> = "bsb",
+    copyrightText = "",
 ): ParsedPassage {
     const dom = new JSDOM(passage)
 
@@ -46,7 +46,7 @@ export function parseApiBibleChapter(
         firstVerseOfPassage?: VerseNumber
         chapter?: number
         book?: Book
-        translation: Exclude<Translation, 'esv'>
+        translation: Exclude<Translation, "esv">
     } = {
         translation,
     }
@@ -56,8 +56,8 @@ export function parseApiBibleChapter(
     }
 
     function hasClass(node: Element, className: string): boolean {
-        const classAttr = getAttr(node, 'class')
-        return classAttr?.split(' ').includes(className) ?? false
+        const classAttr = getAttr(node, "class")
+        return classAttr?.split(" ").includes(className) ?? false
     }
 
     /**
@@ -66,15 +66,15 @@ export function parseApiBibleChapter(
      * MSG gets double indentation for better readability
      */
     function getPoetryIndent(node: Element): number {
-        const offset = translation === 'msg' ? 4 : 0
+        const offset = translation === "msg" ? 4 : 0
 
-        if (hasClass(node, 'q2') || hasClass(node, 'qm2')) {
+        if (hasClass(node, "q2") || hasClass(node, "qm2")) {
             return 4 + offset
         }
         if (
-            hasClass(node, 'q1') ||
-            hasClass(node, 'qm1') ||
-            hasClass(node, 'q')
+            hasClass(node, "q1") ||
+            hasClass(node, "qm1") ||
+            hasClass(node, "q")
         ) {
             return 2 + offset
         }
@@ -84,15 +84,15 @@ export function parseApiBibleChapter(
     /**
      * Create leading space atoms for poetry indentation
      */
-    function createLeadingSpaces(count: number): Array<{ type: 'space' }> {
-        return Array.from({ length: count }, () => ({ type: 'space' }))
+    function createLeadingSpaces(count: number): Array<{ type: "space" }> {
+        return Array.from({ length: count }, () => ({ type: "space" }))
     }
 
     function parseInline(
         node: ChildNode,
         options?: { divineName?: boolean },
     ): Inline[] {
-        if (node.nodeName === '#text' && 'value' in node) {
+        if (node.nodeName === "#text" && "value" in node) {
             const result: Inline[] = []
             let textValue = node.value
 
@@ -104,8 +104,8 @@ export function parseApiBibleChapter(
 
             // Check for pilcrow (¶) at the start - emit as decoration atom
             // This appears in some NASB Psalms as a paragraph marker
-            if (textValue.startsWith('¶')) {
-                result.push({ type: 'decoration', text: '¶' })
+            if (textValue.startsWith("¶")) {
+                result.push({ type: "decoration", text: "¶" })
                 textValue = textValue.slice(1)
             }
 
@@ -131,19 +131,19 @@ export function parseApiBibleChapter(
                               // This preserves opening quotes like " and punctuation like ; ? !
                               // but filters out markers like *
                               const hasQuoteParenOrPunct =
-                                  /[\u0022\u0027\u201C\u201D\u2018\u2019()\[\];:,.?!]/.test(
+                                  /[\u0022\u0027\u201C\u201D\u2018\u2019()[\];:,.?!]/.test(
                                       word,
                                   )
                               return hasQuoteParenOrPunct
                           })
                           .map((word): Inline => {
-                              const letters = word.split('')
+                              const letters = word.split("")
                               // Don't add trailing spaces here - we'll add them after merging
                               // This allows merge logic to distinguish between:
                               // - Words that originally had trailing space (from source)
                               // - Words that need artificial trailing space (incomplete)
                               const result: Word = {
-                                  type: 'word',
+                                  type: "word",
                                   letters,
                               }
                               // Mark divine names for CSS styling (uppercase + smaller font)
@@ -159,24 +159,24 @@ export function parseApiBibleChapter(
 
         // API.Bible verse numbers: <span data-number="1" data-sid="GEN 1:1" class="v">
         // Also handles verse ranges like: <span data-number="1-2" data-sid="GEN 1:1-2" class="v">
-        if (node.nodeName === 'span' && 'attrs' in node) {
+        if (node.nodeName === "span" && "attrs" in node) {
             // Skip footnote markers (sup class contains commas/references)
-            if (hasClass(node, 'sup')) {
+            if (hasClass(node, "sup")) {
                 return []
             }
 
-            const dataSid = getAttr(node, 'data-sid')
-            const dataNumber = getAttr(node, 'data-number')
+            const dataSid = getAttr(node, "data-sid")
+            const dataNumber = getAttr(node, "data-number")
 
-            if (dataSid && dataNumber && hasClass(node, 'v')) {
+            if (dataSid && dataNumber && hasClass(node, "v")) {
                 // Parse data-sid like "GEN 1:1" or "GEN 1:1-2"
-                const parts = dataSid.split(':')
+                const parts = dataSid.split(":")
                 const bookChapter = parts[0]
                 const verseStr = parts[1]
 
                 if (!bookChapter || !verseStr) return []
 
-                const bookParts = bookChapter.split(' ')
+                const bookParts = bookChapter.split(" ")
                 const bookId = bookParts[0]
                 const chapterStr = bookParts[1]
 
@@ -200,9 +200,9 @@ export function parseApiBibleChapter(
                     // (renders as "<b>1 </b>" like ESV does)
                     return [
                         {
-                            type: 'verseNumber',
+                            type: "verseNumber",
                             value: dataNumber.trim(),
-                            text: dataNumber + ' ',
+                            text: dataNumber + " ",
                             verse,
                             chapter,
                             book,
@@ -214,26 +214,26 @@ export function parseApiBibleChapter(
 
             // Handle divine name class (nd) - mark words for CSS styling
             // This is used in NLT and other translations for "Lord" → styled as "LORD"
-            if (hasClass(node, 'nd') && 'childNodes' in node) {
+            if (hasClass(node, "nd") && "childNodes" in node) {
                 return node.childNodes.flatMap(child =>
                     parseInline(child, { divineName: true }),
                 )
             }
 
             // Regular span, parse children
-            if ('childNodes' in node) {
+            if ("childNodes" in node) {
                 return node.childNodes.flatMap(child =>
                     parseInline(child, options),
                 )
             }
         }
 
-        if (node.nodeName === 'br') {
-            return [{ type: 'newLine' }]
+        if (node.nodeName === "br") {
+            return [{ type: "newLine" }]
         }
 
         // Handle other elements with children
-        if ('childNodes' in node && node.childNodes.length > 0) {
+        if ("childNodes" in node && node.childNodes.length > 0) {
             return node.childNodes.flatMap(child => parseInline(child, options))
         }
 
@@ -242,9 +242,9 @@ export function parseApiBibleChapter(
 
     function inlineToString(inlines: Inline[]): string {
         return inlines
-            .filter((node): node is Word => node.type === 'word')
-            .map(node => node.letters.join(''))
-            .join('')
+            .filter((node): node is Word => node.type === "word")
+            .map(node => node.letters.join(""))
+            .join("")
     }
 
     /**
@@ -271,7 +271,7 @@ export function parseApiBibleChapter(
         const result: Inline[] = []
 
         for (const current of nodes) {
-            if (current.type !== 'word') {
+            if (current.type !== "word") {
                 result.push(current)
                 continue
             }
@@ -283,11 +283,11 @@ export function parseApiBibleChapter(
             // Check if previous word is an opening quote/paren that should attach to current word
             // Pattern: previous word is quote/paren-only, current word starts with a letter
             // This check runs even for single-character previous words
-            if (lastResult?.type === 'word' && lastResult.letters.length >= 1) {
-                const lastResultStr = lastResult.letters.join('')
+            if (lastResult?.type === "word" && lastResult.letters.length >= 1) {
+                const lastResultStr = lastResult.letters.join("")
                 // Match opening quotes AND opening parentheses/brackets
                 const isOpeningQuoteOrParen =
-                    /^[\u201C\u2018"'(\[]+$/.test(lastResultStr.trim()) &&
+                    /^[\u201C\u2018"'([]+$/.test(lastResultStr.trim()) &&
                     firstLetter &&
                     /[a-zA-Z]/.test(firstLetter)
 
@@ -301,7 +301,7 @@ export function parseApiBibleChapter(
                 }
             }
 
-            if (lastResult?.type === 'word' && lastResult.letters.length >= 1) {
+            if (lastResult?.type === "word" && lastResult.letters.length >= 1) {
                 const lastLetter =
                     lastResult.letters[lastResult.letters.length - 1]
                 if (!lastLetter) continue // Safety check
@@ -327,8 +327,8 @@ export function parseApiBibleChapter(
                 // - 'A (no space) + nd → merge to 'And ✓
                 // - "I (has space) + say → no merge ✓ (both from same text node)
                 const shouldMergeSmallCaps =
-                    lastLetter !== ' ' &&
-                    lastLetter !== '\n' &&
+                    lastLetter !== " " &&
+                    lastLetter !== "\n" &&
                     /[A-Z]/.test(lastLetter) &&
                     actualLetters.length <= 2 &&
                     firstLetter &&
@@ -341,14 +341,14 @@ export function parseApiBibleChapter(
                 }
 
                 // Check if current word is closing punctuation that should attach to previous word
-                const currentWordStr = current.letters.join('')
+                const currentWordStr = current.letters.join("")
                 const currentTrimmed = currentWordStr.trim()
 
                 // Possessive merge: LORD + 's → LORD's
                 // When previous word has no trailing space and current starts with 's or similar
                 const isPossessive =
-                    lastLetter !== ' ' &&
-                    lastLetter !== '\n' &&
+                    lastLetter !== " " &&
+                    lastLetter !== "\n" &&
                     /^[''\u2019]s\b/.test(currentTrimmed)
 
                 if (isPossessive) {
@@ -358,7 +358,7 @@ export function parseApiBibleChapter(
 
                 // Get the last non-space character of the previous word
                 const lastNonSpaceIdx =
-                    lastLetter === ' ' || lastLetter === '\n'
+                    lastLetter === " " || lastLetter === "\n"
                         ? lastResult.letters.length - 2
                         : lastResult.letters.length - 1
                 const lastNonSpace = lastResult.letters[lastNonSpaceIdx]
@@ -393,7 +393,7 @@ export function parseApiBibleChapter(
                     isStandalonePunct
                 ) {
                     // Remove trailing space if present, then append
-                    if (lastLetter === ' ' || lastLetter === '\n') {
+                    if (lastLetter === " " || lastLetter === "\n") {
                         lastResult.letters.pop()
                     }
                     lastResult.letters.push(...current.letters)
@@ -407,23 +407,23 @@ export function parseApiBibleChapter(
         // After merging, add trailing spaces to incomplete words
         // This ensures all words are "complete" for typing
         return result.map(node => {
-            if (node.type !== 'word') return node
+            if (node.type !== "word") return node
 
             const lastChar = node.letters[node.letters.length - 1]
 
             // Already has trailing space or newline
-            if (lastChar === ' ' || lastChar === '\n') return node
+            if (lastChar === " " || lastChar === "\n") return node
 
             // Punctuation-only words (quotes, parens) don't need trailing space
             // They'll attach to adjacent words
             const hasAlphanumeric =
                 /[a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]/.test(
-                    node.letters.join(''),
+                    node.letters.join(""),
                 )
             if (!hasAlphanumeric) return node
 
             // Add trailing space
-            return { ...node, letters: [...node.letters, ' '] }
+            return { ...node, letters: [...node.letters, " "] }
         })
     }
 
@@ -431,13 +431,13 @@ export function parseApiBibleChapter(
         dataVid: string,
     ): { book: Book; chapter: number; verse: number } | null {
         // Parse data-vid like "GEN 1:5"
-        const parts = dataVid.split(':')
+        const parts = dataVid.split(":")
         const bookChapter = parts[0]
         const verseStr = parts[1]
 
         if (!bookChapter || !verseStr) return null
 
-        const bookParts = bookChapter.split(' ')
+        const bookParts = bookChapter.split(" ")
         const bookId = bookParts[0]
         const chapterStr = bookParts[1]
 
@@ -456,65 +456,65 @@ export function parseApiBibleChapter(
 
     type ParsedBlock =
         | Block
-        | { type: 'stanzaBreak' }
-        | { type: 'poetryLine'; paragraph: Block & { type: 'paragraph' } }
+        | { type: "stanzaBreak" }
+        | { type: "poetryLine"; paragraph: Block & { type: "paragraph" } }
 
     function parseBlock(node: ChildNode): ParsedBlock | null {
-        if (node.nodeName !== 'p') return null
-        if (!('attrs' in node)) return null
+        if (node.nodeName !== "p") return null
+        if (!("attrs" in node)) return null
 
-        const classAttr = getAttr(node, 'class')
-        const dataVid = getAttr(node, 'data-vid')
+        const classAttr = getAttr(node, "class")
+        const dataVid = getAttr(node, "data-vid")
 
         // Blank paragraphs indicate stanza breaks in poetry
-        if (hasClass(node, 'b')) {
-            return { type: 'stanzaBreak' }
+        if (hasClass(node, "b")) {
+            return { type: "stanzaBreak" }
         }
 
         // Skip cross-reference paragraphs
-        if (hasClass(node, 'r')) {
+        if (hasClass(node, "r")) {
             return null
         }
 
         // Hebrew letter headers (qa) - treat as section headers (h4)
-        if (hasClass(node, 'qa')) {
+        if (hasClass(node, "qa")) {
             const text = node.childNodes
                 .flatMap(child => parseInline(child))
-                .filter((n): n is Word => n.type === 'word')
-                .map(n => n.letters.join('').trim())
-                .join(' ')
+                .filter((n): n is Word => n.type === "word")
+                .map(n => n.letters.join("").trim())
+                .join(" ")
             return {
-                type: 'h4',
+                type: "h4",
                 text,
             }
         }
 
         // Skip chapter labels (cl)
-        if (hasClass(node, 'cl')) {
+        if (hasClass(node, "cl")) {
             return null
         }
 
         // Section headers: s1 (main title), s2 (subsection)
-        if (hasClass(node, 's1')) {
+        if (hasClass(node, "s1")) {
             const text = node.childNodes
                 .flatMap(child => parseInline(child))
-                .filter((node): node is Word => node.type === 'word')
-                .map(node => node.letters.join(''))
-                .join('')
+                .filter((node): node is Word => node.type === "word")
+                .map(node => node.letters.join(""))
+                .join("")
             return {
-                type: 'h2',
+                type: "h2",
                 text,
             }
         }
 
-        if (hasClass(node, 's2')) {
+        if (hasClass(node, "s2")) {
             const text = node.childNodes
                 .flatMap(child => parseInline(child))
-                .filter((node): node is Word => node.type === 'word')
-                .map(node => node.letters.join(''))
-                .join('')
+                .filter((node): node is Word => node.type === "word")
+                .map(node => node.letters.join(""))
+                .join("")
             return {
-                type: 'h3',
+                type: "h3",
                 text,
             }
         }
@@ -522,14 +522,14 @@ export function parseApiBibleChapter(
         // Speaker labels: sp (e.g., "She", "Friends" in Song of Solomon)
         // Section headers: s (e.g., "The Banquet", "Solomon's Love for a Shulamite Girl")
         // These are headings indicating who is speaking or section titles, not typeable content
-        if (hasClass(node, 'sp') || hasClass(node, 's')) {
+        if (hasClass(node, "sp") || hasClass(node, "s")) {
             const text = node.childNodes
                 .flatMap(child => parseInline(child))
-                .filter((n): n is Word => n.type === 'word')
-                .map(n => n.letters.join('').trim())
-                .join(' ')
+                .filter((n): n is Word => n.type === "word")
+                .map(n => n.letters.join("").trim())
+                .join(" ")
             return {
-                type: 'h4',
+                type: "h4",
                 text,
             }
         }
@@ -537,37 +537,37 @@ export function parseApiBibleChapter(
         // Regular paragraph or poetry (m, pmo, q1, q2, li1, qm1, qm2, mi, etc.)
         // Also match paragraphs with no class or just data-vid
         const isContentParagraph =
-            hasClass(node, 'm') ||
-            hasClass(node, 'pmo') ||
-            hasClass(node, 'po') || // Opening paragraph (NIV epistles)
-            hasClass(node, 'q') || // Poetry (NASB)
-            hasClass(node, 'q1') ||
-            hasClass(node, 'q2') ||
-            hasClass(node, 'qc') || // Centered poetry (CSB)
-            hasClass(node, 'pm') ||
-            hasClass(node, 'p') ||
-            hasClass(node, 'lh') || // List header (NIV)
-            hasClass(node, 'li1') ||
-            hasClass(node, 'li2') ||
-            hasClass(node, 'qm1') ||
-            hasClass(node, 'qm2') ||
-            hasClass(node, 'mi') ||
-            hasClass(node, 'pi') ||
-            hasClass(node, 'd') || // Descriptive title
-            hasClass(node, 'ms2') || // Manuscript section header (NASB treats as content)
-            hasClass(node, 's') || // Simple section header (may contain content)
+            hasClass(node, "m") ||
+            hasClass(node, "pmo") ||
+            hasClass(node, "po") || // Opening paragraph (NIV epistles)
+            hasClass(node, "q") || // Poetry (NASB)
+            hasClass(node, "q1") ||
+            hasClass(node, "q2") ||
+            hasClass(node, "qc") || // Centered poetry (CSB)
+            hasClass(node, "pm") ||
+            hasClass(node, "p") ||
+            hasClass(node, "lh") || // List header (NIV)
+            hasClass(node, "li1") ||
+            hasClass(node, "li2") ||
+            hasClass(node, "qm1") ||
+            hasClass(node, "qm2") ||
+            hasClass(node, "mi") ||
+            hasClass(node, "pi") ||
+            hasClass(node, "d") || // Descriptive title
+            hasClass(node, "ms2") || // Manuscript section header (NASB treats as content)
+            hasClass(node, "s") || // Simple section header (may contain content)
             dataVid != null || // Continuation paragraph
-            classAttr === '' || // Empty class
+            classAttr === "" || // Empty class
             classAttr == null // No class attribute
 
         if (isContentParagraph) {
             const isPoetryLine =
-                hasClass(node, 'q') ||
-                hasClass(node, 'q1') ||
-                hasClass(node, 'q2') ||
-                hasClass(node, 'qc') ||
-                hasClass(node, 'qm1') ||
-                hasClass(node, 'qm2')
+                hasClass(node, "q") ||
+                hasClass(node, "q1") ||
+                hasClass(node, "q2") ||
+                hasClass(node, "qc") ||
+                hasClass(node, "qm1") ||
+                hasClass(node, "qm2")
 
             // Get leading spaces for poetry indentation
             const indentSpaces = isPoetryLine
@@ -583,7 +583,7 @@ export function parseApiBibleChapter(
             if (indentSpaces.length > 0 && parsedNodes.length > 0) {
                 // Find the verse number position
                 const verseNumIndex = parsedNodes.findIndex(
-                    n => n.type === 'verseNumber',
+                    n => n.type === "verseNumber",
                 )
                 if (verseNumIndex !== -1) {
                     // Insert spaces after verse number
@@ -600,13 +600,13 @@ export function parseApiBibleChapter(
                 nodes = parsedNodes
             }
 
-            if (inlineToString(nodes).trim() === '') {
+            if (inlineToString(nodes).trim() === "") {
                 return null
             }
 
             const verseNumberNodes: number[] = []
             for (const [i, node] of nodes.entries()) {
-                if (node.type === 'verseNumber') {
+                if (node.type === "verseNumber") {
                     verseNumberNodes.push(i)
                 }
             }
@@ -622,7 +622,7 @@ export function parseApiBibleChapter(
                     // This is a continuation of a verse
                     const verses: Verse[] = [
                         {
-                            type: 'verse',
+                            type: "verse",
                             nodes,
                             verse: context.lastVerse.verse,
                             text: inlineToString(nodes),
@@ -639,20 +639,20 @@ export function parseApiBibleChapter(
                     context.lastVerse = verses.at(-1)
 
                     const paragraph = {
-                        type: 'paragraph' as const,
+                        type: "paragraph" as const,
                         text: inlineToString(nodes),
                         nodes: verses,
                         metadata: {
                             type: isPoetryLine
-                                ? ('quote' as const)
-                                : ('default' as const),
+                                ? ("quote" as const)
+                                : ("default" as const),
                             blockIndent: isPoetryLine,
                         },
                     }
 
                     // Return as poetry line to enable merging
                     if (isPoetryLine) {
-                        return { type: 'poetryLine', paragraph }
+                        return { type: "poetryLine", paragraph }
                     }
                     return paragraph
                 }
@@ -675,23 +675,23 @@ export function parseApiBibleChapter(
             const verses: Verse[] = []
             for (const [i, verseSection] of verseSections.entries()) {
                 const firstWordIndex = verseSection.findIndex(
-                    a => a.type === 'word',
+                    a => a.type === "word",
                 )
                 const verseIndex = verseSection.findIndex(
-                    a => a.type === 'verseNumber',
+                    a => a.type === "verseNumber",
                 )
                 const continuingVerse =
                     i === 0 &&
                     (verseIndex === -1 || verseIndex > firstWordIndex)
 
-                if (verseSection.every(inline => inline.type === 'space')) {
+                if (verseSection.every(inline => inline.type === "space")) {
                     // noop
                 } else if (continuingVerse && context?.lastVerse == undefined) {
                     // Skip if we don't have a last verse to continue from
                     continue
                 } else if (continuingVerse && context?.lastVerse) {
                     verses.push({
-                        type: 'verse',
+                        type: "verse",
                         nodes: verseSection,
                         verse: context.lastVerse.verse,
                         text: inlineToString(verseSection),
@@ -705,7 +705,7 @@ export function parseApiBibleChapter(
                     })
                 } else {
                     verses.push({
-                        type: 'verse',
+                        type: "verse",
                         nodes: verseSection,
                         verse: verseSection.at(verseIndex) as VerseNumber,
                         text: inlineToString(verseSection),
@@ -733,28 +733,28 @@ export function parseApiBibleChapter(
             }
 
             const isPoetryBlock =
-                hasClass(node, 'q') ||
-                hasClass(node, 'q1') ||
-                hasClass(node, 'q2') ||
-                hasClass(node, 'qc') ||
-                hasClass(node, 'qm1') ||
-                hasClass(node, 'qm2')
+                hasClass(node, "q") ||
+                hasClass(node, "q1") ||
+                hasClass(node, "q2") ||
+                hasClass(node, "qc") ||
+                hasClass(node, "qm1") ||
+                hasClass(node, "qm2")
 
             const paragraph = {
-                type: 'paragraph' as const,
+                type: "paragraph" as const,
                 text: inlineToString(nodes),
                 nodes: verses,
                 metadata: {
                     type: isPoetryBlock
-                        ? ('quote' as const)
-                        : ('default' as const),
+                        ? ("quote" as const)
+                        : ("default" as const),
                     blockIndent: isPoetryBlock,
                 },
             }
 
             // Return as poetry line to enable merging
             if (isPoetryBlock) {
-                return { type: 'poetryLine', paragraph }
+                return { type: "poetryLine", paragraph }
             }
             return paragraph
         }
@@ -763,14 +763,14 @@ export function parseApiBibleChapter(
     }
 
     const nodes: Block[] = []
-    let currentPoetryParagraph: (Block & { type: 'paragraph' }) | null = null
+    let currentPoetryParagraph: (Block & { type: "paragraph" }) | null = null
 
     for (const node of html.childNodes) {
         const parsed = parseBlock(node)
 
         if (parsed == null) continue
 
-        if (parsed.type === 'stanzaBreak') {
+        if (parsed.type === "stanzaBreak") {
             // Stanza break - finalize current poetry paragraph and start fresh
             if (currentPoetryParagraph) {
                 nodes.push(currentPoetryParagraph)
@@ -779,7 +779,7 @@ export function parseApiBibleChapter(
             continue
         }
 
-        if (parsed.type === 'poetryLine') {
+        if (parsed.type === "poetryLine") {
             if (currentPoetryParagraph) {
                 // Merge into current poetry paragraph
                 const lastVerse =
@@ -795,10 +795,10 @@ export function parseApiBibleChapter(
                     lastVerse.verse.verse === firstNewVerse.verse.verse
                 ) {
                     // Same verse - merge content into existing verse section
-                    lastVerse.nodes.push({ type: 'newLine' })
+                    lastVerse.nodes.push({ type: "newLine" })
                     lastVerse.nodes.push(...firstNewVerse.nodes)
                     // Update the verse text to include the merged content
-                    lastVerse.text += '\n' + firstNewVerse.text
+                    lastVerse.text += "\n" + firstNewVerse.text
                     // Update the length to include merged nodes
                     lastVerse.metadata.length =
                         lastVerse.nodes.filter(isAtomTyped).length
@@ -812,11 +812,11 @@ export function parseApiBibleChapter(
                 } else {
                     // Different verse - add newline and append as new verse section
                     if (lastVerse) {
-                        lastVerse.nodes.push({ type: 'newLine' })
+                        lastVerse.nodes.push({ type: "newLine" })
                     }
                     currentPoetryParagraph.nodes.push(...parsed.paragraph.nodes)
                 }
-                currentPoetryParagraph.text += '\n' + parsed.paragraph.text
+                currentPoetryParagraph.text += "\n" + parsed.paragraph.text
             } else {
                 // Start new poetry paragraph
                 currentPoetryParagraph = parsed.paragraph
@@ -839,13 +839,13 @@ export function parseApiBibleChapter(
     }
 
     if (context.book == undefined) {
-        throw new Error('book is undefined')
+        throw new Error("book is undefined")
     }
     if (context.chapter == undefined) {
-        throw new Error('chapter is undefined')
+        throw new Error("chapter is undefined")
     }
     if (context.firstVerseOfPassage == undefined) {
-        throw new Error('firstVerse is undefined')
+        throw new Error("firstVerse is undefined")
     }
 
     return {

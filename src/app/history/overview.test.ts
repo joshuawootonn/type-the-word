@@ -1,14 +1,14 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from "vitest"
 
-import { Book } from '~/lib/types/book'
-import { db } from '~/server/db'
-import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
-import { createUser, truncateTables } from '~/test-infra/test-utils'
+import { Book } from "~/lib/types/book"
+import { db } from "~/server/db"
+import { TypingSessionRepository } from "~/server/repositories/typingSession.repository"
+import { createUser, truncateTables } from "~/test-infra/test-utils"
 
-import { aggregateBookData } from './overview'
+import { aggregateBookData } from "./overview"
 
-describe('History Overview', () => {
-    it('janet 2_timothy', async () => {
+describe("History Overview", () => {
+    it("janet 2_timothy", async () => {
         await truncateTables()
         const user = await createUser()
         const typingSessionRepository = new TypingSessionRepository(db)
@@ -19,11 +19,11 @@ describe('History Overview', () => {
 
         const overview = aggregateBookData(typingSessions)
 
-        const secondTimothy = overview[Book['2_timothy']]
-        const chapterOne = secondTimothy.chapters['1']!
-        const chapterTwo = secondTimothy.chapters['2']!
-        const chapterThree = secondTimothy.chapters['3']!
-        const chapterFour = secondTimothy.chapters['4']!
+        const secondTimothy = overview[Book["2_timothy"]]
+        const chapterOne = secondTimothy.chapters["1"]!
+        const chapterTwo = secondTimothy.chapters["2"]!
+        const chapterThree = secondTimothy.chapters["3"]!
+        const chapterFour = secondTimothy.chapters["4"]!
         expect(chapterOne.typedVersesInCurrentPrestige).toBeLessThanOrEqual(0)
         expect(chapterTwo.typedVersesInCurrentPrestige).toBeLessThanOrEqual(0)
         expect(chapterThree.typedVersesInCurrentPrestige).toBeLessThanOrEqual(

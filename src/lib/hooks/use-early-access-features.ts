@@ -1,10 +1,10 @@
-'use client'
+"use client"
 
-import { EarlyAccessFeature } from 'posthog-js'
-import { usePostHog, useActiveFeatureFlags } from 'posthog-js/react'
-import { useCallback, useEffect, useState } from 'react'
+import { EarlyAccessFeature } from "posthog-js"
+import { usePostHog, useActiveFeatureFlags } from "posthog-js/react"
+import { useCallback, useEffect, useState } from "react"
 
-import { FeatureFlags } from '~/lib/feature-flags'
+import { FeatureFlags } from "~/lib/feature-flags"
 
 export type { EarlyAccessFeature }
 
@@ -31,7 +31,7 @@ export function useEarlyAccessFeatures() {
             features => {
                 // Filter to only show early access features with valid flagKeys
                 const earlyAccessFeatures = features.filter(
-                    feature => feature.stage === 'beta' && feature.flagKey,
+                    feature => feature.stage === "beta" && feature.flagKey,
                 )
                 setEarlyAccessFeatures(earlyAccessFeatures)
 
@@ -51,7 +51,7 @@ export function useEarlyAccessFeatures() {
                 setIsLoading(false)
             },
             true, // force_reload to get latest
-            ['beta'],
+            ["beta"],
         )
     }, [posthog, activeFlags])
 
@@ -96,5 +96,5 @@ export function useEarlyAccessFeatures() {
  */
 export const BETA_FEATURE_DESCRIPTIONS: Record<string, string> = {
     [FeatureFlags.WPM_ACCURACY_CHART]:
-        'Track your typing speed (WPM) and accuracy over time with detailed charts.',
+        "Track your typing speed (WPM) and accuracy over time with detailed charts.",
 }

@@ -1,11 +1,11 @@
-import { eq } from 'drizzle-orm'
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
-import { createSelectSchema } from 'drizzle-zod'
-import { z } from 'zod'
+import { eq } from "drizzle-orm"
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js"
+import { createSelectSchema } from "drizzle-zod"
+import { z } from "zod"
 
-import * as schema from '~/server/db/schema'
+import * as schema from "~/server/db/schema"
 
-import { ThemeRecord, themeRecordSchema } from './builtinTheme.repository'
+import { ThemeRecord, themeRecordSchema } from "./builtinTheme.repository"
 
 export const userThemeRecordSchema = createSelectSchema(schema.userTheme).merge(
     z.object({
@@ -37,7 +37,7 @@ export class UserThemeRepository {
         theme,
     }: {
         userId: string
-        theme: Omit<ThemeRecord, 'id'>
+        theme: Omit<ThemeRecord, "id">
     }): Promise<UserThemeRecord> {
         return await this.db.transaction(async tx => {
             const insertedRecords = await tx
@@ -62,7 +62,7 @@ export class UserThemeRepository {
 
             if (result == null) {
                 throw new Error(
-                    'Failed to create theme. Fetching theme after creation returned null.',
+                    "Failed to create theme. Fetching theme after creation returned null.",
                 )
             }
 

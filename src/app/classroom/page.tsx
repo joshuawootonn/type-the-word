@@ -1,10 +1,9 @@
-import { getServerSession } from 'next-auth'
-import Link from 'next/link'
+import { getServerSession } from "next-auth"
 
-import { authOptions } from '~/server/auth'
-import { getTeacherToken } from '~/server/repositories/classroom.repository'
+import { authOptions } from "~/server/auth"
+import { getTeacherToken } from "~/server/repositories/classroom.repository"
 
-import { ClientPage } from './client-page'
+import { ClientPage } from "./client-page"
 
 interface PageProps {
     searchParams: Promise<{ success?: string; error?: string }>
@@ -22,7 +21,7 @@ export default async function ClassroomPage({ searchParams }: PageProps) {
     const isConnected = !!token
 
     // Check for OAuth callback params
-    const hasSuccess = params.success === 'true'
+    const hasSuccess = params.success === "true"
     const errorMessage = params.error
         ? `Connection failed: ${params.error}`
         : null

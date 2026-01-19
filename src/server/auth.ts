@@ -1,15 +1,15 @@
-import { DrizzleAdapter } from '@auth/drizzle-adapter'
-import { eq } from 'drizzle-orm'
-import { type GetServerSidePropsContext } from 'next'
-import { getServerSession, type NextAuthOptions } from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
-import GoogleProvider from 'next-auth/providers/google'
+import { DrizzleAdapter } from "@auth/drizzle-adapter"
+import { eq } from "drizzle-orm"
+import { type GetServerSidePropsContext } from "next"
+import { getServerSession, type NextAuthOptions } from "next-auth"
+import CredentialsProvider from "next-auth/providers/credentials"
+import GoogleProvider from "next-auth/providers/google"
 
-import { env } from '~/env.mjs'
-import { verifyPassword } from '~/lib/auth/password'
-import { createSubscription } from '~/lib/convert-kit.service'
-import { db } from '~/server/db'
-import { users, accounts } from '~/server/db/schema'
+import { env } from "~/env.mjs"
+import { verifyPassword } from "~/lib/auth/password"
+import { createSubscription } from "~/lib/convert-kit.service"
+import { db } from "~/server/db"
+import { users, accounts } from "~/server/db/schema"
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -17,7 +17,7 @@ import { users, accounts } from '~/server/db/schema'
  *
  * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
  */
-declare module 'next-auth' {
+declare module "next-auth" {
     interface Session {
         user: {
             id: string
@@ -28,7 +28,7 @@ declare module 'next-auth' {
     }
 }
 
-declare module 'next-auth/jwt' {
+declare module "next-auth/jwt" {
     interface JWT {
         sub?: string
     }
@@ -41,17 +41,17 @@ declare module 'next-auth/jwt' {
  */
 export const authOptions: NextAuthOptions = {
     pages: {
-        signIn: '/auth/login',
+        signIn: "/auth/login",
     },
     callbacks: {
         async signIn({ user, account }) {
             // Prevent account linking - check if user is trying to sign in with a different auth type
-            if (account?.provider === 'google') {
+            if (account?.provider === "google") {
                 // Check if this email already has a credentials account
                 const existingUser = await db
                     .select()
                     .from(users)
-                    .where(eq(users.email, user.email ?? ''))
+                    .where(eq(users.email, user.email ?? ""))
                     .limit(1)
 
                 if (
@@ -101,14 +101,14 @@ export const authOptions: NextAuthOptions = {
     },
     adapter: DrizzleAdapter(db),
     session: {
-        strategy: 'jwt',
+        strategy: "jwt",
     },
     providers: [
         CredentialsProvider({
-            name: 'credentials',
+            name: "credentials",
             credentials: {
-                email: { label: 'Email', type: 'email' },
-                password: { label: 'Password', type: 'password' },
+                email: { label: "Email", type: "email" },
+                password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.password) {
@@ -186,8 +186,8 @@ export const authOptions: NextAuthOptions = {
  * @see https://next-auth.js.org/configuration/nextjs
  */
 export const getServerAuthSession = (ctx: {
-    req: GetServerSidePropsContext['req']
-    res: GetServerSidePropsContext['res']
+    req: GetServerSidePropsContext["req"]
+    res: GetServerSidePropsContext["res"]
 }) => {
     return getServerSession(ctx.req, ctx.res, authOptions)
 }

@@ -1,24 +1,24 @@
-import { eq, sql } from 'drizzle-orm'
-import { createInsertSchema } from 'drizzle-zod'
-import { getServerSession } from 'next-auth'
-import { cookies } from 'next/headers'
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
+import { eq, sql } from "drizzle-orm"
+import { createInsertSchema } from "drizzle-zod"
+import { getServerSession } from "next-auth"
+import { cookies } from "next/headers"
+import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
 
-import { calculateStatsForVerse } from '~/app/history/wpm'
-import { setTranslationCookie } from '~/lib/last-translation'
-import { authOptions } from '~/server/auth'
-import { db } from '~/server/db'
+import { calculateStatsForVerse } from "~/app/history/wpm"
+import { setTranslationCookie } from "~/lib/last-translation"
+import { authOptions } from "~/server/auth"
+import { db } from "~/server/db"
 import {
     typedVerses,
     typingSessions,
     typingDataSchema,
-} from '~/server/db/schema'
-import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
-import { UserDailyActivityRepository } from '~/server/repositories/userDailyActivity.repository'
-import { UserProgressRepository } from '~/server/repositories/userProgress.repository'
+} from "~/server/db/schema"
+import { TypingSessionRepository } from "~/server/repositories/typingSession.repository"
+import { UserDailyActivityRepository } from "~/server/repositories/userDailyActivity.repository"
+import { UserProgressRepository } from "~/server/repositories/userProgress.repository"
 
-export const dynamic = 'force-dynamic' // defaults to auto
+export const dynamic = "force-dynamic" // defaults to auto
 
 const addTypedVerseBodySchema = createInsertSchema(typedVerses, {
     typingData: typingDataSchema.optional(),
@@ -49,20 +49,20 @@ export const POST = async function POST(
     const session = await getServerSession(authOptions)
 
     if (session === null) {
-        return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        return Response.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const { id } = await params
 
     if (uuidSchema.safeParse(id).success === false) {
-        return Response.json({ error: 'Invalid id' }, { status: 400 })
+        return Response.json({ error: "Invalid id" }, { status: 400 })
     }
 
     let body: AddTypedVerseBody
     try {
         body = addTypedVerseBodySchema.parse(await request.json())
-    } catch (e) {
-        return Response.json({ error: 'Invalid body' }, { status: 400 })
+    } catch (_) {
+        return Response.json({ error: "Invalid body" }, { status: 400 })
     }
 
     const verse = addTypedVerseBodySchema.parse(body)
@@ -73,7 +73,7 @@ export const POST = async function POST(
     // Get client timezone offset from cookie
     const cookieStore = await cookies()
     const timezoneOffset = parseInt(
-        cookieStore.get('timezoneOffset')?.value ?? '0',
+        cookieStore.get("timezoneOffset")?.value ?? "0",
     )
 
     let typingSession = await typingSessionRepository.getOne({
@@ -107,7 +107,7 @@ export const POST = async function POST(
     // Calculate WPM/accuracy stats if typing data is available
     const stats = verse.typingData
         ? calculateStatsForVerse({
-              id: '',
+              id: "",
               userId: session.user.id,
               typingSessionId: id,
               translation: verse.translation,

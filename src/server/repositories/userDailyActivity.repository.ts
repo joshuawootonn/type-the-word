@@ -1,9 +1,9 @@
-import { and, eq, sql } from 'drizzle-orm'
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
+import { and, eq, sql } from "drizzle-orm"
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js"
 
-import toProperCase from '~/lib/toProperCase'
-import { bookSchema } from '~/lib/types/book'
-import * as schema from '~/server/db/schema'
+import toProperCase from "~/lib/toProperCase"
+import { bookSchema } from "~/lib/types/book"
+import * as schema from "~/server/db/schema"
 
 export type DailyActivityRow = typeof schema.userDailyActivity.$inferSelect
 
@@ -35,7 +35,7 @@ export function formatVerseReference(
     chapter: number,
     verse: number,
 ): string {
-    const bookName = toProperCase(book.split('_').join(' '))
+    const bookName = toProperCase(book.split("_").join(" "))
     return `${bookName} ${chapter}:${verse}`
 }
 
@@ -68,7 +68,7 @@ export function parsePassageString(passage: string): ParsedPassage | null {
     if (!bookName || !chapterStr || !versesStr) return null
 
     // Convert book name to schema format: "1 Corinthians" -> "1_corinthians"
-    const bookKey = bookName.toLowerCase().split(' ').join('_')
+    const bookKey = bookName.toLowerCase().split(" ").join("_")
 
     // Validate it's a valid book
     const parseResult = bookSchema.safeParse(bookKey)
@@ -79,11 +79,11 @@ export function parsePassageString(passage: string): ParsedPassage | null {
 
     // Parse verses - handle ranges (1-5) and individual verses (1, 3, 5)
     const verses: number[] = []
-    const verseParts = versesStr.split(',').map(s => s.trim())
+    const verseParts = versesStr.split(",").map(s => s.trim())
 
     for (const part of verseParts) {
-        if (part.includes('-')) {
-            const [startStr, endStr] = part.split('-')
+        if (part.includes("-")) {
+            const [startStr, endStr] = part.split("-")
             const start = parseInt(startStr!, 10)
             const end = parseInt(endStr!, 10)
             if (!isNaN(start) && !isNaN(end)) {
@@ -137,7 +137,7 @@ function formatVerseSegments(verses: number[]): string {
             }
             return `${segment[0]}-${segment.at(-1)}`
         })
-        .join(', ')
+        .join(", ")
 }
 
 /**
@@ -168,7 +168,7 @@ export function consolidatePassages(
         if (!parsed) continue
 
         // Use the parsed translation or default to 'esv' for legacy passages
-        const passageTranslation = parsed.translation ?? 'esv'
+        const passageTranslation = parsed.translation ?? "esv"
         const key: PassageKey = `${parsed.book}:${parsed.chapter}:${passageTranslation}`
 
         if (!passageMap.has(key)) {
@@ -190,12 +190,12 @@ export function consolidatePassages(
     // Convert back to passage strings with translation suffix
     const result: string[] = []
     for (const [key, versesSet] of passageMap) {
-        const [book, chapterStr, trans] = key.split(':') as [
+        const [book, chapterStr, trans] = key.split(":") as [
             schema.Book,
             string,
             schema.Translation,
         ]
-        const bookName = toProperCase(book.split('_').join(' '))
+        const bookName = toProperCase(book.split("_").join(" "))
         const chapter = parseInt(chapterStr, 10)
         const versesArray = Array.from(versesSet)
         const versesFormatted = formatVerseSegments(versesArray)
@@ -354,8 +354,8 @@ export class UserDailyActivityRepository {
                 if (!parsed) return passage
 
                 // If no translation suffix, assume ESV
-                const translation = parsed.translation ?? 'esv'
-                const bookName = toProperCase(parsed.book.split('_').join(' '))
+                const translation = parsed.translation ?? "esv"
+                const bookName = toProperCase(parsed.book.split("_").join(" "))
                 const versesFormatted = formatVerseSegments(parsed.verses)
                 return `${bookName} ${parsed.chapter}:${versesFormatted} (${translation.toUpperCase()})`
             })

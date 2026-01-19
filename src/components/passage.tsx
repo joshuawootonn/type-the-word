@@ -1,24 +1,24 @@
-'use client'
+"use client"
 
-import { useQuery } from '@tanstack/react-query'
-import { atom, PrimitiveAtom, Provider } from 'jotai'
-import { useHydrateAtoms } from 'jotai/react/utils'
-import { useSession } from 'next-auth/react'
-import { usePathname } from 'next/navigation'
-import React, { useCallback, useId, useMemo, useRef, useState } from 'react'
+import { useQuery } from "@tanstack/react-query"
+import { atom, PrimitiveAtom, Provider } from "jotai"
+import { useHydrateAtoms } from "jotai/react/utils"
+import { useSession } from "next-auth/react"
+import { usePathname } from "next/navigation"
+import React, { useCallback, useId, useMemo, useRef, useState } from "react"
 
-import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
-import { Cursor } from '~/components/cursor'
-import { fetchChapterHistory, fetchTypingSessionUpsert } from '~/lib/api'
-import { getNextVerseToType } from '~/lib/getNextVerseToType'
-import { useRect, PassageRectContext } from '~/lib/hooks/passageRectContext'
-import { Keystroke } from '~/lib/keystroke'
-import { Inline, ParsedPassage, Translation } from '~/lib/parseEsv'
-import { PassageSegment, toPassageSegment } from '~/lib/passageSegment'
-import { TypingSession } from '~/server/repositories/typingSession.repository'
+import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
+import { Cursor } from "~/components/cursor"
+import { fetchChapterHistory, fetchTypingSessionUpsert } from "~/lib/api"
+import { getNextVerseToType } from "~/lib/getNextVerseToType"
+import { useRect, PassageRectContext } from "~/lib/hooks/passageRectContext"
+import { Keystroke } from "~/lib/keystroke"
+import { Inline, ParsedPassage, Translation } from "~/lib/parseEsv"
+import { PassageSegment, toPassageSegment } from "~/lib/passageSegment"
+import { TypingSession } from "~/server/repositories/typingSession.repository"
 
-import { Paragraph } from './paragraph'
-import { TypedVerseLines } from './typed-verse-lines'
+import { Paragraph } from "./paragraph"
+import { TypedVerseLines } from "./typed-verse-lines"
 
 export const positionAtom = atom<Inline[]>([])
 export const keystrokesAtom = atom<Keystroke[]>([])
@@ -26,9 +26,9 @@ export const keystrokesAtom = atom<Keystroke[]>([])
 export const isPassageActiveAtom = atom(false)
 export const isPassageFocusedAtom = atom(false)
 
-export const currentVerseAtom = atom<string>('')
+export const currentVerseAtom = atom<string>("")
 export const autofocusAtom = atom(false)
-export const passageIdAtom = atom<string>('')
+export const passageIdAtom = atom<string>("")
 
 type InitialValues<T> = [PrimitiveAtom<T>, T]
 
@@ -46,7 +46,7 @@ function HydrateAtoms({
 
 export function Passage({
     passage,
-    translation = 'esv',
+    translation = "esv",
     ...props
 }: {
     passage: ParsedPassage
@@ -61,7 +61,7 @@ export function Passage({
     const passageRef = useRef<HTMLDivElement>(null)
     const passageRect = useRect(passageRef)
     const [verseRects, setVerseRects] = useState<
-        PassageRectContext['verseRects']
+        PassageRectContext["verseRects"]
     >({})
 
     const updateVerseRect = useCallback(
@@ -74,28 +74,28 @@ export function Passage({
         props.passageSegmentOverride ??
         toPassageSegment(passage.firstVerse.book, passage.firstVerse.chapter)
     const typingSession = useQuery({
-        queryKey: ['typing-session'],
+        queryKey: ["typing-session"],
         queryFn: fetchTypingSessionUpsert,
         enabled: sessionData?.user?.id != null,
         placeholderData: props.typingSession,
     })
     const chapterHistory = useQuery({
-        queryKey: ['chapter-history', passageSegementOrOverride, translation],
+        queryKey: ["chapter-history", passageSegementOrOverride, translation],
         queryFn: () =>
             fetchChapterHistory(passageSegementOrOverride, translation),
         enabled: sessionData?.user?.id != null,
         placeholderData: props.chapterHistory,
     })
 
-    const isRootPath = usePathname() === '/'
-    const H2Component = isRootPath ? 'h2' : 'h1'
+    const isRootPath = usePathname() === "/"
+    const H2Component = isRootPath ? "h2" : "h1"
 
     const orderedVerses = useMemo(() => {
         return passage.nodes.flatMap(node => {
-            if (node.type === 'paragraph') {
+            if (node.type === "paragraph") {
                 return node.nodes
             }
-            if (node.type === 'verse') {
+            if (node.type === "verse") {
                 return [node]
             }
             return []
@@ -110,7 +110,7 @@ export function Passage({
                         currentVerseAtom,
                         props.autofocus
                             ? getNextVerseToType(passage, chapterHistory.data)
-                            : '',
+                            : "",
                     ],
                     [autofocusAtom, props.autofocus],
                     [passageIdAtom, passageId],
@@ -136,7 +136,7 @@ export function Passage({
                         />
                         {passage.nodes.map((node, pIndex) => {
                             switch (node.type) {
-                                case 'paragraph':
+                                case "paragraph":
                                     return (
                                         <Paragraph
                                             key={pIndex}
@@ -151,7 +151,7 @@ export function Passage({
                                         />
                                     )
 
-                                case 'h2':
+                                case "h2":
                                     return (
                                         <H2Component
                                             key={pIndex}
@@ -160,7 +160,7 @@ export function Passage({
                                             {node.text}
                                         </H2Component>
                                     )
-                                case 'h3':
+                                case "h3":
                                     return (
                                         <h3
                                             className="prose-h3 mt-0 text-xl font-semibold tracking-wide text-primary"
@@ -169,7 +169,7 @@ export function Passage({
                                             {node.text}
                                         </h3>
                                     )
-                                case 'h4':
+                                case "h4":
                                     return (
                                         <h4
                                             className="prose-h4 text-lg font-medium tracking-wide text-primary"

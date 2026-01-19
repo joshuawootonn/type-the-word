@@ -1,15 +1,15 @@
-import { Metadata } from 'next'
-import { getServerSession } from 'next-auth'
-import { cookies } from 'next/headers'
+import { Metadata } from "next"
+import { getServerSession } from "next-auth"
+import { cookies } from "next/headers"
 
-import { authOptions } from '~/server/auth'
+import { authOptions } from "~/server/auth"
 
-import { getLogData } from '../getHistory'
-import { HistoryLogV2 } from '../history-log-2'
+import { getLogData } from "../getHistory"
+import { HistoryLogV2 } from "../history-log-2"
 
 export const metadata: Metadata = {
-    title: 'Type the Word - History Log',
-    description: 'Log of all the passages you have typed.',
+    title: "Type the Word - History Log",
+    description: "Log of all the passages you have typed.",
 }
 
 export default async function HistoryLogPage() {
@@ -21,7 +21,7 @@ export default async function HistoryLogPage() {
 
     const cookieStore = await cookies()
     const timezoneOffset = parseInt(
-        cookieStore.get('timezoneOffset')?.value ?? '0',
+        cookieStore.get("timezoneOffset")?.value ?? "0",
     )
 
     const log = await getLogData(session.user.id, timezoneOffset)

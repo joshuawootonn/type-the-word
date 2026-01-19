@@ -1,24 +1,24 @@
-import { Sema } from 'async-sema'
-import { parse } from 'csv-parse/sync'
-import fs from 'fs'
-import path from 'path'
+import { Sema } from "async-sema"
+import { parse } from "csv-parse/sync"
+import fs from "fs"
+import path from "path"
 
-import { chunk } from '~/lib/chunk'
-import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
+import { chunk } from "~/lib/chunk"
+import { TypedVerseRepository } from "~/server/repositories/typedVerse.repository"
 import {
     TypedVerse,
     TypingSession,
     TypingSessionRepository,
-} from '~/server/repositories/typingSession.repository'
+} from "~/server/repositories/typingSession.repository"
 
-import { db } from '../server/db'
+import { db } from "../server/db"
 import {
     typedVerses,
     TypingData,
     typingSessions,
     users,
-} from '../server/db/schema'
-import { User, UserRepository } from '../server/repositories/user.repository'
+} from "../server/db/schema"
+import { User, UserRepository } from "../server/repositories/user.repository"
 
 export async function truncateTables() {
     await db.delete(typingSessions).execute()
@@ -42,21 +42,21 @@ export async function createUser({
             .insert(users)
             .values({
                 id: crypto.randomUUID(),
-                email: 'test@test.com',
-                name: 'Test User',
+                email: "test@test.com",
+                name: "Test User",
             })
             .returning()
         user = _user[0]!
     }
 
     if (!user) {
-        throw new Error('Failed to create user')
+        throw new Error("Failed to create user")
     }
 
     // Read and parse the CSV file
     const typedSessionsCsv = fs.readFileSync(
-        path.join(__dirname, './personas/janet/typingSessions.csv'),
-        'utf-8',
+        path.join(__dirname, "./personas/janet/typingSessions.csv"),
+        "utf-8",
     )
     const sessions: TypingSession[] = parse(typedSessionsCsv, {
         columns: true,
@@ -91,8 +91,8 @@ export async function createUser({
 
     // Read and parse the CSV file for typed verses
     const typedVersesCsv = fs.readFileSync(
-        path.join(__dirname, './personas/janet/typedVerses.csv'),
-        'utf-8',
+        path.join(__dirname, "./personas/janet/typedVerses.csv"),
+        "utf-8",
     )
     const verses: TypedVerse[] = parse(typedVersesCsv, {
         columns: true,

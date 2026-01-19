@@ -1,14 +1,14 @@
-import { google, classroom_v1 } from 'googleapis'
-import { z } from 'zod'
+import { google, classroom_v1 } from "googleapis"
+import { z } from "zod"
 
-import { env } from '~/env.mjs'
+import { env } from "~/env.mjs"
 
 // OAuth 2.0 scopes needed for Google Classroom
 const SCOPES = [
-    'https://www.googleapis.com/auth/classroom.courses.readonly',
-    'https://www.googleapis.com/auth/classroom.coursework.students',
-    'https://www.googleapis.com/auth/classroom.rosters.readonly',
-    'https://www.googleapis.com/auth/classroom.student-submissions.students.readonly',
+    "https://www.googleapis.com/auth/classroom.courses.readonly",
+    "https://www.googleapis.com/auth/classroom.coursework.students",
+    "https://www.googleapis.com/auth/classroom.rosters.readonly",
+    "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
 ]
 
 // Zod schemas for return types
@@ -104,9 +104,9 @@ export function getAuthUrl(state?: string): string {
     const oauth2Client = createOAuth2Client()
 
     return oauth2Client.generateAuthUrl({
-        access_type: 'offline',
+        access_type: "offline",
         scope: SCOPES,
-        prompt: 'consent', // Force consent screen to get refresh token
+        prompt: "consent", // Force consent screen to get refresh token
         state: state,
     })
 }
@@ -121,7 +121,7 @@ export async function exchangeCodeForTokens(
     const { tokens } = await oauth2Client.getToken(code)
 
     if (!tokens.access_token || !tokens.refresh_token) {
-        throw new Error('Failed to get tokens from Google')
+        throw new Error("Failed to get tokens from Google")
     }
 
     const result = {
@@ -130,7 +130,7 @@ export async function exchangeCodeForTokens(
         expiresAt: tokens.expiry_date
             ? new Date(tokens.expiry_date)
             : new Date(Date.now() + 3600 * 1000), // Default 1 hour
-        scope: tokens.scope ?? SCOPES.join(' '),
+        scope: tokens.scope ?? SCOPES.join(" "),
     }
 
     return tokenResponseSchema.parse(result)
@@ -150,7 +150,7 @@ export async function refreshAccessToken(
     const { credentials } = await oauth2Client.refreshAccessToken()
 
     if (!credentials.access_token) {
-        throw new Error('Failed to refresh access token')
+        throw new Error("Failed to refresh access token")
     }
 
     const result = {
@@ -172,7 +172,7 @@ export function createClassroomClient(accessToken: string) {
         access_token: accessToken,
     })
 
-    return google.classroom({ version: 'v1', auth: oauth2Client })
+    return google.classroom({ version: "v1", auth: oauth2Client })
 }
 
 /**
@@ -182,8 +182,8 @@ export async function listCourses(accessToken: string): Promise<Course[]> {
     const classroom = createClassroomClient(accessToken)
 
     const response = await classroom.courses.list({
-        teacherId: 'me',
-        courseStates: ['ACTIVE'],
+        teacherId: "me",
+        courseStates: ["ACTIVE"],
     })
 
     const courses =
@@ -238,7 +238,7 @@ export async function createCourseWork(
     data: {
         title: string
         description?: string
-        workType: 'ASSIGNMENT'
+        workType: "ASSIGNMENT"
         maxPoints: number
         dueDate?: { year: number; month: number; day: number }
         dueTime?: { hours: number; minutes: number }
@@ -321,7 +321,7 @@ export async function updateDraftGrade(
             courseId,
             courseWorkId,
             id: submissionId,
-            updateMask: 'draftGrade',
+            updateMask: "draftGrade",
             requestBody: {
                 draftGrade,
             },

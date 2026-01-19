@@ -1,10 +1,10 @@
-import { getServerSession } from 'next-auth'
-import { NextResponse } from 'next/server'
+import { getServerSession } from "next-auth"
+import { NextResponse } from "next/server"
 
-import { authOptions } from '~/server/auth'
-import { getAuthUrl } from '~/server/clients/classroom.client'
+import { authOptions } from "~/server/auth"
+import { getAuthUrl } from "~/server/clients/classroom.client"
 
-import { type AuthResponse } from '../schemas'
+import { type AuthResponse } from "../schemas"
 
 /**
  * Initiates the OAuth flow for Google Classroom
@@ -14,7 +14,7 @@ export async function GET() {
     const session = await getServerSession(authOptions)
 
     if (!session?.user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     try {
@@ -24,9 +24,9 @@ export async function GET() {
         const response: AuthResponse = { authUrl }
         return NextResponse.json(response)
     } catch (error) {
-        console.error('Error generating auth URL:', error)
+        console.error("Error generating auth URL:", error)
         return NextResponse.json(
-            { error: 'Failed to generate auth URL' },
+            { error: "Failed to generate auth URL" },
             { status: 500 },
         )
     }

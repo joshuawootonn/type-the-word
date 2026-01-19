@@ -1,13 +1,14 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import type { NextRequest } from "next/server"
 
-import { isValidTranslation, parseTranslation } from './lib/translations'
+import { NextResponse } from "next/server"
 
-const COOKIE_NAME = 'lastTranslation'
+import { isValidTranslation, parseTranslation } from "./lib/translations"
+
+const COOKIE_NAME = "lastTranslation"
 
 export function proxy(request: NextRequest) {
     const url = request.nextUrl.clone()
-    const translation = url.searchParams.get('translation')
+    const translation = url.searchParams.get("translation")
 
     // Validate translation if present
     if (translation) {
@@ -16,7 +17,7 @@ export function proxy(request: NextRequest) {
             const cookieTranslation = request.cookies.get(COOKIE_NAME)?.value
             const validTranslation = parseTranslation(cookieTranslation)
 
-            url.searchParams.set('translation', validTranslation)
+            url.searchParams.set("translation", validTranslation)
             return NextResponse.redirect(url)
         }
         // Valid translation - pass through
@@ -27,7 +28,7 @@ export function proxy(request: NextRequest) {
     const lastTranslation = request.cookies.get(COOKIE_NAME)?.value
     const validTranslation = parseTranslation(lastTranslation)
 
-    url.searchParams.set('translation', validTranslation)
+    url.searchParams.set("translation", validTranslation)
     return NextResponse.redirect(url)
 }
 
@@ -35,9 +36,9 @@ export function proxy(request: NextRequest) {
 export const config = {
     matcher: [
         // Match passage routes
-        '/passage/:path*',
+        "/passage/:path*",
         // Match all history routes (base and sub-routes)
-        '/history',
-        '/history/:path*',
+        "/history",
+        "/history/:path*",
     ],
 }

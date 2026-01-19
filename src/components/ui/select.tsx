@@ -1,8 +1,8 @@
-'use client'
+"use client"
 
-import * as SelectPrimitive from '@radix-ui/react-select'
-import clsx from 'clsx'
-import { forwardRef, ComponentPropsWithoutRef, ElementRef } from 'react'
+import * as SelectPrimitive from "@radix-ui/react-select"
+import clsx from "clsx"
+import { forwardRef, ComponentPropsWithoutRef, ElementRef } from "react"
 
 const Select = SelectPrimitive.Root
 
@@ -15,7 +15,7 @@ const SelectTrigger = forwardRef<
     <SelectPrimitive.Trigger
         ref={ref}
         className={clsx(
-            'flex items-center justify-between gap-2 border-2 border-primary bg-secondary px-2 py-1 text-primary outline-none focus:bg-primary focus:text-secondary',
+            "flex items-center justify-between gap-2 border-2 border-primary bg-secondary px-2 py-1 text-primary outline-none focus:bg-primary focus:text-secondary",
             className,
         )}
         {...props}
@@ -39,13 +39,13 @@ SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
 const SelectContent = forwardRef<
     ElementRef<typeof SelectPrimitive.Content>,
     ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
->(({ className, children, position = 'popper', ...props }, ref) => (
+>(({ className, children, position = "popper", ...props }, ref) => (
     <SelectPrimitive.Portal>
         <SelectPrimitive.Content
             ref={ref}
             className={clsx(
-                'z-50 border-2 border-primary bg-secondary text-primary',
-                position === 'popper' && 'max-h-96',
+                "z-50 border-2 border-primary bg-secondary text-primary",
+                position === "popper" && "max-h-96",
                 className,
             )}
             position={position}
@@ -54,8 +54,8 @@ const SelectContent = forwardRef<
         >
             <SelectPrimitive.Viewport
                 className={clsx(
-                    position === 'popper' &&
-                        'h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]',
+                    position === "popper" &&
+                        "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]",
                 )}
             >
                 {children}
@@ -72,7 +72,7 @@ const SelectItem = forwardRef<
     <SelectPrimitive.Item
         ref={ref}
         className={clsx(
-            'cursor-pointer px-3 py-1 outline-none focus:bg-primary focus:text-secondary data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+            "cursor-pointer px-3 py-1 outline-none focus:bg-primary focus:text-secondary data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
             className,
         )}
         {...props}

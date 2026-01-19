@@ -1,5 +1,5 @@
-import { animate } from 'motion'
-import { useEffect, useRef } from 'react'
+import { animate } from "motion"
+import { useEffect, useRef } from "react"
 
 function pythagorean(x1: number, x2: number, y1: number, y2: number): number {
     return Math.sqrt(
@@ -32,7 +32,7 @@ export function useCursor(passageId: string): void {
 
             if (activeRect) {
                 if (activeRect.width === 0) {
-                    const indicator = activeElement?.querySelector('.indicator')
+                    const indicator = activeElement?.querySelector(".indicator")
 
                     if (indicator) {
                         activeElement = indicator
@@ -42,7 +42,7 @@ export function useCursor(passageId: string): void {
                 }
 
                 const heightDelta = activeElement?.classList.contains(
-                    'divine-name',
+                    "divine-name",
                 )
                     ? -3
                     : 0
@@ -76,7 +76,7 @@ export function useCursor(passageId: string): void {
                         x: `${nextLeft}px`,
                         y: `${nextTop}px`,
                         width: `2px`,
-                        height: '22px',
+                        height: "22px",
                     },
                     {
                         easing: [0.25, 0.46, 0.45, 0.94],

@@ -1,5 +1,5 @@
-import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
-import { ParsedPassage } from '~/lib/parseEsv'
+import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
+import { ParsedPassage } from "~/lib/parseEsv"
 
 export function getNextVerseToType(
     passage: ParsedPassage,
@@ -15,7 +15,7 @@ export function getNextVerseToType(
     const allVerseNumbers: number[] = []
 
     for (const node of passage.nodes) {
-        if (node.type === 'paragraph') {
+        if (node.type === "paragraph") {
             for (const verse of node.nodes) {
                 // Only count the verse if it's not a hanging verse continuation
                 // Hanging verses don't have their own verse number

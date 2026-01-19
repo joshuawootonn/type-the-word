@@ -1,10 +1,10 @@
-'use client'
+"use client"
 
-import { load, trackPageview } from 'fathom-client'
-import { usePathname, useSearchParams } from 'next/navigation'
-import { useEffect, Suspense } from 'react'
+import { load, trackPageview } from "fathom-client"
+import { usePathname, useSearchParams } from "next/navigation"
+import { useEffect, Suspense } from "react"
 
-import { env } from '~/env.mjs'
+import { env } from "~/env.mjs"
 
 function TrackPageView() {
     const pathname = usePathname()

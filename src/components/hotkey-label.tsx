@@ -1,8 +1,8 @@
-'use client'
+"use client"
 
-import clsx from 'clsx'
+import clsx from "clsx"
 
-import { getOS } from '~/app/global-hotkeys'
+import { getOS } from "~/app/global-hotkeys"
 
 export default function HotkeyLabel(
     props:
@@ -14,11 +14,11 @@ export default function HotkeyLabel(
           }
         | { value: string; className?: string },
 ) {
-    if ('value' in props) {
+    if ("value" in props) {
         return (
             <kbd
                 suppressHydrationWarning
-                className={clsx(props.className, 'font-mono tracking-[0.2em]')}
+                className={clsx(props.className, "font-mono tracking-[0.2em]")}
             >
                 {props.value}
             </kbd>
@@ -31,12 +31,12 @@ export default function HotkeyLabel(
         <kbd
             suppressHydrationWarning
             className={clsx(props.className, {
-                ['font-mono tracking-[0.2em]']: !isMobile,
+                ["font-mono tracking-[0.2em]"]: !isMobile,
             })}
         >
             {isMobile && props.mobile
                 ? props.mobile
-                : os === 'MacOS'
+                : os === "MacOS"
                   ? props.mac
                   : props.nonMac}
         </kbd>

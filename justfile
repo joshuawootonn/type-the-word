@@ -71,10 +71,14 @@ format-check:
 # Type check code
 type-check:
     pnpm type-check
-
-# Lint code
+# Lint and auto-fix issues
 lint:
     pnpm lint
+
+
+# Lint code
+lint-check:
+    pnpm lint-check
 
 # Full setup: start db and run migrations
 setup: db-up migrate

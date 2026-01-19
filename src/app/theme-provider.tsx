@@ -1,5 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Session } from 'next-auth'
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Session } from "next-auth"
 import {
     ReactNode,
     createContext,
@@ -8,39 +8,39 @@ import {
     useEffect,
     useMemo,
     useRef,
-} from 'react'
+} from "react"
 
 import {
     fetchBuiltinThemes,
     fetchCurrentTheme,
     fetchSetCurrentTheme,
     fetchUserThemes,
-} from '~/lib/api'
+} from "~/lib/api"
 import {
     cleanUpdateDocumentStyles,
     uuidToThemeClassname,
     isThemeClassname,
-} from '~/lib/theme/dom'
-import { isThemeDark } from '~/lib/theme/lch'
-import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
-import { CurrentTheme } from '~/server/repositories/currentTheme.repository'
-import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
+} from "~/lib/theme/dom"
+import { isThemeDark } from "~/lib/theme/lch"
+import { BuiltinThemeRecord } from "~/server/repositories/builtinTheme.repository"
+import { CurrentTheme } from "~/server/repositories/currentTheme.repository"
+import { UserThemeRecord } from "~/server/repositories/userTheme.repository"
 
-import { getCurrentThemeOrFallback } from '../lib/theme/get-current-theme-or-fallback'
-import { themeCSS } from './theme-styles'
+import { getCurrentThemeOrFallback } from "../lib/theme/get-current-theme-or-fallback"
+import { themeCSS } from "./theme-styles"
 
 const ThemeContext = createContext<{
     currentTheme: CurrentTheme
-    setTheme: (currentTheme: Omit<CurrentTheme, 'userId'>) => void
+    setTheme: (currentTheme: Omit<CurrentTheme, "userId">) => void
 }>({
     currentTheme: {
-        lightThemeId: '',
-        darkThemeId: '',
-        userId: '',
-        colorScheme: 'system',
+        lightThemeId: "",
+        darkThemeId: "",
+        userId: "",
+        colorScheme: "system",
     },
     setTheme: () => {
-        console.warn('`setTheme` called outside of `ThemeProvider` context')
+        console.warn("`setTheme` called outside of `ThemeProvider` context")
     },
 })
 
@@ -49,15 +49,15 @@ export const useTheme = function () {
 }
 
 export function getResolvedTheme(
-    currentTheme: Omit<CurrentTheme, 'userId'>,
+    currentTheme: Omit<CurrentTheme, "userId">,
     userThemes: UserThemeRecord[],
     builtinThemes: BuiltinThemeRecord[],
 ): { isDark: boolean; resolvedTheme: BuiltinThemeRecord | UserThemeRecord } {
-    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    const media = window.matchMedia("(prefers-color-scheme: dark)")
     const isDarkId =
-        currentTheme.colorScheme === 'system'
+        currentTheme.colorScheme === "system"
             ? media.matches
-            : currentTheme.colorScheme === 'dark'
+            : currentTheme.colorScheme === "dark"
 
     const resolvedId = isDarkId
         ? currentTheme.darkThemeId
@@ -68,11 +68,11 @@ export function getResolvedTheme(
         builtinThemes.at(0)
 
     if (resolvedTheme == null) {
-        throw new Error('There are no themes to resolve from')
+        throw new Error("There are no themes to resolve from")
     }
 
     const isDark =
-        currentTheme.colorScheme === 'system'
+        currentTheme.colorScheme === "system"
             ? media.matches
             : isThemeDark(resolvedTheme.theme)
 
@@ -80,7 +80,7 @@ export function getResolvedTheme(
 }
 
 export function getDarkTheme(
-    currentTheme: Omit<CurrentTheme, 'userId'>,
+    currentTheme: Omit<CurrentTheme, "userId">,
     userThemes: UserThemeRecord[],
     builtinThemes: BuiltinThemeRecord[],
 ): BuiltinThemeRecord | UserThemeRecord {
@@ -88,17 +88,17 @@ export function getDarkTheme(
     const resolvedTheme =
         builtinThemes.find(t => t.themeId === resolvedId) ??
         userThemes.find(t => t.themeId === resolvedId) ??
-        builtinThemes.find(t => t.theme.label === 'Dark')
+        builtinThemes.find(t => t.theme.label === "Dark")
 
     if (resolvedTheme == null) {
-        throw new Error('There are no light themes to resolve from')
+        throw new Error("There are no light themes to resolve from")
     }
 
     return resolvedTheme
 }
 
 export function getLightTheme(
-    currentTheme: Omit<CurrentTheme, 'userId'>,
+    currentTheme: Omit<CurrentTheme, "userId">,
     userThemes: UserThemeRecord[],
     builtinThemes: BuiltinThemeRecord[],
 ): BuiltinThemeRecord | UserThemeRecord {
@@ -106,10 +106,10 @@ export function getLightTheme(
     const resolvedTheme =
         builtinThemes.find(t => t.themeId === resolvedId) ??
         userThemes.find(t => t.themeId === resolvedId) ??
-        builtinThemes.find(t => t.theme.label === 'Light')
+        builtinThemes.find(t => t.theme.label === "Light")
 
     if (resolvedTheme == null) {
-        throw new Error('There are no light themes to resolve from')
+        throw new Error("There are no light themes to resolve from")
     }
 
     return resolvedTheme
@@ -119,11 +119,11 @@ export function updateThemeStyleTag(
     builtinThemes: BuiltinThemeRecord[],
     userThemes: UserThemeRecord[],
 ) {
-    const themeStyleTag = document.getElementById('themes')
+    const themeStyleTag = document.getElementById("themes")
     if (themeStyleTag) {
         themeStyleTag.innerHTML = [...builtinThemes, ...userThemes]
             .map(t => themeCSS({ theme: t.theme }))
-            .join('')
+            .join("")
     }
 }
 
@@ -143,13 +143,13 @@ export function ThemeProvider({
     const userId = session?.user?.id
 
     const builtinThemes = useQuery({
-        queryKey: ['builtinThemes'],
+        queryKey: ["builtinThemes"],
         queryFn: fetchBuiltinThemes,
         placeholderData: serverRenderedBuiltinThemes,
     })
 
     const userThemes = useQuery({
-        queryKey: ['userThemes'],
+        queryKey: ["userThemes"],
         queryFn: fetchUserThemes,
         enabled: Boolean(userId),
         placeholderData: serverRenderedUserThemes,
@@ -161,7 +161,7 @@ export function ThemeProvider({
     }, [builtinThemes.data, userThemes.data])
 
     const currentTheme = useQuery({
-        queryKey: ['currentTheme'],
+        queryKey: ["currentTheme"],
         queryFn: fetchCurrentTheme,
         enabled: Boolean(userId),
         placeholderData: serverRenderedCurrentTheme ?? undefined,
@@ -172,23 +172,23 @@ export function ThemeProvider({
     const setCurrentTheme = useMutation({
         mutationFn: fetchSetCurrentTheme,
         onMutate: async nextCurrentTheme => {
-            await queryClient.cancelQueries({ queryKey: ['currentTheme'] })
+            await queryClient.cancelQueries({ queryKey: ["currentTheme"] })
 
-            const prevCurrentTheme = queryClient.getQueryData(['currentTheme'])
+            const prevCurrentTheme = queryClient.getQueryData(["currentTheme"])
 
-            queryClient.setQueryData(['currentTheme'], nextCurrentTheme)
+            queryClient.setQueryData(["currentTheme"], nextCurrentTheme)
             applyTheme(nextCurrentTheme)
 
             return { prevCurrentTheme, nextCurrentTheme }
         },
         onError: (_err, _newTodo, context) => {
             queryClient.setQueryData(
-                ['currentTheme'],
+                ["currentTheme"],
                 context?.prevCurrentTheme,
             )
         },
         onSettled: () =>
-            queryClient.invalidateQueries({ queryKey: ['currentTheme'] }),
+            queryClient.invalidateQueries({ queryKey: ["currentTheme"] }),
     })
 
     const currentThemeOrFallback = useMemo<CurrentTheme>(() => {
@@ -199,7 +199,7 @@ export function ThemeProvider({
     }, [currentTheme, builtinThemes])
 
     const applyTheme = useCallback(
-        (theme: Omit<CurrentTheme, 'userId'>) => {
+        (theme: Omit<CurrentTheme, "userId">) => {
             // If theme is system, resolve it before setting theme
             const resolvedTheme = getResolvedTheme(
                 theme,
@@ -215,7 +215,7 @@ export function ThemeProvider({
                 uuidToThemeClassname(resolvedTheme.resolvedTheme.themeId),
             )
 
-            d.style.colorScheme = resolvedTheme.isDark ? 'dark' : 'light'
+            d.style.colorScheme = resolvedTheme.isDark ? "dark" : "light"
         },
         [builtinThemes.data, userThemes.data],
     )
@@ -246,7 +246,7 @@ export function ThemeProvider({
 
     // Always listen to System preference
     useEffect(() => {
-        const media = window.matchMedia('(prefers-color-scheme: dark)')
+        const media = window.matchMedia("(prefers-color-scheme: dark)")
 
         // Intentionally use deprecated listener methods to support iOS & old browsers
         media.addListener(handleMediaQuery)
@@ -259,7 +259,7 @@ export function ThemeProvider({
         <ThemeContext.Provider
             value={{
                 currentTheme: currentThemeOrFallback,
-                setTheme: (currentTheme: Omit<CurrentTheme, 'userId'>) => {
+                setTheme: (currentTheme: Omit<CurrentTheme, "userId">) => {
                     setCurrentTheme.mutate(currentTheme)
                     cleanUpdateDocumentStyles()
                     applyTheme(currentTheme)

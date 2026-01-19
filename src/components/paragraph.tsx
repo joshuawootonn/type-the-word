@@ -1,14 +1,14 @@
-import clsx from 'clsx'
-import { useAtom } from 'jotai'
-import React from 'react'
+import clsx from "clsx"
+import { useAtom } from "jotai"
+import React from "react"
 
-import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
-import { CurrentVerse } from '~/components/currentVerse'
-import { currentVerseAtom } from '~/components/passage'
-import { ReadonlyVerse } from '~/components/readonlyVerse'
-import { type Paragraph, ParsedPassage, Translation } from '~/lib/parseEsv'
-import { PassageSegment } from '~/lib/passageSegment'
-import { TypingSession } from '~/server/repositories/typingSession.repository'
+import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
+import { CurrentVerse } from "~/components/currentVerse"
+import { currentVerseAtom } from "~/components/passage"
+import { ReadonlyVerse } from "~/components/readonlyVerse"
+import { type Paragraph, ParsedPassage, Translation } from "~/lib/parseEsv"
+import { PassageSegment } from "~/lib/passageSegment"
+import { TypingSession } from "~/server/repositories/typingSession.repository"
 
 export function Paragraph({
     node,
@@ -16,7 +16,7 @@ export function Paragraph({
     typingSession,
     chapterHistory,
     passageSegment,
-    translation = 'esv',
+    translation = "esv",
 }: {
     passage: ParsedPassage
     node: Paragraph
@@ -27,7 +27,7 @@ export function Paragraph({
 }) {
     const [currentVerse] = useAtom(currentVerseAtom)
     return (
-        <p className={clsx('text-lg', node.metadata.blockIndent && 'ml-3')}>
+        <p className={clsx("text-lg", node.metadata.blockIndent && "ml-3")}>
             {node.nodes.map((verse, vIndex) => {
                 const isCurrentVerse = verse.verse.value === currentVerse
 
@@ -39,7 +39,7 @@ export function Paragraph({
                         verse={verse}
                         isCurrentVerse={isCurrentVerse}
                         isIndented={node.metadata.blockIndent}
-                        isQuote={node.metadata.type === 'quote'}
+                        isQuote={node.metadata.type === "quote"}
                         passage={passage}
                         typingSession={typingSession}
                         chapterHistory={chapterHistory}

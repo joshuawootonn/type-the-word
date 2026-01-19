@@ -1,5 +1,5 @@
-import { createEnv } from '@t3-oss/env-nextjs'
-import { z } from 'zod'
+import { createEnv } from "@t3-oss/env-nextjs"
+import { z } from "zod"
 
 export const env = createEnv({
     /**
@@ -9,12 +9,12 @@ export const env = createEnv({
     server: {
         POSTGRES_DATABASE_URL: z.string().url(),
         NODE_ENV: z
-            .enum(['development', 'test', 'production'])
-            .default('development'),
+            .enum(["development", "test", "production"])
+            .default("development"),
         CROSSWAY_SECRET: z.string(),
         STRIPE_SECRET_KEY: z.string().min(1),
         NEXTAUTH_SECRET:
-            process.env.NODE_ENV === 'production'
+            process.env.NODE_ENV === "production"
                 ? z.string().min(1)
                 : z.string().min(1).optional(),
         // NEXTAUTH_URL: z.preprocess(
@@ -38,7 +38,7 @@ export const env = createEnv({
         MAILPACE_API_TOKEN: z.string(),
         API_BIBLE_API_KEY: z.string(),
         DEPLOYED_URL:
-            process.env.NODE_ENV === 'production'
+            process.env.NODE_ENV === "production"
                 ? z
                       .string()
                       .transform(str => (str ? `https://${str}` : str))

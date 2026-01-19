@@ -1,18 +1,18 @@
-import { Metadata } from 'next'
-import { getServerSession } from 'next-auth'
-import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
+import { Metadata } from "next"
+import { getServerSession } from "next-auth"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 
-import { FeatureFlags } from '~/lib/feature-flags'
-import { authOptions } from '~/server/auth'
-import PostHogClient from '~/server/posthog'
+import { FeatureFlags } from "~/lib/feature-flags"
+import { authOptions } from "~/server/auth"
+import PostHogClient from "~/server/posthog"
 
-import { getWpmData } from '../getHistory'
-import { WPMChart } from '../wpm-chart'
+import { getWpmData } from "../getHistory"
+import { WPMChart } from "../wpm-chart"
 
 export const metadata: Metadata = {
-    title: 'Type the Word - WPM & Accuracy',
-    description: 'Your typing speed and accuracy over time.',
+    title: "Type the Word - WPM & Accuracy",
+    description: "Your typing speed and accuracy over time.",
 }
 
 export default async function HistoryWpmPage() {
@@ -30,12 +30,12 @@ export default async function HistoryWpmPage() {
 
     // Redirect to overview if feature is disabled
     if (!showWpmChart) {
-        redirect('/history')
+        redirect("/history")
     }
 
     const cookieStore = await cookies()
     const timezoneOffset = parseInt(
-        cookieStore.get('timezoneOffset')?.value ?? '0',
+        cookieStore.get("timezoneOffset")?.value ?? "0",
     )
 
     const wpmData = await getWpmData(session.user.id, timezoneOffset)

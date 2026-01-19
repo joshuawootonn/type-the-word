@@ -1,17 +1,17 @@
-import { Metadata } from 'next'
-import { getServerSession } from 'next-auth'
-import { Suspense } from 'react'
+import { Metadata } from "next"
+import { getServerSession } from "next-auth"
+import { Suspense } from "react"
 
-import { historyTranslationSchema } from '~/lib/translations'
-import { authOptions } from '~/server/auth'
+import { historyTranslationSchema } from "~/lib/translations"
+import { authOptions } from "~/server/auth"
 
-import { getOverviewData } from './getHistory'
-import { HistoryOverview } from './history-overview'
-import { TranslationSelector } from './translation-selector'
+import { getOverviewData } from "./getHistory"
+import { HistoryOverview } from "./history-overview"
+import { TranslationSelector } from "./translation-selector"
 
 export const metadata: Metadata = {
-    title: 'Type the Word - History',
-    description: 'History of all the passages you have typed.',
+    title: "Type the Word - History",
+    description: "History of all the passages you have typed.",
 }
 
 export default async function HistoryOverviewPage({

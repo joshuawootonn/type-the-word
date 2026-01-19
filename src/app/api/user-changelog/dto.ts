@@ -1,6 +1,6 @@
-import { z } from 'zod'
+import { z } from "zod"
 
-import { userChangelogRecordSchema } from '~/server/repositories/userChangelog.repository'
+import { userChangelogRecordSchema } from "~/server/repositories/userChangelog.repository"
 
 export const DTOToRecordSchema = z
     .object({ lastVisitedAt: z.string() })

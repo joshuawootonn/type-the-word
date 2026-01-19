@@ -1,16 +1,16 @@
-'use client'
+"use client"
 
-import { Field, Formik } from 'formik'
-import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
-import { useState, useRef } from 'react'
+import { Field, Formik } from "formik"
+import Link from "next/link"
+import { useSearchParams } from "next/navigation"
+import { useState, useRef } from "react"
 
-import { Loading } from '~/components/loading'
-import { cn } from '~/lib/cn'
+import { Loading } from "~/components/loading"
+import { cn } from "~/lib/cn"
 
 export default function ResetPasswordPage() {
     const searchParams = useSearchParams()
-    const token = searchParams?.get('token')
+    const token = searchParams?.get("token")
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(false)
@@ -71,7 +71,7 @@ export default function ResetPasswordPage() {
                 </p>
 
                 <Formik
-                    initialValues={{ password: '', confirmPassword: '' }}
+                    initialValues={{ password: "", confirmPassword: "" }}
                     validate={values => {
                         const errors: {
                             password?: string
@@ -79,27 +79,27 @@ export default function ResetPasswordPage() {
                         } = {}
 
                         if (!values.password) {
-                            errors.password = 'Password is required'
+                            errors.password = "Password is required"
                         } else if (values.password.length < 8) {
                             errors.password =
-                                'Password must be at least 8 characters'
+                                "Password must be at least 8 characters"
                         } else if (!/[A-Z]/.test(values.password)) {
                             errors.password =
-                                'Password must contain at least one uppercase letter'
+                                "Password must contain at least one uppercase letter"
                         } else if (
-                            !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(
+                            !/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(
                                 values.password,
                             )
                         ) {
                             errors.password =
-                                'Password must contain at least one special character'
+                                "Password must contain at least one special character"
                         }
 
                         if (!values.confirmPassword) {
                             errors.confirmPassword =
-                                'Please confirm your password'
+                                "Please confirm your password"
                         } else if (values.password !== values.confirmPassword) {
-                            errors.confirmPassword = 'Passwords do not match'
+                            errors.confirmPassword = "Passwords do not match"
                         }
 
                         // Focus first field with error
@@ -122,11 +122,11 @@ export default function ResetPasswordPage() {
 
                         try {
                             const response = await fetch(
-                                '/api/auth/reset-password',
+                                "/api/auth/reset-password",
                                 {
-                                    method: 'POST',
+                                    method: "POST",
                                     headers: {
-                                        'Content-Type': 'application/json',
+                                        "Content-Type": "application/json",
                                     },
                                     body: JSON.stringify({
                                         token,
@@ -141,7 +141,7 @@ export default function ResetPasswordPage() {
                             } = await response.json()
 
                             if (!response.ok) {
-                                setError(data.error ?? 'An error occurred')
+                                setError(data.error ?? "An error occurred")
                                 setIsLoading(false)
                                 setSubmitting(false)
                                 return
@@ -149,8 +149,8 @@ export default function ResetPasswordPage() {
 
                             // Keep loading state true during transition to success screen
                             setIsSubmitted(true)
-                        } catch (err) {
-                            setError('An error occurred. Please try again.')
+                        } catch (_) {
+                            setError("An error occurred. Please try again.")
                             setIsLoading(false)
                             setSubmitting(false)
                         }
@@ -228,17 +228,17 @@ export default function ResetPasswordPage() {
                                     <>
                                         <Loading
                                             className={cn(
-                                                'text-md absolute left-1/2 top-1/2 -translate-x-8 -translate-y-1/2 font-semibold',
+                                                "text-md absolute left-1/2 top-1/2 -translate-x-8 -translate-y-1/2 font-semibold",
                                                 isLoading
-                                                    ? 'text-secondary'
-                                                    : 'text-primary',
+                                                    ? "text-secondary"
+                                                    : "text-primary",
                                             )}
                                         />
 
                                         <div className="h-6" />
                                     </>
                                 ) : (
-                                    'Reset password'
+                                    "Reset password"
                                 )}
                             </button>
                         </form>

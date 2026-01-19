@@ -1,8 +1,8 @@
-'use client'
+"use client"
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react"
 
-import { cn } from '~/lib/cn'
+import { cn } from "~/lib/cn"
 
 export function Loading(
     { initialDots, className }: { initialDots?: number; className?: string } = {
@@ -11,9 +11,9 @@ export function Loading(
 ) {
     const initialText = useRef(
         `Loading${new Array(initialDots)
-            .fill('')
-            .map(() => '.')
-            .join('')}`,
+            .fill("")
+            .map(() => ".")
+            .join("")}`,
     )
     const ref = useRef<HTMLDivElement>(null)
 
@@ -21,10 +21,10 @@ export function Loading(
         const interval = setInterval(() => {
             if (ref.current) {
                 const isMaxLength =
-                    ref.current.innerText.replace('Loading', '').length >= 3
+                    ref.current.innerText.replace("Loading", "").length >= 3
                 ref.current.innerText = isMaxLength
-                    ? 'Loading.'
-                    : ref.current.innerText + '.'
+                    ? "Loading."
+                    : ref.current.innerText + "."
             }
         }, 240)
 
@@ -32,7 +32,7 @@ export function Loading(
     }, [])
 
     return (
-        <div className={cn('text-xl font-normal', className)} ref={ref}>
+        <div className={cn("text-xl font-normal", className)} ref={ref}>
             {initialText.current}
         </div>
     )

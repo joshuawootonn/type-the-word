@@ -4,7 +4,7 @@ import {
     useContext,
     useEffect,
     useState,
-} from 'react'
+} from "react"
 
 export type PassageRectContext = {
     rect: DOMRect | null
@@ -17,7 +17,7 @@ export const PassageRectContext = createContext<PassageRectContext>({
     verseRects: {},
     updateVerseRect: () => {
         console.info(
-            'Whoops! Looks like you used this outside of a passage context',
+            "Whoops! Looks like you used this outside of a passage context",
         )
     },
 })
@@ -44,12 +44,12 @@ export function useRect(ref: RefObject<HTMLElement | null>) {
             }
         }
 
-        window.addEventListener('resize', updateRect)
-        window.addEventListener('scroll', updateRect)
+        window.addEventListener("resize", updateRect)
+        window.addEventListener("scroll", updateRect)
         updateRect()
         return () => {
-            window.removeEventListener('scroll', updateRect)
-            window.removeEventListener('resize', updateRect)
+            window.removeEventListener("scroll", updateRect)
+            window.removeEventListener("resize", updateRect)
         }
     }, [rect?.height, rect?.left, rect?.top, rect?.width, ref])
 
@@ -76,12 +76,12 @@ export function useVerseRect(
             }
         }
 
-        window.addEventListener('resize', updateRect)
-        window.addEventListener('scroll', updateRect)
+        window.addEventListener("resize", updateRect)
+        window.addEventListener("scroll", updateRect)
         updateRect()
         return () => {
-            window.removeEventListener('scroll', updateRect)
-            window.removeEventListener('resize', updateRect)
+            window.removeEventListener("scroll", updateRect)
+            window.removeEventListener("resize", updateRect)
         }
     }, [ref, updateVerseRect, verse, verseRects])
 

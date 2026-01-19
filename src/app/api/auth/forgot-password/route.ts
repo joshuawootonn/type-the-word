@@ -1,14 +1,14 @@
-import { eq } from 'drizzle-orm'
-import { NextResponse } from 'next/server'
-import { z } from 'zod'
+import { eq } from "drizzle-orm"
+import { NextResponse } from "next/server"
+import { z } from "zod"
 
-import { sendPasswordResetEmail } from '~/lib/auth/mailpace'
-import { createResetToken } from '~/lib/auth/reset-token'
-import { db } from '~/server/db'
-import { users } from '~/server/db/schema'
+import { sendPasswordResetEmail } from "~/lib/auth/mailpace"
+import { createResetToken } from "~/lib/auth/reset-token"
+import { db } from "~/server/db"
+import { users } from "~/server/db/schema"
 
 const forgotPasswordSchema = z.object({
-    email: z.string().email('Invalid email address'),
+    email: z.string().email("Invalid email address"),
 })
 
 export async function POST(request: Request) {
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
                 {
                     error:
                         validation.error.errors[0]?.message ??
-                        'Validation failed',
+                        "Validation failed",
                 },
                 { status: 400 },
             )
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
             return NextResponse.json({
                 success: true,
                 message:
-                    'If an account exists with that email, a password reset link has been sent.',
+                    "If an account exists with that email, a password reset link has been sent.",
             })
         }
 
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
             return NextResponse.json({
                 success: true,
                 message:
-                    'If an account exists with that email, a password reset link has been sent.',
+                    "If an account exists with that email, a password reset link has been sent.",
             })
         }
 
@@ -65,12 +65,12 @@ export async function POST(request: Request) {
         return NextResponse.json({
             success: true,
             message:
-                'If an account exists with that email, a password reset link has been sent.',
+                "If an account exists with that email, a password reset link has been sent.",
         })
     } catch (error) {
-        console.error('Forgot password error:', error)
+        console.error("Forgot password error:", error)
         return NextResponse.json(
-            { error: 'An error occurred while processing your request' },
+            { error: "An error occurred while processing your request" },
             { status: 500 },
         )
     }

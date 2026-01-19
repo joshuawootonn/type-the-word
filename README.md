@@ -1,7 +1,5 @@
 ![image](https://github.com/user-attachments/assets/16363097-d036-4c5e-bf60-0e0032a37c0b)
 
-
-
 A couple of years ago, I typed out Psalms 1 to 137 over a 6 month period. Not only did this improve my typing,
 but it also encouraged me daily. When I later discovered
 <a

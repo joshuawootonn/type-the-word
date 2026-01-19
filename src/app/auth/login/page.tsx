@@ -1,19 +1,19 @@
-'use client'
+"use client"
 
-import clsx from 'clsx'
-import { Field, Formik } from 'formik'
-import { signIn } from 'next-auth/react'
-import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useState, useRef } from 'react'
+import clsx from "clsx"
+import { Field, Formik } from "formik"
+import { signIn } from "next-auth/react"
+import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useState, useRef } from "react"
 
-import { Loading } from '~/components/loading'
-import { cn } from '~/lib/cn'
+import { Loading } from "~/components/loading"
+import { cn } from "~/lib/cn"
 
 export default function LogInPage() {
     const router = useRouter()
     const searchParams = useSearchParams()
-    const callbackUrl = searchParams?.get('callbackUrl') ?? '/'
+    const callbackUrl = searchParams?.get("callbackUrl") ?? "/"
     const [error, setError] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(false)
     const emailRef = useRef<HTMLInputElement>(null)
@@ -27,20 +27,20 @@ export default function LogInPage() {
                 </h1>
 
                 <Formik
-                    initialValues={{ email: '', password: '' }}
+                    initialValues={{ email: "", password: "" }}
                     validate={values => {
                         const errors: { email?: string; password?: string } = {}
                         if (!values.email) {
-                            errors.email = 'Email is required'
+                            errors.email = "Email is required"
                         } else if (
                             !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(
                                 values.email,
                             )
                         ) {
-                            errors.email = 'Invalid email address'
+                            errors.email = "Invalid email address"
                         }
                         if (!values.password) {
-                            errors.password = 'Password is required'
+                            errors.password = "Password is required"
                         }
 
                         // Focus first field with error
@@ -59,14 +59,14 @@ export default function LogInPage() {
                         setIsLoading(true)
 
                         try {
-                            const result = await signIn('credentials', {
+                            const result = await signIn("credentials", {
                                 email: values.email,
                                 password: values.password,
                                 redirect: false,
                             })
 
                             if (result?.error) {
-                                setError('Invalid email or password')
+                                setError("Invalid email or password")
                                 setIsLoading(false)
                                 setSubmitting(false)
                             } else if (result?.ok) {
@@ -74,8 +74,8 @@ export default function LogInPage() {
                                 router.push(callbackUrl)
                                 router.refresh()
                             }
-                        } catch (err) {
-                            setError('An error occurred. Please try again.')
+                        } catch (_) {
+                            setError("An error occurred. Please try again.")
                             setIsLoading(false)
                             setSubmitting(false)
                         }
@@ -157,25 +157,25 @@ export default function LogInPage() {
                                 type="submit"
                                 disabled={isLoading}
                                 className={clsx(
-                                    'svg-outline relative w-full cursor-pointer border-2 border-primary bg-primary px-3 py-1 font-semibold text-secondary',
-                                    'disabled:cursor-not-allowed disabled:bg-primary disabled:text-secondary',
+                                    "svg-outline relative w-full cursor-pointer border-2 border-primary bg-primary px-3 py-1 font-semibold text-secondary",
+                                    "disabled:cursor-not-allowed disabled:bg-primary disabled:text-secondary",
                                 )}
                             >
                                 {isLoading ? (
                                     <>
                                         <Loading
                                             className={cn(
-                                                'text-md absolute left-1/2 top-1/2 -translate-x-8 -translate-y-1/2 font-semibold',
+                                                "text-md absolute left-1/2 top-1/2 -translate-x-8 -translate-y-1/2 font-semibold",
                                                 isLoading
-                                                    ? 'text-secondary'
-                                                    : 'text-primary',
+                                                    ? "text-secondary"
+                                                    : "text-primary",
                                             )}
                                         />
 
                                         <div className="h-6" />
                                     </>
                                 ) : (
-                                    'Log in'
+                                    "Log in"
                                 )}
                             </button>
                         </form>
@@ -189,7 +189,7 @@ export default function LogInPage() {
                 </div>
 
                 <button
-                    onClick={() => void signIn('google', { callbackUrl })}
+                    onClick={() => void signIn("google", { callbackUrl })}
                     disabled={isLoading}
                     className="svg-outline relative w-full cursor-pointer border-2 border-primary bg-secondary px-3 py-1 font-semibold text-primary disabled:cursor-not-allowed"
                 >
@@ -197,7 +197,7 @@ export default function LogInPage() {
                 </button>
 
                 <p className="mt-8 text-center text-primary">
-                    Don&apos;t have an account?{' '}
+                    Don&apos;t have an account?{" "}
                     <Link
                         href="/auth/signup"
                         className="svg-outline relative font-semibold underline hover:no-underline"

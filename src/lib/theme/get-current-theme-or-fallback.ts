@@ -1,26 +1,26 @@
-import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
-import { CurrentTheme } from '~/server/repositories/currentTheme.repository'
+import { BuiltinThemeRecord } from "~/server/repositories/builtinTheme.repository"
+import { CurrentTheme } from "~/server/repositories/currentTheme.repository"
 
-const isServer = typeof window === 'undefined'
+const isServer = typeof window === "undefined"
 
 function clearLegacyTheme(): void {
     try {
-        localStorage.removeItem('theme')
-    } catch (e) {
+        localStorage.removeItem("theme")
+    } catch (_) {
         // Unsupported
     }
 }
 
-function getLegacyTheme(): 'system' | 'dark' | 'light' | undefined {
+function getLegacyTheme(): "system" | "dark" | "light" | undefined {
     if (isServer) return undefined
     let theme
     try {
         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-        theme = localStorage.getItem('theme') || undefined
-    } catch (e) {
+        theme = localStorage.getItem("theme") || undefined
+    } catch (_) {
         // Unsupported
     }
-    return theme as 'system' | 'dark' | 'light'
+    return theme as "system" | "dark" | "light"
 }
 
 export function getCurrentThemeOrFallback(
@@ -35,24 +35,24 @@ export function getCurrentThemeOrFallback(
     const legacyTheme = getLegacyTheme()
 
     const lightThemeId = builtinThemes.find(
-        t => t.theme.label === 'Light',
+        t => t.theme.label === "Light",
     )!.themeId
     const darkThemeId = builtinThemes.find(
-        t => t.theme.label === 'Dark',
+        t => t.theme.label === "Dark",
     )!.themeId
 
-    if (legacyTheme === 'light') {
+    if (legacyTheme === "light") {
         return {
-            userId: '',
+            userId: "",
             lightThemeId,
             darkThemeId: null,
             colorScheme: legacyTheme,
         }
     }
 
-    if (legacyTheme === 'dark') {
+    if (legacyTheme === "dark") {
         return {
-            userId: '',
+            userId: "",
             lightThemeId: null,
             darkThemeId,
             colorScheme: legacyTheme,
@@ -60,9 +60,9 @@ export function getCurrentThemeOrFallback(
     }
 
     return {
-        userId: '',
+        userId: "",
         lightThemeId,
         darkThemeId,
-        colorScheme: legacyTheme ?? 'system',
+        colorScheme: legacyTheme ?? "system",
     }
 }

@@ -1,11 +1,11 @@
-import { differenceInMinutes, subMinutes } from 'date-fns'
+import { differenceInMinutes, subMinutes } from "date-fns"
 
-import { db } from '~/server/db'
-import { typingSessions } from '~/server/db/schema'
+import { db } from "~/server/db"
+import { typingSessions } from "~/server/db/schema"
 import {
     TypingSession,
     TypingSessionRepository,
-} from '~/server/repositories/typingSession.repository'
+} from "~/server/repositories/typingSession.repository"
 
 export async function getOrCreateTypingSession(
     userId: string,
@@ -32,7 +32,7 @@ export async function getOrCreateTypingSession(
         .returning()
 
     if (!nextSession) {
-        throw new Error('Failed to create new typing session')
+        throw new Error("Failed to create new typing session")
     }
 
     const newTypingSession = await typingSessionRepository.getOne({

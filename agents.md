@@ -153,14 +153,12 @@ src/app/some-route/
 **Key Rules:**
 
 1. **`page.tsx`** - Always a Server Component (default)
-
     - Handles server-side data fetching
     - Performs authentication checks
     - Queries database directly
     - Passes initial data as props to client component
 
 2. **`client-page.tsx`** - The main Client Component for the route
-
     - Uses `'use client'` directive
     - Handles user interactions (clicks, form submissions, etc.)
     - Manages client-side state

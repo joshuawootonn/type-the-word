@@ -1,8 +1,8 @@
-'use client'
+"use client"
 
-import * as Popover from '@radix-ui/react-popover'
-import clsx from 'clsx'
-import { useEffect, useState } from 'react'
+import * as Popover from "@radix-ui/react-popover"
+import clsx from "clsx"
+import { useEffect, useState } from "react"
 
 export function EmailLink({
     children,
@@ -32,29 +32,29 @@ export function EmailLink({
             <Popover.Trigger asChild>
                 <button
                     tabIndex={0}
-                    className={clsx('relative z-[5] font-medium', className)}
-                    onClick={e => {
+                    className={clsx("relative z-[5] font-medium", className)}
+                    onClick={_ => {
                         setIsOpen(true)
-                        const el = document.createElement('textarea')
-                        el.value = 'josh@typetheword.site'
+                        const el = document.createElement("textarea")
+                        el.value = "josh@typetheword.site"
                         document.body.appendChild(el)
                         el.select()
-                        document.execCommand('copy')
+                        document.execCommand("copy")
                         document.body.removeChild(el)
                     }}
                 >
-                    {children ?? 'josh@typetheword.site'}
+                    {children ?? "josh@typetheword.site"}
                 </button>
             </Popover.Trigger>
             <Popover.Content
-                side={'top'}
+                side={"top"}
                 className="PopoverContent"
-                align={'center'}
+                align={"center"}
                 sideOffset={5}
             >
                 <span
                     className={clsx(
-                        'block border-2 border-primary bg-secondary px-2 py-1 font-medium outline-none',
+                        "block border-2 border-primary bg-secondary px-2 py-1 font-medium outline-none",
                         popoverClassName,
                     )}
                 >

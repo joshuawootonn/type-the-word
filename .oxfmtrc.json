@@ -1,0 +1,22 @@
+{
+    "$schema": "https://oxc.rs/schema/oxfmt.json",
+    "printWidth": 80,
+    "tabWidth": 4,
+    "useTabs": false,
+    "semi": false,
+    "singleQuote": false,
+    "jsxSingleQuote": false,
+    "trailingComma": "all",
+    "bracketSpacing": true,
+    "bracketSameLine": false,
+    "arrowParens": "avoid",
+    "endOfLine": "lf",
+    "experimentalSortImports": {
+        "partitionByComment": false,
+        "partitionByNewline": false,
+        "sortSideEffects": true
+    },
+    "tailwindCssClassSorting": {
+        "enabled": true
+    }
+}

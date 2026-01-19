@@ -1,11 +1,11 @@
-'use client'
+"use client"
 
-import { Field, Formik } from 'formik'
-import Link from 'next/link'
-import { useState, useRef } from 'react'
+import { Field, Formik } from "formik"
+import Link from "next/link"
+import { useState, useRef } from "react"
 
-import { Loading } from '~/components/loading'
-import { cn } from '~/lib/cn'
+import { Loading } from "~/components/loading"
+import { cn } from "~/lib/cn"
 
 export default function ForgotPasswordPage() {
     const [isSubmitted, setIsSubmitted] = useState(false)
@@ -47,17 +47,17 @@ export default function ForgotPasswordPage() {
                 </p>
 
                 <Formik
-                    initialValues={{ email: '' }}
+                    initialValues={{ email: "" }}
                     validate={values => {
                         const errors: { email?: string } = {}
                         if (!values.email) {
-                            errors.email = 'Email is required'
+                            errors.email = "Email is required"
                         } else if (
                             !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(
                                 values.email,
                             )
                         ) {
-                            errors.email = 'Invalid email address'
+                            errors.email = "Invalid email address"
                         }
 
                         // Focus first field with error
@@ -75,11 +75,11 @@ export default function ForgotPasswordPage() {
 
                         try {
                             const response = await fetch(
-                                '/api/auth/forgot-password',
+                                "/api/auth/forgot-password",
                                 {
-                                    method: 'POST',
+                                    method: "POST",
                                     headers: {
-                                        'Content-Type': 'application/json',
+                                        "Content-Type": "application/json",
                                     },
                                     body: JSON.stringify({
                                         email: values.email,
@@ -93,7 +93,7 @@ export default function ForgotPasswordPage() {
                             } = await response.json()
 
                             if (!response.ok) {
-                                setError(data.error ?? 'An error occurred')
+                                setError(data.error ?? "An error occurred")
                                 setIsLoading(false)
                                 setSubmitting(false)
                                 return
@@ -101,8 +101,8 @@ export default function ForgotPasswordPage() {
 
                             // Keep loading state true during transition to success screen
                             setIsSubmitted(true)
-                        } catch (err) {
-                            setError('An error occurred. Please try again.')
+                        } catch (_) {
+                            setError("An error occurred. Please try again.")
                             setIsLoading(false)
                             setSubmitting(false)
                         }
@@ -154,17 +154,17 @@ export default function ForgotPasswordPage() {
                                     <>
                                         <Loading
                                             className={cn(
-                                                'text-md absolute left-1/2 top-1/2 -translate-x-8 -translate-y-1/2 font-semibold',
+                                                "text-md absolute left-1/2 top-1/2 -translate-x-8 -translate-y-1/2 font-semibold",
                                                 isLoading
-                                                    ? 'text-secondary'
-                                                    : 'text-primary',
+                                                    ? "text-secondary"
+                                                    : "text-primary",
                                             )}
                                         />
 
                                         <div className="h-6" />
                                     </>
                                 ) : (
-                                    'Send reset link'
+                                    "Send reset link"
                                 )}
                             </button>
                         </form>
@@ -172,7 +172,7 @@ export default function ForgotPasswordPage() {
                 </Formik>
 
                 <p className="mt-8 text-center text-primary">
-                    Remember your password?{' '}
+                    Remember your password?{" "}
                     <Link
                         href="/auth/login"
                         className="svg-outline relative font-semibold underline hover:no-underline"

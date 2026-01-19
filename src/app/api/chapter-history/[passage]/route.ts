@@ -1,11 +1,11 @@
-import { getServerSession } from 'next-auth'
-import { NextRequest } from 'next/server'
+import { getServerSession } from "next-auth"
+import { NextRequest } from "next/server"
 
-import { Translation } from '~/lib/parseEsv'
-import { segmentToPassageObject } from '~/lib/passageObject'
-import { authOptions } from '~/server/auth'
+import { Translation } from "~/lib/parseEsv"
+import { segmentToPassageObject } from "~/lib/passageObject"
+import { authOptions } from "~/server/auth"
 
-import { getChapterHistory } from './getChapterHistory'
+import { getChapterHistory } from "./getChapterHistory"
 
 export type ChapterLog = {
     location: string[]
@@ -17,25 +17,25 @@ export type ChapterHistory = {
     chapterLogs: ChapterLog[]
 }
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic"
 
 const validTranslations: Translation[] = [
-    'esv',
-    'bsb',
-    'nlt',
-    'niv',
-    'csb',
-    'nkjv',
-    'nasb',
-    'ntv',
-    'msg',
+    "esv",
+    "bsb",
+    "nlt",
+    "niv",
+    "csb",
+    "nkjv",
+    "nasb",
+    "ntv",
+    "msg",
 ]
 
 function parseTranslation(value: string | undefined | null): Translation {
     if (value && validTranslations.includes(value as Translation)) {
         return value as Translation
     }
-    return 'esv'
+    return "esv"
 }
 
 export async function GET(
@@ -45,7 +45,7 @@ export async function GET(
     const session = await getServerSession(authOptions)
 
     if (session === null) {
-        return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        return Response.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const { passage } = await params
@@ -53,17 +53,17 @@ export async function GET(
 
     try {
         passageObject = segmentToPassageObject(passage)
-    } catch (e) {
+    } catch (_) {
         return Response.json(
             {
-                error: 'Invalid reference route segement',
+                error: "Invalid reference route segement",
             },
             { status: 400 },
         )
     }
 
     const translation = parseTranslation(
-        request.nextUrl.searchParams.get('translation'),
+        request.nextUrl.searchParams.get("translation"),
     )
 
     const data = await getChapterHistory(

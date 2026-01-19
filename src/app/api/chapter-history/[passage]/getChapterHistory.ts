@@ -1,11 +1,11 @@
-import { typingSessionToString } from '~/app/history/typingSessionToString'
-import { Translation } from '~/lib/parseEsv'
-import { PassageObject } from '~/lib/passageObject'
-import { getBibleMetadata } from '~/server/bibleMetadata'
-import { db } from '~/server/db'
-import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
+import { typingSessionToString } from "~/app/history/typingSessionToString"
+import { Translation } from "~/lib/parseEsv"
+import { PassageObject } from "~/lib/passageObject"
+import { getBibleMetadata } from "~/server/bibleMetadata"
+import { db } from "~/server/db"
+import { TypingSessionRepository } from "~/server/repositories/typingSession.repository"
 
-import { ChapterHistory } from './route'
+import { ChapterHistory } from "./route"
 
 export async function getChapterHistory(
     userId: string,
@@ -32,7 +32,7 @@ export async function getChapterHistory(
         )
     }
 
-    let verses: ChapterHistory['verses'] = {}
+    let verses: ChapterHistory["verses"] = {}
 
     const chronologicalTypingSession = typingSessions.slice().reverse()
     for (const session of chronologicalTypingSession) {
@@ -64,9 +64,9 @@ export async function getChapterHistory(
                     typedVerse.translation === translation,
             ),
             {
-                seperator: '\n',
+                seperator: "\n",
             },
-        ).split('\n'),
+        ).split("\n"),
         createdAt: typingSession.createdAt,
     }))
 

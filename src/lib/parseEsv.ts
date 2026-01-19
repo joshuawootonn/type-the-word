@@ -1,29 +1,29 @@
-import { JSDOM } from 'jsdom'
-import { parseFragment } from 'parse5'
-import { ChildNode } from 'parse5/dist/tree-adapters/default'
+import { JSDOM } from "jsdom"
+import { parseFragment } from "parse5"
+import { ChildNode } from "parse5/dist/tree-adapters/default"
 
-import { isAtomTyped } from '~/lib/isEqual'
-import { isAtomComplete } from '~/lib/keystroke'
-import { Book, bookSchema } from '~/lib/types/book'
-import { getBibleMetadata } from '~/server/bibleMetadata'
+import { isAtomTyped } from "~/lib/isEqual"
+import { isAtomComplete } from "~/lib/keystroke"
+import { Book, bookSchema } from "~/lib/types/book"
+import { getBibleMetadata } from "~/server/bibleMetadata"
 
-import { PassageReference, passageReferenceSchema } from './passageReference'
-import { PassageSegment, toPassageSegment } from './passageSegment'
-import { splitLineBySpaceOrNewLine } from './splitBySpaceOrNewLine'
+import { PassageReference, passageReferenceSchema } from "./passageReference"
+import { PassageSegment, toPassageSegment } from "./passageSegment"
+import { splitLineBySpaceOrNewLine } from "./splitBySpaceOrNewLine"
 
 export type Translation =
-    | 'esv'
-    | 'bsb'
-    | 'nlt'
-    | 'niv'
-    | 'csb'
-    | 'nkjv'
-    | 'nasb'
-    | 'ntv'
-    | 'msg'
+    | "esv"
+    | "bsb"
+    | "nlt"
+    | "niv"
+    | "csb"
+    | "nkjv"
+    | "nasb"
+    | "ntv"
+    | "msg"
 
 export type VerseNumber = {
-    type: 'verseNumber'
+    type: "verseNumber"
     value: string
     text: string
     verse: number
@@ -32,16 +32,16 @@ export type VerseNumber = {
     translation: Translation
 }
 
-export type Word = { type: 'word'; letters: string[]; divineName?: boolean }
+export type Word = { type: "word"; letters: string[]; divineName?: boolean }
 
-export type Decoration = { type: 'decoration'; text: string }
+export type Decoration = { type: "decoration"; text: string }
 
 export type Inline =
     | VerseNumber
     | Word
     | Decoration
-    | { type: 'space' }
-    | { type: 'newLine' }
+    | { type: "space" }
+    | { type: "newLine" }
 
 type VerseMetadata = {
     hangingVerse?: boolean
@@ -50,7 +50,7 @@ type VerseMetadata = {
 }
 
 export type Verse = {
-    type: 'verse'
+    type: "verse"
     verse: VerseNumber
     text: string
     nodes: (Paragraph | Inline)[]
@@ -58,32 +58,32 @@ export type Verse = {
 }
 
 export type H1 = {
-    type: 'h1'
+    type: "h1"
     text: string
 }
 
 export type H2 = {
-    type: 'h2'
+    type: "h2"
     text: string
 }
 
 export type H3 = {
-    type: 'h3'
+    type: "h3"
     text: string
 }
 
 export type H4 = {
-    type: 'h4'
+    type: "h4"
     text: string
 }
 
 export type ParagraphMetadata = {
-    type: 'default' | 'quote'
+    type: "default" | "quote"
     blockIndent: boolean
 }
 
 export type Paragraph = {
-    type: 'paragraph'
+    type: "paragraph"
     text: string
     nodes: Verse[]
     metadata: ParagraphMetadata
@@ -93,9 +93,9 @@ export type Block = H1 | H2 | H3 | H4 | Verse | Paragraph
 
 function inlineToString(inlines: Inline[]): string {
     return inlines
-        .filter((node): node is Word => node.type === 'word')
-        .map(node => node.letters.join(''))
-        .join('')
+        .filter((node): node is Word => node.type === "word")
+        .map(node => node.letters.join(""))
+        .join("")
 }
 
 export type CopyrightMetadata = {
@@ -176,7 +176,7 @@ export function parseNextChapter(
     )
 
     if (nextBookMetadata) {
-        const url = toPassageSegment(nextBookMetadata[0], '1')
+        const url = toPassageSegment(nextBookMetadata[0], "1")
         return {
             url,
             label: passageReferenceSchema.parse(url),
@@ -188,7 +188,7 @@ export function parseNextChapter(
 
 export function parseChapter(passage: string): ParsedPassage {
     const dom = new JSDOM(passage)
-    dom.window.document.querySelectorAll('sup.footnote').forEach(node => {
+    dom.window.document.querySelectorAll("sup.footnote").forEach(node => {
         node.parentNode?.removeChild(node)
     })
 
@@ -202,26 +202,26 @@ export function parseChapter(passage: string): ParsedPassage {
     } = {}
 
     function parseInline(node: ChildNode): Inline[] {
-        if (node.nodeName === '#text' && 'value' in node) {
-            const leadingSpaces = new Array<{ type: 'space' }>(
+        if (node.nodeName === "#text" && "value" in node) {
+            const leadingSpaces = new Array<{ type: "space" }>(
                 node.value.length - node.value.trimStart().length,
             ).fill({
-                type: 'space',
+                type: "space",
             })
 
             const wordSegments = splitLineBySpaceOrNewLine(node.value)
             const words =
                 wordSegments.length > 0
                     ? wordSegments.map((word): Inline => {
-                          const letters = word.split('')
+                          const letters = word.split("")
                           const atom: Word = {
-                              type: 'word',
+                              type: "word",
                               letters,
                           }
 
                           return isAtomComplete(atom)
                               ? atom
-                              : { ...atom, letters: [...atom.letters, ' '] }
+                              : { ...atom, letters: [...atom.letters, " "] }
                       })
                     : []
 
@@ -229,51 +229,51 @@ export function parseChapter(passage: string): ParsedPassage {
         }
 
         if (
-            node.nodeName === 'b' &&
+            node.nodeName === "b" &&
             node.attrs.find(
                 attr =>
-                    attr.value.includes('verse-num') ||
-                    attr.value.includes('chapter-num'),
+                    attr.value.includes("verse-num") ||
+                    attr.value.includes("chapter-num"),
             ) != undefined
         ) {
             const numberString = node.childNodes
                 .flatMap(parseInline)
-                .filter((node): node is Word => node.type === 'word')
-                .map(node => node.letters.join(''))
-                .join('')
+                .filter((node): node is Word => node.type === "word")
+                .map(node => node.letters.join(""))
+                .join("")
 
             if (
-                node.attrs.find(attr => attr.value.includes('chapter-num')) !=
+                node.attrs.find(attr => attr.value.includes("chapter-num")) !=
                 undefined
             ) {
-                context.chapter = parseInt(numberString.split(':').at(0) ?? '')
+                context.chapter = parseInt(numberString.split(":").at(0) ?? "")
             }
 
             if (context.book == undefined) {
-                throw new Error('Attempted to create verse without book')
+                throw new Error("Attempted to create verse without book")
             }
             if (context.chapter == undefined) {
-                throw new Error('Attempted to create verse without chapter')
+                throw new Error("Attempted to create verse without chapter")
             }
 
             return [
                 {
-                    type: 'verseNumber',
+                    type: "verseNumber",
                     value: numberString.trim(),
                     text: numberString,
-                    verse: parseInt(numberString.split(':').at(-1) ?? ''),
+                    verse: parseInt(numberString.split(":").at(-1) ?? ""),
                     chapter: context.chapter,
                     book: context.book,
-                    translation: 'esv',
+                    translation: "esv",
                 },
             ]
         }
 
-        if (node.nodeName === 'br') {
-            return [{ type: 'newLine' }]
+        if (node.nodeName === "br") {
+            return [{ type: "newLine" }]
         }
 
-        if (node.nodeName === 'span' && node.childNodes.length > 0) {
+        if (node.nodeName === "span" && node.childNodes.length > 0) {
             return node.childNodes.flatMap(parseInline)
         }
 
@@ -281,14 +281,14 @@ export function parseChapter(passage: string): ParsedPassage {
     }
 
     function parseBlock(node: ChildNode): Block | null {
-        if (node.nodeName === 'h2') {
+        if (node.nodeName === "h2") {
             const text = node.childNodes
                 .flatMap(parseInline)
-                .filter((node): node is Word => node.type === 'word')
-                .map(node => node.letters.join(''))
-                .join('')
+                .filter((node): node is Word => node.type === "word")
+                .map(node => node.letters.join(""))
+                .join("")
 
-            if (node.attrs.find(attr => attr.value.includes('extra_text'))) {
+            if (node.attrs.find(attr => attr.value.includes("extra_text"))) {
                 const trimmedText = text.trim().toLowerCase()
                 const book = /([0-9])*([A-Za-z ])+(?!([0-9:]))/
                     .exec(trimmedText)
@@ -297,44 +297,44 @@ export function parseChapter(passage: string): ParsedPassage {
                     .exec(trimmedText)
                     ?.at(0)
 
-                context.book = bookSchema.parse(book?.split(' ').join('_'))
+                context.book = bookSchema.parse(book?.split(" ").join("_"))
                 context.chapter = chapter ? parseInt(chapter) : undefined
             }
             return {
-                type: 'h2',
+                type: "h2",
                 text: text,
             }
         }
-        if (node.nodeName === 'h3') {
+        if (node.nodeName === "h3") {
             return {
-                type: 'h3',
+                type: "h3",
                 text: node.childNodes
                     .flatMap(parseInline)
-                    .filter((node): node is Word => node.type === 'word')
-                    .map(node => node.letters.join(''))
-                    .join(''),
+                    .filter((node): node is Word => node.type === "word")
+                    .map(node => node.letters.join(""))
+                    .join(""),
             }
         }
-        if (node.nodeName === 'h4') {
+        if (node.nodeName === "h4") {
             return {
-                type: 'h4',
+                type: "h4",
                 text: node.childNodes
                     .flatMap(parseInline)
-                    .filter((node): node is Word => node.type === 'word')
-                    .map(node => node.letters.join(''))
-                    .join(''),
+                    .filter((node): node is Word => node.type === "word")
+                    .map(node => node.letters.join(""))
+                    .join(""),
             }
         }
-        if (node.nodeName === 'p' && node.childNodes.length > 0) {
+        if (node.nodeName === "p" && node.childNodes.length > 0) {
             const nodes: Inline[] = node.childNodes.flatMap(parseInline)
 
-            if (inlineToString(nodes) === '( ) ') {
+            if (inlineToString(nodes) === "( ) ") {
                 return null
             }
 
             const verseNumberNodes: number[] = []
             for (const [i, node] of nodes.entries()) {
-                if (node.type === 'verseNumber') {
+                if (node.type === "verseNumber") {
                     verseNumberNodes.push(i)
                 }
             }
@@ -358,24 +358,24 @@ export function parseChapter(passage: string): ParsedPassage {
             const verses: Verse[] = []
             for (const [i, verseSection] of verseSections.entries()) {
                 const firstWordIndex = verseSection.findIndex(
-                    a => a.type === 'word',
+                    a => a.type === "word",
                 )
                 const verseIndex = verseSection.findIndex(
-                    a => a.type === 'verseNumber',
+                    a => a.type === "verseNumber",
                 )
                 const continuingVerse =
                     i === 0 &&
                     (verseIndex === -1 || verseIndex > firstWordIndex)
 
-                if (verseSection.every(inline => inline.type === 'space')) {
+                if (verseSection.every(inline => inline.type === "space")) {
                     // noop
                 } else if (continuingVerse && context?.lastVerse == undefined) {
                     throw new Error(
-                        'continuing prev verse but verseMetadata is undefined',
+                        "continuing prev verse but verseMetadata is undefined",
                     )
                 } else if (continuingVerse && context?.lastVerse) {
                     verses.push({
-                        type: 'verse',
+                        type: "verse",
                         nodes: verseSection,
                         verse: context.lastVerse.verse,
                         text: inlineToString(verseSection),
@@ -389,7 +389,7 @@ export function parseChapter(passage: string): ParsedPassage {
                     })
                 } else {
                     verses.push({
-                        type: 'verse',
+                        type: "verse",
                         nodes: verseSection,
                         verse: verseSection.at(verseIndex) as VerseNumber,
                         text: inlineToString(verseSection),
@@ -413,21 +413,21 @@ export function parseChapter(passage: string): ParsedPassage {
             }
 
             return {
-                type: 'paragraph',
+                type: "paragraph",
                 text: inlineToString(nodes),
                 nodes: verses,
                 metadata: {
                     type:
                         node.attrs.find(
                             attr =>
-                                attr.value.includes('block-indent') ||
-                                attr.value.includes('same-paragraph'),
+                                attr.value.includes("block-indent") ||
+                                attr.value.includes("same-paragraph"),
                         ) != undefined
-                            ? 'quote'
-                            : 'default',
+                            ? "quote"
+                            : "default",
                     blockIndent:
                         node.attrs.find(attr =>
-                            attr.value.includes('block-indent'),
+                            attr.value.includes("block-indent"),
                         ) != undefined,
                 },
             }
@@ -445,13 +445,13 @@ export function parseChapter(passage: string): ParsedPassage {
         nodes.push(parsed)
     }
     if (context.book == undefined) {
-        throw new Error('book is undefined')
+        throw new Error("book is undefined")
     }
     if (context.chapter == undefined) {
-        throw new Error('chapter is undefined')
+        throw new Error("chapter is undefined")
     }
     if (context.firstVerseOfPassage == undefined) {
-        throw new Error('firstVerse is undefined')
+        throw new Error("firstVerse is undefined")
     }
 
     return {
@@ -460,9 +460,9 @@ export function parseChapter(passage: string): ParsedPassage {
         prevChapter: parsePrevChapter(context.book, context.chapter),
         nextChapter: parseNextChapter(context.book, context.chapter),
         copyright: {
-            text: 'Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved.',
-            abbreviation: 'ESV',
-            translation: 'esv',
+            text: "Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved.",
+            abbreviation: "ESV",
+            translation: "esv",
         },
     }
 }

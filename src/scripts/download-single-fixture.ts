@@ -2,16 +2,16 @@
  * Download a single fixture from API.Bible
  * Run with: pnpm exec dotenv -e .env -- tsx ./src/scripts/download-single-fixture.ts
  */
-import fs from 'fs'
-import path from 'path'
-import { z } from 'zod'
+import fs from "fs"
+import path from "path"
+import { z } from "zod"
 
-import { env } from '~/env.mjs'
-import { bookToApiBibleId } from '~/lib/api-bible-book-id'
-import { API_BIBLE_IDS, ApiBibleTranslation } from '~/lib/api-bible-ids'
+import { env } from "~/env.mjs"
+import { bookToApiBibleId } from "~/lib/api-bible-book-id"
+import { API_BIBLE_IDS, ApiBibleTranslation } from "~/lib/api-bible-ids"
 
-const TRANSLATION: ApiBibleTranslation = 'nasb'
-const BOOK: keyof typeof bookToApiBibleId = 'luke'
+const TRANSLATION: ApiBibleTranslation = "nasb"
+const BOOK: keyof typeof bookToApiBibleId = "luke"
 const CHAPTER = 19
 
 const apiBibleResponseSchema = z.object({
@@ -26,13 +26,13 @@ async function main() {
     const passageId = `${bookId}.${CHAPTER}`
 
     const params = new URLSearchParams({
-        'content-type': 'html',
-        'include-notes': 'false',
-        'include-titles': 'true',
-        'include-chapter-numbers': 'false',
-        'include-verse-numbers': 'true',
-        'include-verse-spans': 'true',
-        'use-org-id': 'false',
+        "content-type": "html",
+        "include-notes": "false",
+        "include-titles": "true",
+        "include-chapter-numbers": "false",
+        "include-verse-numbers": "true",
+        "include-verse-spans": "true",
+        "use-org-id": "false",
     })
 
     const url = `https://rest.api.bible/v1/bibles/${bibleId}/passages/${passageId}?${params.toString()}`
@@ -43,7 +43,7 @@ async function main() {
 
     const response = await fetch(url, {
         headers: {
-            'api-key': env.API_BIBLE_API_KEY,
+            "api-key": env.API_BIBLE_API_KEY,
         },
     })
 
@@ -55,7 +55,7 @@ async function main() {
 
     const dir = path.join(
         process.cwd(),
-        'src/server/api-bible/responses',
+        "src/server/api-bible/responses",
         TRANSLATION,
     )
     if (!fs.existsSync(dir)) {

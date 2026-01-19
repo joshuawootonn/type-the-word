@@ -1,8 +1,8 @@
-import clsx from 'clsx'
+import clsx from "clsx"
 
-import { NewLineIndicator } from '~/components/newLineIndicator'
-import { isAtomEqual, isLetterEqual } from '~/lib/isEqual'
-import { type Word } from '~/lib/parseEsv'
+import { NewLineIndicator } from "~/components/newLineIndicator"
+import { isAtomEqual, isLetterEqual } from "~/lib/isEqual"
+import { type Word } from "~/lib/parseEsv"
 
 export function Word({
     word,
@@ -27,7 +27,7 @@ export function Word({
 
     return (
         <>
-            <span className={clsx('word', active && 'active-word')}>
+            <span className={clsx("word", active && "active-word")}>
                 {wordWithoutEnder.map((letter, lIndex) => {
                     const typedLetter = typedWord?.letters.at(lIndex)
                     const isEqual = isLetterEqual(letter, typedLetter)
@@ -35,13 +35,13 @@ export function Word({
                         <span
                             key={lIndex}
                             className={clsx(
-                                'letter',
-                                isEqual && 'correct',
-                                typedLetter && !isEqual && 'incorrect',
+                                "letter",
+                                isEqual && "correct",
+                                typedLetter && !isEqual && "incorrect",
                                 isErrored &&
-                                    'error underline decoration-error decoration-2',
+                                    "error underline decoration-error decoration-2",
                                 Boolean(word.divineName) &&
-                                    (lIndex > 0 ? 'divine-name' : ''),
+                                    (lIndex > 0 ? "divine-name" : ""),
                             )}
                         >
                             {letter}
@@ -53,9 +53,9 @@ export function Word({
                         <span
                             key={lIndex}
                             className={clsx(
-                                'letter extra',
+                                "letter extra",
                                 isErrored &&
-                                    'error underline decoration-error decoration-2',
+                                    "error underline decoration-error decoration-2",
                             )}
                         >
                             {letter}
@@ -65,13 +65,13 @@ export function Word({
 
                 <span
                     className={clsx(
-                        'letter relative z-0',
-                        word.divineName && 'divine-name',
+                        "letter relative z-0",
+                        word.divineName && "divine-name",
                     )}
                 >
-                    {ender === '\n' ? (
+                    {ender === "\n" ? (
                         <NewLineIndicator isActive={active} />
-                    ) : ender === ' ' ? (
+                    ) : ender === " " ? (
                         <>&nbsp;</>
                     ) : (
                         ender

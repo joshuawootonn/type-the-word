@@ -1,0 +1,52 @@
+{
+    "$schema": "https://oxc.rs/schema/oxlint.json",
+    "jsPlugins": ["eslint-plugin-better-tailwindcss"],
+    "extends": ["plugin:better-tailwindcss/recommended"],
+    "settings": {
+        "better-tailwindcss": {
+            "tailwindConfig": "tailwind.config.ts"
+        }
+    },
+    "categories": {
+        "correctness": "error",
+        "suspicious": "warn",
+        "perf": "warn"
+    },
+    "plugins": ["react", "nextjs"],
+    "rules": {
+        "typescript/no-floating-promises": "error",
+        "typescript/no-misused-promises": "error",
+        "typescript/await-thenable": "error",
+        "typescript/no-unnecessary-type-assertion": "warn",
+        "typescript/no-explicit-any": "off",
+        "typescript/no-unused-vars": [
+            "warn",
+            {
+                "argsIgnorePattern": "^_",
+                "caughtErrorsIgnorePattern": "^_"
+            }
+        ],
+        "react/react-in-jsx-scope": "off",
+        "react/no-array-index-key": "off",
+        "nextjs/no-html-link-for-pages": "off",
+        "no-await-in-loop": "off",
+        "no-useless-escape": "off",
+        "unicorn/no-new-array": "off",
+        "better-tailwindcss/enforce-consistent-class-order": [
+            "warn",
+            { "entryPoint": "src/global.css" }
+        ],
+        "better-tailwindcss/no-conflicting-classes": [
+            "error",
+            { "entryPoint": "src/global.css" }
+        ],
+        "better-tailwindcss/no-duplicate-classes": [
+            "warn",
+            { "entryPoint": "src/global.css" }
+        ],
+        "better-tailwindcss/no-unnecessary-whitespace": [
+            "warn",
+            { "entryPoint": "src/global.css" }
+        ]
+    }
+}

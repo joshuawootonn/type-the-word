@@ -1,26 +1,26 @@
-import { z } from 'zod'
+import { z } from "zod"
 
-import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
-import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
+import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
+import { AddTypedVerseBody } from "~/app/api/typing-session/[id]/route"
 import {
     BuiltinThemeRecord,
     ThemeRecord,
-} from '~/server/repositories/builtinTheme.repository'
-import { CurrentTheme } from '~/server/repositories/currentTheme.repository'
+} from "~/server/repositories/builtinTheme.repository"
+import { CurrentTheme } from "~/server/repositories/currentTheme.repository"
 import {
     TypedVerse,
     TypingSession,
-} from '~/server/repositories/typingSession.repository'
-import { UserChangelogRecord } from '~/server/repositories/userChangelog.repository'
-import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
+} from "~/server/repositories/typingSession.repository"
+import { UserChangelogRecord } from "~/server/repositories/userChangelog.repository"
+import { UserThemeRecord } from "~/server/repositories/userTheme.repository"
 
-import { ParsedPassage, Translation } from './parseEsv'
-import { PassageSegment } from './passageSegment'
+import { ParsedPassage, Translation } from "./parseEsv"
+import { PassageSegment } from "./passageSegment"
 
 export type Body<T> = { data: T }
 
 export function getBaseUrl() {
-    if (typeof window !== 'undefined') return ''
+    if (typeof window !== "undefined") return ""
 
     if (process.env.VERCEL_PROJECT_PRODUCTION_URL)
         return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
@@ -30,14 +30,14 @@ export function getBaseUrl() {
 
 export async function fetchPassage(
     value: PassageSegment,
-    translation: Translation = 'esv',
+    translation: Translation = "esv",
 ): Promise<ParsedPassage> {
     const params = new URLSearchParams()
-    if (translation !== 'esv') {
-        params.set('translation', translation)
+    if (translation !== "esv") {
+        params.set("translation", translation)
     }
     const queryString = params.toString()
-    const url = `${getBaseUrl()}/api/passage/${value}${queryString ? `?${queryString}` : ''}`
+    const url = `${getBaseUrl()}/api/passage/${value}${queryString ? `?${queryString}` : ""}`
 
     const response = await fetch(url)
 
@@ -52,7 +52,7 @@ export async function fetchPassage(
 
     const typedBody = body as Body<ParsedPassage>
     if (!typedBody.data) {
-        throw new Error('Passage data is undefined')
+        throw new Error("Passage data is undefined")
     }
 
     return typedBody.data
@@ -60,7 +60,7 @@ export async function fetchPassage(
 
 export async function fetchTypingSessionUpsert(): Promise<TypingSession> {
     const response = await fetch(`${getBaseUrl()}/api/typing-session`, {
-        cache: 'no-store',
+        cache: "no-store",
     })
 
     const body: Body<TypingSession> = await response.json()
@@ -70,16 +70,16 @@ export async function fetchTypingSessionUpsert(): Promise<TypingSession> {
 
 export async function fetchChapterHistory(
     value: PassageSegment,
-    translation: Translation = 'esv',
+    translation: Translation = "esv",
 ): Promise<ChapterHistory> {
     const params = new URLSearchParams()
-    if (translation !== 'esv') {
-        params.set('translation', translation)
+    if (translation !== "esv") {
+        params.set("translation", translation)
     }
     const queryString = params.toString()
-    const url = `${getBaseUrl()}/api/chapter-history/${value}${queryString ? `?${queryString}` : ''}`
+    const url = `${getBaseUrl()}/api/chapter-history/${value}${queryString ? `?${queryString}` : ""}`
 
-    const response = await fetch(url, { cache: 'no-store' })
+    const response = await fetch(url, { cache: "no-store" })
 
     const body: Body<ChapterHistory> = await response.json()
 
@@ -93,9 +93,9 @@ export async function fetchAddVerseToTypingSession(
     const response = await fetch(
         `${getBaseUrl()}/api/typing-session/${typingSessionId}`,
         {
-            method: 'POST',
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(verse),
         },
@@ -109,7 +109,7 @@ export async function fetchAddVerseToTypingSession(
 export async function fetchLastVerse(): Promise<TypedVerse> {
     const response = await fetch(`${getBaseUrl()}/api/last-verse`, {
         headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         },
     })
 
@@ -126,7 +126,7 @@ export type UserChangelogClientSchema = z.infer<
 export async function fetchUserChangelog(): Promise<UserChangelogClientSchema | null> {
     const response = await fetch(`${getBaseUrl()}/api/user-changelog`, {
         headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         },
     })
 
@@ -150,7 +150,7 @@ export async function fetchUserChangelog(): Promise<UserChangelogClientSchema | 
 export async function fetchBuiltinThemes(): Promise<BuiltinThemeRecord[]> {
     const response = await fetch(`${getBaseUrl()}/api/builtin-theme`, {
         headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         },
     })
 
@@ -166,7 +166,7 @@ export async function fetchBuiltinThemes(): Promise<BuiltinThemeRecord[]> {
 export async function fetchUserThemes(): Promise<UserThemeRecord[]> {
     const response = await fetch(`${getBaseUrl()}/api/user-theme`, {
         headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         },
     })
 
@@ -182,7 +182,7 @@ export async function fetchUserThemes(): Promise<UserThemeRecord[]> {
 export async function fetchCurrentTheme(): Promise<CurrentTheme | null> {
     const response = await fetch(`${getBaseUrl()}/api/current-theme`, {
         headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         },
     })
 
@@ -196,12 +196,12 @@ export async function fetchCurrentTheme(): Promise<CurrentTheme | null> {
 }
 
 export async function fetchSetCurrentTheme(
-    theme: Omit<CurrentTheme, 'userId'>,
+    theme: Omit<CurrentTheme, "userId">,
 ): Promise<CurrentTheme> {
     const response = await fetch(`${getBaseUrl()}/api/current-theme`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         },
         body: JSON.stringify(theme),
     })
@@ -212,12 +212,12 @@ export async function fetchSetCurrentTheme(
 }
 
 export async function fetchCreateTheme(
-    theme: Omit<ThemeRecord, 'id'>,
+    theme: Omit<ThemeRecord, "id">,
 ): Promise<UserThemeRecord> {
     const response = await fetch(`${getBaseUrl()}/api/user-theme`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         },
         body: JSON.stringify(theme),
     })
@@ -229,7 +229,7 @@ export async function fetchCreateTheme(
 
 export async function fetchDeleteTheme(id: string): Promise<null> {
     await fetch(`${getBaseUrl()}/api/user-theme/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
     })
 
     return null

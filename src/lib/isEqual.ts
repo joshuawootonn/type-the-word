@@ -1,10 +1,10 @@
-import { isAtomComplete } from '~/lib/keystroke'
+import { isAtomComplete } from "~/lib/keystroke"
 
-import { Inline, Paragraph } from './parseEsv'
+import { Inline, Paragraph } from "./parseEsv"
 
 export const validQuotes = [
-    '“', // U+201c
-    '”', // U+201d
+    "“", // U+201c
+    "”", // U+201d
     '"',
     // '«', // U+00AB
     // '»', // U+00BB
@@ -20,19 +20,19 @@ export const validQuotes = [
     // '＂', // U+FF02
 ]
 
-export const validSingleQuotes = ["'", '‘', '’', '‛', '❛', '❜', '']
+export const validSingleQuotes = ["'", "‘", "’", "‛", "❛", "❜", ""]
 
-export const validEnter = ['Enter', '\n']
+export const validEnter = ["Enter", "\n"]
 
-export const validEmDash = ['-', '–', '—']
+export const validEmDash = ["-", "–", "—"]
 
 export function isAtomTyped(atom: Inline | Paragraph): boolean {
     switch (atom.type) {
-        case 'verseNumber':
-        case 'paragraph':
-        case 'space':
-        case 'newLine':
-        case 'decoration':
+        case "verseNumber":
+        case "paragraph":
+        case "space":
+        case "newLine":
+        case "decoration":
             return false
 
         default:
@@ -63,7 +63,7 @@ export function isAtomEqual(a?: Inline, b?: Inline): boolean {
 
     if (a.type !== b.type) return false
 
-    if (a.type === 'word' && b.type === 'word') {
+    if (a.type === "word" && b.type === "word") {
         if (b.letters.length !== a.letters.length) return false
 
         if (b.letters.length > a.letters.length) {

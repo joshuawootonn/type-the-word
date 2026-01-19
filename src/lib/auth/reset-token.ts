@@ -1,13 +1,13 @@
-import { randomBytes } from 'crypto'
-import { eq, and, gt } from 'drizzle-orm'
+import { randomBytes } from "crypto"
+import { eq, and, gt } from "drizzle-orm"
 
-import { db } from '~/server/db'
-import { verificationTokens } from '~/server/db/schema'
+import { db } from "~/server/db"
+import { verificationTokens } from "~/server/db/schema"
 
 const TOKEN_EXPIRY_HOURS = 24
 
 export function generateResetToken(): string {
-    return randomBytes(32).toString('hex')
+    return randomBytes(32).toString("hex")
 }
 
 export async function createResetToken(email: string): Promise<string> {
@@ -47,12 +47,12 @@ export async function verifyResetToken(token: string): Promise<string | null> {
     }
 
     const identifier = result[0]!.identifier
-    if (!identifier.startsWith('password-reset:')) {
+    if (!identifier.startsWith("password-reset:")) {
         return null
     }
 
     // Extract email from identifier
-    return identifier.replace('password-reset:', '')
+    return identifier.replace("password-reset:", "")
 }
 
 export async function deleteResetToken(token: string): Promise<void> {

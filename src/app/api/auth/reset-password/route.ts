@@ -1,11 +1,11 @@
-import { eq } from 'drizzle-orm'
-import { NextResponse } from 'next/server'
-import { z } from 'zod'
+import { eq } from "drizzle-orm"
+import { NextResponse } from "next/server"
+import { z } from "zod"
 
-import { hashPassword, passwordSchema } from '~/lib/auth/password'
-import { verifyResetToken, deleteResetToken } from '~/lib/auth/reset-token'
-import { db } from '~/server/db'
-import { users } from '~/server/db/schema'
+import { hashPassword, passwordSchema } from "~/lib/auth/password"
+import { verifyResetToken, deleteResetToken } from "~/lib/auth/reset-token"
+import { db } from "~/server/db"
+import { users } from "~/server/db/schema"
 
 const resetPasswordSchema = z.object({
     token: z.string(),
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
                 {
                     error:
                         validation.error.errors[0]?.message ??
-                        'Validation failed',
+                        "Validation failed",
                 },
                 { status: 400 },
             )
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
         if (!email) {
             return NextResponse.json(
-                { error: 'Invalid or expired reset token' },
+                { error: "Invalid or expired reset token" },
                 { status: 400 },
             )
         }
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
 
         if (existingUser.length === 0) {
             return NextResponse.json(
-                { error: 'User not found' },
+                { error: "User not found" },
                 { status: 404 },
             )
         }
@@ -68,12 +68,12 @@ export async function POST(request: Request) {
 
         return NextResponse.json({
             success: true,
-            message: 'Password has been reset successfully',
+            message: "Password has been reset successfully",
         })
     } catch (error) {
-        console.error('Reset password error:', error)
+        console.error("Reset password error:", error)
         return NextResponse.json(
-            { error: 'An error occurred while resetting your password' },
+            { error: "An error occurred while resetting your password" },
             { status: 500 },
         )
     }

@@ -1,8 +1,8 @@
-'use client'
+"use client"
 
-import { Loading } from '~/components/loading'
-import { Switch } from '~/components/ui/switch'
-import { useEarlyAccessFeatures } from '~/lib/hooks/use-early-access-features'
+import { Loading } from "~/components/loading"
+import { Switch } from "~/components/ui/switch"
+import { useEarlyAccessFeatures } from "~/lib/hooks/use-early-access-features"
 
 export function EarlyAccess() {
     const { earlyAccessFeatures, isLoading, toggleFeature, isFeatureEnabled } =

@@ -10,17 +10,17 @@ import {
     eachWeekOfInterval,
     eachMonthOfInterval,
     isWithinInterval,
-} from 'date-fns'
+} from "date-fns"
 
-import { TypingData, typingDataSchema } from '~/server/db/schema'
+import { TypingData, typingDataSchema } from "~/server/db/schema"
 import {
     TypedVerse,
     TypingSession,
-} from '~/server/repositories/typingSession.repository'
-import { DailyActivityRow } from '~/server/repositories/userDailyActivity.repository'
+} from "~/server/repositories/typingSession.repository"
+import { DailyActivityRow } from "~/server/repositories/userDailyActivity.repository"
 
-export type TimeRange = 'week' | 'month' | '3months' | 'year'
-export type Interval = 'daily' | 'weekly' | 'monthly'
+export type TimeRange = "week" | "month" | "3months" | "year"
+export type Interval = "daily" | "weekly" | "monthly"
 
 export type AggregatedStats = {
     date: Date
@@ -44,7 +44,7 @@ export type VerseStats = {
     correctedAccuracy: number
 }
 
-type UserAction = TypingData['userActions'][number]
+type UserAction = TypingData["userActions"][number]
 
 const PAUSE_THRESHOLD_MS = 3000 // 3 seconds
 const PAUSE_PENALTY_MS = 1000 // Only count 1 second of pause time
@@ -99,10 +99,10 @@ export function calculateAccuracy(typingData: TypingData): number {
     let correctCount = 0
     let incorrectCount = 0
     let position = 0
-    let currentText = ''
+    let currentText = ""
 
     for (const action of validActions) {
-        if (action.type === 'insertText') {
+        if (action.type === "insertText") {
             // Check if this keystroke matches the expected character
             const expectedChar = correctLetters[position]
             if (action.key === expectedChar) {
@@ -112,15 +112,15 @@ export function calculateAccuracy(typingData: TypingData): number {
             }
             currentText += action.key
             position++
-        } else if (action.type === 'deleteContentBackward') {
+        } else if (action.type === "deleteContentBackward") {
             // Move position back, but don't undo the accuracy counts
             if (position > 0) {
                 position--
                 currentText = currentText.slice(0, -1)
             }
-        } else if (action.type === 'deleteWordBackward') {
+        } else if (action.type === "deleteWordBackward") {
             // Word deletion - find the last word boundary
-            const lastSpaceIndex = currentText.lastIndexOf(' ')
+            const lastSpaceIndex = currentText.lastIndexOf(" ")
             const charsToDelete =
                 lastSpaceIndex >= 0
                     ? currentText.length - lastSpaceIndex - 1
@@ -179,7 +179,7 @@ export function calculateEffectiveDuration(actions: UserAction[]): number {
 export function getValidActionsAfterReset(actions: UserAction[]): UserAction[] {
     // Find the last deleteSoftLineBackward action - this invalidates previous data
     const lastSoftLineBackwardIndex = actions.findLastIndex(
-        action => action.type === 'deleteSoftLineBackward',
+        action => action.type === "deleteSoftLineBackward",
     )
 
     // Use only actions after the last deleteSoftLineBackward (or all actions if none)
@@ -308,7 +308,7 @@ export type DailyStatsFromCache = {
 /**
  * WPM chart data from cached daily activity
  */
-export type WpmChartData = { type: 'cached'; data: DailyStatsFromCache[] }
+export type WpmChartData = { type: "cached"; data: DailyStatsFromCache[] }
 
 /**
  * Convert cached daily activity to DailyStatsFromCache format
@@ -429,36 +429,36 @@ function getTimeRangeInterval(timeRange: TimeRange): {
 } {
     const now = new Date()
     switch (timeRange) {
-        case 'week':
+        case "week":
             return { start: startOfDay(subDays(now, 6)), end: now }
-        case 'month':
+        case "month":
             return { start: startOfDay(subMonths(now, 1)), end: now }
-        case '3months':
+        case "3months":
             return { start: startOfDay(subMonths(now, 3)), end: now }
-        case 'year':
+        case "year":
             return { start: startOfDay(subYears(now, 1)), end: now }
     }
 }
 
 function getDateLabel(date: Date, interval: Interval): string {
     switch (interval) {
-        case 'daily':
-            return format(date, 'MMM d')
-        case 'weekly':
-            return format(date, 'MMM d')
-        case 'monthly':
-            return format(date, 'MMM yyyy')
+        case "daily":
+            return format(date, "MMM d")
+        case "weekly":
+            return format(date, "MMM d")
+        case "monthly":
+            return format(date, "MMM yyyy")
     }
 }
 
 function getDateKey(date: Date, interval: Interval): string {
     switch (interval) {
-        case 'daily':
-            return format(date, 'yyyy-MM-dd')
-        case 'weekly':
-            return format(startOfWeek(date), 'yyyy-MM-dd')
-        case 'monthly':
-            return format(startOfMonth(date), 'yyyy-MM')
+        case "daily":
+            return format(date, "yyyy-MM-dd")
+        case "weekly":
+            return format(startOfWeek(date), "yyyy-MM-dd")
+        case "monthly":
+            return format(startOfMonth(date), "yyyy-MM")
     }
 }
 
@@ -467,11 +467,11 @@ function getIntervalDates(
     interval: Interval,
 ): Date[] {
     switch (interval) {
-        case 'daily':
+        case "daily":
             return eachDayOfInterval(rangeInterval)
-        case 'weekly':
+        case "weekly":
             return eachWeekOfInterval(rangeInterval)
-        case 'monthly':
+        case "monthly":
             return eachMonthOfInterval(rangeInterval)
     }
 }

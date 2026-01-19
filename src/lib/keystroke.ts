@@ -1,13 +1,13 @@
-import { KnownNativeInputEvent } from '~/components/currentVerse'
-import { validEnter, validQuotes, validSingleQuotes } from '~/lib/isEqual'
-import { Inline } from '~/lib/parseEsv'
+import { KnownNativeInputEvent } from "~/components/currentVerse"
+import { validEnter, validQuotes, validSingleQuotes } from "~/lib/isEqual"
+import { Inline } from "~/lib/parseEsv"
 
 export type Keystroke = {
     type:
-        | 'deleteContentBackward'
-        | 'deleteSoftLineBackward'
-        | 'deleteWordBackward'
-        | 'insertText'
+        | "deleteContentBackward"
+        | "deleteSoftLineBackward"
+        | "deleteWordBackward"
+        | "insertText"
     key: string
     datetime: string // ISO string
 }
@@ -22,7 +22,7 @@ export function cleanInputKey(key: string): string {
     }
 
     if (validEnter.includes(key)) {
-        return '\n'
+        return "\n"
     }
 
     return key
@@ -30,8 +30,8 @@ export function cleanInputKey(key: string): string {
 export function getPosition(keystrokes: Keystroke[] = []): Inline[] {
     return keystrokes.reduce((acc, keystroke) => {
         const last = acc.at(-1)
-        if (keystroke.type === 'insertText' && keystroke.key) {
-            if (last && last.type === 'word' && !isAtomComplete(last)) {
+        if (keystroke.type === "insertText" && keystroke.key) {
+            if (last && last.type === "word" && !isAtomComplete(last)) {
                 return [
                     ...acc.slice(0, -1),
                     {
@@ -44,9 +44,9 @@ export function getPosition(keystrokes: Keystroke[] = []): Inline[] {
                 ]
             }
 
-            return [...acc, { type: 'word', letters: [keystroke.key] }]
-        } else if (keystroke.type === 'deleteContentBackward') {
-            if (last?.type === 'word' && last.letters.length > 1) {
+            return [...acc, { type: "word", letters: [keystroke.key] }]
+        } else if (keystroke.type === "deleteContentBackward") {
+            if (last?.type === "word" && last.letters.length > 1) {
                 return [
                     ...acc.slice(0, -1),
                     { ...last, letters: last.letters.slice(0, -1) },
@@ -54,9 +54,9 @@ export function getPosition(keystrokes: Keystroke[] = []): Inline[] {
             }
 
             return acc.slice(0, -1)
-        } else if (keystroke.type === 'deleteWordBackward') {
+        } else if (keystroke.type === "deleteWordBackward") {
             return acc.slice(0, -1)
-        } else if (keystroke.type === 'deleteSoftLineBackward') {
+        } else if (keystroke.type === "deleteSoftLineBackward") {
             return []
         }
         return [...acc]
@@ -64,7 +64,7 @@ export function getPosition(keystrokes: Keystroke[] = []): Inline[] {
 }
 
 function lastLetter(atom: Inline | undefined): string | undefined {
-    if (atom == null || atom.type !== 'word') {
+    if (atom == null || atom.type !== "word") {
         return
     }
 
@@ -76,14 +76,14 @@ export function isAtomComplete(atom: Inline | undefined): boolean {
         return false
     }
 
-    if (atom.type !== 'word') {
+    if (atom.type !== "word") {
         return true
     }
 
     const lastLetter = atom.letters.at(-1)
 
     return lastLetter
-        ? /\s/.test(lastLetter) || lastLetter === '\n' || lastLetter === 'Enter'
+        ? /\s/.test(lastLetter) || lastLetter === "\n" || lastLetter === "Enter"
         : false
 }
 
@@ -92,16 +92,16 @@ export function isValidKeystroke(e: KnownNativeInputEvent, prev: Keystroke[]) {
     const prevCurrentTyped = prevPosition.at(-1)
 
     if (
-        e.inputType === 'insertText' &&
-        e.data === ' ' &&
-        (lastLetter(prevCurrentTyped) === ' ' ||
-            lastLetter(prevCurrentTyped) === '\n')
+        e.inputType === "insertText" &&
+        e.data === " " &&
+        (lastLetter(prevCurrentTyped) === " " ||
+            lastLetter(prevCurrentTyped) === "\n")
     )
         return
 
     return prev.concat({
         type: e.inputType,
-        key: e.data ?? '',
+        key: e.data ?? "",
         datetime: new Date().toISOString(),
     })
 }

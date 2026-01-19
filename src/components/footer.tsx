@@ -1,20 +1,20 @@
-'use client'
+"use client"
 
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { useQuery } from '@tanstack/react-query'
-import clsx from 'clsx'
-import { isBefore, parseISO } from 'date-fns'
-import { useSession } from 'next-auth/react'
-import Link from 'next/link'
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
+import { useQuery } from "@tanstack/react-query"
+import clsx from "clsx"
+import { isBefore, parseISO } from "date-fns"
+import { useSession } from "next-auth/react"
+import Link from "next/link"
 
-import { changelogUpdatedAt } from '~/app/(marketing)/changelog/updated-at'
-import { EmailLink } from '~/components/emailLink'
-import { fetchUserChangelog } from '~/lib/api'
+import { changelogUpdatedAt } from "~/app/(marketing)/changelog/updated-at"
+import { EmailLink } from "~/components/emailLink"
+import { fetchUserChangelog } from "~/lib/api"
 
 export function Footer() {
     const { data: sessionData } = useSession()
     const { data } = useQuery({
-        queryKey: ['user-changelog'],
+        queryKey: ["user-changelog"],
         queryFn: fetchUserChangelog,
         enabled: sessionData?.user?.id != null,
     })
@@ -41,31 +41,31 @@ export function Footer() {
                         </DropdownMenu.Trigger>
 
                         <DropdownMenu.Content
-                            className="flex flex-col border-2 border-primary bg-secondary "
+                            className="flex flex-col border-2 border-primary bg-secondary"
                             sideOffset={4}
                             align="center"
                             side="top"
                         >
                             <DropdownMenu.Item asChild={true}>
                                 <Link
-                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary "
-                                    href={'/copyright'}
+                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
+                                    href={"/copyright"}
                                 >
                                     copyright
                                 </Link>
                             </DropdownMenu.Item>
                             <DropdownMenu.Item asChild={true}>
                                 <Link
-                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary "
-                                    href={'/privacy-policy'}
+                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
+                                    href={"/privacy-policy"}
                                 >
                                     privacy
                                 </Link>
                             </DropdownMenu.Item>
                             <DropdownMenu.Item asChild={true}>
                                 <Link
-                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary "
-                                    href={'/terms-of-service'}
+                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
+                                    href={"/terms-of-service"}
                                 >
                                     terms
                                 </Link>
@@ -76,7 +76,7 @@ export function Footer() {
                     <div>/</div>
                     <Link
                         className="svg-outline relative no-underline"
-                        href={'/why'}
+                        href={"/why"}
                     >
                         why?
                     </Link>
@@ -86,14 +86,14 @@ export function Footer() {
                 <div className="flex items-center justify-between space-x-3">
                     <Link
                         className={clsx(`svg-outline relative`)}
-                        href={'/donate'}
+                        href={"/donate"}
                     >
                         donate
                     </Link>
                     <div>/</div>
                     <Link
                         className={clsx(`svg-outline relative`)}
-                        href={'/changelog'}
+                        href={"/changelog"}
                     >
                         changelog
                         {hasUnreadChangelog && (
@@ -102,7 +102,7 @@ export function Footer() {
                                 height="10"
                                 viewBox="0 0 8 8"
                                 fill="currentColor"
-                                className="absolute -right-1.5 -top-1.5 origin-center animate-spin-every-once-in-a-while text-primary "
+                                className="absolute -right-1.5 -top-1.5 origin-center animate-spin-every-once-in-a-while text-primary"
                                 xmlns="http://www.w3.org/2000/svg"
                             >
                                 <path
@@ -119,7 +119,7 @@ export function Footer() {
                         )}
                     </Link>
                     <div>/</div>
-                    <EmailLink className={'svg-outline shrink-0 font-normal'}>
+                    <EmailLink className={"svg-outline shrink-0 font-normal"}>
                         email me
                     </EmailLink>
                     <div>/</div>
@@ -134,16 +134,16 @@ export function Footer() {
                         </DropdownMenu.Trigger>
 
                         <DropdownMenu.Content
-                            className="flex flex-col border-2 border-primary bg-secondary "
+                            className="flex flex-col border-2 border-primary bg-secondary"
                             sideOffset={4}
                             align="center"
                             side="top"
                         >
                             <DropdownMenu.Item asChild>
                                 <Link
-                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary "
+                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
                                     href={
-                                        'https://github.com/joshuawootonn/type-the-word'
+                                        "https://github.com/joshuawootonn/type-the-word"
                                     }
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -153,8 +153,8 @@ export function Footer() {
                             </DropdownMenu.Item>
                             <DropdownMenu.Item asChild={true}>
                                 <Link
-                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary "
-                                    href={'https://typetheword.kit.com'}
+                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
+                                    href={"https://typetheword.kit.com"}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
@@ -163,9 +163,9 @@ export function Footer() {
                             </DropdownMenu.Item>
                             <DropdownMenu.Item asChild={true}>
                                 <Link
-                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary "
+                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
                                     href={
-                                        'https://discord.com/invite/a9eYv4sgWp '
+                                        "https://discord.com/invite/a9eYv4sgWp "
                                     }
                                     target="_blank"
                                     rel="noopener noreferrer"

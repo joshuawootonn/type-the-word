@@ -1,10 +1,10 @@
-import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
+import { cookies } from "next/headers"
+import { NextResponse } from "next/server"
 
-import { Translation } from './parseEsv'
-import { validTranslations } from './translations'
+import { Translation } from "./parseEsv"
+import { validTranslations } from "./translations"
 
-const COOKIE_NAME = 'lastTranslation'
+const COOKIE_NAME = "lastTranslation"
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365 // 1 year in seconds
 
 /**
@@ -22,7 +22,7 @@ export async function getLastTranslation(): Promise<Translation> {
         return value as Translation
     }
 
-    return 'esv'
+    return "esv"
 }
 
 /**
@@ -43,7 +43,7 @@ export function setTranslationCookie(
 
     response.cookies.set(COOKIE_NAME, translation, {
         maxAge: COOKIE_MAX_AGE,
-        path: '/',
-        sameSite: 'lax',
+        path: "/",
+        sameSite: "lax",
     })
 }

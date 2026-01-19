@@ -1,12 +1,12 @@
-import { passageReferenceSchema } from '~/lib/passageReference'
-import { Book, bookSchema } from '~/lib/types/book'
-import { BookMetadata, getBibleMetadata } from '~/server/bibleMetadata'
-import { TypingSession } from '~/server/repositories/typingSession.repository'
-import { UserProgressData } from '~/server/repositories/userProgress.repository'
+import { passageReferenceSchema } from "~/lib/passageReference"
+import { Book, bookSchema } from "~/lib/types/book"
+import { BookMetadata, getBibleMetadata } from "~/server/bibleMetadata"
+import { TypingSession } from "~/server/repositories/typingSession.repository"
+import { UserProgressData } from "~/server/repositories/userProgress.repository"
 
 function toPluralBookForm(book: Book) {
-    if (book === 'psalm') {
-        return 'psalms'
+    if (book === "psalm") {
+        return "psalms"
     }
 
     return book

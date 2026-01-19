@@ -1,18 +1,18 @@
-'use client'
+"use client"
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Session } from 'next-auth'
-import { SessionProvider } from 'next-auth/react'
-import { ReactNode } from 'react'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { Session } from "next-auth"
+import { SessionProvider } from "next-auth/react"
+import { ReactNode } from "react"
 
-import { useSoliDeoGloria } from '~/components/use-soli-deo-gloria'
-import { useTimezoneOffsetCookie } from '~/components/use-time-zone-offset-cookie'
-import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
-import { CurrentTheme } from '~/server/repositories/currentTheme.repository'
-import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
+import { useSoliDeoGloria } from "~/components/use-soli-deo-gloria"
+import { useTimezoneOffsetCookie } from "~/components/use-time-zone-offset-cookie"
+import { BuiltinThemeRecord } from "~/server/repositories/builtinTheme.repository"
+import { CurrentTheme } from "~/server/repositories/currentTheme.repository"
+import { UserThemeRecord } from "~/server/repositories/userTheme.repository"
 
-import { PostHogProvider, PostHogIdentify } from './PostHogProvider'
-import { ThemeProvider } from './theme-provider'
+import { PostHogProvider, PostHogIdentify } from "./PostHogProvider"
+import { ThemeProvider } from "./theme-provider"
 
 const queryClient = new QueryClient()
 

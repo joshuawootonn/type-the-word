@@ -1,6 +1,6 @@
-import { z } from 'zod'
+import { z } from "zod"
 
-import { ThemeRecord } from '~/server/repositories/builtinTheme.repository'
+import { ThemeRecord } from "~/server/repositories/builtinTheme.repository"
 
 export function isThemeDark(theme: ThemeRecord) {
     return theme.primaryLightness > 50
@@ -11,10 +11,10 @@ export function stringToOKLCH(s: string): {
     chroma: number
     hue: number
 } {
-    const components = s.split(' ')
+    const components = s.split(" ")
 
     return {
-        lightness: parseFloat(components.at(0)!.replace('%', '')),
+        lightness: parseFloat(components.at(0)!.replace("%", "")),
         chroma: parseFloat(components.at(1)!),
         hue: parseFloat(components.at(2)!),
     }

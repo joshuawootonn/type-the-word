@@ -1,10 +1,10 @@
-'use client'
+"use client"
 
-import { Tabs as TabsPrimitive } from '@base-ui/react/tabs'
-import clsx from 'clsx'
-import { forwardRef, ComponentPropsWithoutRef, ElementRef } from 'react'
+import { Tabs as TabsPrimitive } from "@base-ui/react/tabs"
+import clsx from "clsx"
+import { forwardRef, ComponentPropsWithoutRef, ElementRef } from "react"
 
-import { cn } from '~/lib/cn'
+import { cn } from "~/lib/cn"
 
 const Tabs = TabsPrimitive.Root
 
@@ -15,7 +15,7 @@ const TabsList = forwardRef<
     <TabsPrimitive.List
         ref={ref}
         className={clsx(
-            'relative flex gap-1 border-b-2 border-primary',
+            "relative flex gap-1 border-b-2 border-primary",
             className,
         )}
         {...props}
@@ -23,7 +23,7 @@ const TabsList = forwardRef<
         {children}
     </TabsPrimitive.List>
 ))
-TabsList.displayName = 'TabsList'
+TabsList.displayName = "TabsList"
 
 const TabsTab = forwardRef<
     ElementRef<typeof TabsPrimitive.Tab>,
@@ -33,16 +33,16 @@ const TabsTab = forwardRef<
         <TabsPrimitive.Tab
             ref={ref}
             className={clsx(
-                'flex  cursor-pointer',
-                'group',
-                'svg-outline relative outline-none',
+                "flex cursor-pointer",
+                "group",
+                "svg-outline relative outline-none",
                 className,
             )}
             {...props}
         >
             <div
                 className={cn(
-                    'px-4 py-2 text-primary',
+                    "px-4 py-2 text-primary",
                     "group-aria-[selected='true']:bg-secondary group-aria-[selected='true']:invert",
                 )}
             >
@@ -58,12 +58,12 @@ const TabsPanel = forwardRef<
 >(({ className, children, ...props }, ref) => (
     <TabsPrimitive.Panel
         ref={ref}
-        className={clsx('pt-4 outline-none', className)}
+        className={clsx("pt-4 outline-none", className)}
         {...props}
     >
         {children}
     </TabsPrimitive.Panel>
 ))
-TabsPanel.displayName = 'TabsPanel'
+TabsPanel.displayName = "TabsPanel"
 
 export { Tabs, TabsList, TabsTab, TabsPanel }

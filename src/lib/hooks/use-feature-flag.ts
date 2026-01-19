@@ -1,8 +1,8 @@
-'use client'
+"use client"
 
-import { useFeatureFlagEnabled } from 'posthog-js/react'
+import { useFeatureFlagEnabled } from "posthog-js/react"
 
-import { FeatureFlagKey } from '~/lib/feature-flags'
+import { FeatureFlagKey } from "~/lib/feature-flags"
 
 /**
  * Hook to check if a feature flag is enabled for the current user.

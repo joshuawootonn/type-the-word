@@ -1,4 +1,4 @@
-import { env } from '~/env.mjs'
+import { env } from "~/env.mjs"
 
 export async function createSubscription({
     email,
@@ -10,9 +10,9 @@ export async function createSubscription({
     const response = await fetch(
         `https://api.convertkit.com/v3/forms/${env.CONVERTKIT_SUBSCRIBE_FORM_ID}/subscribe`,
         {
-            method: 'POST',
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
             body: JSON.stringify({
                 api_key: env.CONVERTKIT_API_KEY,

@@ -1,8 +1,8 @@
-import { memo } from 'react'
+import { memo } from "react"
 
-import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
-import { CurrentTheme } from '~/server/repositories/currentTheme.repository'
-import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
+import { BuiltinThemeRecord } from "~/server/repositories/builtinTheme.repository"
+import { CurrentTheme } from "~/server/repositories/currentTheme.repository"
+import { UserThemeRecord } from "~/server/repositories/userTheme.repository"
 
 // The functions below are similar to 'get-current-theme-or-fallback'
 // The only difference is these functions are `toString`'d into a script for server rendering
@@ -16,20 +16,20 @@ export const script = (
 
     function clearLegacyTheme() {
         try {
-            localStorage.removeItem('theme')
-        } catch (e) {
-            console.warn('threw in clear')
+            localStorage.removeItem("theme")
+        } catch (_) {
+            console.warn("threw in clear")
         }
     }
 
     function getLegacyTheme() {
         let theme
         try {
-            theme = localStorage.getItem('theme') ?? undefined
-        } catch (e) {
-            console.warn('threw in get')
+            theme = localStorage.getItem("theme") ?? undefined
+        } catch (_) {
+            console.warn("threw in get")
         }
-        return theme as 'system' | 'dark' | 'light' | undefined
+        return theme as "system" | "dark" | "light" | undefined
     }
 
     function getCurrentThemeOrFallback(
@@ -44,24 +44,24 @@ export const script = (
         const legacyTheme = getLegacyTheme()
 
         const lightThemeId = builtinThemes.find(
-            t => t.theme.label === 'Light',
+            t => t.theme.label === "Light",
         )!.themeId
         const darkThemeId = builtinThemes.find(
-            t => t.theme.label === 'Dark',
+            t => t.theme.label === "Dark",
         )!.themeId
 
-        if (legacyTheme === 'light') {
+        if (legacyTheme === "light") {
             return {
-                userId: '',
+                userId: "",
                 lightThemeId,
                 darkThemeId: null,
                 colorScheme: legacyTheme,
             }
         }
 
-        if (legacyTheme === 'dark') {
+        if (legacyTheme === "dark") {
             return {
-                userId: '',
+                userId: "",
                 lightThemeId: null,
                 darkThemeId,
                 colorScheme: legacyTheme,
@@ -69,19 +69,19 @@ export const script = (
         }
 
         return {
-            userId: '',
+            userId: "",
             lightThemeId,
             darkThemeId,
-            colorScheme: legacyTheme ?? 'system',
+            colorScheme: legacyTheme ?? "system",
         }
     }
 
     function setColorScheme(currentTheme: CurrentTheme) {
         el.style.colorScheme =
-            currentTheme.colorScheme === 'system'
-                ? window.matchMedia('(prefers-color-scheme: dark)').matches
-                    ? 'dark'
-                    : 'light'
+            currentTheme.colorScheme === "system"
+                ? window.matchMedia("(prefers-color-scheme: dark)").matches
+                    ? "dark"
+                    : "light"
                 : currentTheme.colorScheme
     }
 
@@ -91,13 +91,13 @@ export const script = (
     }
 
     function getResolvedThemeId(currentThemeOrFallback: CurrentTheme): string {
-        if (currentThemeOrFallback.colorScheme === 'light')
+        if (currentThemeOrFallback.colorScheme === "light")
             return currentThemeOrFallback.lightThemeId
-        if (currentThemeOrFallback.colorScheme === 'dark')
+        if (currentThemeOrFallback.colorScheme === "dark")
             return currentThemeOrFallback.darkThemeId
 
         const resolvedThemeId = window.matchMedia(
-            '(prefers-color-scheme: dark)',
+            "(prefers-color-scheme: dark)",
         ).matches
             ? currentThemeOrFallback.darkThemeId
             : currentThemeOrFallback.lightThemeId
@@ -113,7 +113,7 @@ export const script = (
         const resolvedId = getResolvedThemeId(currentThemeOrFallback)
         updateClasses(resolvedId)
         setColorScheme(currentThemeOrFallback)
-    } catch (e) {
+    } catch (_) {
         //
     }
 }

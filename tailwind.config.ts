@@ -1,70 +1,70 @@
-import { type Config } from 'tailwindcss'
-import defaultTheme from 'tailwindcss/defaultTheme'
+import { type Config } from "tailwindcss"
+import defaultTheme from "tailwindcss/defaultTheme"
 
 module.exports = {
-    darkMode: 'selector',
-    content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
+    darkMode: "selector",
+    content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
     theme: {
         fontFamily: {
-            sans: ['var(--font-poppins)', ...defaultTheme.fontFamily.sans],
+            sans: ["var(--font-poppins)", ...defaultTheme.fontFamily.sans],
             mono: ['"Google Sans Mono"', ...defaultTheme.fontFamily.mono],
         },
         extend: {
             colors: {
-                transparent: 'transparent',
-                current: 'currentColor',
+                transparent: "transparent",
+                current: "currentColor",
                 white: {
-                    DEFAULT: '#ffffff',
+                    DEFAULT: "#ffffff",
                 },
-                primary: 'oklch(var(--color-primary) / <alpha-value>)',
-                secondary: 'oklch(var(--color-secondary) / <alpha-value>)',
-                success: 'oklch(var(--color-success) / <alpha-value>)',
-                error: 'oklch(var(--color-error) / <alpha-value>)',
+                primary: "oklch(var(--color-primary) / <alpha-value>)",
+                secondary: "oklch(var(--color-secondary) / <alpha-value>)",
+                success: "oklch(var(--color-success) / <alpha-value>)",
+                error: "oklch(var(--color-error) / <alpha-value>)",
             },
             borderWidth: {
-                DEFAULT: '1px',
-                0: '0',
-                1.5: '1.5px',
-                1: '1px',
-                2: '2px',
-                3: '3px',
-                4: '4px',
-                6: '6px',
-                8: '8px',
+                DEFAULT: "1px",
+                0: "0",
+                1.5: "1.5px",
+                1: "1px",
+                2: "2px",
+                3: "3px",
+                4: "4px",
+                6: "6px",
+                8: "8px",
             },
             boxShadow: {
-                lg: '12px 12px 0px oklch(var(--color-primary), 0.5)',
+                lg: "12px 12px 0px oklch(var(--color-primary), 0.5)",
             },
             spacing: {
-                100: '25rem',
-                104: '26rem',
-                108: '27rem',
-                112: '28rem',
-                116: '29rem',
-                120: '30rem',
-                124: '31rem',
-                128: '32rem',
-                132: '33rem',
-                136: '34rem',
-                140: '35rem',
+                100: "25rem",
+                104: "26rem",
+                108: "27rem",
+                112: "28rem",
+                116: "29rem",
+                120: "30rem",
+                124: "31rem",
+                128: "32rem",
+                132: "33rem",
+                136: "34rem",
+                140: "35rem",
             },
             maxWidth: {
-                page: '65ch',
+                page: "65ch",
             },
             screens: {
-                sm: '540px',
+                sm: "540px",
             },
             animation: {
-                'spin-every-once-in-a-while':
-                    'spin-every-once-in-a-while 7s ease-in-out infinite',
+                "spin-every-once-in-a-while":
+                    "spin-every-once-in-a-while 7s ease-in-out infinite",
             },
             keyframes: {
-                'spin-every-once-in-a-while': {
-                    '0%': { transform: 'rotate(0deg)' },
-                    '100%': { transform: 'rotate(90deg)' },
+                "spin-every-once-in-a-while": {
+                    "0%": { transform: "rotate(0deg)" },
+                    "100%": { transform: "rotate(90deg)" },
                 },
             },
         },
     },
-    plugins: [require('@tailwindcss/typography')],
+    plugins: [require("@tailwindcss/typography")],
 } satisfies Config

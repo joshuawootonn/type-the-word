@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
-import { usePostHog } from 'posthog-js/react'
-import { useCallback } from 'react'
+import { usePostHog } from "posthog-js/react"
+import { useCallback } from "react"
 
 type VerseCompletedProperties = {
     book: string
@@ -23,27 +23,27 @@ export function useAnalytics() {
 
     const trackVerseCompleted = useCallback(
         (properties: VerseCompletedProperties) => {
-            posthog.capture('verse_completed', properties)
+            posthog.capture("verse_completed", properties)
         },
         [posthog],
     )
 
     const trackThemeCreated = useCallback(
         (properties: ThemeCreatedProperties) => {
-            posthog.capture('theme_created', properties)
+            posthog.capture("theme_created", properties)
         },
         [posthog],
     )
 
     const trackThemeDeleted = useCallback(
         (properties: ThemeDeletedProperties) => {
-            posthog.capture('theme_deleted', properties)
+            posthog.capture("theme_deleted", properties)
         },
         [posthog],
     )
 
     const trackChangelogViewed = useCallback(() => {
-        posthog.capture('changelog_viewed')
+        posthog.capture("changelog_viewed")
     }, [posthog])
 
     return {

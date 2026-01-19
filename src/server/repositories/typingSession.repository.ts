@@ -1,10 +1,10 @@
-import { and, desc, eq, gte, lte, sql, SQL } from 'drizzle-orm'
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
-import { createSelectSchema } from 'drizzle-zod'
-import { z } from 'zod'
+import { and, desc, eq, gte, lte, sql, SQL } from "drizzle-orm"
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js"
+import { createSelectSchema } from "drizzle-zod"
+import { z } from "zod"
 
-import * as schema from '~/server/db/schema'
-import { typedVerses, typingSessions } from '~/server/db/schema'
+import * as schema from "~/server/db/schema"
+import { typedVerses, typingSessions } from "~/server/db/schema"
 
 export const typingSessionSchema = createSelectSchema(typingSessions).and(
     z.object({
@@ -13,7 +13,7 @@ export const typingSessionSchema = createSelectSchema(typingSessions).and(
 )
 
 export type TypingSession = z.infer<typeof typingSessionSchema>
-export type TypedVerse = TypingSession['typedVerses'][number]
+export type TypedVerse = TypingSession["typedVerses"][number]
 
 export class TypingSessionRepository {
     db: PostgresJsDatabase<typeof schema>
@@ -34,7 +34,7 @@ export class TypingSessionRepository {
               ? eq(typingSessions.id, id)
               : null
         if (where == null) {
-            throw new Error('Must provide either userId or id')
+            throw new Error("Must provide either userId or id")
         }
         return (
             (await this.db.query.typingSessions.findFirst({
@@ -56,7 +56,7 @@ export class TypingSessionRepository {
     }): Promise<TypingSession> {
         const session = await this.getOneOrNull({ userId, id })
         if (session == null) {
-            throw new Error('Typing session not found')
+            throw new Error("Typing session not found")
         }
         return session
     }

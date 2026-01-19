@@ -1,22 +1,11 @@
 function trimEndToAtMostOneSpace(str: string): string {
     if (str.trimEnd() == str) return str
 
-    return str.trimEnd() + ' '
+    return str.trimEnd() + " "
 }
 
 export function splitLineBySpaceOrNewLine(str: string): string[] {
     return trimEndToAtMostOneSpace(str.trimStart()).split(splitBySpaceOrNewLine)
-}
-
-function numberOfSpaces(str: string, startIndex = 0) {
-    let count = 1
-    let i = startIndex + 1
-
-    while (i < str.length && isWhitespace(str[i]!)) {
-        count += 1
-        i += 1
-    }
-    return count
 }
 
 // Whitespace characters that should be treated as word separators
@@ -38,23 +27,23 @@ const splitBySpaceOrNewLine = {
         const result = []
         while (pos < str.length) {
             if (isWhitespace(str[pos]!)) {
-                result.push(' ')
+                result.push(" ")
                 // Skip consecutive whitespace
                 while (pos < str.length && isWhitespace(str[pos]!)) {
                     pos++
                 }
-            } else if (str[pos] === '\n') {
-                result.push('\n')
+            } else if (str[pos] === "\n") {
+                result.push("\n")
                 pos += 1
-            } else if (str[pos] === '[' && str.indexOf(']', pos) !== -1) {
-                const indexOfEndOfVerseNumber = str.indexOf(']', pos)
+            } else if (str[pos] === "[" && str.indexOf("]", pos) !== -1) {
+                const indexOfEndOfVerseNumber = str.indexOf("]", pos)
 
                 if (indexOfEndOfVerseNumber !== -1) {
                     result.push(str.substring(pos, indexOfEndOfVerseNumber + 1))
                     pos = indexOfEndOfVerseNumber + 1
                 }
             } else {
-                const indexOfNewLine = str.indexOf('\n', pos)
+                const indexOfNewLine = str.indexOf("\n", pos)
                 // Find the next whitespace character
                 let indexOfSpace = -1
                 for (let i = pos; i < str.length; i++) {
@@ -78,7 +67,7 @@ const splitBySpaceOrNewLine = {
                     // For regular space, include it in the word (original behavior)
                     // For other whitespace (thin space, etc.), don't include it
                     const whitespaceChar = str[endOfWord]!
-                    if (whitespaceChar === ' ') {
+                    if (whitespaceChar === " ") {
                         // Include trailing regular space in word
                         result.push(str.substring(pos, endOfWord + 1))
                         pos = endOfWord + 1

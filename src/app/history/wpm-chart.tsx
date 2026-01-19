@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
-import { ParentSize } from '@visx/responsive'
-import { defaultStyles as defaultTooltipStyles } from '@visx/tooltip'
+import { ParentSize } from "@visx/responsive"
+import { defaultStyles as defaultTooltipStyles } from "@visx/tooltip"
 import {
     Axis,
     LineSeries,
@@ -9,8 +9,8 @@ import {
     Tooltip,
     GlyphSeries,
     buildChartTheme,
-} from '@visx/xychart'
-import { useState, useMemo } from 'react'
+} from "@visx/xychart"
+import { useState, useMemo } from "react"
 
 import {
     Select,
@@ -18,7 +18,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '~/components/ui/select'
+} from "~/components/ui/select"
 
 import {
     AggregatedStats,
@@ -26,19 +26,19 @@ import {
     TimeRange,
     Interval,
     aggregateStatsFromCache,
-} from './wpm'
+} from "./wpm"
 
 const TIME_RANGE_OPTIONS: { value: TimeRange; label: string }[] = [
-    { value: 'week', label: 'Past Week' },
-    { value: 'month', label: 'Past Month' },
-    { value: '3months', label: 'Past 3 Months' },
-    { value: 'year', label: 'Past Year' },
+    { value: "week", label: "Past Week" },
+    { value: "month", label: "Past Month" },
+    { value: "3months", label: "Past 3 Months" },
+    { value: "year", label: "Past Year" },
 ]
 
 const INTERVAL_OPTIONS: { value: Interval; label: string }[] = [
-    { value: 'daily', label: 'Daily' },
-    { value: 'weekly', label: 'Weekly' },
-    { value: 'monthly', label: 'Monthly' },
+    { value: "daily", label: "Daily" },
+    { value: "weekly", label: "Weekly" },
+    { value: "monthly", label: "Monthly" },
 ]
 
 const accessors = {
@@ -50,17 +50,17 @@ const accessors = {
 }
 // Add before the component
 const chartTheme = buildChartTheme({
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     colors: [
-        'oklch(var(--color-primary))',
-        'oklch(var(--color-primary))', // wpm-points same as wpm
-        'oklch(var(--color-success))',
-        'oklch(var(--color-success))', // accuracy-points same as accuracy
-        'oklch(var(--color-success))',
-        'oklch(var(--color-success))', // corrected-accuracy-points same as corrected-accuracy
+        "oklch(var(--color-primary))",
+        "oklch(var(--color-primary))", // wpm-points same as wpm
+        "oklch(var(--color-success))",
+        "oklch(var(--color-success))", // accuracy-points same as accuracy
+        "oklch(var(--color-success))",
+        "oklch(var(--color-success))", // corrected-accuracy-points same as corrected-accuracy
     ],
-    gridColor: 'oklch(var(--color-primary))',
-    gridColorDark: 'oklch(var(--color-primary))',
+    gridColor: "oklch(var(--color-primary))",
+    gridColorDark: "oklch(var(--color-primary))",
     tickLength: 4,
 })
 
@@ -93,16 +93,16 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                 <XYChart
                     height={200}
                     width={width}
-                    xScale={{ type: 'band', paddingInner: 0.5 }}
-                    yScale={{ type: 'linear', domain: [0, 100] }}
+                    xScale={{ type: "band", paddingInner: 0.5 }}
+                    yScale={{ type: "linear", domain: [0, 100] }}
                     margin={{ top: 20, right: 50, bottom: 40, left: 50 }}
                     theme={chartTheme}
                 >
                     <Axis
                         orientation="bottom"
                         tickLabelProps={{
-                            fill: 'oklch(var(--color-primary))',
-                            fontFamily: 'var(--font-poppins)',
+                            fill: "oklch(var(--color-primary))",
+                            fontFamily: "var(--font-poppins)",
                             fontSize: 12,
                         }}
                         strokeWidth={2}
@@ -116,13 +116,13 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                         label="WPM"
                         labelOffset={30}
                         labelProps={{
-                            fill: 'oklch(var(--color-primary))',
-                            fontFamily: 'var(--font-poppins)',
+                            fill: "oklch(var(--color-primary))",
+                            fontFamily: "var(--font-poppins)",
                             fontSize: 12,
                         }}
                         tickLabelProps={{
-                            fill: 'oklch(var(--color-primary))',
-                            fontFamily: 'var(--font-poppins)',
+                            fill: "oklch(var(--color-primary))",
+                            fontFamily: "var(--font-poppins)",
                             fontSize: 12,
                         }}
                         strokeWidth={2}
@@ -135,13 +135,13 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                         label="Accuracy %"
                         labelOffset={30}
                         labelProps={{
-                            fill: 'oklch(var(--color-success))',
-                            fontFamily: 'var(--font-poppins)',
+                            fill: "oklch(var(--color-success))",
+                            fontFamily: "var(--font-poppins)",
                             fontSize: 12,
                         }}
                         tickLabelProps={{
-                            fill: 'oklch(var(--color-success))',
-                            fontFamily: 'var(--font-poppins)',
+                            fill: "oklch(var(--color-success))",
+                            fontFamily: "var(--font-poppins)",
                             fontSize: 12,
                         }}
                         strokeWidth={2}
@@ -161,7 +161,7 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                         data={wpmData}
                         xAccessor={accessors.xAccessor}
                         yAccessor={accessors.yAccessorWpm}
-                        colorAccessor={() => 'oklch(var(--color-primary))'}
+                        colorAccessor={() => "oklch(var(--color-primary))"}
                     />
                     <LineSeries
                         dataKey="accuracy"
@@ -176,7 +176,7 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                         data={accuracyData}
                         xAccessor={accessors.xAccessor}
                         yAccessor={accessors.yAccessorAccuracy}
-                        colorAccessor={() => 'oklch(var(--color-success))'}
+                        colorAccessor={() => "oklch(var(--color-success))"}
                     />
                     <LineSeries
                         dataKey="corrected-accuracy"
@@ -192,7 +192,7 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                         data={correctedAccuracyData}
                         xAccessor={accessors.xAccessor}
                         yAccessor={accessors.yAccessorCorrectedAccuracy}
-                        colorAccessor={() => 'oklch(var(--color-success))'}
+                        colorAccessor={() => "oklch(var(--color-success))"}
                     />
                     <Tooltip
                         snapTooltipToDatumX
@@ -201,9 +201,9 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                         showSeriesGlyphs
                         style={{
                             ...defaultTooltipStyles,
-                            padding: '0',
-                            borderRadius: '0',
-                            border: '1.5px solid oklch(var(--color-primary))',
+                            padding: "0",
+                            borderRadius: "0",
+                            border: "1.5px solid oklch(var(--color-primary))",
                         }}
                         renderTooltip={({ tooltipData }) => {
                             const datum = tooltipData?.nearestDatum
@@ -277,8 +277,8 @@ function ChartSelect<T extends string>({
 }
 
 export function WPMChart({ chartData }: { chartData: WpmChartData }) {
-    const [timeRange, setTimeRange] = useState<TimeRange>('week')
-    const [interval, setInterval] = useState<Interval>('daily')
+    const [timeRange, setTimeRange] = useState<TimeRange>("week")
+    const [interval, setInterval] = useState<Interval>("daily")
 
     const aggregatedData = useMemo(() => {
         return aggregateStatsFromCache(chartData.data, timeRange, interval)

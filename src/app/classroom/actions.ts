@@ -1,17 +1,17 @@
-'use client'
+"use client"
 
 import {
     authResponseSchema,
     disconnectResponseSchema,
     errorResponseSchema,
-} from '~/app/api/classroom/schemas'
+} from "~/app/api/classroom/schemas"
 
 /**
  * Client-side actions for classroom connection management
  */
 
 export async function initiateOAuthConnection(): Promise<string> {
-    const response = await fetch('/api/classroom/auth')
+    const response = await fetch("/api/classroom/auth")
 
     if (!response.ok) {
         const errorData = await response.json()
@@ -25,8 +25,8 @@ export async function initiateOAuthConnection(): Promise<string> {
 }
 
 export async function disconnectClassroom(): Promise<void> {
-    const response = await fetch('/api/classroom/disconnect', {
-        method: 'POST',
+    const response = await fetch("/api/classroom/disconnect", {
+        method: "POST",
     })
 
     if (!response.ok) {

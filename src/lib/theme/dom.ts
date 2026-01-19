@@ -1,7 +1,7 @@
-import { themeCSS } from '~/app/theme-styles'
-import { ThemeRecord } from '~/server/repositories/builtinTheme.repository'
+import { themeCSS } from "~/app/theme-styles"
+import { ThemeRecord } from "~/server/repositories/builtinTheme.repository"
 
-export const THEME_PREFIX = 'theme-'
+export const THEME_PREFIX = "theme-"
 
 export function uuidToThemeClassname(id: string) {
     return `${THEME_PREFIX}${id.toLowerCase()}`
@@ -18,7 +18,7 @@ export function cleanUpdateDocumentStyles() {
 }
 
 export function injectNewClassIntoStyle(theme: ThemeRecord) {
-    const el = document.getElementById('themes')
+    const el = document.getElementById("themes")
 
     if (el == null) return
 

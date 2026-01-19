@@ -1,9 +1,9 @@
-import clsx from 'clsx'
-import { useAtom } from 'jotai'
-import React from 'react'
+import clsx from "clsx"
+import { useAtom } from "jotai"
+import React from "react"
 
-import { isPassageActiveAtom, isPassageFocusedAtom } from '~/components/passage'
-import { useCursor } from '~/lib/hooks'
+import { isPassageActiveAtom, isPassageFocusedAtom } from "~/components/passage"
+import { useCursor } from "~/lib/hooks"
 
 export function Cursor({ passageId }: { passageId: string }) {
     const [isPassageActive] = useAtom(isPassageActiveAtom)
@@ -25,9 +25,9 @@ export function Cursor({ passageId }: { passageId: string }) {
             <div
                 id={`${passageId}-cursor`}
                 className={clsx(
-                    'absolute rounded-lg bg-primary',
-                    !isPassageActive && 'blink',
-                    isPassageFocused ? 'opacity-100' : 'opacity-0',
+                    "absolute rounded-lg bg-primary",
+                    !isPassageActive && "blink",
+                    isPassageFocused ? "opacity-100" : "opacity-0",
                 )}
             />
         </>

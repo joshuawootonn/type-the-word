@@ -12,17 +12,17 @@
  *   dotenv pnpm dlx tsx ./src/scripts/backfill-daily-activity.ts
  *   dotenv pnpm dlx tsx ./src/scripts/backfill-daily-activity.ts --start 2024-01-01 --end 2024-12-31
  */
-import { format, parseISO, startOfDay, endOfDay } from 'date-fns'
+import { format, parseISO, startOfDay, endOfDay } from "date-fns"
 
-import { typingSessionToString } from '~/app/history/typingSessionToString'
-import { calculateStatsForVerse, VerseStats } from '~/app/history/wpm'
-import { db } from '~/server/db'
-import { users } from '~/server/db/schema'
+import { typingSessionToString } from "~/app/history/typingSessionToString"
+import { calculateStatsForVerse, VerseStats } from "~/app/history/wpm"
+import { db } from "~/server/db"
+import { users } from "~/server/db/schema"
 import {
     TypedVerse,
     TypingSessionRepository,
-} from '~/server/repositories/typingSession.repository'
-import { UserDailyActivityRepository } from '~/server/repositories/userDailyActivity.repository'
+} from "~/server/repositories/typingSession.repository"
+import { UserDailyActivityRepository } from "~/server/repositories/userDailyActivity.repository"
 
 type DayData = {
     verseCount: number
@@ -36,10 +36,10 @@ function parseArgs(): { startDate?: Date; endDate?: Date } {
     let endDate: Date | undefined
 
     for (let i = 0; i < args.length; i++) {
-        if (args[i] === '--start' && args[i + 1]) {
+        if (args[i] === "--start" && args[i + 1]) {
             startDate = startOfDay(parseISO(args[i + 1]!))
             i++
-        } else if (args[i] === '--end' && args[i + 1]) {
+        } else if (args[i] === "--end" && args[i + 1]) {
             endDate = endOfDay(parseISO(args[i + 1]!))
             i++
         }
@@ -51,12 +51,12 @@ function parseArgs(): { startDate?: Date; endDate?: Date } {
 async function backfillDailyActivity() {
     const { startDate, endDate } = parseArgs()
 
-    console.log('Starting backfill of daily activity table...')
+    console.log("Starting backfill of daily activity table...")
     if (startDate) {
-        console.log(`  Start date: ${format(startDate, 'yyyy-MM-dd')}`)
+        console.log(`  Start date: ${format(startDate, "yyyy-MM-dd")}`)
     }
     if (endDate) {
-        console.log(`  End date: ${format(endDate, 'yyyy-MM-dd')}`)
+        console.log(`  End date: ${format(endDate, "yyyy-MM-dd")}`)
     }
 
     // Get all users
@@ -90,7 +90,7 @@ async function backfillDailyActivity() {
                 if (typingSession.typedVerses.length === 0) continue
 
                 // Use createdAt date, normalized to UTC day
-                const dayKey = format(typingSession.createdAt, 'yyyy-MM-dd')
+                const dayKey = format(typingSession.createdAt, "yyyy-MM-dd")
                 const existingDay = dayMap.get(dayKey)
 
                 // Calculate stats for each verse that has typing data
@@ -131,10 +131,10 @@ async function backfillDailyActivity() {
                 // Format passages using same logic as getLog2
                 const passagesString = typingSessionToString(
                     dayData.typedVerses,
-                    { seperator: '\n' },
+                    { seperator: "\n" },
                 )
                 const passages = passagesString
-                    .split('\n')
+                    .split("\n")
                     .map(p => p.trim())
                     .filter(p => p.length > 0)
 
@@ -203,10 +203,10 @@ async function backfillDailyActivity() {
 // Run the backfill
 backfillDailyActivity()
     .then(() => {
-        console.log('Backfill finished successfully')
+        console.log("Backfill finished successfully")
         process.exit(0)
     })
     .catch(error => {
-        console.error('Backfill failed:', error)
+        console.error("Backfill failed:", error)
         process.exit(1)
     })

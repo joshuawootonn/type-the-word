@@ -1,9 +1,9 @@
-import { Metadata } from 'next'
+import { Metadata } from "next"
 
-import { EmailLink } from '~/components/emailLink'
+import { EmailLink } from "~/components/emailLink"
 
 export const metadata: Metadata = {
-    title: 'Type the Word - Privacy Policy',
+    title: "Type the Word - Privacy Policy",
     description:
         "The Privacy Policy for Type the Word. A typing practice tool that tracks your typing progress through the Bible. Improve your typing skills while meditating on God's word.",
 }
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function Home() {
     return (
         <>
-            <div className={'prose-h2:text-3xl prose-p:text-xl'}>
+            <div className={"prose-h2:text-3xl prose-p:text-xl"}>
                 <h1>Privacy Policy</h1>
                 <hr className="mx-0 w-full border-t-2 border-primary" />
 
@@ -52,7 +52,7 @@ export default function Home() {
                 <p>
                     <EmailLink className="svg-outline-sm underline">
                         Contact me
-                    </EmailLink>{' '}
+                    </EmailLink>{" "}
                     if you have any questions about Type the Words&apos; privacy
                     policy, the data it holds on you, or you would like to
                     exercise one of your data protection rights.

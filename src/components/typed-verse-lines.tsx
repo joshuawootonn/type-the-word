@@ -1,8 +1,8 @@
-import React, { useMemo } from 'react'
+import React, { useMemo } from "react"
 
-import { PassageRectContext } from '~/lib/hooks/passageRectContext'
-import { Verse } from '~/lib/parseEsv'
-import { TypedVerse } from '~/server/repositories/typingSession.repository'
+import { PassageRectContext } from "~/lib/hooks/passageRectContext"
+import { Verse } from "~/lib/parseEsv"
+import { TypedVerse } from "~/server/repositories/typingSession.repository"
 
 export function TypedVerseLines({
     orderedVerses,
@@ -14,7 +14,7 @@ export function TypedVerseLines({
     orderedVerses: Verse[]
     passageRect: DOMRect | null
     typedVerses: TypedVerse[] | undefined
-    verseRects: PassageRectContext['verseRects']
+    verseRects: PassageRectContext["verseRects"]
     padding?: number
 }) {
     const typedVerseRanges = useMemo<

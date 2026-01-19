@@ -1,20 +1,21 @@
-import { Metadata } from 'next'
-import { getServerSession } from 'next-auth'
+import { Metadata } from "next"
+import { getServerSession } from "next-auth"
+import Link from "next/link"
 
-import { CopyrightCitation } from '~/components/copyright-citation'
-import { Passage } from '~/components/passage'
-import { PassageSelector } from '~/components/passageSelector'
-import { fetchPassage } from '~/lib/api'
-import { getLastTranslation } from '~/lib/last-translation'
-import { segmentToPassageObject } from '~/lib/passageObject'
-import { passageSegmentSchema } from '~/lib/passageSegment'
-import { authOptions } from '~/server/auth'
+import { CopyrightCitation } from "~/components/copyright-citation"
+import { Passage } from "~/components/passage"
+import { PassageSelector } from "~/components/passageSelector"
+import { fetchPassage } from "~/lib/api"
+import { getLastTranslation } from "~/lib/last-translation"
+import { segmentToPassageObject } from "~/lib/passageObject"
+import { passageSegmentSchema } from "~/lib/passageSegment"
+import { authOptions } from "~/server/auth"
 
-import { getChapterHistory } from '../api/chapter-history/[passage]/getChapterHistory'
-import { getOrCreateTypingSession } from '../api/typing-session/getOrCreateTypingSession'
+import { getChapterHistory } from "../api/chapter-history/[passage]/getChapterHistory"
+import { getOrCreateTypingSession } from "../api/typing-session/getOrCreateTypingSession"
 
 export const metadata: Metadata = {
-    title: 'Type the Word',
+    title: "Type the Word",
     description:
         "A typing practice tool that tracks your typing progress through the Bible. Improve your typing skills while meditating on God's word.",
 }
@@ -23,7 +24,7 @@ export default async function PassagePage() {
     const session = await getServerSession(authOptions)
     const lastTranslation = await getLastTranslation()
 
-    const value = passageSegmentSchema.parse('psalm 23:1-2')
+    const value = passageSegmentSchema.parse("psalm 23:1-2")
 
     const [passage, typingSession, chapterHistory] = await Promise.all([
         fetchPassage(value, lastTranslation),
@@ -40,7 +41,7 @@ export default async function PassagePage() {
     return (
         <div
             className={
-                'prose-h2:text-3xl prose-p:text-xl prose-code:before:content-none prose-code:after:content-none prose-li:text-xl'
+                "prose-h2:text-3xl prose-p:text-xl prose-code:before:content-none prose-code:after:content-none prose-li:text-xl"
             }
         >
             <h1>Welcome to Type the Word</h1>
@@ -68,13 +69,13 @@ export default async function PassagePage() {
             </div>
 
             <p>
-                {session == null ? 'Once you create an account, your' : 'Your'}{' '}
-                <a
+                {session == null ? "Once you create an account, your" : "Your"}{" "}
+                <Link
                     className="svg-outline-sm relative text-primary"
                     href="/history"
                 >
                     typing history
-                </a>{' '}
+                </Link>{" "}
                 will be saved automatically so that you can see statistics about
                 how much of each book you have typed and how many verses you
                 have typed in the last month.

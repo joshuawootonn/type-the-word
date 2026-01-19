@@ -1,8 +1,8 @@
-import { and, eq, sql } from 'drizzle-orm'
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
+import { and, eq, sql } from "drizzle-orm"
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js"
 
-import { getBibleMetadata, BookMetadata } from '~/server/bibleMetadata'
-import * as schema from '~/server/db/schema'
+import { getBibleMetadata, BookMetadata } from "~/server/bibleMetadata"
+import * as schema from "~/server/db/schema"
 
 // Use Drizzle's inferred types to avoid casting
 export type BookProgressRow = typeof schema.userBookProgress.$inferSelect

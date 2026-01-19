@@ -1,8 +1,8 @@
-import Color from 'colorjs.io'
-import { useField } from 'formik'
-import { ComponentPropsWithoutRef } from 'react'
+import Color from "colorjs.io"
+import { useField } from "formik"
+import { ComponentPropsWithoutRef } from "react"
 
-type Props = Omit<ComponentPropsWithoutRef<'input'>, 'name'> & { name: string }
+type Props = Omit<ComponentPropsWithoutRef<"input">, "name"> & { name: string }
 
 export function ColorInput(props: Props) {
     const [field, , { setValue }] = useField(props.name)
@@ -16,20 +16,20 @@ export function ColorInput(props: Props) {
                     type="color"
                     className="border-2 border-primary outline-none"
                     value={new Color(`oklch(${field.value})`)
-                        .to('srgb')
+                        .to("srgb")
                         .toString({
-                            format: 'hex',
+                            format: "hex",
                             collapse: false,
                         })}
                     onChange={e => {
                         const color = new Color(e.currentTarget.value).to(
-                            'oklch',
+                            "oklch",
                         )
                         const colorString = color
                             .toString({ precision: 4 })
-                            .replace(')', '')
-                            .replace('oklch(', '')
-                            .replace('none', '0')
+                            .replace(")", "")
+                            .replace("oklch(", "")
+                            .replace("none", "0")
                         document.documentElement.style.setProperty(
                             `--color-${field.name}`,
                             colorString,
@@ -40,15 +40,15 @@ export function ColorInput(props: Props) {
                 />
             </div>
             <style jsx>{`
-                input[type='color'] {
+                input[type="color"] {
                     -webkit-appearance: none;
                     width: 32px;
                     height: 32px;
                 }
-                input[type='color']::-webkit-color-swatch-wrapper {
+                input[type="color"]::-webkit-color-swatch-wrapper {
                     padding: 0;
                 }
-                input[type='color']::-webkit-color-swatch {
+                input[type="color"]::-webkit-color-swatch {
                     border: none;
                 }
             `}</style>

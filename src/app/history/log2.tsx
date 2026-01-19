@@ -1,12 +1,12 @@
-import { format, startOfMonth } from 'date-fns'
+import { format, startOfMonth } from "date-fns"
 
 import {
     TypedVerse,
     TypingSession,
-} from '~/server/repositories/typingSession.repository'
-import { DailyActivityRow } from '~/server/repositories/userDailyActivity.repository'
+} from "~/server/repositories/typingSession.repository"
+import { DailyActivityRow } from "~/server/repositories/userDailyActivity.repository"
 
-import { typingSessionToString } from './typingSessionToString'
+import { typingSessionToString } from "./typingSessionToString"
 
 type DayLog = {
     typedVerses: TypedVerse[]
@@ -66,8 +66,8 @@ export function getLogFromCache(
 
         // Create a local date from the UTC components for formatting
         const dateForFormatting = new Date(year, month, day)
-        const monthString = format(dateForFormatting, 'yyyy-MM')
-        const dayString = format(dateForFormatting, 'dd')
+        const monthString = format(dateForFormatting, "yyyy-MM")
+        const dayString = format(dateForFormatting, "dd")
 
         const currentMonthLog = monthLogs[monthString]
 
@@ -121,8 +121,8 @@ export function getLog2(
             typingSession.createdAt.getTime() +
                 (serverUTCOffset - clientTimezoneOffset) * 60 * 1000,
         )
-        const monthString = format(clientTimezoneCreatedAt, 'yyyy-MM')
-        const dayString = format(clientTimezoneCreatedAt, 'dd')
+        const monthString = format(clientTimezoneCreatedAt, "yyyy-MM")
+        const dayString = format(clientTimezoneCreatedAt, "dd")
         const currentMonthLog = monthLogs[monthString]
         const currentDayLog = currentMonthLog?.days[dayString]
 
@@ -171,12 +171,12 @@ export function getLog2(
                     [key]: {
                         numberOfVersesTyped: day.numberOfVersesTyped,
                         location: typingSessionToString(day.typedVerses, {
-                            seperator: '\n',
-                        }).split('\n'),
+                            seperator: "\n",
+                        }).split("\n"),
                         createdAt: day.createdAt,
                     },
                 }),
-                {} as MonthlyLogDTO['days'],
+                {} as MonthlyLogDTO["days"],
             )
 
             return {

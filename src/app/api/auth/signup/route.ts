@@ -1,19 +1,19 @@
-import { eq } from 'drizzle-orm'
-import { NextResponse } from 'next/server'
-import { z } from 'zod'
+import { eq } from "drizzle-orm"
+import { NextResponse } from "next/server"
+import { z } from "zod"
 
 import {
     hashPassword,
     passwordSchema,
     firstNameSchema,
-} from '~/lib/auth/password'
-import { createSubscription } from '~/lib/convert-kit.service'
-import { db } from '~/server/db'
-import { users } from '~/server/db/schema'
+} from "~/lib/auth/password"
+import { createSubscription } from "~/lib/convert-kit.service"
+import { db } from "~/server/db"
+import { users } from "~/server/db/schema"
 
 const signupSchema = z.object({
     firstName: firstNameSchema,
-    email: z.string().email('Invalid email address'),
+    email: z.string().email("Invalid email address"),
     password: passwordSchema,
 })
 
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
                 {
                     error:
                         validation.error.errors[0]?.message ??
-                        'Validation failed',
+                        "Validation failed",
                 },
                 { status: 400 },
             )
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
 
         if (existingUser.length > 0) {
             return NextResponse.json(
-                { error: 'Email already registered' },
+                { error: "Email already registered" },
                 { status: 400 },
             )
         }
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
         try {
             await createSubscription({ email, name: firstName })
         } catch (error) {
-            console.error('Failed to create subscription:', error)
+            console.error("Failed to create subscription:", error)
             // Don't fail the signup if subscription fails
         }
 
@@ -84,9 +84,9 @@ export async function POST(request: Request) {
             { status: 201 },
         )
     } catch (error) {
-        console.error('Signup error:', error)
+        console.error("Signup error:", error)
         return NextResponse.json(
-            { error: 'An error occurred during signup' },
+            { error: "An error occurred during signup" },
             { status: 500 },
         )
     }

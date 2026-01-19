@@ -1,16 +1,16 @@
-import { Metadata } from 'next'
+import { Metadata } from "next"
 
-import { EmailLink } from '~/components/emailLink'
+import { EmailLink } from "~/components/emailLink"
 
 export const metadata: Metadata = {
-    title: 'Type the Word - Terms of Service',
+    title: "Type the Word - Terms of Service",
     description:
         "The Terms of Service for Type the Word. A typing practice tool that tracks your typing progress through the Bible. Improve your typing skills while meditating on God's word.",
 }
 
 export default function Home() {
     return (
-        <div className={'prose-h2:text-3xl prose-p:text-xl'}>
+        <div className={"prose-h2:text-3xl prose-p:text-xl"}>
             <h1>Terms of Service</h1>
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <p>
@@ -46,7 +46,7 @@ export default function Home() {
             <p>
                 <EmailLink className="svg-outline-sm underline">
                     Contact me
-                </EmailLink>{' '}
+                </EmailLink>{" "}
                 if you have any questions about Type the Words&apos; terms of
                 service.
             </p>

@@ -1,14 +1,13 @@
-'use client'
+"use client"
 
-import * as Tooltip from '@radix-ui/react-tooltip'
-import clsx from 'clsx'
-import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import * as Tooltip from "@radix-ui/react-tooltip"
+import clsx from "clsx"
+import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 
-import { Translation } from '~/lib/parseEsv'
-import { tryParseTranslation } from '~/lib/translations'
+import { tryParseTranslation } from "~/lib/translations"
 
-import { BookOverview } from './overview'
+import { BookOverview } from "./overview"
 
 function Box({
     percentage,
@@ -28,7 +27,7 @@ function Box({
                 height="14"
                 width="14"
                 strokeWidth="1"
-                className="stroke-primary "
+                className="stroke-primary"
                 fill="none"
                 x="1"
                 y="1"
@@ -56,7 +55,7 @@ function Box({
 export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
     const searchParams = useSearchParams()
     const currentTranslation =
-        tryParseTranslation(searchParams?.get('translation')) ?? 'esv'
+        tryParseTranslation(searchParams?.get("translation")) ?? "esv"
 
     return (
         <Tooltip.Provider delayDuration={0}>
@@ -78,7 +77,7 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                                     .map((_, i) => (
                                                         <Box
                                                             className={
-                                                                'aspect-square h-[28.5px]'
+                                                                "aspect-square h-[28.5px]"
                                                             }
                                                             key={i}
                                                             percentage={100}
@@ -87,7 +86,7 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                                 {book.percentage !== 0 && (
                                                     <Box
                                                         className={
-                                                            'aspect-square h-[28.5px]'
+                                                            "aspect-square h-[28.5px]"
                                                         }
                                                         percentage={
                                                             book.percentage
@@ -107,7 +106,7 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                         </div>
                                     )}
                                     <div>
-                                        Current Progress: {book.typedVerses} /{' '}
+                                        Current Progress: {book.typedVerses} /{" "}
                                         {book.verses}
                                     </div>
                                     <div>
@@ -132,7 +131,7 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                             </Link>
                                         </Tooltip.Trigger>
                                         <Tooltip.Content
-                                            className="prose grid select-none grid-cols-[1fr_minmax(30px,min-content)] gap-x-3 gap-y-1 border-2 border-primary bg-secondary px-3 py-2 font-sans leading-none text-primary "
+                                            className="prose grid select-none grid-cols-[1fr_minmax(30px,min-content)] gap-x-3 gap-y-1 border-2 border-primary bg-secondary px-3 py-2 font-sans leading-none text-primary"
                                             sideOffset={2}
                                         >
                                             <div>Chapter: </div>

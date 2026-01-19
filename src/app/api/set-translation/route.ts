@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from "next/server"
 
-import { setTranslationCookie } from '~/lib/last-translation'
-import { Translation } from '~/lib/parseEsv'
-import { validTranslations } from '~/lib/translations'
+import { setTranslationCookie } from "~/lib/last-translation"
+import { Translation } from "~/lib/parseEsv"
+import { validTranslations } from "~/lib/translations"
 
 export async function POST(request: NextRequest) {
     const { translation } = (await request.json()) as {
@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
     if (!validTranslations.includes(translation)) {
         return NextResponse.json(
-            { error: 'Invalid translation' },
+            { error: "Invalid translation" },
             { status: 400 },
         )
     }

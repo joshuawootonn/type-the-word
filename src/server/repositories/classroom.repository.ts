@@ -1,13 +1,13 @@
-import { eq, and } from 'drizzle-orm'
+import { eq, and } from "drizzle-orm"
 
-import { db } from '~/server/db'
+import { db } from "~/server/db"
 import {
     classroomTeacherToken,
     classroomAssignment,
     classroomSubmission,
     type Translation,
     type Book,
-} from '~/server/db/schema'
+} from "~/server/db/schema"
 
 /**
  * Teacher Token Operations

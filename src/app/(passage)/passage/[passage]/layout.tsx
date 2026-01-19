@@ -1,9 +1,9 @@
-import { ReactNode } from 'react'
+import { ReactNode } from "react"
 
-import { PassageSelector } from '~/components/passageSelector'
-import { passageReferenceSchema } from '~/lib/passageReference'
+import { PassageSelector } from "~/components/passageSelector"
+import { passageReferenceSchema } from "~/lib/passageReference"
 
-const DEFAULT_PASSAGE_REFERENCE = 'psalm_23'
+const DEFAULT_PASSAGE_REFERENCE = "psalm_23"
 
 export default async function PassageLayout({
     children,

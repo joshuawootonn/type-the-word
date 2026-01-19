@@ -9,16 +9,16 @@
  *
  * Run with: dotenv pnpm dlx tsx ./src/scripts/backfill-progress.ts
  */
-import { aggregateBookData } from '~/app/history/overview'
-import { Book, bookSchema } from '~/lib/types/book'
-import { getBibleMetadata } from '~/server/bibleMetadata'
-import { db } from '~/server/db'
-import { users, Translation } from '~/server/db/schema'
-import { TypingSessionRepository } from '~/server/repositories/typingSession.repository'
-import { UserProgressRepository } from '~/server/repositories/userProgress.repository'
+import { aggregateBookData } from "~/app/history/overview"
+import { Book, bookSchema } from "~/lib/types/book"
+import { getBibleMetadata } from "~/server/bibleMetadata"
+import { db } from "~/server/db"
+import { users, Translation } from "~/server/db/schema"
+import { TypingSessionRepository } from "~/server/repositories/typingSession.repository"
+import { UserProgressRepository } from "~/server/repositories/userProgress.repository"
 
 async function backfillUserProgress() {
-    console.log('Starting backfill of book/chapter progress tables...')
+    console.log("Starting backfill of book/chapter progress tables...")
 
     const bibleMetadata = getBibleMetadata()
 
@@ -82,7 +82,7 @@ async function backfillUserProgress() {
                 bookRows.push({
                     userId: user.id,
                     book: bookSlug,
-                    translation: 'esv', // Default to ESV for backfill
+                    translation: "esv", // Default to ESV for backfill
                     prestige: book.prestige,
                     typedVerseCount: book.typedVersesInCurrentPrestige,
                     totalVerses: book.totalVerses,
@@ -101,7 +101,7 @@ async function backfillUserProgress() {
                         userId: user.id,
                         book: bookSlug,
                         chapter,
-                        translation: 'esv',
+                        translation: "esv",
                         typedVerses: chapterData.verses,
                         totalVerses: chapterData.totalVerses,
                     })
@@ -136,10 +136,10 @@ async function backfillUserProgress() {
 // Run the backfill
 backfillUserProgress()
     .then(() => {
-        console.log('Backfill finished successfully')
+        console.log("Backfill finished successfully")
         process.exit(0)
     })
     .catch(error => {
-        console.error('Backfill failed:', error)
+        console.error("Backfill failed:", error)
         process.exit(1)
     })

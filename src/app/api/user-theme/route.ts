@@ -1,19 +1,19 @@
-import { createSelectSchema } from 'drizzle-zod'
-import { getServerSession } from 'next-auth'
-import { NextRequest } from 'next/server'
+import { createSelectSchema } from "drizzle-zod"
+import { getServerSession } from "next-auth"
+import { NextRequest } from "next/server"
 
-import { authOptions } from '~/server/auth'
-import { db } from '~/server/db'
-import { theme } from '~/server/db/schema'
-import { UserThemeRepository } from '~/server/repositories/userTheme.repository'
+import { authOptions } from "~/server/auth"
+import { db } from "~/server/db"
+import { theme } from "~/server/db/schema"
+import { UserThemeRepository } from "~/server/repositories/userTheme.repository"
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic"
 
 export async function GET() {
     const session = await getServerSession(authOptions)
 
     if (session === null) {
-        return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        return Response.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const userThemeRepository = new UserThemeRepository(db)
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions)
 
     if (session === null) {
-        return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        return Response.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const rawBody = await request.json()
@@ -43,13 +43,9 @@ export async function POST(request: NextRequest) {
     }
 
     const userThemeRepository = new UserThemeRepository(db)
-    try {
-        const theme = await userThemeRepository.createTheme({
-            theme: body.data,
-            userId: session.user.id,
-        })
-        return Response.json({ data: theme }, { status: 200 })
-    } catch (e) {
-        throw e
-    }
+    const theme = await userThemeRepository.createTheme({
+        theme: body.data,
+        userId: session.user.id,
+    })
+    return Response.json({ data: theme }, { status: 200 })
 }

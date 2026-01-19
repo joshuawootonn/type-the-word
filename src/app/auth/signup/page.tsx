@@ -1,13 +1,13 @@
-'use client'
+"use client"
 
-import { Field, Formik } from 'formik'
-import { signIn } from 'next-auth/react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState, useRef } from 'react'
+import { Field, Formik } from "formik"
+import { signIn } from "next-auth/react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useState, useRef } from "react"
 
-import { Loading } from '~/components/loading'
-import { cn } from '~/lib/cn'
+import { Loading } from "~/components/loading"
+import { cn } from "~/lib/cn"
 
 export default function SignUpPage() {
     const router = useRouter()
@@ -27,10 +27,10 @@ export default function SignUpPage() {
 
                 <Formik
                     initialValues={{
-                        firstName: '',
-                        email: '',
-                        password: '',
-                        confirmPassword: '',
+                        firstName: "",
+                        email: "",
+                        password: "",
+                        confirmPassword: "",
                     }}
                     validate={values => {
                         const errors: {
@@ -41,44 +41,44 @@ export default function SignUpPage() {
                         } = {}
 
                         if (!values.firstName) {
-                            errors.firstName = 'First name is required'
+                            errors.firstName = "First name is required"
                         } else if (values.firstName.length > 50) {
                             errors.firstName =
-                                'First name must be less than 50 characters'
+                                "First name must be less than 50 characters"
                         }
 
                         if (!values.email) {
-                            errors.email = 'Email is required'
+                            errors.email = "Email is required"
                         } else if (
                             !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(
                                 values.email,
                             )
                         ) {
-                            errors.email = 'Invalid email address'
+                            errors.email = "Invalid email address"
                         }
 
                         if (!values.password) {
-                            errors.password = 'Password is required'
+                            errors.password = "Password is required"
                         } else if (values.password.length < 8) {
                             errors.password =
-                                'Password must be at least 8 characters'
+                                "Password must be at least 8 characters"
                         } else if (!/[A-Z]/.test(values.password)) {
                             errors.password =
-                                'Password must contain at least one uppercase letter'
+                                "Password must contain at least one uppercase letter"
                         } else if (
-                            !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(
+                            !/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(
                                 values.password,
                             )
                         ) {
                             errors.password =
-                                'Password must contain at least one special character'
+                                "Password must contain at least one special character"
                         }
 
                         if (!values.confirmPassword) {
                             errors.confirmPassword =
-                                'Please confirm your password'
+                                "Please confirm your password"
                         } else if (values.password !== values.confirmPassword) {
-                            errors.confirmPassword = 'Passwords do not match'
+                            errors.confirmPassword = "Passwords do not match"
                         }
 
                         // Focus first field with error
@@ -104,9 +104,9 @@ export default function SignUpPage() {
                         setIsLoading(true)
 
                         try {
-                            const response = await fetch('/api/auth/signup', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
+                            const response = await fetch("/api/auth/signup", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({
                                     firstName: values.firstName,
                                     email: values.email,
@@ -122,7 +122,7 @@ export default function SignUpPage() {
                             if (!response.ok) {
                                 setError(
                                     data.error ??
-                                        'An error occurred during signup',
+                                        "An error occurred during signup",
                                 )
                                 setIsLoading(false)
                                 setSubmitting(false)
@@ -130,7 +130,7 @@ export default function SignUpPage() {
                             }
 
                             // Auto log in after successful signup
-                            const result = await signIn('credentials', {
+                            const result = await signIn("credentials", {
                                 email: values.email,
                                 password: values.password,
                                 redirect: false,
@@ -138,14 +138,14 @@ export default function SignUpPage() {
 
                             if (result?.ok) {
                                 // Keep loading state true during redirect
-                                router.push('/')
+                                router.push("/")
                                 router.refresh()
                             } else {
                                 // Signup succeeded but login failed, redirect to login page
-                                router.push('/auth/login')
+                                router.push("/auth/login")
                             }
-                        } catch (err) {
-                            setError('An error occurred. Please try again.')
+                        } catch (_) {
+                            setError("An error occurred. Please try again.")
                             setIsLoading(false)
                             setSubmitting(false)
                         }
@@ -275,17 +275,17 @@ export default function SignUpPage() {
                                     <>
                                         <Loading
                                             className={cn(
-                                                'text-md absolute left-1/2 top-1/2 -translate-x-8 -translate-y-1/2 font-semibold',
+                                                "text-md absolute left-1/2 top-1/2 -translate-x-8 -translate-y-1/2 font-semibold",
                                                 isLoading
-                                                    ? 'text-secondary'
-                                                    : 'text-primary',
+                                                    ? "text-secondary"
+                                                    : "text-primary",
                                             )}
                                         />
 
                                         <div className="h-6" />
                                     </>
                                 ) : (
-                                    'Sign up'
+                                    "Sign up"
                                 )}
                             </button>
                         </form>
@@ -293,7 +293,7 @@ export default function SignUpPage() {
                 </Formik>
 
                 <p className="mt-8 text-center text-primary">
-                    Already have an account?{' '}
+                    Already have an account?{" "}
                     <Link
                         href="/auth/login"
                         className="svg-outline relative font-semibold underline hover:no-underline"

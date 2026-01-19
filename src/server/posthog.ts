@@ -1,6 +1,6 @@
-import { PostHog } from 'posthog-node'
+import { PostHog } from "posthog-node"
 
-import { env } from '~/env.mjs'
+import { env } from "~/env.mjs"
 
 // NOTE: This is a Node.js client, so you can use it for sending events from the server side to PostHog.
 export default function PostHogClient() {

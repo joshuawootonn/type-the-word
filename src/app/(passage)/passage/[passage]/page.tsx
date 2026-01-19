@@ -1,41 +1,41 @@
-import { Metadata } from 'next'
-import { getServerSession } from 'next-auth'
-import Link from 'next/link'
-import { redirect } from 'next/navigation'
+import { Metadata } from "next"
+import { getServerSession } from "next-auth"
+import Link from "next/link"
+import { redirect } from "next/navigation"
 
-import { getChapterHistory } from '~/app/api/chapter-history/[passage]/getChapterHistory'
-import { getOrCreateTypingSession } from '~/app/api/typing-session/getOrCreateTypingSession'
-import { ChapterLog } from '~/components/chapter-log'
-import { CopyrightCitation } from '~/components/copyright-citation'
-import { Passage } from '~/components/passage'
-import { fetchPassage } from '~/lib/api'
-import { Translation } from '~/lib/parseEsv'
-import { segmentToPassageObject } from '~/lib/passageObject'
-import { passageReferenceSchema } from '~/lib/passageReference'
-import { PassageSegment, toPassageSegment } from '~/lib/passageSegment'
-import { authOptions } from '~/server/auth'
-import { db } from '~/server/db'
-import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
+import { getChapterHistory } from "~/app/api/chapter-history/[passage]/getChapterHistory"
+import { getOrCreateTypingSession } from "~/app/api/typing-session/getOrCreateTypingSession"
+import { ChapterLog } from "~/components/chapter-log"
+import { CopyrightCitation } from "~/components/copyright-citation"
+import { Passage } from "~/components/passage"
+import { fetchPassage } from "~/lib/api"
+import { Translation } from "~/lib/parseEsv"
+import { segmentToPassageObject } from "~/lib/passageObject"
+import { passageReferenceSchema } from "~/lib/passageReference"
+import { PassageSegment, toPassageSegment } from "~/lib/passageSegment"
+import { authOptions } from "~/server/auth"
+import { db } from "~/server/db"
+import { TypedVerseRepository } from "~/server/repositories/typedVerse.repository"
 
-import { DEFAULT_PASSAGE_SEGMENT } from './default-passage'
+import { DEFAULT_PASSAGE_SEGMENT } from "./default-passage"
 
 const validTranslations: Translation[] = [
-    'esv',
-    'bsb',
-    'nlt',
-    'niv',
-    'csb',
-    'nkjv',
-    'nasb',
-    'ntv',
-    'msg',
+    "esv",
+    "bsb",
+    "nlt",
+    "niv",
+    "csb",
+    "nkjv",
+    "nasb",
+    "ntv",
+    "msg",
 ]
 
 function parseTranslation(value: string | undefined | null): Translation {
     if (value && validTranslations.includes(value as Translation)) {
         return value as Translation
     }
-    return 'esv'
+    return "esv"
 }
 
 export async function generateMetadata({

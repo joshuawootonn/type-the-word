@@ -1,7 +1,7 @@
 const config = {
     plugins: {
         tailwindcss: {},
-        '@csstools/postcss-oklab-function': { preserve: true },
+        "@csstools/postcss-oklab-function": { preserve: true },
         autoprefixer: {},
     },
 }

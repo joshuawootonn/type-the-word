@@ -1,9 +1,9 @@
-import { and, desc, eq, count as sqlCount } from 'drizzle-orm'
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
+import { and, desc, eq, count as sqlCount } from "drizzle-orm"
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js"
 
-import * as schema from '~/server/db/schema'
+import * as schema from "~/server/db/schema"
 
-import { TypedVerse } from './typingSession.repository'
+import { TypedVerse } from "./typingSession.repository"
 
 export class TypedVerseRepository {
     db: PostgresJsDatabase<typeof schema>

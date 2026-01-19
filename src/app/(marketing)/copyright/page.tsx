@@ -1,11 +1,11 @@
-import { Metadata } from 'next'
-import { z } from 'zod'
+import { Metadata } from "next"
+import { z } from "zod"
 
-import { env } from '~/env.mjs'
-import { API_BIBLE_IDS } from '~/lib/api-bible-ids'
+import { env } from "~/env.mjs"
+import { API_BIBLE_IDS } from "~/lib/api-bible-ids"
 
 export const metadata: Metadata = {
-    title: 'Type the Word - Copyright',
+    title: "Type the Word - Copyright",
     description:
         "The Copyright for Type the Word. A typing practice tool that tracks your typing progress through the Bible. Improve your typing skills while meditating on God's word.",
 }
@@ -29,19 +29,19 @@ type BibleCopyright = {
 
 // IP Holder websites per Appendix B
 const IP_HOLDER_URLS: Record<string, string> = {
-    Crossway: 'https://www.crossway.org',
-    'Biblica, Inc': 'https://www.biblica.com',
-    Biblica: 'https://www.biblica.com',
-    'Tyndale House Publishers': 'https://www.tyndale.com',
-    Tyndale: 'https://www.tyndale.com',
-    'The Lockman Foundation': 'https://www.lockman.org',
-    Lockman: 'https://www.lockman.org',
-    'Lifeway Christian Resources': 'https://www.lifeway.com',
-    Holman: 'https://www.lifeway.com',
-    'HarperCollins Publishers': 'https://www.harpercollins.com',
-    'Thomas Nelson': 'https://www.thomasnelson.com',
-    NavPress: 'https://www.navpress.com',
-    'Bible Hub': 'https://biblehub.com',
+    Crossway: "https://www.crossway.org",
+    "Biblica, Inc": "https://www.biblica.com",
+    Biblica: "https://www.biblica.com",
+    "Tyndale House Publishers": "https://www.tyndale.com",
+    Tyndale: "https://www.tyndale.com",
+    "The Lockman Foundation": "https://www.lockman.org",
+    Lockman: "https://www.lockman.org",
+    "Lifeway Christian Resources": "https://www.lifeway.com",
+    Holman: "https://www.lifeway.com",
+    "HarperCollins Publishers": "https://www.harpercollins.com",
+    "Thomas Nelson": "https://www.thomasnelson.com",
+    NavPress: "https://www.navpress.com",
+    "Bible Hub": "https://biblehub.com",
 }
 
 function findIpHolderUrl(copyright: string): string | undefined {
@@ -61,7 +61,7 @@ async function fetchBibleCopyright(
             `https://rest.api.bible/v1/bibles/${bibleId}`,
             {
                 headers: {
-                    'api-key': env.API_BIBLE_API_KEY,
+                    "api-key": env.API_BIBLE_API_KEY,
                 },
                 next: { revalidate: 86400 }, // Revalidate once per day
             },
@@ -100,16 +100,16 @@ export default async function CopyrightPage() {
 
     // ESV copyright (hardcoded since it uses a different API)
     const esvCopyright: BibleCopyright = {
-        abbreviation: 'ESV',
-        name: 'English Standard Version',
+        abbreviation: "ESV",
+        name: "English Standard Version",
         copyright:
-            'Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved. The ESV text may not be quoted in any publication made available to the public by a Creative Commons license. The ESV may not be translated into any other language.',
-        url: 'https://www.crossway.org',
+            "Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved. The ESV text may not be quoted in any publication made available to the public by a Creative Commons license. The ESV may not be translated into any other language.",
+        url: "https://www.crossway.org",
     }
 
     // Combine ESV with API.Bible translations
     const allCopyrights = [
-        { key: 'esv', copyright: esvCopyright },
+        { key: "esv", copyright: esvCopyright },
         ...apiBibleCopyrights.filter(
             (item): item is { key: string; copyright: BibleCopyright } =>
                 item.copyright !== null,
@@ -155,7 +155,7 @@ export default async function CopyrightPage() {
 
             <h2 className="text-xl font-semibold">Additional Information</h2>
             <p className="mb-16 mt-4 text-sm text-primary">
-                Scripture data for non-ESV translations is provided by{' '}
+                Scripture data for non-ESV translations is provided by{" "}
                 <a
                     href="https://api.bible"
                     target="_blank"

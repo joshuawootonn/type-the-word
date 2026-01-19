@@ -1,14 +1,14 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import clsx from 'clsx'
-import { trackEvent } from 'fathom-client'
-import { useAtom } from 'jotai'
-import { useSession } from 'next-auth/react'
-import React, { FormEvent, KeyboardEvent, useEffect, useRef } from 'react'
-import { z } from 'zod'
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import clsx from "clsx"
+import { trackEvent } from "fathom-client"
+import { useAtom } from "jotai"
+import { useSession } from "next-auth/react"
+import React, { FormEvent, KeyboardEvent, useEffect, useRef } from "react"
+import { z } from "zod"
 
-import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
-import { AddTypedVerseBody } from '~/app/api/typing-session/[id]/route'
-import { getOS } from '~/app/global-hotkeys'
+import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
+import { AddTypedVerseBody } from "~/app/api/typing-session/[id]/route"
+import { getOS } from "~/app/global-hotkeys"
 import {
     passageIdAtom,
     autofocusAtom,
@@ -17,34 +17,34 @@ import {
     isPassageFocusedAtom,
     keystrokesAtom,
     positionAtom,
-} from '~/components/passage'
-import { Word } from '~/components/word'
-import { fetchAddVerseToTypingSession } from '~/lib/api'
-import { usePassageRect, useVerseRect } from '~/lib/hooks/passageRectContext'
-import { useAnalytics } from '~/lib/hooks/useAnalytics'
-import { isAtomTyped, isVerseSameShape } from '~/lib/isEqual'
-import { getPosition, isAtomComplete, isValidKeystroke } from '~/lib/keystroke'
-import { Translation } from '~/lib/parseEsv'
-import { Block, Inline, ParsedPassage, Verse } from '~/lib/parseEsv'
-import { PassageSegment } from '~/lib/passageSegment'
-import { TypingSession } from '~/server/repositories/typingSession.repository'
+} from "~/components/passage"
+import { Word } from "~/components/word"
+import { fetchAddVerseToTypingSession } from "~/lib/api"
+import { usePassageRect, useVerseRect } from "~/lib/hooks/passageRectContext"
+import { useAnalytics } from "~/lib/hooks/useAnalytics"
+import { isAtomTyped, isVerseSameShape } from "~/lib/isEqual"
+import { getPosition, isAtomComplete, isValidKeystroke } from "~/lib/keystroke"
+import { Translation } from "~/lib/parseEsv"
+import { Block, Inline, ParsedPassage, Verse } from "~/lib/parseEsv"
+import { PassageSegment } from "~/lib/passageSegment"
+import { TypingSession } from "~/server/repositories/typingSession.repository"
 
-const knownInputEventSchema = z.discriminatedUnion('inputType', [
+const knownInputEventSchema = z.discriminatedUnion("inputType", [
     z.object({
         data: z.string(),
-        inputType: z.literal('insertText'),
+        inputType: z.literal("insertText"),
     }),
     z.object({
         data: z.null(),
-        inputType: z.literal('deleteContentBackward'),
+        inputType: z.literal("deleteContentBackward"),
     }),
     z.object({
         data: z.null(),
-        inputType: z.literal('deleteWordBackward'),
+        inputType: z.literal("deleteWordBackward"),
     }),
     z.object({
         data: z.null(),
-        inputType: z.literal('deleteSoftLineBackward'),
+        inputType: z.literal("deleteSoftLineBackward"),
     }),
 ])
 
@@ -53,16 +53,16 @@ export type KnownNativeInputEvent = z.infer<typeof knownInputEventSchema>
 function getWords(verse: string, blocks: Block[]): Inline[] {
     return blocks.flatMap(block => {
         switch (block.type) {
-            case 'paragraph':
+            case "paragraph":
                 return getWords(verse, block.nodes)
 
-            case 'verse':
+            case "verse":
                 if (verse !== block.verse.value) return []
 
                 return block.nodes.flatMap(node => {
-                    if (node.type === 'paragraph')
+                    if (node.type === "paragraph")
                         return [...getWords(verse, node.nodes)]
-                    else if (node.type === 'word') {
+                    else if (node.type === "word") {
                         return [node]
                     } else {
                         return []
@@ -77,9 +77,9 @@ function getWords(verse: string, blocks: Block[]): Inline[] {
 function getListOfVerses(blocks: Block[]): Verse[] {
     return blocks.flatMap(block => {
         switch (block.type) {
-            case 'paragraph':
+            case "paragraph":
                 return getListOfVerses(block.nodes)
-            case 'verse':
+            case "verse":
                 return [block]
             default:
                 return []
@@ -96,7 +96,7 @@ function getVerse(currentVerse: string, blocks: Block[]): Verse {
     const verse = listOfVerses.at(indexOfCurrent)
 
     if (verse == null) {
-        throw new Error('ReadonlyVerse not found')
+        throw new Error("ReadonlyVerse not found")
     }
 
     return verse
@@ -124,7 +124,7 @@ export function CurrentVerse({
     typingSession,
     chapterHistory,
     passageSegment,
-    translation = 'esv',
+    translation = "esv",
 }: {
     isCurrentVerse: boolean
     isIndented: boolean
@@ -157,22 +157,22 @@ export function CurrentVerse({
         onMutate: async verse => {
             // Cancel any outgoing refetches
             // (so they don't overwrite our optimistic update)
-            await queryClient.cancelQueries({ queryKey: ['typing-session'] })
+            await queryClient.cancelQueries({ queryKey: ["typing-session"] })
 
             // Snapshot the previous value
             const previousTypingSession = queryClient.getQueryData([
-                'typing-session',
+                "typing-session",
             ])
             // Snapshot the previous value
             const previousChapterHistory = queryClient.getQueryData([
-                'chapter-history',
+                "chapter-history",
                 passageSegment,
                 translation,
             ])
 
             // Optimistically update to the new value
             queryClient.setQueryData<TypingSession>(
-                ['typing-session'],
+                ["typing-session"],
                 prevTypingSession => {
                     if (prevTypingSession == null) {
                         return undefined
@@ -194,7 +194,7 @@ export function CurrentVerse({
                 },
             )
             queryClient.setQueryData<ChapterHistory>(
-                ['chapter-history', passageSegment, translation],
+                ["chapter-history", passageSegment, translation],
                 prevChapterHistory => {
                     if (prevChapterHistory == null) {
                         return undefined
@@ -220,7 +220,7 @@ export function CurrentVerse({
                     setPosition([])
                     setKeystrokes([])
                 } else {
-                    setCurrentVerse('')
+                    setCurrentVerse("")
                     inputRef.current?.blur()
                     setPosition([])
                     setKeystrokes([])
@@ -234,24 +234,24 @@ export function CurrentVerse({
         // use the context returned from onMutate to roll back
         onError: (_err, _newTodo, context) => {
             queryClient.setQueryData(
-                ['typing-session'],
+                ["typing-session"],
                 context?.previousTypingSession,
             )
             queryClient.setQueryData(
-                ['chapter-history', passageSegment, translation],
+                ["chapter-history", passageSegment, translation],
                 context?.previousChapterHistory,
             )
         },
         // Always refetch after error or success:
         onSettled: async () => {
             await queryClient.invalidateQueries({
-                queryKey: ['typing-session'],
+                queryKey: ["typing-session"],
             })
             await queryClient.invalidateQueries({
-                queryKey: ['chapter-history'],
+                queryKey: ["chapter-history"],
             })
             await queryClient.invalidateQueries({
-                queryKey: ['last-verse'],
+                queryKey: ["last-verse"],
             })
         },
         retry: 3,
@@ -272,8 +272,8 @@ export function CurrentVerse({
             document
                 .getElementById(`${passageId}-scroll-anchor`)
                 ?.scrollIntoView({
-                    block: 'start',
-                    behavior: 'smooth',
+                    block: "start",
+                    behavior: "smooth",
                 })
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -305,7 +305,7 @@ export function CurrentVerse({
         setIsPassageActive(true)
         const currentVerseNodes = getWords(currentVerse, passage.nodes)
         if (currentVerseNodes == null) {
-            throw new Error('Current ReadonlyVerse is invalid.')
+            throw new Error("Current ReadonlyVerse is invalid.")
         }
 
         const next = isValidKeystroke(event, keystrokes)
@@ -320,7 +320,7 @@ export function CurrentVerse({
 
         if (isVerseComplete) {
             const verse = getVerse(currentVerse, passage.nodes)
-            trackEvent('typed-verse')
+            trackEvent("typed-verse")
             trackVerseCompleted({
                 book: verse.verse.book,
                 chapter: verse.verse.chapter,
@@ -339,14 +339,14 @@ export function CurrentVerse({
                         userNodes: position
                             .filter(isAtomTyped)
                             .filter(
-                                (n): n is { type: 'word'; letters: string[] } =>
-                                    n.type === 'word',
+                                (n): n is { type: "word"; letters: string[] } =>
+                                    n.type === "word",
                             ),
                         correctNodes: currentVerseNodes
                             .filter(isAtomTyped)
                             .filter(
-                                (n): n is { type: 'word'; letters: string[] } =>
-                                    n.type === 'word',
+                                (n): n is { type: "word"; letters: string[] } =>
+                                    n.type === "word",
                             ),
                     },
                 })
@@ -357,7 +357,7 @@ export function CurrentVerse({
                     setPosition([])
                     setKeystrokes([])
                 } else {
-                    setCurrentVerse('')
+                    setCurrentVerse("")
                     inputRef.current?.blur()
                     setPosition([])
                     setKeystrokes([])
@@ -372,48 +372,48 @@ export function CurrentVerse({
     function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
         const { os } = getOS()
 
-        if (os === 'Windows' || os === 'Linux') {
+        if (os === "Windows" || os === "Linux") {
             // Windows doesn't have a "delete the current line" shortcut.
             // So I am faking the 'deleteSoftLineBackward' from this `onKeyDown` given the right situation.
-            if (event.shiftKey && event.ctrlKey && event.key === 'Backspace') {
+            if (event.shiftKey && event.ctrlKey && event.key === "Backspace") {
                 event.preventDefault()
                 handleKnownEvents({
                     data: null,
-                    inputType: 'deleteSoftLineBackward',
+                    inputType: "deleteSoftLineBackward",
                 })
-            } else if (event.ctrlKey && event.key === 'Backspace') {
+            } else if (event.ctrlKey && event.key === "Backspace") {
                 event.preventDefault()
                 handleKnownEvents({
                     data: null,
-                    inputType: 'deleteWordBackward',
+                    inputType: "deleteWordBackward",
                 })
-            } else if (event.key === 'Backspace') {
+            } else if (event.key === "Backspace") {
                 event.preventDefault()
                 handleKnownEvents({
                     data: null,
-                    inputType: 'deleteContentBackward',
+                    inputType: "deleteContentBackward",
                 })
             }
         }
 
-        if (os === 'MacOS') {
-            if (event.metaKey && event.key === 'Backspace') {
+        if (os === "MacOS") {
+            if (event.metaKey && event.key === "Backspace") {
                 event.preventDefault()
                 handleKnownEvents({
                     data: null,
-                    inputType: 'deleteSoftLineBackward',
+                    inputType: "deleteSoftLineBackward",
                 })
-            } else if (event.altKey && event.key === 'Backspace') {
+            } else if (event.altKey && event.key === "Backspace") {
                 event.preventDefault()
                 handleKnownEvents({
                     data: null,
-                    inputType: 'deleteWordBackward',
+                    inputType: "deleteWordBackward",
                 })
-            } else if (event.key === 'Backspace') {
+            } else if (event.key === "Backspace") {
                 event.preventDefault()
                 handleKnownEvents({
                     data: null,
-                    inputType: 'deleteContentBackward',
+                    inputType: "deleteContentBackward",
                 })
             }
         }
@@ -424,8 +424,8 @@ export function CurrentVerse({
 
         if (knownEvent.success) {
             if (
-                knownEvent.data.inputType === 'insertText' &&
-                knownEvent.data.data === ' '
+                knownEvent.data.inputType === "insertText" &&
+                knownEvent.data.data === " "
             ) {
                 event.preventDefault()
             }
@@ -454,9 +454,9 @@ export function CurrentVerse({
     return (
         <span
             className={clsx(
-                'verse break-spaces group inline h-3 text-balance hover:cursor-pointer',
-                isCurrentVerse && 'active-verse',
-                isTypedInHistory ? 'text-primary/50' : 'text-primary',
+                "verse break-spaces group inline h-3 text-balance hover:cursor-pointer",
+                isCurrentVerse && "active-verse",
+                isTypedInHistory ? "text-primary/50" : "text-primary",
             )}
             ref={ref}
             onClick={() => {
@@ -466,7 +466,7 @@ export function CurrentVerse({
             <span
                 id={`${passageId}-scroll-anchor`}
                 className={
-                    'inline-block -translate-y-[300px] lg:-translate-y-[340px]'
+                    "inline-block -translate-y-[300px] lg:-translate-y-[340px]"
                 }
             />
             {verse.nodes.map((atom, aIndexPrime) => {
@@ -478,41 +478,41 @@ export function CurrentVerse({
                 const typedAtom = versePosition.at(aIndex)
                 const nextAtom = versePosition.at(aIndex + 1)
 
-                if (atom.type === 'newLine') {
+                if (atom.type === "newLine") {
                     return <br key={aIndexPrime} />
                 }
 
-                if (atom.type === 'verseNumber') {
+                if (atom.type === "verseNumber") {
                     return (
                         <b
-                            className={clsx(isIndented && 'absolute -left-0')}
+                            className={clsx(isIndented && "absolute -left-0")}
                             key={aIndexPrime}
                         >
-                            {atom.text.split(':').at(-1)}
+                            {atom.text.split(":").at(-1)}
                         </b>
                     )
                 }
-                if (atom.type === 'space') {
+                if (atom.type === "space") {
                     return (
                         <span
                             key={aIndexPrime}
                             className={clsx(
-                                'space inline-flex h-[19px] w-[1ch] translate-y-[3px]',
+                                "space inline-flex h-[19px] w-[1ch] translate-y-[3px]",
                                 lastAtom != null &&
                                     typedAtom == null &&
-                                    'active-space',
+                                    "active-space",
                             )}
                         >
                             &nbsp;
                         </span>
                     )
                 }
-                if (atom.type === 'decoration') {
+                if (atom.type === "decoration") {
                     return null
                 }
                 if (
-                    atom.type === 'word' &&
-                    (typedAtom == null || typedAtom.type === 'word')
+                    atom.type === "word" &&
+                    (typedAtom == null || typedAtom.type === "word")
                 ) {
                     return (
                         <Word
@@ -520,8 +520,8 @@ export function CurrentVerse({
                             word={atom}
                             active={Boolean(
                                 (aIndex === 0 || isAtomComplete(lastAtom)) &&
-                                    !isAtomComplete(typedAtom) &&
-                                    nextAtom == null,
+                                !isAtomComplete(typedAtom) &&
+                                nextAtom == null,
                             )}
                             typedWord={typedAtom}
                             isPrevTyped={
@@ -539,7 +539,7 @@ export function CurrentVerse({
             {isTypedInSession && rect && passageRect ? (
                 <svg
                     className={
-                        'absolute -bottom-1 -left-3 -top-1 right-full z-0 w-4 rounded-none md:-left-6'
+                        "absolute -bottom-1 -left-3 -top-1 right-full z-0 w-4 rounded-none md:-left-6"
                     }
                     style={
                         isQuote
@@ -555,10 +555,10 @@ export function CurrentVerse({
                     xmlns="http://www.w3.org/2000/svg"
                 >
                     <line
-                        className={'stroke-primary'}
-                        strokeWidth={'2'}
-                        strokeLinejoin={'round'}
-                        strokeLinecap={'round'}
+                        className={"stroke-primary"}
+                        strokeWidth={"2"}
+                        strokeLinejoin={"round"}
+                        strokeLinecap={"round"}
                         x1="5px"
                         y1="0%"
                         x2="5px"
@@ -570,9 +570,9 @@ export function CurrentVerse({
             {rect && passageRect && !isPassageFocused ? (
                 <button
                     className={clsx(
-                        'svg-outline absolute z-10 border-2 border-primary bg-secondary/80 text-primary opacity-0 backdrop-blur-sm transition-opacity duration-100 ',
-                        !isPassageActive && 'hover:opacity-100',
-                        'focus:opacity-100',
+                        "svg-outline absolute z-10 border-2 border-primary bg-secondary/80 text-primary opacity-0 backdrop-blur-sm transition-opacity duration-100",
+                        !isPassageActive && "hover:opacity-100",
+                        "focus:opacity-100",
                     )}
                     style={{
                         width: passageRect.width + 16,
@@ -597,8 +597,8 @@ export function CurrentVerse({
                     document
                         .getElementById(`${passageId}-scroll-anchor`)
                         ?.scrollIntoView({
-                            block: 'start',
-                            behavior: 'smooth',
+                            block: "start",
+                            behavior: "smooth",
                         })
                     setIsPassageFocused(true)
                 }}

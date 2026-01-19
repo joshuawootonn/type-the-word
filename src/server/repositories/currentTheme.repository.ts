@@ -1,9 +1,9 @@
-import { eq } from 'drizzle-orm'
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
-import { createSelectSchema } from 'drizzle-zod'
-import { z } from 'zod'
+import { eq } from "drizzle-orm"
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js"
+import { createSelectSchema } from "drizzle-zod"
+import { z } from "zod"
 
-import * as schema from '~/server/db/schema'
+import * as schema from "~/server/db/schema"
 
 export const currentThemeRecordSchema = createSelectSchema(
     schema.userCurrentTheme,
@@ -11,19 +11,19 @@ export const currentThemeRecordSchema = createSelectSchema(
 
 export const currentThemeSchema = z.union([
     z.object({
-        colorScheme: z.literal('system'),
+        colorScheme: z.literal("system"),
         lightThemeId: z.string(),
         darkThemeId: z.string(),
         userId: z.string(),
     }),
     z.object({
-        colorScheme: z.literal('light'),
+        colorScheme: z.literal("light"),
         lightThemeId: z.string(),
         darkThemeId: z.null(),
         userId: z.string(),
     }),
     z.object({
-        colorScheme: z.literal('dark'),
+        colorScheme: z.literal("dark"),
         lightThemeId: z.null(),
         darkThemeId: z.string(),
         userId: z.string(),

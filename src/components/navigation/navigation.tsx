@@ -1,28 +1,28 @@
-'use client'
+"use client"
 
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import * as Popover from '@radix-ui/react-popover'
-import { useQuery } from '@tanstack/react-query'
-import clsx from 'clsx'
-import { signOut, useSession } from 'next-auth/react'
-import Head from 'next/head'
-import Link from 'next/link'
-import { usePathname, useSearchParams } from 'next/navigation'
-import { useRef, useState } from 'react'
-import { useHotkeys } from 'react-hotkeys-hook'
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
+import * as Popover from "@radix-ui/react-popover"
+import { useQuery } from "@tanstack/react-query"
+import clsx from "clsx"
+import { signOut, useSession } from "next-auth/react"
+import Head from "next/head"
+import Link from "next/link"
+import { usePathname, useSearchParams } from "next/navigation"
+import { useRef, useState } from "react"
+import { useHotkeys } from "react-hotkeys-hook"
 
-import { fetchBuiltinThemes, fetchLastVerse, fetchUserThemes } from '~/lib/api'
-import { Translation } from '~/lib/parseEsv'
-import { toPassageSegment } from '~/lib/passageSegment'
-import { tryParseTranslation } from '~/lib/translations'
-import { BuiltinThemeRecord } from '~/server/repositories/builtinTheme.repository'
-import { TypedVerse } from '~/server/repositories/typingSession.repository'
-import { UserThemeRecord } from '~/server/repositories/userTheme.repository'
+import { fetchBuiltinThemes, fetchLastVerse, fetchUserThemes } from "~/lib/api"
+import { Translation } from "~/lib/parseEsv"
+import { toPassageSegment } from "~/lib/passageSegment"
+import { tryParseTranslation } from "~/lib/translations"
+import { BuiltinThemeRecord } from "~/server/repositories/builtinTheme.repository"
+import { TypedVerse } from "~/server/repositories/typingSession.repository"
+import { UserThemeRecord } from "~/server/repositories/userTheme.repository"
 
-import HotkeyLabel from '../hotkey-label'
-import { CreateThemeForm } from './create-theme-form'
-import { EarlyAccess } from './early-access'
-import { Settings } from './settings'
+import HotkeyLabel from "../hotkey-label"
+import { CreateThemeForm } from "./create-theme-form"
+import { EarlyAccess } from "./early-access"
+import { Settings } from "./settings"
 
 export function Navigation({
     builtinThemes: serverRenderedBuiltinThemes,
@@ -36,53 +36,53 @@ export function Navigation({
     lastTranslation: Translation
 }) {
     const { data: sessionData } = useSession()
-    const isRootPath = usePathname() === '/'
+    const isRootPath = usePathname() === "/"
     const searchParams = useSearchParams()
-    const RootLinkComponent = isRootPath ? 'h1' : 'span'
+    const RootLinkComponent = isRootPath ? "h1" : "span"
     const dropDownTriggerRef = useRef<HTMLButtonElement>(null)
     const [isSettingsOpen, setSettingsOpen] = useState(false)
     const [settingsState, setSettingsState] = useState<
-        'initial' | 'create-theme' | 'edit-theme'
-    >('initial')
+        "initial" | "create-theme" | "edit-theme"
+    >("initial")
 
     useHotkeys(
-        'mod+shift+comma',
+        "mod+shift+comma",
         () => setSettingsOpen(prev => !prev),
         { enableOnFormTags: true },
         [setSettingsOpen],
     )
 
     const builtinThemes = useQuery({
-        queryKey: ['builtinThemes'],
+        queryKey: ["builtinThemes"],
         queryFn: fetchBuiltinThemes,
         placeholderData: serverRenderedBuiltinThemes,
     })
 
     const userThemes = useQuery({
-        queryKey: ['userThemes'],
+        queryKey: ["userThemes"],
         queryFn: fetchUserThemes,
         enabled: Boolean(sessionData?.user.id),
         placeholderData: serverRenderedUserThemes,
     })
 
     const { data: lastTypedVerse } = useQuery({
-        queryKey: ['last-verse'],
+        queryKey: ["last-verse"],
         queryFn: fetchLastVerse,
         enabled: sessionData?.user?.id != null,
         placeholderData: props.lastTypedVerse ?? undefined,
     })
 
     // Get current translation from URL, fallback to cookie, then server value
-    const urlTranslation = tryParseTranslation(searchParams?.get('translation'))
+    const urlTranslation = tryParseTranslation(searchParams?.get("translation"))
 
     let cookieTranslation: Translation | null = null
-    if (typeof document !== 'undefined') {
-        const cookies = document.cookie.split('; ')
+    if (typeof document !== "undefined") {
+        const cookies = document.cookie.split("; ")
         const translationCookie = cookies.find(row =>
-            row.startsWith('lastTranslation='),
+            row.startsWith("lastTranslation="),
         )
         cookieTranslation = tryParseTranslation(
-            translationCookie?.split('=')[1],
+            translationCookie?.split("=")[1],
         )
     }
 
@@ -111,7 +111,7 @@ export function Navigation({
                             mask-position: -741px 0;
                         }
                     }
-
+                    
                     .icon {
                         display: block;
                         transform: translateY(1px);
@@ -124,12 +124,12 @@ export function Navigation({
                         width: 39px;
                         height: 33px;
                         background-color: oklch(var(--color-primary));
-                        -webkit-mask-image: url('/bible.svg');
-                        mask-image: url('/bible.svg');
+                        -webkit-mask-image: url("/bible.svg");
+                        mask-image: url("/bible.svg");
                         mask-repeat: no-repeat;
                         mask-position: -741px 0;
                     }
-
+                    
                     .link:hover .icon,
                     .link:focus-visible .icon {
                         display: none;
@@ -137,16 +137,15 @@ export function Navigation({
                     .link:hover .animated-icon,
                     .link:focus-visible .animated-icon {
                         display: block;
-                        animation: bibleAnimation 0.6s steps(20, jump-none)
-                            forwards;
+                        animation: bibleAnimation 0.6s steps(20, jump-none) forwards;
                     }
                 `}</style>
                 <Link
                     className={
-                        'link svg-outline relative flex items-center space-x-1'
+                        "link svg-outline relative flex items-center space-x-1"
                     }
                     href={rootPathname}
-                    aria-label={'Type the Word logo'}
+                    aria-label={"Type the Word logo"}
                 >
                     <RootLinkComponent className="text-xl font-semibold">
                         <span className="text-primary/50">Type th</span>
@@ -183,7 +182,7 @@ export function Navigation({
                         <Popover.Root
                             onOpenChange={next => {
                                 if (next == false) {
-                                    setSettingsState('initial')
+                                    setSettingsState("initial")
                                 }
                                 setSettingsOpen(next)
                             }}
@@ -209,7 +208,7 @@ export function Navigation({
                                     <DropdownMenu.Item asChild={true}>
                                         <Link
                                             className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
-                                            href={'/history'}
+                                            href={"/history"}
                                         >
                                             History
                                             <HotkeyLabel
@@ -220,7 +219,7 @@ export function Navigation({
                                         </Link>
                                     </DropdownMenu.Item>
                                     <Popover.PopoverTrigger asChild>
-                                        <DropdownMenu.Item className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary ">
+                                        <DropdownMenu.Item className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary">
                                             Settings
                                             <HotkeyLabel
                                                 className="ml-auto pl-5 text-sm text-primary/80 group-focus:text-secondary/80"
@@ -240,20 +239,20 @@ export function Navigation({
                                 </DropdownMenu.Content>
                                 <Popover.PopoverContent
                                     className={clsx(
-                                        settingsState === 'create-theme'
-                                            ? 'min-w-100'
-                                            : 'min-w-52',
-                                        'z-50 border-2 border-primary bg-secondary px-3 py-3 text-primary outline-none',
+                                        settingsState === "create-theme"
+                                            ? "min-w-100"
+                                            : "min-w-52",
+                                        "z-50 border-2 border-primary bg-secondary px-3 py-3 text-primary outline-none",
                                     )}
                                     sideOffset={-2}
                                     align="end"
                                     onEscapeKeyDown={e => {
-                                        setSettingsState('initial')
+                                        setSettingsState("initial")
                                         e.preventDefault()
                                         dropDownTriggerRef.current?.focus()
                                     }}
                                 >
-                                    {settingsState === 'initial' ? (
+                                    {settingsState === "initial" ? (
                                         <>
                                             <h2 className="mb-2 text-xl">
                                                 Settings
@@ -261,7 +260,7 @@ export function Navigation({
                                             <Settings
                                                 createTheme={() =>
                                                     setSettingsState(
-                                                        'create-theme',
+                                                        "create-theme",
                                                     )
                                                 }
                                                 builtinThemes={
@@ -277,7 +276,7 @@ export function Navigation({
                                             </h2>
                                             <EarlyAccess />
                                         </>
-                                    ) : settingsState === 'create-theme' ? (
+                                    ) : settingsState === "create-theme" ? (
                                         <>
                                             <h2 className="mb-2 text-xl">
                                                 Theme Creator
@@ -287,7 +286,7 @@ export function Navigation({
                                                     builtinThemes.data ?? []
                                                 }
                                                 goBackToSettings={() =>
-                                                    setSettingsState('initial')
+                                                    setSettingsState("initial")
                                                 }
                                             />
                                         </>
@@ -298,7 +297,7 @@ export function Navigation({
                     ) : (
                         <Link
                             href="/auth/login"
-                            className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary "
+                            className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary"
                         >
                             Log in
                         </Link>

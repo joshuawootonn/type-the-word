@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from "vitest"
 
-import { DailyActivityRow } from '~/server/repositories/userDailyActivity.repository'
+import { DailyActivityRow } from "~/server/repositories/userDailyActivity.repository"
 
-import { getLogFromCache, MonthlyLogDTO } from './log2'
+import { getLogFromCache } from "./log2"
 
 // Helper to create a DailyActivityRow for testing
 function createDailyActivity(
@@ -11,7 +11,7 @@ function createDailyActivity(
     passages: string[],
 ): DailyActivityRow {
     return {
-        userId: 'test-user',
+        userId: "test-user",
         date,
         verseCount,
         passages,
@@ -23,20 +23,20 @@ function createDailyActivity(
     }
 }
 
-describe('getLogFromCache', () => {
-    describe('empty input', () => {
-        it('returns empty array for empty input', () => {
+describe("getLogFromCache", () => {
+    describe("empty input", () => {
+        it("returns empty array for empty input", () => {
             const result = getLogFromCache([], 0)
             expect(result).toEqual([])
         })
     })
 
-    describe('single day activity', () => {
-        it('creates a single month with single day', () => {
+    describe("single day activity", () => {
+        it("creates a single month with single day", () => {
             const activity = [
-                createDailyActivity(new Date('2024-03-15T00:00:00Z'), 5, [
-                    'Genesis 1:1',
-                    'Genesis 1:2',
+                createDailyActivity(new Date("2024-03-15T00:00:00Z"), 5, [
+                    "Genesis 1:1",
+                    "Genesis 1:2",
                 ]),
             ]
 
@@ -47,23 +47,23 @@ describe('getLogFromCache', () => {
             expect(result[0]!.month).toBe(2) // March is month 2 (0-indexed)
             expect(result[0]!.numberOfVersesTyped).toBe(5)
             expect(Object.keys(result[0]!.days)).toHaveLength(1)
-            expect(result[0]!.days['15']).toBeDefined()
-            expect(result[0]!.days['15']!.numberOfVersesTyped).toBe(5)
-            expect(result[0]!.days['15']!.location).toEqual([
-                'Genesis 1:1',
-                'Genesis 1:2',
+            expect(result[0]!.days["15"]).toBeDefined()
+            expect(result[0]!.days["15"]!.numberOfVersesTyped).toBe(5)
+            expect(result[0]!.days["15"]!.location).toEqual([
+                "Genesis 1:1",
+                "Genesis 1:2",
             ])
         })
     })
 
-    describe('multiple days in same month', () => {
-        it('aggregates days under same month', () => {
+    describe("multiple days in same month", () => {
+        it("aggregates days under same month", () => {
             const activity = [
-                createDailyActivity(new Date('2024-03-15T00:00:00Z'), 3, [
-                    'Genesis 1:1',
+                createDailyActivity(new Date("2024-03-15T00:00:00Z"), 3, [
+                    "Genesis 1:1",
                 ]),
-                createDailyActivity(new Date('2024-03-20T00:00:00Z'), 7, [
-                    'Exodus 20:3',
+                createDailyActivity(new Date("2024-03-20T00:00:00Z"), 7, [
+                    "Exodus 20:3",
                 ]),
             ]
 
@@ -72,19 +72,19 @@ describe('getLogFromCache', () => {
             expect(result).toHaveLength(1)
             expect(result[0]!.numberOfVersesTyped).toBe(10) // 3 + 7
             expect(Object.keys(result[0]!.days)).toHaveLength(2)
-            expect(result[0]!.days['15']!.numberOfVersesTyped).toBe(3)
-            expect(result[0]!.days['20']!.numberOfVersesTyped).toBe(7)
+            expect(result[0]!.days["15"]!.numberOfVersesTyped).toBe(3)
+            expect(result[0]!.days["20"]!.numberOfVersesTyped).toBe(7)
         })
     })
 
-    describe('multiple months', () => {
-        it('separates activity by month', () => {
+    describe("multiple months", () => {
+        it("separates activity by month", () => {
             const activity = [
-                createDailyActivity(new Date('2024-03-15T00:00:00Z'), 3, [
-                    'Genesis 1:1',
+                createDailyActivity(new Date("2024-03-15T00:00:00Z"), 3, [
+                    "Genesis 1:1",
                 ]),
-                createDailyActivity(new Date('2024-04-10T00:00:00Z'), 5, [
-                    'John 3:16',
+                createDailyActivity(new Date("2024-04-10T00:00:00Z"), 5, [
+                    "John 3:16",
                 ]),
             ]
 
@@ -98,11 +98,11 @@ describe('getLogFromCache', () => {
             expect(result[1]!.numberOfVersesTyped).toBe(3)
         })
 
-        it('sorts months in descending order', () => {
+        it("sorts months in descending order", () => {
             const activity = [
-                createDailyActivity(new Date('2024-01-01T00:00:00Z'), 1, ['A']),
-                createDailyActivity(new Date('2024-06-15T00:00:00Z'), 2, ['B']),
-                createDailyActivity(new Date('2024-03-10T00:00:00Z'), 3, ['C']),
+                createDailyActivity(new Date("2024-01-01T00:00:00Z"), 1, ["A"]),
+                createDailyActivity(new Date("2024-06-15T00:00:00Z"), 2, ["B"]),
+                createDailyActivity(new Date("2024-03-10T00:00:00Z"), 3, ["C"]),
             ]
 
             const result = getLogFromCache(activity, 0)
@@ -114,14 +114,14 @@ describe('getLogFromCache', () => {
         })
     })
 
-    describe('year boundaries', () => {
-        it('handles activity across different years', () => {
+    describe("year boundaries", () => {
+        it("handles activity across different years", () => {
             const activity = [
-                createDailyActivity(new Date('2023-12-31T00:00:00Z'), 2, [
-                    'Old year',
+                createDailyActivity(new Date("2023-12-31T00:00:00Z"), 2, [
+                    "Old year",
                 ]),
-                createDailyActivity(new Date('2024-01-01T00:00:00Z'), 3, [
-                    'New year',
+                createDailyActivity(new Date("2024-01-01T00:00:00Z"), 3, [
+                    "New year",
                 ]),
             ]
 
@@ -135,17 +135,17 @@ describe('getLogFromCache', () => {
         })
     })
 
-    describe('timezone handling', () => {
+    describe("timezone handling", () => {
         // Note: getLogFromCache now treats dates as calendar dates stored at UTC midnight.
         // The clientTimezoneOffset parameter is no longer used for date shifting.
         // This is intentional - the backfill stores dates based on when the activity
         // was recorded, and we display those dates as-is.
 
-        it('does not shift dates regardless of timezone offset', () => {
+        it("does not shift dates regardless of timezone offset", () => {
             // Activity recorded on March 15 (stored at UTC midnight)
             const activity = [
-                createDailyActivity(new Date('2024-03-15T00:00:00Z'), 5, [
-                    'Genesis 1:1',
+                createDailyActivity(new Date("2024-03-15T00:00:00Z"), 5, [
+                    "Genesis 1:1",
                 ]),
             ]
 
@@ -159,17 +159,17 @@ describe('getLogFromCache', () => {
             expect(resultUTC).toHaveLength(1)
 
             // All should show March 15
-            expect(resultUTCPlus5[0]!.days['15']).toBeDefined()
-            expect(resultUTCMinus5[0]!.days['15']).toBeDefined()
-            expect(resultUTC[0]!.days['15']).toBeDefined()
+            expect(resultUTCPlus5[0]!.days["15"]).toBeDefined()
+            expect(resultUTCMinus5[0]!.days["15"]).toBeDefined()
+            expect(resultUTC[0]!.days["15"]).toBeDefined()
         })
 
-        it('uses UTC date extraction to avoid local timezone issues', () => {
+        it("uses UTC date extraction to avoid local timezone issues", () => {
             // Even if the date object appears to be a different day in local time,
             // we extract using UTC methods so April 1 UTC stays April 1
             const activity = [
-                createDailyActivity(new Date('2024-04-01T00:00:00Z'), 5, [
-                    'Genesis 1:1',
+                createDailyActivity(new Date("2024-04-01T00:00:00Z"), 5, [
+                    "Genesis 1:1",
                 ]),
             ]
 
@@ -178,21 +178,21 @@ describe('getLogFromCache', () => {
             expect(result).toHaveLength(1)
             // Should be April (month 3, 0-indexed) not March
             expect(result[0]!.month).toBe(3) // April
-            expect(result[0]!.days['01']).toBeDefined()
+            expect(result[0]!.days["01"]).toBeDefined()
         })
     })
 
-    describe('passages handling', () => {
-        it('preserves passage arrays as location', () => {
+    describe("passages handling", () => {
+        it("preserves passage arrays as location", () => {
             const passages = [
-                'Genesis 1:1',
-                'Genesis 1:2',
-                'John 3:16',
-                'Romans 8:28',
+                "Genesis 1:1",
+                "Genesis 1:2",
+                "John 3:16",
+                "Romans 8:28",
             ]
             const activity = [
                 createDailyActivity(
-                    new Date('2024-03-15T00:00:00Z'),
+                    new Date("2024-03-15T00:00:00Z"),
                     4,
                     passages,
                 ),
@@ -200,28 +200,28 @@ describe('getLogFromCache', () => {
 
             const result = getLogFromCache(activity, 0)
 
-            expect(result[0]!.days['15']!.location).toEqual(passages)
+            expect(result[0]!.days["15"]!.location).toEqual(passages)
         })
 
-        it('handles empty passages array', () => {
+        it("handles empty passages array", () => {
             const activity = [
-                createDailyActivity(new Date('2024-03-15T00:00:00Z'), 0, []),
+                createDailyActivity(new Date("2024-03-15T00:00:00Z"), 0, []),
             ]
 
             const result = getLogFromCache(activity, 0)
 
-            expect(result[0]!.days['15']!.location).toEqual([])
+            expect(result[0]!.days["15"]!.location).toEqual([])
         })
     })
 
-    describe('large datasets', () => {
-        it('handles a full month of activity', () => {
+    describe("large datasets", () => {
+        it("handles a full month of activity", () => {
             const activity: DailyActivityRow[] = []
             for (let day = 1; day <= 31; day++) {
                 activity.push(
                     createDailyActivity(
                         new Date(
-                            `2024-03-${day.toString().padStart(2, '0')}T12:00:00Z`,
+                            `2024-03-${day.toString().padStart(2, "0")}T12:00:00Z`,
                         ),
                         day, // verse count = day number
                         [`Day ${day}`],

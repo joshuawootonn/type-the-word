@@ -1,5 +1,5 @@
 name: type_the_word
-version: '3.8'
+version: "3.8"
 
 services:
     postgres:

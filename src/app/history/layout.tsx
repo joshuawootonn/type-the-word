@@ -1,12 +1,12 @@
-import { getServerSession } from 'next-auth/next'
-import { redirect } from 'next/navigation'
-import { ReactNode } from 'react'
+import { getServerSession } from "next-auth/next"
+import { redirect } from "next/navigation"
+import { ReactNode } from "react"
 
-import { FeatureFlags } from '~/lib/feature-flags'
-import { authOptions } from '~/server/auth'
-import PostHogClient from '~/server/posthog'
+import { FeatureFlags } from "~/lib/feature-flags"
+import { authOptions } from "~/server/auth"
+import PostHogClient from "~/server/posthog"
 
-import { HistoryTabsNav } from './history-tabs-nav'
+import { HistoryTabsNav } from "./history-tabs-nav"
 
 export default async function HistoryLayout({
     children,
@@ -16,7 +16,7 @@ export default async function HistoryLayout({
     const session = await getServerSession(authOptions)
 
     if (session == null) {
-        redirect('/')
+        redirect("/")
     }
 
     // Check feature flags

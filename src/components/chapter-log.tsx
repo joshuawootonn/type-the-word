@@ -1,17 +1,17 @@
-'use client'
+"use client"
 
-import { useQuery } from '@tanstack/react-query'
-import { format } from 'date-fns'
-import { useSession } from 'next-auth/react'
+import { useQuery } from "@tanstack/react-query"
+import { format } from "date-fns"
+import { useSession } from "next-auth/react"
 
-import { ChapterHistory } from '~/app/api/chapter-history/[passage]/route'
-import { fetchChapterHistory } from '~/lib/api'
-import { Translation } from '~/lib/parseEsv'
-import { PassageSegment } from '~/lib/passageSegment'
+import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
+import { fetchChapterHistory } from "~/lib/api"
+import { Translation } from "~/lib/parseEsv"
+import { PassageSegment } from "~/lib/passageSegment"
 
 export function ChapterLog({
     passageSegment,
-    translation = 'esv',
+    translation = "esv",
     ...props
 }: {
     passageSegment: PassageSegment
@@ -20,7 +20,7 @@ export function ChapterLog({
 }) {
     const { data: sessionData } = useSession()
     const chapterHistory = useQuery({
-        queryKey: ['chapter-history', passageSegment, translation],
+        queryKey: ["chapter-history", passageSegment, translation],
         queryFn: () => fetchChapterHistory(passageSegment, translation),
         enabled: sessionData?.user?.id != null,
         placeholderData: props.chapterHistory,
@@ -38,7 +38,7 @@ export function ChapterLog({
                         <div className="flex items-center justify-between">
                             <span>{log.location} </span>
                             <span>
-                                {format(log.createdAt, 'MMMM do, yyyy')}
+                                {format(log.createdAt, "MMMM do, yyyy")}
                             </span>
                         </div>
                     </li>

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Mono:wght@400&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Google+Sans+Mono:wght@400&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -25,7 +25,7 @@ body[style] {
 
 .svg-outline-within:focus-within:before {
     @apply -inset-2;
-    content: ' ';
+    content: " ";
     background-color: oklch(var(--color-primary));
     -webkit-mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
@@ -38,7 +38,7 @@ body[style] {
 .svg-outline-xs:focus:before,
 .svg-outline-stubby:focus:before {
     @apply -inset-2;
-    content: ' ';
+    content: " ";
     background-color: oklch(var(--color-primary));
     -webkit-mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');

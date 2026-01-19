@@ -1,33 +1,33 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Field, Formik } from 'formik'
-import { FocusEvent, useState } from 'react'
-import { z } from 'zod'
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { Field, Formik } from "formik"
+import { FocusEvent, useState } from "react"
+import { z } from "zod"
 
-import { useTheme } from '~/app/theme-provider'
-import { fetchCreateTheme } from '~/lib/api'
-import { useAnalytics } from '~/lib/hooks/useAnalytics'
+import { useTheme } from "~/app/theme-provider"
+import { fetchCreateTheme } from "~/lib/api"
+import { useAnalytics } from "~/lib/hooks/useAnalytics"
 import {
     cleanUpdateDocumentStyles,
     getCSSVarValue,
     injectNewClassIntoStyle,
-} from '~/lib/theme/dom'
+} from "~/lib/theme/dom"
 import {
     isThemeDark,
     oklchSchema,
     oklchToString,
     stringToOKLCH,
-} from '~/lib/theme/lch'
+} from "~/lib/theme/lch"
 import {
     BuiltinThemeRecord,
     ThemeRecord,
-} from '~/server/repositories/builtinTheme.repository'
+} from "~/server/repositories/builtinTheme.repository"
 
-import { ColorInput } from './color-input'
+import { ColorInput } from "./color-input"
 
 export const formSchema = z.object({
     label: z
-        .string({ required_error: 'Name is required' })
-        .min(1, 'Name is required'),
+        .string({ required_error: "Name is required" })
+        .min(1, "Name is required"),
     primary: oklchSchema,
     secondary: oklchSchema,
     success: oklchSchema,
@@ -35,7 +35,7 @@ export const formSchema = z.object({
 })
 
 export const themeToDTOSchema = formSchema.transform(
-    (t): Omit<ThemeRecord, 'id'> => {
+    (t): Omit<ThemeRecord, "id"> => {
         const primary = stringToOKLCH(t.primary)
         const secondary = stringToOKLCH(t.secondary)
         const success = stringToOKLCH(t.success)
@@ -62,28 +62,28 @@ export function getCreateThemeInitialProps(
     firstBuiltinTheme: BuiltinThemeRecord,
 ): z.infer<typeof formSchema> {
     const primary =
-        getCSSVarValue('--color-primary') ||
+        getCSSVarValue("--color-primary") ||
         oklchToString({
             lightness: firstBuiltinTheme.theme.primaryLightness,
             chroma: firstBuiltinTheme.theme.primaryChroma,
             hue: firstBuiltinTheme.theme.primaryHue,
         })
     const secondary =
-        getCSSVarValue('--color-secondary') ||
+        getCSSVarValue("--color-secondary") ||
         oklchToString({
             lightness: firstBuiltinTheme.theme.secondaryLightness,
             chroma: firstBuiltinTheme.theme.secondaryChroma,
             hue: firstBuiltinTheme.theme.secondaryHue,
         })
     const success =
-        getCSSVarValue('--color-success') ||
+        getCSSVarValue("--color-success") ||
         oklchToString({
             lightness: firstBuiltinTheme.theme.successLightness,
             chroma: firstBuiltinTheme.theme.successChroma,
             hue: firstBuiltinTheme.theme.successHue,
         })
     const error =
-        getCSSVarValue('--color-error') ||
+        getCSSVarValue("--color-error") ||
         oklchToString({
             lightness: firstBuiltinTheme.theme.errorLightness,
             chroma: firstBuiltinTheme.theme.errorChroma,
@@ -95,7 +95,7 @@ export function getCreateThemeInitialProps(
         secondary,
         success,
         error,
-        label: '',
+        label: "",
     }
 }
 
@@ -121,24 +121,24 @@ export function CreateThemeForm({
                 theme_name: data.theme.label,
             })
             injectNewClassIntoStyle(data.theme)
-            await queryClient.invalidateQueries({ queryKey: ['userThemes'] })
+            await queryClient.invalidateQueries({ queryKey: ["userThemes"] })
 
             let nextLightThemeId: string | null = null
             let nextDarkThemeId: string | null = null
 
             nextLightThemeId =
-                currentTheme.colorScheme === 'light'
+                currentTheme.colorScheme === "light"
                     ? data.themeId
-                    : currentTheme.colorScheme === 'system'
+                    : currentTheme.colorScheme === "system"
                       ? !isThemeDark(data.theme)
                           ? data.themeId
                           : currentTheme.lightThemeId
                       : null
 
             nextDarkThemeId =
-                currentTheme.colorScheme === 'dark'
+                currentTheme.colorScheme === "dark"
                     ? data.themeId
-                    : currentTheme.colorScheme === 'system'
+                    : currentTheme.colorScheme === "system"
                       ? isThemeDark(data.theme)
                           ? data.themeId
                           : currentTheme.darkThemeId
@@ -164,7 +164,7 @@ export function CreateThemeForm({
                     const errors: Record<string, string> = {}
 
                     for (const x of result.error.errors) {
-                        errors[x.path.filter(Boolean).join('.')] = x.message
+                        errors[x.path.filter(Boolean).join(".")] = x.message
                     }
 
                     return errors
@@ -175,15 +175,15 @@ export function CreateThemeForm({
                     setGeneralError(null)
                     const dto = themeToDTOSchema.parse(values)
                     mutate(dto)
-                } catch (e) {
-                    setGeneralError('Whoops something went wrong!')
+                } catch (_) {
+                    setGeneralError("Whoops something went wrong!")
                 }
             }}
         >
             {props => (
                 <form
                     onSubmit={props.handleSubmit}
-                    className="flex flex-col  gap-x-2 gap-y-4 [&>*:nth-child(even)]:justify-self-end"
+                    className="flex flex-col gap-x-2 gap-y-4 [&>*:nth-child(even)]:justify-self-end"
                 >
                     <div className="flex justify-between">
                         <label htmlFor="theme-name" className="pr-4">
@@ -199,7 +199,7 @@ export function CreateThemeForm({
                                         e: FocusEvent<HTMLInputElement>,
                                     ) => e.currentTarget.select()}
                                     className={
-                                        'w-40 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none placeholder:text-primary/50'
+                                        "w-40 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none placeholder:text-primary/50"
                                     }
                                     id="theme-name"
                                     autoComplete="off"
@@ -245,7 +245,7 @@ export function CreateThemeForm({
                         <p className="prose w-full border-2 border-primary p-3 text-primary">
                             <span className="correct">The L</span>
                             <span className="incorrect">o</span>
-                            <span className="correct">rd is my</span>{' '}
+                            <span className="correct">rd is my</span>{" "}
                             <span className="extra">Shepherd</span>
                             <span> I shall not want.</span>
                         </p>
@@ -260,7 +260,7 @@ export function CreateThemeForm({
                         className="svg-outline relative col-span-2 border-2 border-primary px-3 py-1 font-semibold text-primary"
                         disabled={isPending}
                     >
-                        {isPending ? 'Loading...' : 'Save'}
+                        {isPending ? "Loading..." : "Save"}
                     </button>
                     <input className="hidden" type="submit" />
                 </form>

@@ -1,35 +1,35 @@
-import { Analytics } from '@vercel/analytics/react'
-import clsx from 'clsx'
-import { Metadata } from 'next'
-import { getServerSession } from 'next-auth'
+import { Analytics } from "@vercel/analytics/react"
+import clsx from "clsx"
+import { Metadata } from "next"
+import { getServerSession } from "next-auth"
 
-import { Footer } from '~/components/footer'
-import { Navigation } from '~/components/navigation/navigation'
-import { getLastTranslation } from '~/lib/last-translation'
-import { authOptions } from '~/server/auth'
-import { db } from '~/server/db'
-import { BuiltinThemeRepository } from '~/server/repositories/builtinTheme.repository'
+import { Footer } from "~/components/footer"
+import { Navigation } from "~/components/navigation/navigation"
+import { getLastTranslation } from "~/lib/last-translation"
+import { authOptions } from "~/server/auth"
+import { db } from "~/server/db"
+import { BuiltinThemeRepository } from "~/server/repositories/builtinTheme.repository"
 import {
     CurrentTheme,
     CurrentThemeRepository,
-} from '~/server/repositories/currentTheme.repository'
-import { TypedVerseRepository } from '~/server/repositories/typedVerse.repository'
-import { TypedVerse } from '~/server/repositories/typingSession.repository'
+} from "~/server/repositories/currentTheme.repository"
+import { TypedVerseRepository } from "~/server/repositories/typedVerse.repository"
+import { TypedVerse } from "~/server/repositories/typingSession.repository"
 import {
     UserThemeRecord,
     UserThemeRepository,
-} from '~/server/repositories/userTheme.repository'
-import '~/styles/globals.css'
+} from "~/server/repositories/userTheme.repository"
+import "~/styles/globals.css"
 
-import Fathom from './fathom'
-import { poppins } from './fonts'
-import { GlobalHotkeys } from './global-hotkeys'
-import { Providers } from './providers'
-import { ThemeScript } from './theme-script'
-import { ThemeStyles } from './theme-styles'
+import Fathom from "./fathom"
+import { poppins } from "./fonts"
+import { GlobalHotkeys } from "./global-hotkeys"
+import { Providers } from "./providers"
+import { ThemeScript } from "./theme-script"
+import { ThemeStyles } from "./theme-styles"
 
 export const metadata: Metadata = {
-    metadataBase: new URL('https://typetheword.site'),
+    metadataBase: new URL("https://typetheword.site"),
 }
 
 export default async function RootLayout({
@@ -81,7 +81,7 @@ export default async function RootLayout({
             </head>
             <body
                 className={clsx(
-                    'min-h-screen-1px flex w-full font-sans',
+                    "min-h-screen-1px flex w-full font-sans",
                     poppins.variable,
                 )}
             >

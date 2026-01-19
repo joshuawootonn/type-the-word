@@ -1,11 +1,11 @@
-import Stripe from 'stripe'
+import Stripe from "stripe"
 
-import { env } from '~/env.mjs'
+import { env } from "~/env.mjs"
 
 const stripeSecretKey = env.STRIPE_SECRET_KEY
 
 export const stripe = new Stripe(stripeSecretKey, {
-    apiVersion: '2025-07-30.basil',
+    apiVersion: "2025-07-30.basil",
     typescript: true,
 })
 
@@ -23,7 +23,7 @@ export async function fetchTotalDonationsCents(): Promise<number> {
         const paymentIntents =
             await stripe.paymentIntents.list(paymentIntentParams)
         for (const paymentIntent of paymentIntents.data) {
-            if (paymentIntent.status === 'succeeded') {
+            if (paymentIntent.status === "succeeded") {
                 const refunds = await stripe.refunds.list({
                     payment_intent: paymentIntent.id,
                     limit: 100,
@@ -32,7 +32,7 @@ export async function fetchTotalDonationsCents(): Promise<number> {
                 const totalRefunded = refunds.data.reduce((sum, refund) => {
                     return (
                         sum +
-                        (refund.status === 'succeeded' ? refund.amount : 0)
+                        (refund.status === "succeeded" ? refund.amount : 0)
                     )
                 }, 0)
 
@@ -46,7 +46,7 @@ export async function fetchTotalDonationsCents(): Promise<number> {
 
         return total
     } catch (error) {
-        console.error('Error fetching donations from Stripe:', error)
+        console.error("Error fetching donations from Stripe:", error)
         return alternateDonationAmounts
     }
 }

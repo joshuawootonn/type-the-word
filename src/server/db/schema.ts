@@ -1,4 +1,4 @@
-import { relations, sql } from 'drizzle-orm'
+import { relations, sql } from "drizzle-orm"
 import {
     index,
     integer,
@@ -13,43 +13,43 @@ import {
     unique,
     pgEnum,
     pgTable,
-} from 'drizzle-orm/pg-core'
-import { createSelectSchema } from 'drizzle-zod'
-import { type AdapterAccount } from 'next-auth/adapters'
-import { z } from 'zod'
+} from "drizzle-orm/pg-core"
+import { createSelectSchema } from "drizzle-zod"
+import { type AdapterAccount } from "next-auth/adapters"
+import { z } from "zod"
 
-import { bookSchema } from '~/lib/types/book'
+import { bookSchema } from "~/lib/types/book"
 
 export const passageResponseBook = pgEnum(
-    'passageResponse_book',
+    "passageResponse_book",
     bookSchema.options,
 )
 export const passageResponseTranslation = pgEnum(
-    'passageResponse_translation',
-    ['esv', 'bsb', 'nlt', 'niv', 'csb', 'nkjv', 'nasb', 'ntv', 'msg'],
+    "passageResponse_translation",
+    ["esv", "bsb", "nlt", "niv", "csb", "nkjv", "nasb", "ntv", "msg"],
 )
-export const typedVerseBook = pgEnum('typedVerse_book', bookSchema.options)
-export const typedVerseTranslation = pgEnum('typedVerse_translation', [
-    'esv',
-    'bsb',
-    'nlt',
-    'niv',
-    'csb',
-    'nkjv',
-    'nasb',
-    'ntv',
-    'msg',
+export const typedVerseBook = pgEnum("typedVerse_book", bookSchema.options)
+export const typedVerseTranslation = pgEnum("typedVerse_translation", [
+    "esv",
+    "bsb",
+    "nlt",
+    "niv",
+    "csb",
+    "nkjv",
+    "nasb",
+    "ntv",
+    "msg",
 ])
 
-export const users = pgTable('user', {
-    id: varchar('id', { length: 255 }).notNull().primaryKey(),
-    name: varchar('name', { length: 255 }),
-    email: varchar('email', { length: 255 }).notNull(),
-    emailVerified: timestamp('emailVerified', {
-        mode: 'date',
+export const users = pgTable("user", {
+    id: varchar("id", { length: 255 }).notNull().primaryKey(),
+    name: varchar("name", { length: 255 }),
+    email: varchar("email", { length: 255 }).notNull(),
+    emailVerified: timestamp("emailVerified", {
+        mode: "date",
     }).default(sql`CURRENT_TIMESTAMP(3)`),
-    image: varchar('image', { length: 255 }),
-    hashedPassword: text('hashedPassword'),
+    image: varchar("image", { length: 255 }),
+    hashedPassword: text("hashedPassword"),
 })
 
 export const usersRelations = relations(users, ({ many, one }) => ({
@@ -66,27 +66,27 @@ export const usersRelations = relations(users, ({ many, one }) => ({
     classroomSubmissions: many(classroomSubmission),
 }))
 
-export const userChangelog = pgTable('userChangelog', {
-    userId: varchar('userId', { length: 255 })
+export const userChangelog = pgTable("userChangelog", {
+    userId: varchar("userId", { length: 255 })
         .notNull()
         .$default(() => crypto.randomUUID())
         .primaryKey(),
-    lastVisitedAt: timestamp('lastVisitedAt', { mode: 'date' })
+    lastVisitedAt: timestamp("lastVisitedAt", { mode: "date" })
         .notNull()
         .$default(() => sql`CURRENT_TIMESTAMP(3)`),
 })
 
 export const userCurrentTheme = pgTable(
-    'userCurrentTheme',
+    "userCurrentTheme",
     {
-        userId: varchar('userId', { length: 255 }).notNull(),
-        colorScheme: varchar('colorScheme', { length: 255 }).notNull(),
-        lightThemeId: varchar('lightThemeId', { length: 255 }),
-        darkThemeId: varchar('darkThemeId', { length: 255 }),
+        userId: varchar("userId", { length: 255 }).notNull(),
+        colorScheme: varchar("colorScheme", { length: 255 }).notNull(),
+        lightThemeId: varchar("lightThemeId", { length: 255 }),
+        darkThemeId: varchar("darkThemeId", { length: 255 }),
     },
     table => ({
         checkConstraint: check(
-            'schemeToThemeCheck',
+            "schemeToThemeCheck",
             sql`
         (${table.colorScheme} IS 'system' AND ${table.lightThemeId} IS NOT NULL AND ${table.darkThemeId} IS NOT NULL) OR
         (${table.colorScheme} IS 'light' AND ${table.lightThemeId} IS NOT NULL AND ${table.darkThemeId} IS NULL) OR
@@ -106,13 +106,13 @@ export const userCurrentThemeRelations = relations(
 )
 
 export const userTheme = pgTable(
-    'userTheme',
+    "userTheme",
     {
-        userId: varchar('userId', { length: 255 }).notNull(),
-        themeId: varchar('themeId', { length: 255 }).notNull(),
+        userId: varchar("userId", { length: 255 }).notNull(),
+        themeId: varchar("themeId", { length: 255 }).notNull(),
     },
     userTheme => ({
-        userIdIdx: index('userTheme_userId_idx').on(userTheme.userId),
+        userIdIdx: index("userTheme_userId_idx").on(userTheme.userId),
     }),
 )
 
@@ -127,8 +127,8 @@ export const userThemeRelations = relations(userTheme, ({ one }) => ({
     }),
 }))
 
-export const builtinTheme = pgTable('builtinTheme', {
-    themeId: varchar('themeId', { length: 255 }).notNull(),
+export const builtinTheme = pgTable("builtinTheme", {
+    themeId: varchar("themeId", { length: 255 }).notNull(),
 })
 
 export const builtinThemeRelations = relations(builtinTheme, ({ one }) => ({
@@ -138,48 +138,48 @@ export const builtinThemeRelations = relations(builtinTheme, ({ one }) => ({
     }),
 }))
 
-export const theme = pgTable('theme', {
-    id: varchar('id', { length: 255 })
+export const theme = pgTable("theme", {
+    id: varchar("id", { length: 255 })
         .notNull()
         .$default(() => crypto.randomUUID())
         .primaryKey(),
-    label: varchar('label', { length: 255 }).notNull(),
-    primaryLightness: real('primaryLightness').notNull().default(0),
-    primaryChroma: real('primaryChroma').notNull().default(0),
-    primaryHue: real('primaryHue').notNull().default(0),
-    secondaryLightness: real('secondaryLightness').notNull().default(0),
-    secondaryChroma: real('secondaryChroma').notNull().default(0),
-    secondaryHue: real('secondaryHue').notNull().default(0),
-    successLightness: real('successLightness').notNull().default(0),
-    successChroma: real('successChroma').notNull().default(0),
-    successHue: real('successHue').notNull().default(0),
-    errorLightness: real('errorLightness').notNull().default(0),
-    errorChroma: real('errorChroma').notNull().default(0),
-    errorHue: real('errorHue').notNull().default(0),
+    label: varchar("label", { length: 255 }).notNull(),
+    primaryLightness: real("primaryLightness").notNull().default(0),
+    primaryChroma: real("primaryChroma").notNull().default(0),
+    primaryHue: real("primaryHue").notNull().default(0),
+    secondaryLightness: real("secondaryLightness").notNull().default(0),
+    secondaryChroma: real("secondaryChroma").notNull().default(0),
+    secondaryHue: real("secondaryHue").notNull().default(0),
+    successLightness: real("successLightness").notNull().default(0),
+    successChroma: real("successChroma").notNull().default(0),
+    successHue: real("successHue").notNull().default(0),
+    errorLightness: real("errorLightness").notNull().default(0),
+    errorChroma: real("errorChroma").notNull().default(0),
+    errorHue: real("errorHue").notNull().default(0),
 })
 
 export const accounts = pgTable(
-    'account',
+    "account",
     {
-        userId: varchar('userId', { length: 255 }).notNull(),
-        type: varchar('type', { length: 255 })
-            .$type<AdapterAccount['type']>()
+        userId: varchar("userId", { length: 255 }).notNull(),
+        type: varchar("type", { length: 255 })
+            .$type<AdapterAccount["type"]>()
             .notNull(),
-        provider: varchar('provider', { length: 255 }).notNull(),
-        providerAccountId: varchar('providerAccountId', {
+        provider: varchar("provider", { length: 255 }).notNull(),
+        providerAccountId: varchar("providerAccountId", {
             length: 255,
         }).notNull(),
-        refresh_token: text('refresh_token'),
-        access_token: text('access_token'),
-        expires_at: integer('expires_at'),
-        token_type: varchar('token_type', { length: 255 }),
-        scope: varchar('scope', { length: 255 }),
-        id_token: text('id_token'),
-        session_state: varchar('session_state', { length: 255 }),
+        refresh_token: text("refresh_token"),
+        access_token: text("access_token"),
+        expires_at: integer("expires_at"),
+        token_type: varchar("token_type", { length: 255 }),
+        scope: varchar("scope", { length: 255 }),
+        id_token: text("id_token"),
+        session_state: varchar("session_state", { length: 255 }),
     },
     account => ({
         compoundKey: primaryKey(account.provider, account.providerAccountId),
-        userIdIdx: index('account_userId_idx').on(account.userId),
+        userIdIdx: index("account_userId_idx").on(account.userId),
     }),
 )
 
@@ -188,16 +188,16 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
 }))
 
 export const sessions = pgTable(
-    'session',
+    "session",
     {
-        sessionToken: varchar('sessionToken', { length: 255 })
+        sessionToken: varchar("sessionToken", { length: 255 })
             .notNull()
             .primaryKey(),
-        userId: varchar('userId', { length: 255 }).notNull(),
-        expires: timestamp('expires', { mode: 'date' }).notNull(),
+        userId: varchar("userId", { length: 255 }).notNull(),
+        expires: timestamp("expires", { mode: "date" }).notNull(),
     },
     session => ({
-        userIdIdx: index('session_userId_idx').on(session.userId),
+        userIdIdx: index("session_userId_idx").on(session.userId),
     }),
 )
 
@@ -206,11 +206,11 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 }))
 
 export const verificationTokens = pgTable(
-    'verificationToken',
+    "verificationToken",
     {
-        identifier: varchar('identifier', { length: 255 }).notNull(),
-        token: varchar('token', { length: 255 }).notNull(),
-        expires: timestamp('expires', { mode: 'date' }).notNull(),
+        identifier: varchar("identifier", { length: 255 }).notNull(),
+        token: varchar("token", { length: 255 }).notNull(),
+        expires: timestamp("expires", { mode: "date" }).notNull(),
     },
     vt => ({
         compoundKey: primaryKey(vt.identifier, vt.token),
@@ -218,22 +218,22 @@ export const verificationTokens = pgTable(
 )
 
 export const typingSessions = pgTable(
-    'typingSession',
+    "typingSession",
     {
-        id: varchar('id', { length: 255 })
+        id: varchar("id", { length: 255 })
             .notNull()
             .$default(() => crypto.randomUUID())
             .primaryKey(),
-        userId: varchar('userId', { length: 255 }).notNull(),
-        createdAt: timestamp('createdAt', { mode: 'date' })
+        userId: varchar("userId", { length: 255 }).notNull(),
+        createdAt: timestamp("createdAt", { mode: "date" })
             .notNull()
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
-        updatedAt: timestamp('updatedAt', { mode: 'date' })
+        updatedAt: timestamp("updatedAt", { mode: "date" })
             .notNull()
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
     },
     typingSession => ({
-        userIdIdx: index('typingSession_userId_idx').on(typingSession.userId),
+        userIdIdx: index("typingSession_userId_idx").on(typingSession.userId),
     }),
 )
 
@@ -252,50 +252,50 @@ export const typingDataSchema = z.object({
     userActions: z.array(
         z.object({
             type: z.enum([
-                'deleteContentBackward',
-                'deleteSoftLineBackward',
-                'deleteWordBackward',
-                'insertText',
+                "deleteContentBackward",
+                "deleteSoftLineBackward",
+                "deleteWordBackward",
+                "insertText",
             ]),
             key: z.string(),
             datetime: z.string(),
         }),
     ),
     userNodes: z.array(
-        z.object({ type: z.literal('word'), letters: z.array(z.string()) }),
+        z.object({ type: z.literal("word"), letters: z.array(z.string()) }),
     ),
     correctNodes: z.array(
-        z.object({ type: z.literal('word'), letters: z.array(z.string()) }),
+        z.object({ type: z.literal("word"), letters: z.array(z.string()) }),
     ),
 })
 
 export type TypingData = z.infer<typeof typingDataSchema>
 
 export const typedVerses = pgTable(
-    'typedVerse',
+    "typedVerse",
     {
-        id: varchar('id', { length: 255 })
+        id: varchar("id", { length: 255 })
             .notNull()
             .$default(() => crypto.randomUUID())
             .primaryKey(),
-        userId: varchar('userId', { length: 255 }).notNull(),
-        typingSessionId: varchar('typingSessionId', { length: 255 }).notNull(),
-        translation: typedVerseTranslation('translation').notNull(),
-        book: typedVerseBook('book').notNull(),
-        chapter: integer('chapter').notNull(),
-        verse: integer('verse').notNull(),
-        createdAt: timestamp('createdAt', { mode: 'date' })
+        userId: varchar("userId", { length: 255 }).notNull(),
+        typingSessionId: varchar("typingSessionId", { length: 255 }).notNull(),
+        translation: typedVerseTranslation("translation").notNull(),
+        book: typedVerseBook("book").notNull(),
+        chapter: integer("chapter").notNull(),
+        verse: integer("verse").notNull(),
+        createdAt: timestamp("createdAt", { mode: "date" })
             .notNull()
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
-        typingData: jsonb('typingData').$type<TypingData | null>(),
+        typingData: jsonb("typingData").$type<TypingData | null>(),
     },
     typedVerse => ({
-        userIdIdx: index('typedVerse_userId_idx').on(typedVerse.userId),
-        typingSessionIdUserIdIdx: index('typingSessionId_userId_idx').on(
+        userIdIdx: index("typedVerse_userId_idx").on(typedVerse.userId),
+        typingSessionIdUserIdIdx: index("typingSessionId_userId_idx").on(
             typedVerse.typingSessionId,
             typedVerse.userId,
         ),
-        typingSessionIdIdx: index('typingSessionId_idx').on(
+        typingSessionIdIdx: index("typingSessionId_idx").on(
             typedVerse.typingSessionId,
         ),
     }),
@@ -322,21 +322,21 @@ export const typedVerseRelations = relations(typedVerses, ({ one }) => ({
 
 // Cache table for book-level progress (prestige + totals) per user
 export const userBookProgress = pgTable(
-    'userBookProgress',
+    "userBookProgress",
     {
-        userId: varchar('userId', { length: 255 }).notNull(),
-        book: typedVerseBook('book').notNull(),
-        translation: typedVerseTranslation('translation').notNull(),
-        prestige: integer('prestige').notNull().default(0),
-        typedVerseCount: integer('typedVerseCount').notNull().default(0),
-        totalVerses: integer('totalVerses').notNull(),
-        updatedAt: timestamp('updatedAt', { mode: 'date' })
+        userId: varchar("userId", { length: 255 }).notNull(),
+        book: typedVerseBook("book").notNull(),
+        translation: typedVerseTranslation("translation").notNull(),
+        prestige: integer("prestige").notNull().default(0),
+        typedVerseCount: integer("typedVerseCount").notNull().default(0),
+        totalVerses: integer("totalVerses").notNull(),
+        updatedAt: timestamp("updatedAt", { mode: "date" })
             .notNull()
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
     },
     table => ({
         pk: primaryKey(table.userId, table.book, table.translation),
-        userIdIdx: index('userBookProgress_userId_idx').on(table.userId),
+        userIdIdx: index("userBookProgress_userId_idx").on(table.userId),
     }),
 )
 
@@ -353,19 +353,19 @@ export const userBookProgressRelations = relations(
 
 // Cache table for chapter-level progress per user
 export const userChapterProgress = pgTable(
-    'userChapterProgress',
+    "userChapterProgress",
     {
-        userId: varchar('userId', { length: 255 }).notNull(),
-        book: typedVerseBook('book').notNull(),
-        chapter: integer('chapter').notNull(),
-        translation: typedVerseTranslation('translation').notNull(),
-        typedVerses: jsonb('typedVerses')
+        userId: varchar("userId", { length: 255 }).notNull(),
+        book: typedVerseBook("book").notNull(),
+        chapter: integer("chapter").notNull(),
+        translation: typedVerseTranslation("translation").notNull(),
+        typedVerses: jsonb("typedVerses")
             .notNull()
             .$type<Record<number, boolean>>()
             .default({}),
-        typedVerseCount: integer('typedVerseCount').notNull().default(0),
-        totalVerses: integer('totalVerses').notNull(),
-        updatedAt: timestamp('updatedAt', { mode: 'date' })
+        typedVerseCount: integer("typedVerseCount").notNull().default(0),
+        totalVerses: integer("totalVerses").notNull(),
+        updatedAt: timestamp("updatedAt", { mode: "date" })
             .notNull()
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
     },
@@ -376,8 +376,8 @@ export const userChapterProgress = pgTable(
             table.chapter,
             table.translation,
         ),
-        userIdIdx: index('userChapterProgress_userId_idx').on(table.userId),
-        userIdBookIdx: index('userChapterProgress_userId_book_idx').on(
+        userIdIdx: index("userChapterProgress_userId_idx").on(table.userId),
+        userIdBookIdx: index("userChapterProgress_userId_book_idx").on(
             table.userId,
             table.book,
         ),
@@ -408,25 +408,25 @@ export const userChapterProgressRelations = relations(
 
 // Cache table for daily typing activity per user (for the log and WPM sections)
 export const userDailyActivity = pgTable(
-    'userDailyActivity',
+    "userDailyActivity",
     {
-        userId: varchar('userId', { length: 255 }).notNull(),
-        date: timestamp('date', { mode: 'date' }).notNull(),
-        verseCount: integer('verseCount').notNull().default(0),
-        passages: jsonb('passages').notNull().$type<string[]>().default([]),
+        userId: varchar("userId", { length: 255 }).notNull(),
+        date: timestamp("date", { mode: "date" }).notNull(),
+        verseCount: integer("verseCount").notNull().default(0),
+        passages: jsonb("passages").notNull().$type<string[]>().default([]),
         // WPM/Accuracy stats - nullable since not all verses have typing data
-        averageWpm: integer('averageWpm'),
-        averageAccuracy: integer('averageAccuracy'),
-        averageCorrectedAccuracy: integer('averageCorrectedAccuracy'),
-        versesWithStats: integer('versesWithStats').notNull().default(0),
-        updatedAt: timestamp('updatedAt', { mode: 'date' })
+        averageWpm: integer("averageWpm"),
+        averageAccuracy: integer("averageAccuracy"),
+        averageCorrectedAccuracy: integer("averageCorrectedAccuracy"),
+        versesWithStats: integer("versesWithStats").notNull().default(0),
+        updatedAt: timestamp("updatedAt", { mode: "date" })
             .notNull()
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
     },
     table => ({
         pk: primaryKey(table.userId, table.date),
-        userIdIdx: index('userDailyActivity_userId_idx').on(table.userId),
-        userIdDateIdx: index('userDailyActivity_userId_date_idx').on(
+        userIdIdx: index("userDailyActivity_userId_idx").on(table.userId),
+        userIdDateIdx: index("userDailyActivity_userId_date_idx").on(
             table.userId,
             table.date,
         ),
@@ -443,19 +443,19 @@ export const userDailyActivityRelations = relations(
     }),
 )
 
-export const passageResponse = pgTable('passageResponse', {
-    id: varchar('id', { length: 255 })
+export const passageResponse = pgTable("passageResponse", {
+    id: varchar("id", { length: 255 })
         .notNull()
         .$default(() => crypto.randomUUID())
         .primaryKey(),
-    book: passageResponseBook('book').notNull(),
-    chapter: integer('chapter').notNull(),
-    translation: passageResponseTranslation('translation').notNull(),
-    response: json('response').notNull(),
-    createdAt: timestamp('createdAt', { mode: 'date' })
+    book: passageResponseBook("book").notNull(),
+    chapter: integer("chapter").notNull(),
+    translation: passageResponseTranslation("translation").notNull(),
+    response: json("response").notNull(),
+    createdAt: timestamp("createdAt", { mode: "date" })
         .notNull()
         .$default(() => sql`CURRENT_TIMESTAMP(3)`),
-    updatedAt: timestamp('updatedAt', { mode: 'date' })
+    updatedAt: timestamp("updatedAt", { mode: "date" })
         .notNull()
         .$default(() => sql`CURRENT_TIMESTAMP(3)`),
 })
@@ -464,22 +464,22 @@ export const passageResponse = pgTable('passageResponse', {
 
 // Stores OAuth tokens for teachers who connect their Google Classroom account
 export const classroomTeacherToken = pgTable(
-    'classroomTeacherToken',
+    "classroomTeacherToken",
     {
-        userId: varchar('userId', { length: 255 }).notNull().primaryKey(),
-        accessToken: text('accessToken').notNull(),
-        refreshToken: text('refreshToken').notNull(),
-        expiresAt: timestamp('expiresAt', { mode: 'date' }).notNull(),
-        scope: text('scope').notNull(),
-        createdAt: timestamp('createdAt', { mode: 'date' })
+        userId: varchar("userId", { length: 255 }).notNull().primaryKey(),
+        accessToken: text("accessToken").notNull(),
+        refreshToken: text("refreshToken").notNull(),
+        expiresAt: timestamp("expiresAt", { mode: "date" }).notNull(),
+        scope: text("scope").notNull(),
+        createdAt: timestamp("createdAt", { mode: "date" })
             .notNull()
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
-        updatedAt: timestamp('updatedAt', { mode: 'date' })
+        updatedAt: timestamp("updatedAt", { mode: "date" })
             .notNull()
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
     },
     table => ({
-        userIdIdx: index('classroomTeacherToken_userId_idx').on(table.userId),
+        userIdIdx: index("classroomTeacherToken_userId_idx").on(table.userId),
     }),
 )
 
@@ -495,44 +495,44 @@ export const classroomTeacherTokenRelations = relations(
 
 // Stores assignments created by teachers
 export const classroomAssignment = pgTable(
-    'classroomAssignment',
+    "classroomAssignment",
     {
-        id: varchar('id', { length: 255 })
+        id: varchar("id", { length: 255 })
             .notNull()
             .$default(() => crypto.randomUUID())
             .primaryKey(),
-        teacherUserId: varchar('teacherUserId', { length: 255 }).notNull(),
+        teacherUserId: varchar("teacherUserId", { length: 255 }).notNull(),
         // Google Classroom IDs
-        courseId: varchar('courseId', { length: 255 }).notNull(),
-        courseWorkId: varchar('courseWorkId', { length: 255 }).notNull(),
+        courseId: varchar("courseId", { length: 255 }).notNull(),
+        courseWorkId: varchar("courseWorkId", { length: 255 }).notNull(),
         // Assignment details
-        title: text('title').notNull(),
-        description: text('description'),
+        title: text("title").notNull(),
+        description: text("description"),
         // Passage details
-        translation: typedVerseTranslation('translation').notNull(),
-        book: typedVerseBook('book').notNull(),
-        startChapter: integer('startChapter').notNull(),
-        startVerse: integer('startVerse').notNull(),
-        endChapter: integer('endChapter').notNull(),
-        endVerse: integer('endVerse').notNull(),
+        translation: typedVerseTranslation("translation").notNull(),
+        book: typedVerseBook("book").notNull(),
+        startChapter: integer("startChapter").notNull(),
+        startVerse: integer("startVerse").notNull(),
+        endChapter: integer("endChapter").notNull(),
+        endVerse: integer("endVerse").notNull(),
         // Metadata
-        maxPoints: integer('maxPoints').notNull().default(100),
-        dueDate: timestamp('dueDate', { mode: 'date' }),
-        createdAt: timestamp('createdAt', { mode: 'date' })
+        maxPoints: integer("maxPoints").notNull().default(100),
+        dueDate: timestamp("dueDate", { mode: "date" }),
+        createdAt: timestamp("createdAt", { mode: "date" })
             .notNull()
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
-        updatedAt: timestamp('updatedAt', { mode: 'date' })
+        updatedAt: timestamp("updatedAt", { mode: "date" })
             .notNull()
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
     },
     table => ({
-        teacherUserIdIdx: index('classroomAssignment_teacherUserId_idx').on(
+        teacherUserIdIdx: index("classroomAssignment_teacherUserId_idx").on(
             table.teacherUserId,
         ),
-        courseIdIdx: index('classroomAssignment_courseId_idx').on(
+        courseIdIdx: index("classroomAssignment_courseId_idx").on(
             table.courseId,
         ),
-        courseWorkIdIdx: index('classroomAssignment_courseWorkId_idx').on(
+        courseWorkIdIdx: index("classroomAssignment_courseWorkId_idx").on(
             table.courseWorkId,
         ),
     }),
@@ -551,45 +551,45 @@ export const classroomAssignmentRelations = relations(
 
 // Tracks student progress on assignments
 export const classroomSubmission = pgTable(
-    'classroomSubmission',
+    "classroomSubmission",
     {
-        id: varchar('id', { length: 255 })
+        id: varchar("id", { length: 255 })
             .notNull()
             .$default(() => crypto.randomUUID())
             .primaryKey(),
-        assignmentId: varchar('assignmentId', { length: 255 }).notNull(),
-        studentUserId: varchar('studentUserId', { length: 255 }).notNull(),
+        assignmentId: varchar("assignmentId", { length: 255 }).notNull(),
+        studentUserId: varchar("studentUserId", { length: 255 }).notNull(),
         // Google Classroom submission ID
-        submissionId: varchar('submissionId', { length: 255 }),
+        submissionId: varchar("submissionId", { length: 255 }),
         // Progress tracking
-        completedVerses: integer('completedVerses').notNull().default(0),
-        totalVerses: integer('totalVerses').notNull(),
+        completedVerses: integer("completedVerses").notNull().default(0),
+        totalVerses: integer("totalVerses").notNull(),
         // Performance metrics
-        averageWpm: integer('averageWpm'),
-        averageAccuracy: integer('averageAccuracy'),
+        averageWpm: integer("averageWpm"),
+        averageAccuracy: integer("averageAccuracy"),
         // Status (0 = false, 1 = true)
-        isCompleted: integer('isCompleted').notNull().default(0),
-        isTurnedIn: integer('isTurnedIn').notNull().default(0),
-        grade: integer('grade'),
+        isCompleted: integer("isCompleted").notNull().default(0),
+        isTurnedIn: integer("isTurnedIn").notNull().default(0),
+        grade: integer("grade"),
         // Timestamps
-        startedAt: timestamp('startedAt', { mode: 'date' }),
-        completedAt: timestamp('completedAt', { mode: 'date' }),
-        turnedInAt: timestamp('turnedInAt', { mode: 'date' }),
-        createdAt: timestamp('createdAt', { mode: 'date' })
+        startedAt: timestamp("startedAt", { mode: "date" }),
+        completedAt: timestamp("completedAt", { mode: "date" }),
+        turnedInAt: timestamp("turnedInAt", { mode: "date" }),
+        createdAt: timestamp("createdAt", { mode: "date" })
             .notNull()
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
-        updatedAt: timestamp('updatedAt', { mode: 'date' })
+        updatedAt: timestamp("updatedAt", { mode: "date" })
             .notNull()
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),
     },
     table => ({
-        assignmentIdIdx: index('classroomSubmission_assignmentId_idx').on(
+        assignmentIdIdx: index("classroomSubmission_assignmentId_idx").on(
             table.assignmentId,
         ),
-        studentUserIdIdx: index('classroomSubmission_studentUserId_idx').on(
+        studentUserIdIdx: index("classroomSubmission_studentUserId_idx").on(
             table.studentUserId,
         ),
-        submissionIdIdx: index('classroomSubmission_submissionId_idx').on(
+        submissionIdIdx: index("classroomSubmission_submissionId_idx").on(
             table.submissionId,
         ),
         // Composite unique constraint - one submission per student per assignment

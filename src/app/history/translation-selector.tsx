@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { useCallback } from 'react'
+import { useRouter, useSearchParams, usePathname } from "next/navigation"
+import { useCallback } from "react"
 
 import {
     Select,
@@ -9,12 +9,12 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '~/components/ui/select'
+} from "~/components/ui/select"
 import {
     allTranslations,
     historyTranslationSchema,
     HistoryTranslation,
-} from '~/lib/translations'
+} from "~/lib/translations"
 
 export function TranslationSelector() {
     const router = useRouter()
@@ -22,20 +22,20 @@ export function TranslationSelector() {
     const searchParams = useSearchParams()
 
     const currentTranslation: HistoryTranslation =
-        historyTranslationSchema.parse(searchParams?.get('translation'))
+        historyTranslationSchema.parse(searchParams?.get("translation"))
 
     const handleChange = useCallback(
         (value: string) => {
             // Set cookie to remember translation preference
-            void fetch('/api/set-translation', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+            void fetch("/api/set-translation", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ translation: value }),
             })
 
             // Update URL
-            const params = new URLSearchParams(searchParams?.toString() ?? '')
-            params.set('translation', value)
+            const params = new URLSearchParams(searchParams?.toString() ?? "")
+            params.set("translation", value)
             router.push(`${pathname}?${params.toString()}`)
         },
         [router, pathname, searchParams],

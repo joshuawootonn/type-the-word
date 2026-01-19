@@ -1,10 +1,10 @@
-import { withSentryConfig } from '@sentry/nextjs'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import { withSentryConfig } from "@sentry/nextjs"
+import path from "path"
+import { fileURLToPath } from "url"
 
-import { env } from './src/env.mjs'
+import { env } from "./src/env.mjs"
 
-await import('./src/env.mjs')
+await import("./src/env.mjs")
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -17,12 +17,12 @@ const config = {
     async rewrites() {
         return [
             {
-                source: '/ingest/static/:path*',
-                destination: 'https://us-assets.i.posthog.com/static/:path*',
+                source: "/ingest/static/:path*",
+                destination: "https://us-assets.i.posthog.com/static/:path*",
             },
             {
-                source: '/ingest/:path*',
-                destination: 'https://us.i.posthog.com/:path*',
+                source: "/ingest/:path*",
+                destination: "https://us.i.posthog.com/:path*",
             },
         ]
     },
@@ -30,8 +30,8 @@ const config = {
 }
 
 export default withSentryConfig(config, {
-    org: 'type-the-word',
-    project: 'typetheword-site',
+    org: "type-the-word",
+    project: "typetheword-site",
 
     authToken: env.SENTRY_AUTH_TOKEN,
 

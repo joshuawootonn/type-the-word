@@ -1,15 +1,15 @@
-import toProperCase from '~/lib/toProperCase'
-import { getBibleMetadata } from '~/server/bibleMetadata'
-import { Book } from '~/server/db/schema'
-import { TypedVerse } from '~/server/repositories/typingSession.repository'
+import toProperCase from "~/lib/toProperCase"
+import { getBibleMetadata } from "~/server/bibleMetadata"
+import { Book } from "~/server/db/schema"
+import { TypedVerse } from "~/server/repositories/typingSession.repository"
 
 export function typingSessionToString(
     typedVerses: TypedVerse[],
     {
         seperator,
-        filter,
+        filter: _filter,
     }: { seperator?: string; filter?: { book?: Book; chapter?: number } } = {
-        seperator: ',',
+        seperator: ",",
     },
 ) {
     const bibleMetadata = getBibleMetadata()
@@ -22,7 +22,7 @@ export function typingSessionToString(
             const bIndex = biblicalOrder.findIndex(book => book === b)
 
             if (aIndex === -1 || bIndex === -1) {
-                throw new Error('Book not found in typing session to string')
+                throw new Error("Book not found in typing session to string")
             }
 
             return aIndex - bIndex
@@ -87,9 +87,7 @@ export function typingSessionToString(
                 })
                 .join(`, `)
 
-            return `${toProperCase(
-                book.split('_').join(' '),
-            )} ${chaptersString}`
+            return `${toProperCase(book.split("_").join(" "))} ${chaptersString}`
         })
 
     return `${books.join(`${seperator} `)} `
