@@ -200,3 +200,227 @@ export function ClientPage({ initialData }) {
 - ✅ Easy to locate client-side logic
 - ✅ Better performance (less client-side JavaScript)
 ```
+
+---
+
+# UI Component & Design System Guidelines
+
+## UI Primitives Location
+
+All reusable UI primitives should be located in `src/components/ui/`. These components provide consistent styling and behavior across the application.
+
+### Available Primitives
+
+- **`<Input />`** - Text/number/date inputs with SVG outline focus state
+- **`<Textarea />`** - Multiline text input with SVG outline focus state
+- \*\*<Select />`- Radix UI Select with custom styling (also:`SelectTrigger`, `SelectContent`, `SelectItem`, `SelectValue`)
+- **`<Link />`** - Next.js Link with button or text variants
+- **`<Meter />`** - Base UI Meter for progress bars
+- **`<Loading />`** - Animated loading indicator
+
+## Design System Rules
+
+### 1. No Rounded Corners
+
+**Never use `rounded` classes.** This application uses sharp, rectangular design throughout.
+
+```tsx
+// ❌ BAD: Using rounded corners
+<div className="rounded-lg border">
+
+// ✅ GOOD: Sharp corners
+<div className="border-2 border-primary">
+```
+
+### 2. Color Scheme
+
+Use the semantic color utilities that work with the theme system:
+
+- **`text-primary`** - Primary text color (adapts to theme)
+- **`bg-primary`** - Primary background color
+- **`text-secondary`** - Secondary text color
+- **`bg-secondary`** - Secondary background color (main page background)
+- **`text-success`** - Success/completion color (green)
+- **`text-error`** - Error color (red)
+- **`border-primary`** - Primary border color
+
+**Never use:** Hardcoded colors like `text-gray-600`, `bg-white`, `bg-blue-600`, etc.
+
+### 3. Border Styling
+
+Always use `border-2` for consistency:
+
+```tsx
+// ✅ Consistent border width
+<div className="border-2 border-primary">
+```
+
+### 4. Button Styling
+
+Standard button pattern:
+
+```tsx
+<button className="svg-outline relative border-2 border-primary bg-secondary px-3 py-1 font-semibold">
+    Click Me
+</button>
+```
+
+**Key classes:**
+
+- `svg-outline relative` - Focus state with dashed border
+- `border-2 border-primary` - Standard border
+- `bg-secondary` - Background matches page
+- `px-3 py-1` - Standard padding
+- `font-semibold` - Button text weight
+
+**Disabled state:**
+
+```tsx
+<button disabled className="... disabled:cursor-wait">
+```
+
+**❌ Don't use:** `disabled:opacity-50` - Buttons should keep their color when disabled, only cursor changes.
+
+### 5. Link Styling
+
+Use the `<Link>` primitive:
+
+```tsx
+// Button-style link (default)
+<Link href="/somewhere">Action Text</Link>
+
+// Text-style link (breadcrumbs, inline text)
+<Link href="/somewhere" variant="text">Dashboard</Link>
+
+// Custom styled link (cards, complex layouts)
+<NextLink href="/somewhere" className="block p-4 no-underline">
+    // Custom content
+</NextLink>
+```
+
+### 6. Input Styling
+
+Always use the `<Input>` or `<Textarea>` primitives which include:
+
+- SVG outline focus state
+- Consistent border and padding
+- Theme-aware colors
+
+```tsx
+// ✅ Use primitive
+<Input type="text" />
+<Textarea rows={3} />
+
+// ❌ Don't use raw inputs
+<input className="border-2..." />
+```
+
+### 7. Typography with Prose
+
+Most layouts use Tailwind Typography's `prose` class. When working within prose layouts:
+
+```tsx
+// Strip unnecessary text utilities - let prose handle it
+<h1>Title</h1>  // ✅ No need for text-3xl, font-semibold, etc.
+
+// When you need to break out of prose styles:
+<div className="not-prose">
+    {/* Custom styling here */}
+</div>
+```
+
+### 8. Form Layouts
+
+Standard form structure:
+
+```tsx
+<form className="not-prose space-y-6">
+    <div>
+        <label htmlFor="field" className="mb-2 block">
+            Field Label
+        </label>
+        <Input id="field" type="text" required />
+    </div>
+
+    {/* Submit buttons - right aligned */}
+    <div className="flex justify-end gap-3 border-t-2 border-primary pt-6">
+        <button
+            type="submit"
+            className="svg-outline relative border-2 border-primary bg-secondary px-3 py-1 font-semibold"
+        >
+            Submit
+        </button>
+        <Link href="/cancel">Cancel</Link>
+    </div>
+</form>
+```
+
+### 9. Error/Success Messages
+
+```tsx
+// Error message
+<div className="not-prose flex items-start gap-3 border-2 border-error bg-secondary p-4">
+    <svg className="h-5 w-5 flex-shrink-0 text-error" {/* icon */} />
+    <div className="text-sm text-error">{error}</div>
+</div>
+
+// Success message
+<div className="not-prose flex items-start gap-3 border-2 border-success bg-secondary p-4">
+    <svg className="h-5 w-5 flex-shrink-0 text-success" {/* icon */} />
+    <div className="text-sm text-success">{message}</div>
+</div>
+```
+
+### 10. SVG Outline Focus States
+
+The application uses a custom dashed-border focus state (`.svg-outline`):
+
+```tsx
+// For buttons, links, inputs
+<button className="svg-outline relative border-2 border-primary ...">
+
+// Input/Textarea primitives handle this automatically via wrapper:
+<div className="group svg-outline relative">
+    <div className="svg-outline-override absolute -z-10 hidden group-focus-within:block" />
+    <input className="outline-none ..." />
+</div>
+```
+
+### 11. Book Name Formatting
+
+When displaying book names to users:
+
+```tsx
+import toProperCase from "~/lib/toProperCase"
+
+// Convert from database format to display format
+const displayName = toProperCase(book.split("_").join(" "))
+// "1_corinthians" → "1 Corinthians"
+// "song_of_solomon" → "Song Of Solomon"
+```
+
+### 12. Shared API Schemas
+
+API response schemas should be shared between client and server:
+
+```typescript
+// src/app/api/some-route/schemas.ts
+export const responseSchema = z.object({
+    data: z.string(),
+})
+export type Response = z.infer<typeof responseSchema>
+
+// Server uses it:
+const response: Response = { data: "value" }
+return NextResponse.json(response)
+
+// Client validates it:
+const data = await response.json()
+const validated = responseSchema.parse(data)
+```
+
+**Benefits:**
+
+- Type safety on both ends
+- Runtime validation catches API contract violations
+- Single source of truth for API contracts
