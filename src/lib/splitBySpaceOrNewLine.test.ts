@@ -3,7 +3,7 @@ import { expect, test, describe } from "vitest"
 import { splitLineBySpaceOrNewLine } from "./splitBySpaceOrNewLine"
 
 describe("splitLineBySpaceOrNewLine", () => {
-    test("works brackets in Pslam 145:13c", () => {
+    test.concurrent("works brackets in Pslam 145:13c", () => {
         const verseSegment = "  [The LORD is faithful in all his words"
 
         const result = splitLineBySpaceOrNewLine(verseSegment)
@@ -20,7 +20,7 @@ describe("splitLineBySpaceOrNewLine", () => {
             "words",
         ])
     })
-    test("works brackets in Pslam 145:13d", () => {
+    test.concurrent("works brackets in Pslam 145:13d", () => {
         const verseSegment = "    and kind in all his works.]"
 
         const result = splitLineBySpaceOrNewLine(verseSegment)
@@ -36,7 +36,7 @@ describe("splitLineBySpaceOrNewLine", () => {
         ])
     })
 
-    test("doesn't create single space words with verses ending in double space like 1 Kings 4:20", () => {
+    test.concurrent("doesn't create single space words with verses ending in double space like 1 Kings 4:20", () => {
         const verseSegment =
             "Judah and Israel were as many as the sand by the sea. They ate and drank and were happy.   "
 

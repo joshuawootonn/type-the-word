@@ -66,7 +66,7 @@ function createMockPassage(verseNumbers: number[]): ParsedPassage {
 }
 
 describe("getNextVerseToType", () => {
-    test("WHEN no chapter history THEN returns first verse", () => {
+    test.concurrent("WHEN no chapter history THEN returns first verse", () => {
         const passage = createMockPassage([1, 2, 3, 4, 5])
 
         const result = getNextVerseToType(passage, undefined)
@@ -74,7 +74,7 @@ describe("getNextVerseToType", () => {
         expect(result).toBe("1")
     })
 
-    test("WHEN no verses typed THEN returns first verse", () => {
+    test.concurrent("WHEN no verses typed THEN returns first verse", () => {
         const passage = createMockPassage([1, 2, 3, 4, 5])
         const chapterHistory: ChapterHistory = {
             verses: {},
@@ -86,7 +86,7 @@ describe("getNextVerseToType", () => {
         expect(result).toBe("1")
     })
 
-    test("WHEN first verse typed THEN returns second verse", () => {
+    test.concurrent("WHEN first verse typed THEN returns second verse", () => {
         const passage = createMockPassage([1, 2, 3, 4, 5])
         const chapterHistory: ChapterHistory = {
             verses: { 1: true },
@@ -98,7 +98,7 @@ describe("getNextVerseToType", () => {
         expect(result).toBe("2")
     })
 
-    test("WHEN first three verses typed THEN returns fourth verse", () => {
+    test.concurrent("WHEN first three verses typed THEN returns fourth verse", () => {
         const passage = createMockPassage([1, 2, 3, 4, 5])
         const chapterHistory: ChapterHistory = {
             verses: { 1: true, 2: true, 3: true },
@@ -110,7 +110,7 @@ describe("getNextVerseToType", () => {
         expect(result).toBe("4")
     })
 
-    test("WHEN all verses typed THEN returns first verse", () => {
+    test.concurrent("WHEN all verses typed THEN returns first verse", () => {
         const passage = createMockPassage([1, 2, 3, 4, 5])
         const chapterHistory: ChapterHistory = {
             verses: { 1: true, 2: true, 3: true, 4: true, 5: true },
@@ -122,7 +122,7 @@ describe("getNextVerseToType", () => {
         expect(result).toBe("1")
     })
 
-    test("WHEN verses typed out of order THEN returns verse after highest typed", () => {
+    test.concurrent("WHEN verses typed out of order THEN returns verse after highest typed", () => {
         const passage = createMockPassage([1, 2, 3, 4, 5])
         const chapterHistory: ChapterHistory = {
             verses: { 1: true, 3: true, 5: true },
@@ -136,7 +136,7 @@ describe("getNextVerseToType", () => {
         expect(result).toBe("1")
     })
 
-    test("WHEN middle verses untyped THEN returns first untyped", () => {
+    test.concurrent("WHEN middle verses untyped THEN returns first untyped", () => {
         const passage = createMockPassage([1, 2, 3, 4, 5])
         const chapterHistory: ChapterHistory = {
             verses: { 1: true, 2: true },
@@ -148,7 +148,7 @@ describe("getNextVerseToType", () => {
         expect(result).toBe("3")
     })
 
-    test("WHEN only last verse untyped THEN returns last verse", () => {
+    test.concurrent("WHEN only last verse untyped THEN returns last verse", () => {
         const passage = createMockPassage([1, 2, 3, 4, 5])
         const chapterHistory: ChapterHistory = {
             verses: { 1: true, 2: true, 3: true, 4: true },
@@ -160,7 +160,7 @@ describe("getNextVerseToType", () => {
         expect(result).toBe("5")
     })
 
-    test("WHEN passage has hanging verses THEN skips them in counting", () => {
+    test.concurrent("WHEN passage has hanging verses THEN skips them in counting", () => {
         const passage: ParsedPassage = {
             nodes: [
                 {
@@ -214,7 +214,7 @@ describe("getNextVerseToType", () => {
         expect(result).toBe("2")
     })
 
-    test("WHEN empty passage THEN returns first verse", () => {
+    test.concurrent("WHEN empty passage THEN returns first verse", () => {
         const passage: ParsedPassage = {
             nodes: [],
             firstVerse: {
@@ -244,7 +244,7 @@ describe("getNextVerseToType", () => {
         expect(result).toBe("1")
     })
 
-    test("WHEN only verse 5 typed THEN returns verse 6", () => {
+    test.concurrent("WHEN only verse 5 typed THEN returns verse 6", () => {
         const passage = createMockPassage([1, 2, 3, 4, 5, 6, 7])
         const chapterHistory: ChapterHistory = {
             verses: { 5: true },
@@ -256,7 +256,7 @@ describe("getNextVerseToType", () => {
         expect(result).toBe("6")
     })
 
-    test("WHEN non-sequential verses typed THEN returns verse after highest", () => {
+    test.concurrent("WHEN non-sequential verses typed THEN returns verse after highest", () => {
         const passage = createMockPassage([1, 2, 3, 4, 5, 6, 7, 8])
         const chapterHistory: ChapterHistory = {
             verses: { 2: true, 5: true, 3: true },
@@ -269,7 +269,7 @@ describe("getNextVerseToType", () => {
         expect(result).toBe("6")
     })
 
-    test("WHEN highest typed verse is last in chapter THEN returns first verse", () => {
+    test.concurrent("WHEN highest typed verse is last in chapter THEN returns first verse", () => {
         const passage = createMockPassage([1, 2, 3, 4, 5])
         const chapterHistory: ChapterHistory = {
             verses: { 5: true },

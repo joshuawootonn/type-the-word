@@ -7,6 +7,20 @@ import { Decoration, Paragraph, Translation, Word } from "~/lib/parseEsv"
 
 import { parseApiBibleChapter } from "./parse-api-bible"
 
+// Memoization cache for parsed results
+const parseCache = new Map<string, ReturnType<typeof parseApiBibleChapter>>()
+
+function cachedParseApiBibleChapter(
+    html: string,
+    translation?: Exclude<Translation, "esv">,
+) {
+    const key = `${html.slice(0, 100)}-${translation || "default"}`
+    if (!parseCache.has(key)) {
+        parseCache.set(key, parseApiBibleChapter(html, translation))
+    }
+    return parseCache.get(key)!
+}
+
 // Load the fixture
 const genesis1Html = fs.readFileSync(
     path.join(process.cwd(), "src/server/api-bible/responses/genesis-1.html"),
@@ -14,25 +28,24 @@ const genesis1Html = fs.readFileSync(
 )
 
 describe("parseApiBibleChapter", () => {
-    test("parses Genesis 1 from API.Bible fixture", () => {
-        const result = parseApiBibleChapter(genesis1Html)
+    // Cache parsed result to avoid re-parsing for each test
+    const genesis1Result = cachedParseApiBibleChapter(genesis1Html)
 
+    test.concurrent("parses Genesis 1 from API.Bible fixture", () => {
         // Should have nodes
-        expect(result.nodes.length).toBeGreaterThan(0)
+        expect(genesis1Result.nodes.length).toBeGreaterThan(0)
 
         // Should have a firstVerse
-        expect(result.firstVerse).toBeDefined()
-        expect(result.firstVerse.book).toBe("genesis")
-        expect(result.firstVerse.chapter).toBe(1)
-        expect(result.firstVerse.verse).toBe(1)
-        expect(result.firstVerse.translation).toBe("bsb")
+        expect(genesis1Result.firstVerse).toBeDefined()
+        expect(genesis1Result.firstVerse.book).toBe("genesis")
+        expect(genesis1Result.firstVerse.chapter).toBe(1)
+        expect(genesis1Result.firstVerse.verse).toBe(1)
+        expect(genesis1Result.firstVerse.translation).toBe("bsb")
     })
 
-    test("extracts section headers", () => {
-        const result = parseApiBibleChapter(genesis1Html)
-
+    test.concurrent("extracts section headers", () => {
         // First node should be the h2 "The Creation"
-        const h2 = result.nodes.find(n => n.type === "h2")
+        const h2 = genesis1Result.nodes.find(n => n.type === "h2")
         expect(h2).toBeDefined()
         expect(h2?.type).toBe("h2")
         if (h2?.type === "h2") {
@@ -40,15 +53,13 @@ describe("parseApiBibleChapter", () => {
         }
 
         // Should have section headers like "The First Day", "The Second Day"
-        const h3s = result.nodes.filter(n => n.type === "h3")
+        const h3s = genesis1Result.nodes.filter(n => n.type === "h3")
         expect(h3s.length).toBeGreaterThan(0)
     })
 
-    test("extracts verse 1 correctly", () => {
-        const result = parseApiBibleChapter(genesis1Html)
-
+    test.concurrent("extracts verse 1 correctly", () => {
         // Find the first paragraph with verse 1
-        const paragraphs = result.nodes.filter(
+        const paragraphs = genesis1Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -64,14 +75,12 @@ describe("parseApiBibleChapter", () => {
         expect(verse1?.text).toContain("beginning")
     })
 
-    test("handles continuation verses (data-vid attribute)", () => {
-        const result = parseApiBibleChapter(genesis1Html)
-
+    test.concurrent("handles continuation verses (data-vid attribute)", () => {
         // Verse 5 has a continuation paragraph:
         // <p data-vid="GEN 1:5" class="pmo">
         //     And there was evening, and there was morning—the first day.
         // </p>
-        const paragraphs = result.nodes.filter(
+        const paragraphs = genesis1Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -85,15 +94,13 @@ describe("parseApiBibleChapter", () => {
         expect(verse5Continuations.length).toBeGreaterThan(0)
     })
 
-    test("handles poetry formatting (q1, q2 classes)", () => {
-        const result = parseApiBibleChapter(genesis1Html)
-
+    test.concurrent("handles poetry formatting (q1, q2 classes)", () => {
         // Verse 27 has poetry formatting:
         // <p class="q1">...So God created man in His own image;</p>
         // <p data-vid="GEN 1:27" class="q2">in the image of God He created him;</p>
         // <p data-vid="GEN 1:27" class="q2">male and female He created them.</p>
 
-        const paragraphs = result.nodes.filter(
+        const paragraphs = genesis1Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -106,10 +113,8 @@ describe("parseApiBibleChapter", () => {
         expect(verse27.length).toBeGreaterThanOrEqual(1)
     })
 
-    test("parses all 31 verses", () => {
-        const result = parseApiBibleChapter(genesis1Html)
-
-        const paragraphs = result.nodes.filter(
+    test.concurrent("parses all 31 verses", () => {
+        const paragraphs = genesis1Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -126,28 +131,24 @@ describe("parseApiBibleChapter", () => {
         expect(verseNumbers.has(31)).toBe(true)
     })
 
-    test("generates correct prev/next chapter links", () => {
-        const result = parseApiBibleChapter(genesis1Html)
-
+    test.concurrent("generates correct prev/next chapter links", () => {
         // Genesis 1 should have no prev chapter (it's the first chapter of the Bible)
-        expect(result.prevChapter).toBeNull()
+        expect(genesis1Result.prevChapter).toBeNull()
 
         // Genesis 1 should have next chapter pointing to Genesis 2
-        expect(result.nextChapter).toBeDefined()
-        expect(result.nextChapter?.url).toBe("genesis_2")
-        expect(result.nextChapter?.label).toBe("Genesis 2")
+        expect(genesis1Result.nextChapter).toBeDefined()
+        expect(genesis1Result.nextChapter?.url).toBe("genesis_2")
+        expect(genesis1Result.nextChapter?.label).toBe("Genesis 2")
     })
 
     test('skips cross-reference paragraphs (class="r")', () => {
-        const result = parseApiBibleChapter(genesis1Html)
-
         // The fixture has:
         // <p class="r">
         //     (<span id="JHN.1.1-JHN.1.5">John 1:1–5</span>;...
         // </p>
         // These should be skipped (not included as verse content)
 
-        const paragraphs = result.nodes.filter(
+        const paragraphs = genesis1Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -160,12 +161,10 @@ describe("parseApiBibleChapter", () => {
     })
 
     test('skips blank paragraphs (class="b")', () => {
-        const result = parseApiBibleChapter(genesis1Html)
-
         // The fixture has <p class="b"></p> blank paragraphs
         // These should be skipped entirely
 
-        const paragraphs = result.nodes.filter(
+        const paragraphs = genesis1Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -196,8 +195,8 @@ describe("Opening paragraph handling (po class)", () => {
         "utf8",
     )
 
-    test("parses NIV Romans 1 verse 1 from opening paragraph", () => {
-        const result = parseApiBibleChapter(nivRomans1Html, "niv")
+    test.concurrent("parses NIV Romans 1 verse 1 from opening paragraph", () => {
+        const result = cachedParseApiBibleChapter(nivRomans1Html, "niv")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -213,8 +212,8 @@ describe("Opening paragraph handling (po class)", () => {
         expect(verse1?.text).toContain("servant")
     })
 
-    test("parses NIV James 1 verse 1 from opening paragraph", () => {
-        const result = parseApiBibleChapter(nivJames1Html, "niv")
+    test.concurrent("parses NIV James 1 verse 1 from opening paragraph", () => {
+        const result = cachedParseApiBibleChapter(nivJames1Html, "niv")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -230,8 +229,8 @@ describe("Opening paragraph handling (po class)", () => {
         expect(verse1?.text).toContain("servant")
     })
 
-    test("parses all 32 verses in NIV Romans 1", () => {
-        const result = parseApiBibleChapter(nivRomans1Html, "niv")
+    test.concurrent("parses all 32 verses in NIV Romans 1", () => {
+        const result = cachedParseApiBibleChapter(nivRomans1Html, "niv")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -249,8 +248,8 @@ describe("Opening paragraph handling (po class)", () => {
         expect(verseNumbers.has(1)).toBe(true)
     })
 
-    test("parses all 27 verses in NIV James 1", () => {
-        const result = parseApiBibleChapter(nivJames1Html, "niv")
+    test.concurrent("parses all 27 verses in NIV James 1", () => {
+        const result = cachedParseApiBibleChapter(nivJames1Html, "niv")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -290,10 +289,12 @@ describe("Poetry paragraph merging", () => {
         "utf8",
     )
 
-    test("Psalm 23 merges poetry lines into few paragraphs (not one per line)", () => {
-        const result = parseApiBibleChapter(nivPsalm23Html, "niv")
+    // Cache parsed results to avoid re-parsing
+    const psalm23Result = cachedParseApiBibleChapter(nivPsalm23Html, "niv")
+    const psalm119Result = cachedParseApiBibleChapter(nivPsalm119Html, "niv")
 
-        const paragraphs = result.nodes.filter(
+    test.concurrent("Psalm 23 merges poetry lines into few paragraphs (not one per line)", () => {
+        const paragraphs = psalm23Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -303,10 +304,8 @@ describe("Poetry paragraph merging", () => {
         expect(paragraphs.length).toBeGreaterThanOrEqual(1)
     })
 
-    test("Psalm 23 respects stanza breaks", () => {
-        const result = parseApiBibleChapter(nivPsalm23Html, "niv")
-
-        const paragraphs = result.nodes.filter(
+    test.concurrent("Psalm 23 respects stanza breaks", () => {
+        const paragraphs = psalm23Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -329,10 +328,8 @@ describe("Poetry paragraph merging", () => {
         expect(secondParagraphVerses.has(6)).toBe(true)
     })
 
-    test("Psalm 23 poetry paragraphs contain newLine elements between lines", () => {
-        const result = parseApiBibleChapter(nivPsalm23Html, "niv")
-
-        const paragraphs = result.nodes.filter(
+    test.concurrent("Psalm 23 poetry paragraphs contain newLine elements between lines", () => {
+        const paragraphs = psalm23Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -348,10 +345,8 @@ describe("Poetry paragraph merging", () => {
         }
     })
 
-    test("Psalm 119 splits into sections by Hebrew letter headers", () => {
-        const result = parseApiBibleChapter(nivPsalm119Html, "niv")
-
-        const paragraphs = result.nodes.filter(
+    test.concurrent("Psalm 119 splits into sections by Hebrew letter headers", () => {
+        const paragraphs = psalm119Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -360,10 +355,8 @@ describe("Poetry paragraph merging", () => {
         expect(paragraphs.length).toBe(22)
     })
 
-    test("Psalm 119 each section contains 8 verses", () => {
-        const result = parseApiBibleChapter(nivPsalm119Html, "niv")
-
-        const paragraphs = result.nodes.filter(
+    test.concurrent("Psalm 119 each section contains 8 verses", () => {
+        const paragraphs = psalm119Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -374,19 +367,15 @@ describe("Poetry paragraph merging", () => {
         }
     })
 
-    test("Psalm 119 Hebrew letter headers are converted to h4", () => {
-        const result = parseApiBibleChapter(nivPsalm119Html, "niv")
-
-        const h4Headers = result.nodes.filter(n => n.type === "h4")
+    test.concurrent("Psalm 119 Hebrew letter headers are converted to h4", () => {
+        const h4Headers = psalm119Result.nodes.filter(n => n.type === "h4")
 
         // Should have 22 Hebrew letter headers (Aleph through Tav)
         expect(h4Headers.length).toBe(22)
     })
 
-    test("all 6 verses in Psalm 23 are preserved after merging", () => {
-        const result = parseApiBibleChapter(nivPsalm23Html, "niv")
-
-        const paragraphs = result.nodes.filter(
+    test.concurrent("all 6 verses in Psalm 23 are preserved after merging", () => {
+        const paragraphs = psalm23Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -403,10 +392,8 @@ describe("Poetry paragraph merging", () => {
         }
     })
 
-    test("all 176 verses in Psalm 119 are preserved after merging", () => {
-        const result = parseApiBibleChapter(nivPsalm119Html, "niv")
-
-        const paragraphs = result.nodes.filter(
+    test.concurrent("all 176 verses in Psalm 119 are preserved after merging", () => {
+        const paragraphs = psalm119Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -479,8 +466,8 @@ describe("Poetry indentation", () => {
         return count
     }
 
-    test("Genesis 1:27 first line (q1) has 2 leading spaces", () => {
-        const result = parseApiBibleChapter(nivGen1Html, "niv")
+    test.concurrent("Genesis 1:27 first line (q1) has 2 leading spaces", () => {
+        const result = cachedParseApiBibleChapter(nivGen1Html, "niv")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -499,8 +486,8 @@ describe("Poetry indentation", () => {
         expect(countLeadingSpaces(verse27!.nodes)).toBe(2)
     })
 
-    test("Genesis 1:27 continuation lines (q2) have 4 leading spaces after newLine", () => {
-        const result = parseApiBibleChapter(nivGen1Html, "niv")
+    test.concurrent("Genesis 1:27 continuation lines (q2) have 4 leading spaces after newLine", () => {
+        const result = cachedParseApiBibleChapter(nivGen1Html, "niv")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -536,8 +523,8 @@ describe("Poetry indentation", () => {
         }
     })
 
-    test("Psalm 23 verse 1 (q1) has 2 leading spaces", () => {
-        const result = parseApiBibleChapter(nivPsalm23Html, "niv")
+    test.concurrent("Psalm 23 verse 1 (q1) has 2 leading spaces", () => {
+        const result = cachedParseApiBibleChapter(nivPsalm23Html, "niv")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -555,8 +542,8 @@ describe("Poetry indentation", () => {
         expect(countLeadingSpaces(verse1!.nodes)).toBe(2)
     })
 
-    test("Psalm 23 has mix of q1 (2 spaces) and q2 (4 spaces) indentation", () => {
-        const result = parseApiBibleChapter(nivPsalm23Html, "niv")
+    test.concurrent("Psalm 23 has mix of q1 (2 spaces) and q2 (4 spaces) indentation", () => {
+        const result = cachedParseApiBibleChapter(nivPsalm23Html, "niv")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -570,8 +557,8 @@ describe("Poetry indentation", () => {
         expect(indentCounts.some(c => c === 4)).toBe(true)
     })
 
-    test("non-poetry paragraphs have no leading indent spaces", () => {
-        const result = parseApiBibleChapter(nivGen1Html, "niv")
+    test.concurrent("non-poetry paragraphs have no leading indent spaces", () => {
+        const result = cachedParseApiBibleChapter(nivGen1Html, "niv")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -614,8 +601,9 @@ describe("Speaker labels and section headers (Song of Solomon)", () => {
         "utf8",
     )
 
-    test("speaker labels are parsed as h4 headings (NIV)", () => {
-        const result = parseApiBibleChapter(nivSongHtml, "niv")
+    test.concurrent("speaker labels are parsed as h4 headings (NIV)", () => {
+        const nivSongResult = cachedParseApiBibleChapter(nivSongHtml, "niv")
+        const result = nivSongResult
 
         const h4Headers = result.nodes.filter(n => n.type === "h4")
 
@@ -623,8 +611,9 @@ describe("Speaker labels and section headers (Song of Solomon)", () => {
         expect(h4Headers.length).toBeGreaterThan(0)
     })
 
-    test("speaker labels contain expected text (NIV)", () => {
-        const result = parseApiBibleChapter(nivSongHtml, "niv")
+    test.concurrent("speaker labels contain expected text (NIV)", () => {
+        const nivSongResult = cachedParseApiBibleChapter(nivSongHtml, "niv")
+        const result = nivSongResult
 
         const h4Headers = result.nodes.filter(n => n.type === "h4")
         const speakerTexts = h4Headers.map(h =>
@@ -637,8 +626,8 @@ describe("Speaker labels and section headers (Song of Solomon)", () => {
         expect(speakerTexts.some(t => t === "He")).toBe(true)
     })
 
-    test("section headers are parsed as h4 headings (NKJV)", () => {
-        const result = parseApiBibleChapter(nkjvSongHtml, "nkjv")
+    test.concurrent("section headers are parsed as h4 headings (NKJV)", () => {
+        const result = cachedParseApiBibleChapter(nkjvSongHtml, "nkjv")
 
         const h4Headers = result.nodes.filter(n => n.type === "h4")
         const headerTexts = h4Headers.map(h =>
@@ -654,7 +643,7 @@ describe("Speaker labels and section headers (Song of Solomon)", () => {
     })
 
     test('speaker labels like "The Shulamite" are parsed as h4 (NKJV)', () => {
-        const result = parseApiBibleChapter(nkjvSongHtml, "nkjv")
+        const result = cachedParseApiBibleChapter(nkjvSongHtml, "nkjv")
 
         const h4Headers = result.nodes.filter(n => n.type === "h4")
         const headerTexts = h4Headers.map(h =>
@@ -669,8 +658,9 @@ describe("Speaker labels and section headers (Song of Solomon)", () => {
         expect(headerTexts.some(t => t === "The Beloved")).toBe(true)
     })
 
-    test("speaker labels are not included in paragraph text (NIV)", () => {
-        const result = parseApiBibleChapter(nivSongHtml, "niv")
+    test.concurrent("speaker labels are not included in paragraph text (NIV)", () => {
+        const nivSongResult = cachedParseApiBibleChapter(nivSongHtml, "niv")
+        const result = nivSongResult
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -685,8 +675,8 @@ describe("Speaker labels and section headers (Song of Solomon)", () => {
         }
     })
 
-    test("section headers are not included in paragraph text (NKJV)", () => {
-        const result = parseApiBibleChapter(nkjvSongHtml, "nkjv")
+    test.concurrent("section headers are not included in paragraph text (NKJV)", () => {
+        const result = cachedParseApiBibleChapter(nkjvSongHtml, "nkjv")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -703,8 +693,9 @@ describe("Speaker labels and section headers (Song of Solomon)", () => {
         }
     })
 
-    test("all 17 verses are still parsed correctly", () => {
-        const result = parseApiBibleChapter(nivSongHtml, "niv")
+    test.concurrent("all 17 verses are still parsed correctly", () => {
+        const nivSongResult = cachedParseApiBibleChapter(nivSongHtml, "niv")
+        const result = nivSongResult
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -723,10 +714,11 @@ describe("Speaker labels and section headers (Song of Solomon)", () => {
         }
     })
 
-    test("verse 4 sections are split by speaker changes (h4 headers)", () => {
+    test.concurrent("verse 4 sections are split by speaker changes (h4 headers)", () => {
         // NIV Song 1:4 has speaker changes (She -> Friends -> She)
         // Each speaker section creates a separate verse section (3 total)
-        const result = parseApiBibleChapter(nivSongHtml, "niv")
+        const nivSongResult = cachedParseApiBibleChapter(nivSongHtml, "niv")
+        const result = nivSongResult
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -745,10 +737,11 @@ describe("Speaker labels and section headers (Song of Solomon)", () => {
         expect(verse4Sections[2]!.metadata.hangingVerse).toBe(true)
     })
 
-    test("same-verse poetry lines within speaker section are merged", () => {
+    test.concurrent("same-verse poetry lines within speaker section are merged", () => {
         // NIV Song 1:2-3 spans multiple poetry lines with same speaker (She)
         // They should be merged within the same paragraph
-        const result = parseApiBibleChapter(nivSongHtml, "niv")
+        const nivSongResult = cachedParseApiBibleChapter(nivSongHtml, "niv")
+        const result = nivSongResult
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -796,8 +789,8 @@ describe("Luke 19:38 poetry continuation (NASB)", () => {
         "utf8",
     )
 
-    test("verse 38 is parsed correctly with all content", () => {
-        const result = parseApiBibleChapter(nasbLuke19Html, "nasb")
+    test.concurrent("verse 38 is parsed correctly with all content", () => {
+        const result = cachedParseApiBibleChapter(nasbLuke19Html, "nasb")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -812,7 +805,7 @@ describe("Luke 19:38 poetry continuation (NASB)", () => {
     })
 
     test('verse 38 contains "Blessed" text (small caps merged correctly)', () => {
-        const result = parseApiBibleChapter(nasbLuke19Html, "nasb")
+        const result = cachedParseApiBibleChapter(nasbLuke19Html, "nasb")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -842,7 +835,7 @@ describe("Luke 19:38 poetry continuation (NASB)", () => {
     })
 
     test('verse 38 contains "Peace" text (second poetry line)', () => {
-        const result = parseApiBibleChapter(nasbLuke19Html, "nasb")
+        const result = cachedParseApiBibleChapter(nasbLuke19Html, "nasb")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -860,8 +853,8 @@ describe("Luke 19:38 poetry continuation (NASB)", () => {
         expect(allText).toContain("highest")
     })
 
-    test("verse 38 has no empty word atoms", () => {
-        const result = parseApiBibleChapter(nasbLuke19Html, "nasb")
+    test.concurrent("verse 38 has no empty word atoms", () => {
+        const result = cachedParseApiBibleChapter(nasbLuke19Html, "nasb")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -881,8 +874,8 @@ describe("Luke 19:38 poetry continuation (NASB)", () => {
         }
     })
 
-    test("all verse 38 words are typeable (have letters)", () => {
-        const result = parseApiBibleChapter(nasbLuke19Html, "nasb")
+    test.concurrent("all verse 38 words are typeable (have letters)", () => {
+        const result = cachedParseApiBibleChapter(nasbLuke19Html, "nasb")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -905,8 +898,8 @@ describe("Luke 19:38 poetry continuation (NASB)", () => {
         }
     })
 
-    test("poetry lines are merged (verse 38 has newLine atoms)", () => {
-        const result = parseApiBibleChapter(nasbLuke19Html, "nasb")
+    test.concurrent("poetry lines are merged (verse 38 has newLine atoms)", () => {
+        const result = cachedParseApiBibleChapter(nasbLuke19Html, "nasb")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -924,8 +917,8 @@ describe("Luke 19:38 poetry continuation (NASB)", () => {
         expect(hasNewLine).toBe(true)
     })
 
-    test("hanging verse metadata.length includes all merged words", () => {
-        const result = parseApiBibleChapter(nasbLuke19Html, "nasb")
+    test.concurrent("hanging verse metadata.length includes all merged words", () => {
+        const result = cachedParseApiBibleChapter(nasbLuke19Html, "nasb")
 
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
@@ -1247,12 +1240,12 @@ describe.each(TRANSLATIONS)("Translation: %s", translation => {
 
             test("parses without throwing", () => {
                 expect(() =>
-                    parseApiBibleChapter(html, translation),
+                    cachedParseApiBibleChapter(html, translation),
                 ).not.toThrow()
             })
 
             test("has correct firstVerse metadata", () => {
-                const result = parseApiBibleChapter(html, translation)
+                const result = cachedParseApiBibleChapter(html, translation)
 
                 expect(result.firstVerse).toBeDefined()
                 expect(result.firstVerse.book).toBe(bookSlug)
@@ -1261,7 +1254,7 @@ describe.each(TRANSLATIONS)("Translation: %s", translation => {
             })
 
             test("verse number text includes trailing space (matches ESV format)", () => {
-                const result = parseApiBibleChapter(html, translation)
+                const result = cachedParseApiBibleChapter(html, translation)
                 const paragraphs = result.nodes.filter(
                     (n): n is Paragraph => n.type === "paragraph",
                 )
@@ -1295,7 +1288,7 @@ describe.each(TRANSLATIONS)("Translation: %s", translation => {
             })
 
             test("parses all expected verses", () => {
-                const result = parseApiBibleChapter(html, translation)
+                const result = cachedParseApiBibleChapter(html, translation)
                 const paragraphs = result.nodes.filter(
                     (n): n is Paragraph => n.type === "paragraph",
                 )
@@ -1318,7 +1311,7 @@ describe.each(TRANSLATIONS)("Translation: %s", translation => {
             })
 
             test("has no embedded newlines in words", () => {
-                const result = parseApiBibleChapter(html, translation)
+                const result = cachedParseApiBibleChapter(html, translation)
                 const paragraphs = result.nodes.filter(
                     (n): n is Paragraph => n.type === "paragraph",
                 )
@@ -1339,7 +1332,7 @@ describe.each(TRANSLATIONS)("Translation: %s", translation => {
             })
 
             test("has no double spaces", () => {
-                const result = parseApiBibleChapter(html, translation)
+                const result = cachedParseApiBibleChapter(html, translation)
                 const paragraphs = result.nodes.filter(
                     (n): n is Paragraph => n.type === "paragraph",
                 )
@@ -1348,7 +1341,7 @@ describe.each(TRANSLATIONS)("Translation: %s", translation => {
             })
 
             test("has no punctuation-only words", () => {
-                const result = parseApiBibleChapter(html, translation)
+                const result = cachedParseApiBibleChapter(html, translation)
                 const paragraphs = result.nodes.filter(
                     (n): n is Paragraph => n.type === "paragraph",
                 )
@@ -1366,7 +1359,7 @@ describe.each(TRANSLATIONS)("Translation: %s", translation => {
             })
 
             test("verse numbers are followed by words not space atoms", () => {
-                const result = parseApiBibleChapter(html, translation)
+                const result = cachedParseApiBibleChapter(html, translation)
                 const paragraphs = result.nodes.filter(
                     (n): n is Paragraph => n.type === "paragraph",
                 )
@@ -1386,7 +1379,7 @@ describe.each(TRANSLATIONS)("Translation: %s", translation => {
             })
 
             test("generates valid prev/next chapter links", () => {
-                const result = parseApiBibleChapter(html, translation)
+                const result = cachedParseApiBibleChapter(html, translation)
 
                 // Genesis 1 should have no prev
                 if (bookSlug === "genesis" && chapter === 1) {
@@ -1411,7 +1404,7 @@ describe.each(TRANSLATIONS)("Translation: %s", translation => {
             })
 
             test("produces non-empty verse text", () => {
-                const result = parseApiBibleChapter(html, translation)
+                const result = cachedParseApiBibleChapter(html, translation)
                 const paragraphs = result.nodes.filter(
                     (n): n is Paragraph => n.type === "paragraph",
                 )
@@ -1443,10 +1436,11 @@ describe("Luke 19 NASB - Poetry continuation typing", () => {
         "utf8",
     )
 
-    test("parses all 48 verses", () => {
-        const result = parseApiBibleChapter(nasbLuke19Html, "nasb")
+    // Cache parsed result - this is a large file
+    const luke19Result = cachedParseApiBibleChapter(nasbLuke19Html, "nasb")
 
-        const paragraphs = result.nodes.filter(
+    test.concurrent("parses all 48 verses", () => {
+        const paragraphs = luke19Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -1463,10 +1457,8 @@ describe("Luke 19 NASB - Poetry continuation typing", () => {
         }
     })
 
-    test("verse 38 has all content including poetry continuation", () => {
-        const result = parseApiBibleChapter(nasbLuke19Html, "nasb")
-
-        const paragraphs = result.nodes.filter(
+    test.concurrent("verse 38 has all content including poetry continuation", () => {
+        const paragraphs = luke19Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -1486,10 +1478,8 @@ describe("Luke 19 NASB - Poetry continuation typing", () => {
         expect(allText).toContain("glory")
     })
 
-    test("all verse 38 sections have typeable words", () => {
-        const result = parseApiBibleChapter(nasbLuke19Html, "nasb")
-
-        const paragraphs = result.nodes.filter(
+    test.concurrent("all verse 38 sections have typeable words", () => {
+        const paragraphs = luke19Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -1507,10 +1497,8 @@ describe("Luke 19 NASB - Poetry continuation typing", () => {
         }
     })
 
-    test("verse 38 poetry continuation is properly typed as hanging verse", () => {
-        const result = parseApiBibleChapter(nasbLuke19Html, "nasb")
-
-        const paragraphs = result.nodes.filter(
+    test.concurrent("verse 38 poetry continuation is properly typed as hanging verse", () => {
+        const paragraphs = luke19Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -1528,10 +1516,8 @@ describe("Luke 19 NASB - Poetry continuation typing", () => {
         }
     })
 
-    test("can type through entire verse 38 including all poetry lines", () => {
-        const result = parseApiBibleChapter(nasbLuke19Html, "nasb")
-
-        const paragraphs = result.nodes.filter(
+    test.concurrent("can type through entire verse 38 including all poetry lines", () => {
+        const paragraphs = luke19Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -1562,10 +1548,8 @@ describe("Luke 19 NASB - Poetry continuation typing", () => {
         expect(allLetters).toContain("heaven")
     })
 
-    test("no verse 38 section has empty nodes array", () => {
-        const result = parseApiBibleChapter(nasbLuke19Html, "nasb")
-
-        const paragraphs = result.nodes.filter(
+    test.concurrent("no verse 38 section has empty nodes array", () => {
+        const paragraphs = luke19Result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
 
@@ -1592,13 +1576,15 @@ describe("Luke 7:5-10 NASB - Spacing and quote rendering", () => {
         "utf8",
     )
 
-    test("parses Luke 7 successfully", () => {
-        const result = parseApiBibleChapter(nasbLuke7Html, "nasb")
-        expect(result.nodes.length).toBeGreaterThan(0)
+    // Cache parsed result
+    const luke7Result = cachedParseApiBibleChapter(nasbLuke7Html, "nasb")
+
+    test.concurrent("parses Luke 7 successfully", () => {
+        expect(luke7Result.nodes.length).toBeGreaterThan(0)
     })
 
-    test("verse 5 text is correct", () => {
-        const result = parseApiBibleChapter(nasbLuke7Html, "nasb")
+    test.concurrent("verse 5 text is correct", () => {
+        const result = luke7Result // cachedParseApiBibleChapter(nasbLuke7Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -1614,7 +1600,7 @@ describe("Luke 7:5-10 NASB - Spacing and quote rendering", () => {
     })
 
     test('verse 6 has opening quote before "Lord"', () => {
-        const result = parseApiBibleChapter(nasbLuke7Html, "nasb")
+        const result = luke7Result // cachedParseApiBibleChapter(nasbLuke7Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -1632,7 +1618,7 @@ describe("Luke 7:5-10 NASB - Spacing and quote rendering", () => {
     })
 
     test('verse 6 opening quote is grouped with "Lord" as one word', () => {
-        const result = parseApiBibleChapter(nasbLuke7Html, "nasb")
+        const result = luke7Result // cachedParseApiBibleChapter(nasbLuke7Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -1658,7 +1644,7 @@ describe("Luke 7:5-10 NASB - Spacing and quote rendering", () => {
     })
 
     test('verse 7 "I did" is rendered with proper spacing', () => {
-        const result = parseApiBibleChapter(nasbLuke7Html, "nasb")
+        const result = luke7Result // cachedParseApiBibleChapter(nasbLuke7Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -1675,7 +1661,7 @@ describe("Luke 7:5-10 NASB - Spacing and quote rendering", () => {
     })
 
     test('verse 9 "I say" is rendered with proper spacing', () => {
-        const result = parseApiBibleChapter(nasbLuke7Html, "nasb")
+        const result = luke7Result // cachedParseApiBibleChapter(nasbLuke7Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -1692,8 +1678,8 @@ describe("Luke 7:5-10 NASB - Spacing and quote rendering", () => {
         expect(verse9Text).toMatch(/[\u0022\u201C]I say to you,/)
     })
 
-    test("verse 8 ending has no space before closing quote", () => {
-        const result = parseApiBibleChapter(nasbLuke7Html, "nasb")
+    test.concurrent("verse 8 ending has no space before closing quote", () => {
+        const result = luke7Result // cachedParseApiBibleChapter(nasbLuke7Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -1711,8 +1697,8 @@ describe("Luke 7:5-10 NASB - Spacing and quote rendering", () => {
         expect(verse8Text).not.toContain('it. "')
     })
 
-    test("verses 5-10 full text has proper spacing", () => {
-        const result = parseApiBibleChapter(nasbLuke7Html, "nasb")
+    test.concurrent("verses 5-10 full text has proper spacing", () => {
+        const result = luke7Result // cachedParseApiBibleChapter(nasbLuke7Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -1752,15 +1738,15 @@ describe("Psalm 6 NASB - Pilcrow decoration handling", () => {
         "utf8",
     )
 
-    test("parses Psalm 6 successfully", () => {
-        const result = parseApiBibleChapter(nasbPsalm6Html, "nasb")
+    test.concurrent("parses Psalm 6 successfully", () => {
+        const result = cachedParseApiBibleChapter(nasbPsalm6Html, "nasb")
         expect(result.nodes.length).toBeGreaterThan(0)
         expect(result.firstVerse.book).toBe("psalm")
         expect(result.firstVerse.chapter).toBe(6)
     })
 
-    test("pilcrow is parsed as decoration atom", () => {
-        const result = parseApiBibleChapter(nasbPsalm6Html, "nasb")
+    test.concurrent("pilcrow is parsed as decoration atom", () => {
+        const result = cachedParseApiBibleChapter(nasbPsalm6Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -1786,8 +1772,8 @@ describe("Psalm 6 NASB - Pilcrow decoration handling", () => {
         }
     })
 
-    test("decoration atoms are NOT typable", () => {
-        const result = parseApiBibleChapter(nasbPsalm6Html, "nasb")
+    test.concurrent("decoration atoms are NOT typable", () => {
+        const result = cachedParseApiBibleChapter(nasbPsalm6Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -1805,7 +1791,7 @@ describe("Psalm 6 NASB - Pilcrow decoration handling", () => {
     })
 
     test('verse 4 has pilcrow decoration before "Return"', () => {
-        const result = parseApiBibleChapter(nasbPsalm6Html, "nasb")
+        const result = cachedParseApiBibleChapter(nasbPsalm6Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -1826,8 +1812,8 @@ describe("Psalm 6 NASB - Pilcrow decoration handling", () => {
         expect(verse4Text).toContain("Return")
     })
 
-    test("pilcrow does not affect verse text content", () => {
-        const result = parseApiBibleChapter(nasbPsalm6Html, "nasb")
+    test.concurrent("pilcrow does not affect verse text content", () => {
+        const result = cachedParseApiBibleChapter(nasbPsalm6Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -1847,8 +1833,8 @@ describe("Psalm 6 NASB - Pilcrow decoration handling", () => {
         expect(allText).toContain("weary")
     })
 
-    test("verse lengths do not include decoration atoms", () => {
-        const result = parseApiBibleChapter(nasbPsalm6Html, "nasb")
+    test.concurrent("verse lengths do not include decoration atoms", () => {
+        const result = cachedParseApiBibleChapter(nasbPsalm6Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -1883,13 +1869,13 @@ describe("Luke 8:21 NASB - Closing quote completeness", () => {
         "utf8",
     )
 
-    test("parses Luke 8 successfully", () => {
-        const result = parseApiBibleChapter(nasbLuke8Html, "nasb")
+    test.concurrent("parses Luke 8 successfully", () => {
+        const result = cachedParseApiBibleChapter(nasbLuke8Html, "nasb")
         expect(result.nodes.length).toBeGreaterThan(0)
     })
 
-    test("verse 21 last word ends with trailing space (is complete)", () => {
-        const result = parseApiBibleChapter(nasbLuke8Html, "nasb")
+    test.concurrent("verse 21 last word ends with trailing space (is complete)", () => {
+        const result = cachedParseApiBibleChapter(nasbLuke8Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -1929,13 +1915,13 @@ describe("John 4:2 NASB - Parentheses handling", () => {
         "utf8",
     )
 
-    test("parses John 4 successfully", () => {
-        const result = parseApiBibleChapter(nasbJohn4Html, "nasb")
+    test.concurrent("parses John 4 successfully", () => {
+        const result = cachedParseApiBibleChapter(nasbJohn4Html, "nasb")
         expect(result.nodes.length).toBeGreaterThan(0)
     })
 
-    test("verse 2 contains closing parenthesis", () => {
-        const result = parseApiBibleChapter(nasbJohn4Html, "nasb")
+    test.concurrent("verse 2 contains closing parenthesis", () => {
+        const result = cachedParseApiBibleChapter(nasbJohn4Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -1950,8 +1936,8 @@ describe("John 4:2 NASB - Parentheses handling", () => {
         expect(verse2Text).toContain(")")
     })
 
-    test("verse 53 contains semicolon after closing quote", () => {
-        const result = parseApiBibleChapter(nasbJohn4Html, "nasb")
+    test.concurrent("verse 53 contains semicolon after closing quote", () => {
+        const result = cachedParseApiBibleChapter(nasbJohn4Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -1980,13 +1966,13 @@ describe("John 6:1 NASB - Opening parenthesis", () => {
         "utf8",
     )
 
-    test("parses John 6 successfully", () => {
-        const result = parseApiBibleChapter(nasbJohn6Html, "nasb")
+    test.concurrent("parses John 6 successfully", () => {
+        const result = cachedParseApiBibleChapter(nasbJohn6Html, "nasb")
         expect(result.nodes.length).toBeGreaterThan(0)
     })
 
-    test("verse 1 contains opening parenthesis", () => {
-        const result = parseApiBibleChapter(nasbJohn6Html, "nasb")
+    test.concurrent("verse 1 contains opening parenthesis", () => {
+        const result = cachedParseApiBibleChapter(nasbJohn6Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -2015,7 +2001,7 @@ describe("John 6:1 NASB - Opening parenthesis", () => {
     })
 
     test('verse 45 "And" is not split up (small caps merge)', () => {
-        const result = parseApiBibleChapter(nasbJohn6Html, "nasb")
+        const result = cachedParseApiBibleChapter(nasbJohn6Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -2036,7 +2022,7 @@ describe("John 6:1 NASB - Opening parenthesis", () => {
 
     // Test cases for "I am" and "It is" - should NOT merge when in same text node
     test('verse 20 "It is I" - "I" is NOT merged (same text node)', () => {
-        const result = parseApiBibleChapter(nasbJohn6Html, "nasb")
+        const result = cachedParseApiBibleChapter(nasbJohn6Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -2055,7 +2041,7 @@ describe("John 6:1 NASB - Opening parenthesis", () => {
     })
 
     test('verse 35 "I am" - "I" is NOT merged (same text node)', () => {
-        const result = parseApiBibleChapter(nasbJohn6Html, "nasb")
+        const result = cachedParseApiBibleChapter(nasbJohn6Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -2073,7 +2059,7 @@ describe("John 6:1 NASB - Opening parenthesis", () => {
     })
 
     test('verse 41 "I am" - "I" is NOT merged (same text node)', () => {
-        const result = parseApiBibleChapter(nasbJohn6Html, "nasb")
+        const result = cachedParseApiBibleChapter(nasbJohn6Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -2091,7 +2077,7 @@ describe("John 6:1 NASB - Opening parenthesis", () => {
     })
 
     test('verse 42 "Is this" - properly spaced (same text node)', () => {
-        const result = parseApiBibleChapter(nasbJohn6Html, "nasb")
+        const result = cachedParseApiBibleChapter(nasbJohn6Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -2121,8 +2107,8 @@ describe("John 8:11 NASB - Double bracket merge", () => {
         "utf-8",
     )
 
-    test("verse 11 ends with closing quote merged with brackets", () => {
-        const result = parseApiBibleChapter(nasbJohn8Html, "nasb")
+    test.concurrent("verse 11 ends with closing quote merged with brackets", () => {
+        const result = cachedParseApiBibleChapter(nasbJohn8Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -2153,8 +2139,8 @@ describe("John 10:34 NASB - Quote+punctuation merge", () => {
         "utf-8",
     )
 
-    test("verse 34 ends with gods'? (no space before quote)", () => {
-        const result = parseApiBibleChapter(nasbJohn10Html, "nasb")
+    test.concurrent("verse 34 ends with gods'? (no space before quote)", () => {
+        const result = cachedParseApiBibleChapter(nasbJohn10Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -2186,7 +2172,7 @@ describe("John 12:38 NASB - Standalone question mark", () => {
     )
 
     test('verse 38 has question mark after "report" (no space before ?)', () => {
-        const result = parseApiBibleChapter(nasbJohn12Html, "nasb")
+        const result = cachedParseApiBibleChapter(nasbJohn12Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -2216,8 +2202,8 @@ describe("Proverbs 20 NLT - Divine name and possessive", () => {
         "utf-8",
     )
 
-    test("verse 10 has Lord marked as divine name (nd class)", () => {
-        const result = parseApiBibleChapter(nltProverbs20Html, "nlt")
+    test.concurrent("verse 10 has Lord marked as divine name (nd class)", () => {
+        const result = cachedParseApiBibleChapter(nltProverbs20Html, "nlt")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -2239,8 +2225,8 @@ describe("Proverbs 20 NLT - Divine name and possessive", () => {
         expect(lordWord?.type === "word" && lordWord.divineName).toBe(true)
     })
 
-    test("verse 12 has Lord marked as divine name (nd class)", () => {
-        const result = parseApiBibleChapter(nltProverbs20Html, "nlt")
+    test.concurrent("verse 12 has Lord marked as divine name (nd class)", () => {
+        const result = cachedParseApiBibleChapter(nltProverbs20Html, "nlt")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -2262,8 +2248,8 @@ describe("Proverbs 20 NLT - Divine name and possessive", () => {
         expect(lordWord?.type === "word" && lordWord.divineName).toBe(true)
     })
 
-    test("verse 27 has LORD's with possessive merged and divine name flag", () => {
-        const result = parseApiBibleChapter(nltProverbs20Html, "nlt")
+    test.concurrent("verse 27 has LORD's with possessive merged and divine name flag", () => {
+        const result = cachedParseApiBibleChapter(nltProverbs20Html, "nlt")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -2304,13 +2290,13 @@ describe("John 1:15 NASB - Nested quote handling", () => {
         "utf8",
     )
 
-    test("parses John 1 successfully", () => {
-        const result = parseApiBibleChapter(nasbJohn1Html, "nasb")
+    test.concurrent("parses John 1 successfully", () => {
+        const result = cachedParseApiBibleChapter(nasbJohn1Html, "nasb")
         expect(result.nodes.length).toBeGreaterThan(0)
     })
 
-    test("verse 15 nested quotes have no space between them", () => {
-        const result = parseApiBibleChapter(nasbJohn1Html, "nasb")
+    test.concurrent("verse 15 nested quotes have no space between them", () => {
+        const result = cachedParseApiBibleChapter(nasbJohn1Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -2341,13 +2327,13 @@ describe("Luke 10:27 NASB - Punct+quote merging", () => {
         "utf8",
     )
 
-    test("parses Luke 10 successfully", () => {
-        const result = parseApiBibleChapter(nasbLuke10Html, "nasb")
+    test.concurrent("parses Luke 10 successfully", () => {
+        const result = cachedParseApiBibleChapter(nasbLuke10Html, "nasb")
         expect(result.nodes.length).toBeGreaterThan(0)
     })
 
     test('verse 27 "yourself" has punct+quote attached (no space before .")', () => {
-        const result = parseApiBibleChapter(nasbLuke10Html, "nasb")
+        const result = cachedParseApiBibleChapter(nasbLuke10Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )
@@ -2364,8 +2350,8 @@ describe("Luke 10:27 NASB - Punct+quote merging", () => {
         expect(verse27Text).not.toContain('yourself ."')
     })
 
-    test("verse 27 last word is complete (ends with space)", () => {
-        const result = parseApiBibleChapter(nasbLuke10Html, "nasb")
+    test.concurrent("verse 27 last word is complete (ends with space)", () => {
+        const result = cachedParseApiBibleChapter(nasbLuke10Html, "nasb")
         const paragraphs = result.nodes.filter(
             (n): n is Paragraph => n.type === "paragraph",
         )

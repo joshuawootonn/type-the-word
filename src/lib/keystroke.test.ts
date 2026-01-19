@@ -29,7 +29,7 @@ function createDeleteEvent(
 }
 
 describe("isValidKeystroke - space handling", () => {
-    test("WHEN double space at the end of a word THEN second space prevented", () => {
+    test.concurrent("WHEN double space at the end of a word THEN second space prevented", () => {
         const prev: Keystroke[] = [
             createKeystroke('"'),
             createKeystroke("Y"),
@@ -43,7 +43,7 @@ describe("isValidKeystroke - space handling", () => {
         expect(result).toBeUndefined()
     })
 
-    test("WHEN space after newline THEN prevented", () => {
+    test.concurrent("WHEN space after newline THEN prevented", () => {
         const prev: Keystroke[] = [
             createKeystroke("H"),
             createKeystroke("e"),
@@ -58,7 +58,7 @@ describe("isValidKeystroke - space handling", () => {
         expect(result).toBeUndefined()
     })
 
-    test("WHEN space mid-word THEN valid", () => {
+    test.concurrent("WHEN space mid-word THEN valid", () => {
         const prev: Keystroke[] = [createKeystroke('"'), createKeystroke("Y")]
 
         const result = isValidKeystroke(createInsertEvent(" "), prev)
@@ -67,7 +67,7 @@ describe("isValidKeystroke - space handling", () => {
         expect(result?.at(-1)?.key).toBe(" ")
     })
 
-    test("WHEN space after complete word (no trailing space) THEN valid", () => {
+    test.concurrent("WHEN space after complete word (no trailing space) THEN valid", () => {
         const prev: Keystroke[] = [
             createKeystroke('"'),
             createKeystroke("Y"),
@@ -83,7 +83,7 @@ describe("isValidKeystroke - space handling", () => {
 })
 
 describe("isValidKeystroke - character insertion", () => {
-    test("WHEN inserting character at start THEN valid", () => {
+    test.concurrent("WHEN inserting character at start THEN valid", () => {
         const result = isValidKeystroke(createInsertEvent("H"), [])
 
         expect(result).toBeDefined()
@@ -91,7 +91,7 @@ describe("isValidKeystroke - character insertion", () => {
         expect(result?.at(-1)?.key).toBe("H")
     })
 
-    test("WHEN inserting character after space THEN valid", () => {
+    test.concurrent("WHEN inserting character after space THEN valid", () => {
         const prev: Keystroke[] = [
             createKeystroke("H"),
             createKeystroke("i"),
@@ -104,7 +104,7 @@ describe("isValidKeystroke - character insertion", () => {
         expect(result?.at(-1)?.key).toBe("t")
     })
 
-    test("WHEN inserting newline THEN valid", () => {
+    test.concurrent("WHEN inserting newline THEN valid", () => {
         const prev: Keystroke[] = [createKeystroke("H"), createKeystroke("i")]
 
         const result = isValidKeystroke(createInsertEvent("\n"), prev)
@@ -115,7 +115,7 @@ describe("isValidKeystroke - character insertion", () => {
 })
 
 describe("isValidKeystroke - delete handling", () => {
-    test("WHEN deleteContentBackward with keystrokes THEN valid", () => {
+    test.concurrent("WHEN deleteContentBackward with keystrokes THEN valid", () => {
         const prev: Keystroke[] = [
             createKeystroke("H"),
             createKeystroke("e"),
@@ -131,7 +131,7 @@ describe("isValidKeystroke - delete handling", () => {
         expect(result?.at(-1)?.type).toBe("deleteContentBackward")
     })
 
-    test("WHEN deleteWordBackward THEN valid", () => {
+    test.concurrent("WHEN deleteWordBackward THEN valid", () => {
         const prev: Keystroke[] = [
             createKeystroke("H"),
             createKeystroke("e"),
@@ -149,7 +149,7 @@ describe("isValidKeystroke - delete handling", () => {
         expect(result?.at(-1)?.type).toBe("deleteWordBackward")
     })
 
-    test("WHEN deleteSoftLineBackward THEN valid", () => {
+    test.concurrent("WHEN deleteSoftLineBackward THEN valid", () => {
         const prev: Keystroke[] = [
             createKeystroke("H"),
             createKeystroke("i"),
@@ -172,13 +172,13 @@ describe("isValidKeystroke - delete handling", () => {
 })
 
 describe("getPosition - builds position from keystrokes", () => {
-    test("WHEN empty keystrokes THEN empty position", () => {
+    test.concurrent("WHEN empty keystrokes THEN empty position", () => {
         const result = getPosition([])
 
         expect(result).toEqual([])
     })
 
-    test("WHEN single word THEN one word atom", () => {
+    test.concurrent("WHEN single word THEN one word atom", () => {
         const keystrokes: Keystroke[] = [
             createKeystroke("H"),
             createKeystroke("i"),
@@ -190,7 +190,7 @@ describe("getPosition - builds position from keystrokes", () => {
         expect(result[0]).toEqual({ type: "word", letters: ["H", "i"] })
     })
 
-    test("WHEN word with space THEN word is complete", () => {
+    test.concurrent("WHEN word with space THEN word is complete", () => {
         const keystrokes: Keystroke[] = [
             createKeystroke("H"),
             createKeystroke("i"),
@@ -203,7 +203,7 @@ describe("getPosition - builds position from keystrokes", () => {
         expect(result[0]).toEqual({ type: "word", letters: ["H", "i", " "] })
     })
 
-    test("WHEN two words THEN two word atoms", () => {
+    test.concurrent("WHEN two words THEN two word atoms", () => {
         const keystrokes: Keystroke[] = [
             createKeystroke("H"),
             createKeystroke("i"),
@@ -220,7 +220,7 @@ describe("getPosition - builds position from keystrokes", () => {
         expect(result[1]).toEqual({ type: "word", letters: ["y", "o", "u"] })
     })
 
-    test("WHEN deleteContentBackward mid-word THEN removes last letter", () => {
+    test.concurrent("WHEN deleteContentBackward mid-word THEN removes last letter", () => {
         const keystrokes: Keystroke[] = [
             createKeystroke("H"),
             createKeystroke("e"),
@@ -234,7 +234,7 @@ describe("getPosition - builds position from keystrokes", () => {
         expect(result[0]).toEqual({ type: "word", letters: ["H", "e"] })
     })
 
-    test("WHEN deleteContentBackward on single letter word THEN removes word", () => {
+    test.concurrent("WHEN deleteContentBackward on single letter word THEN removes word", () => {
         const keystrokes: Keystroke[] = [
             createKeystroke("H"),
             createKeystroke("", "deleteContentBackward"),
@@ -245,7 +245,7 @@ describe("getPosition - builds position from keystrokes", () => {
         expect(result).toHaveLength(0)
     })
 
-    test("WHEN deleteWordBackward THEN removes last word atom", () => {
+    test.concurrent("WHEN deleteWordBackward THEN removes last word atom", () => {
         const keystrokes: Keystroke[] = [
             createKeystroke("H"),
             createKeystroke("i"),
@@ -264,7 +264,7 @@ describe("getPosition - builds position from keystrokes", () => {
         expect(result[0]).toEqual({ type: "word", letters: ["H", "i", " "] })
     })
 
-    test("WHEN deleteSoftLineBackward THEN clears all", () => {
+    test.concurrent("WHEN deleteSoftLineBackward THEN clears all", () => {
         const keystrokes: Keystroke[] = [
             createKeystroke("H"),
             createKeystroke("i"),
@@ -282,7 +282,7 @@ describe("getPosition - builds position from keystrokes", () => {
         expect(result).toHaveLength(0)
     })
 
-    test("WHEN quote characters THEN normalized to standard quote", () => {
+    test.concurrent("WHEN quote characters THEN normalized to standard quote", () => {
         const keystrokes: Keystroke[] = [
             createKeystroke('"'), // fancy quote
             createKeystroke("H"),

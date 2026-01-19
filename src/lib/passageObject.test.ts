@@ -5,7 +5,7 @@ import { stringToPassageObject } from "~/lib/passageObject"
 import { passageReferenceSchema } from "./passageReference"
 
 describe("passageObject parsing", () => {
-    test("WHEN multiword book THEN success", () => {
+    test.concurrent("WHEN multiword book THEN success", () => {
         const result = stringToPassageObject.parse("Song of Solomon 1")
 
         expect(result).toEqual({
@@ -14,7 +14,7 @@ describe("passageObject parsing", () => {
             firstVerse: 1,
         })
     })
-    test("WHEN single word book THEN success", () => {
+    test.concurrent("WHEN single word book THEN success", () => {
         const result = stringToPassageObject.parse("1 John 3")
 
         expect(result).toEqual({
@@ -23,7 +23,7 @@ describe("passageObject parsing", () => {
             firstVerse: 1,
         })
     })
-    test("WHEN verse included THEN success", () => {
+    test.concurrent("WHEN verse included THEN success", () => {
         const result = stringToPassageObject.parse("John 3:16")
 
         expect(result).toEqual({
@@ -33,7 +33,7 @@ describe("passageObject parsing", () => {
             lastVerse: 16,
         })
     })
-    test("WHEN verses included THEN success", () => {
+    test.concurrent("WHEN verses included THEN success", () => {
         const result = stringToPassageObject.parse("John 3:10-12")
 
         expect(result).toEqual({
@@ -44,7 +44,7 @@ describe("passageObject parsing", () => {
         })
     })
 
-    test("WHEN using url segment THEN you need to use passageReferenceSchema ", () => {
+    test.concurrent("WHEN using url segment THEN you need to use passageReferenceSchema ", () => {
         const result = stringToPassageObject.parse(
             passageReferenceSchema.parse("2_thessalonians_2"),
         )
