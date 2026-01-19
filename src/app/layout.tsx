@@ -85,7 +85,7 @@ export default async function RootLayout({
                     poppins.variable,
                 )}
             >
-                <div className="container mx-auto flex max-w-page flex-col px-4  lg:px-0">
+                <div className="container mx-auto flex max-w-page flex-col px-4 lg:px-0">
                     <Providers
                         currentTheme={currentTheme}
                         userThemes={userThemes}
