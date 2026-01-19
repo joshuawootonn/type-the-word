@@ -15,7 +15,7 @@ const SelectTrigger = forwardRef<
     <SelectPrimitive.Trigger
         ref={ref}
         className={clsx(
-            "flex items-center justify-between gap-2 border-2 border-primary bg-secondary px-2 py-1 text-primary outline-none focus:bg-primary focus:text-secondary",
+            "svg-outline relative flex items-center justify-between gap-2 border-2 border-primary bg-secondary px-2 py-1 text-primary outline-none focus:bg-primary focus:text-secondary",
             className,
         )}
         {...props}
@@ -55,7 +55,7 @@ const SelectContent = forwardRef<
             <SelectPrimitive.Viewport
                 className={clsx(
                     position === "popper" &&
-                        "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]",
+                        "h-[var(--radix-select-trigger-height)] w-full min-w-[calc(var(--radix-select-trigger-width)_-_4px)]",
                 )}
             >
                 {children}
