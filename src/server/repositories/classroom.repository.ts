@@ -3,6 +3,7 @@ import { eq, and } from "drizzle-orm"
 import { db } from "~/server/db"
 import {
     classroomTeacherToken,
+    classroomStudentToken,
     classroomAssignment,
     classroomSubmission,
     type Translation,
@@ -65,6 +66,66 @@ export async function deleteTeacherToken(userId: string) {
     await db
         .delete(classroomTeacherToken)
         .where(eq(classroomTeacherToken.userId, userId))
+}
+
+/**
+ * Student Token Operations
+ */
+
+export async function getStudentToken(userId: string) {
+    const token = await db.query.classroomStudentToken.findFirst({
+        where: eq(classroomStudentToken.userId, userId),
+    })
+    return token
+}
+
+export async function saveStudentToken(data: {
+    userId: string
+    googleUserId: string
+    accessToken: string
+    refreshToken: string
+    expiresAt: Date
+    scope: string
+}) {
+    await db
+        .insert(classroomStudentToken)
+        .values({
+            ...data,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        })
+        .onConflictDoUpdate({
+            target: classroomStudentToken.userId,
+            set: {
+                googleUserId: data.googleUserId,
+                accessToken: data.accessToken,
+                refreshToken: data.refreshToken,
+                expiresAt: data.expiresAt,
+                scope: data.scope,
+                updatedAt: new Date(),
+            },
+        })
+}
+
+export async function updateStudentTokenAccess(
+    userId: string,
+    accessToken: string,
+    expiresAt: Date,
+) {
+    await db
+        .update(classroomStudentToken)
+        .set({
+            accessToken,
+            expiresAt,
+            updatedAt: new Date(),
+        })
+        .where(eq(classroomStudentToken.userId, userId))
+}
+
+export async function deleteStudentToken(userId: string) {
+    await db
+        .delete(classroomStudentToken)
+        .where(eq(classroomStudentToken.userId, userId))
 }
 
 /**

@@ -1,4 +1,3 @@
-import { and, eq } from "drizzle-orm"
 import { getServerSession } from "next-auth"
 import Link from "next/link"
 
@@ -8,13 +7,12 @@ import { fetchPassage } from "~/lib/api"
 import { passageSegmentSchema } from "~/lib/passageSegment"
 import toProperCase from "~/lib/toProperCase"
 import { authOptions } from "~/server/auth"
+import { getValidStudentToken } from "~/server/classroom/student-token"
 import { getValidTeacherToken } from "~/server/classroom/teacher-token"
 import {
     getStudent,
     getStudentSubmission,
 } from "~/server/clients/classroom.client"
-import { db } from "~/server/db"
-import { accounts } from "~/server/db/schema"
 import {
     getAssignment,
     getOrCreateSubmission,
@@ -148,27 +146,24 @@ export default async function ClassroomAssignmentPage({ params }: PageProps) {
         )
     }
 
-    const googleAccount = await db.query.accounts.findFirst({
-        where: and(
-            eq(accounts.userId, session.user.id),
-            eq(accounts.provider, "google"),
-        ),
-    })
-    const googleUserId = googleAccount?.providerAccountId
-    if (!googleUserId) {
+    let googleUserId: string
+    try {
+        const studentToken = await getValidStudentToken(session.user.id)
+        googleUserId = studentToken.googleUserId
+    } catch (_error) {
         return (
             <div>
                 <h1>{assignment.title}</h1>
                 <div className="not-prose border-2 border-error bg-secondary p-6">
                     <p className="text-error">
-                        Please sign in with Google to link your Classroom
-                        account before starting this assignment.
+                        Please connect your student Google Classroom account
+                        before starting this assignment.
                     </p>
                     <Link
-                        href={`/auth/login?callbackUrl=%2Fclassroom%2Fassignment%2F${encodeURIComponent(assignmentId)}`}
+                        href="/classroom"
                         className="svg-outline relative mt-4 inline-block border-2 border-primary px-3 py-1 font-semibold no-underline"
                     >
-                        Sign in with Google
+                        Connect Student Account
                     </Link>
                 </div>
             </div>
@@ -211,7 +206,9 @@ export default async function ClassroomAssignmentPage({ params }: PageProps) {
 
     const [passage, typingSession, assignmentHistory] = await Promise.all([
         fetchPassage(passageSegment, assignment.translation),
-        session == null ? undefined : getOrCreateTypingSession(session.user.id),
+        session == null
+            ? undefined
+            : getOrCreateTypingSession(session.user.id, assignmentId),
         session == null
             ? undefined
             : getAssignmentHistory(session.user.id, assignmentId),

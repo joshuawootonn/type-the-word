@@ -134,6 +134,20 @@
             "when": 1768850462624,
             "tag": "0018_overconfident_jean_grey",
             "breakpoints": true
+        },
+        {
+            "idx": 19,
+            "version": "7",
+            "when": 1768859957094,
+            "tag": "0019_brief_clea",
+            "breakpoints": true
+        },
+        {
+            "idx": 20,
+            "version": "7",
+            "when": 1768860106240,
+            "tag": "0020_eager_punisher",
+            "breakpoints": true
         }
     ]
 }

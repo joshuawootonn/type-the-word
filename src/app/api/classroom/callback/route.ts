@@ -31,7 +31,10 @@ export async function GET(request: NextRequest) {
 
     try {
         // Exchange code for tokens
-        const tokens = await exchangeCodeForTokens(code)
+        const tokens = await exchangeCodeForTokens(
+            code,
+            `${request.nextUrl.origin}/api/classroom/callback`,
+        )
 
         // Save tokens to database
         await saveTeacherToken({

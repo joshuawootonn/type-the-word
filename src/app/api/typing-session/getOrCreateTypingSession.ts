@@ -9,6 +9,7 @@ import {
 
 export async function getOrCreateTypingSession(
     userId: string,
+    assignmentId?: string,
 ): Promise<TypingSession> {
     const typingSessionRepository = new TypingSessionRepository(db)
 
@@ -23,7 +24,14 @@ export async function getOrCreateTypingSession(
             lastTypingSession?.updatedAt,
         ) < 15
     ) {
-        return lastTypingSession
+        return {
+            ...lastTypingSession,
+            typedVerses: lastTypingSession.typedVerses.filter(
+                verse =>
+                    assignmentId == null ||
+                    verse.classroomAssignmentId === assignmentId,
+            ),
+        }
     }
 
     const [nextSession] = await db
@@ -38,6 +46,5 @@ export async function getOrCreateTypingSession(
     const newTypingSession = await typingSessionRepository.getOne({
         id: nextSession.id,
     })
-
     return newTypingSession
 }

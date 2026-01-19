@@ -9,6 +9,14 @@ const SCOPES = [
     "https://www.googleapis.com/auth/classroom.coursework.students",
     "https://www.googleapis.com/auth/classroom.rosters.readonly",
     "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
+    "https://www.googleapis.com/auth/classroom.student-submissions.students",
+]
+
+const STUDENT_SCOPES = [
+    "openid",
+    "email",
+    "profile",
+    "https://www.googleapis.com/auth/classroom.coursework.me",
 ]
 
 // Zod schemas for return types
@@ -89,11 +97,11 @@ export type TurnInResponse = z.infer<typeof turnInResponseSchema>
 /**
  * Creates an OAuth2 client for Google Classroom API
  */
-export function createOAuth2Client() {
+export function createOAuth2Client(redirectUri?: string) {
     return new google.auth.OAuth2(
         env.GOOGLE_CLASSROOM_CLIENT_ID,
         env.GOOGLE_CLASSROOM_CLIENT_SECRET,
-        `${env.DEPLOYED_URL}/api/classroom/callback`,
+        redirectUri ?? `${env.DEPLOYED_URL}/api/classroom/callback`,
     )
 }
 
@@ -101,7 +109,9 @@ export function createOAuth2Client() {
  * Generates the Google OAuth URL for teacher to authorize
  */
 export function getAuthUrl(state?: string): string {
-    const oauth2Client = createOAuth2Client()
+    const oauth2Client = createOAuth2Client(
+        `${env.DEPLOYED_URL}/api/classroom/callback`,
+    )
 
     return oauth2Client.generateAuthUrl({
         access_type: "offline",
@@ -112,12 +122,29 @@ export function getAuthUrl(state?: string): string {
 }
 
 /**
+ * Generates the Google OAuth URL for student to authorize
+ */
+export function getStudentAuthUrl(state?: string): string {
+    const oauth2Client = createOAuth2Client(
+        `${env.DEPLOYED_URL}/api/classroom/student-callback`,
+    )
+
+    return oauth2Client.generateAuthUrl({
+        access_type: "offline",
+        scope: STUDENT_SCOPES,
+        prompt: "consent",
+        state: state,
+    })
+}
+
+/**
  * Exchanges authorization code for tokens
  */
 export async function exchangeCodeForTokens(
     code: string,
+    redirectUri?: string,
 ): Promise<TokenResponse> {
-    const oauth2Client = createOAuth2Client()
+    const oauth2Client = createOAuth2Client(redirectUri)
     const { tokens } = await oauth2Client.getToken(code)
 
     if (!tokens.access_token || !tokens.refresh_token) {

@@ -59,10 +59,19 @@ export async function fetchPassage(
     return typedBody.data
 }
 
-export async function fetchTypingSessionUpsert(): Promise<TypingSession> {
-    const response = await fetch(`${getBaseUrl()}/api/typing-session`, {
-        cache: "no-store",
-    })
+export async function fetchTypingSessionUpsert(
+    assignmentId?: string,
+): Promise<TypingSession> {
+    const qsp = new URLSearchParams()
+    if (assignmentId) {
+        qsp.set("assignmentId", assignmentId)
+    }
+    const response = await fetch(
+        `${getBaseUrl()}/api/typing-session${qsp.toString() ? `?${qsp.toString()}` : ""}`,
+        {
+            cache: "no-store",
+        },
+    )
 
     const body: Body<TypingSession> = await response.json()
 

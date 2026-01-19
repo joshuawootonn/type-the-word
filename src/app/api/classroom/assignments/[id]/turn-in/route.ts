@@ -1,19 +1,18 @@
-import { and, eq } from "drizzle-orm"
 import { getServerSession } from "next-auth"
 import { NextRequest, NextResponse } from "next/server"
 
 import { authOptions } from "~/server/auth"
+import { getValidStudentToken } from "~/server/classroom/student-token"
 import { getValidTeacherToken } from "~/server/classroom/teacher-token"
 import {
     getStudent,
     getStudentSubmission,
     turnInSubmission,
 } from "~/server/clients/classroom.client"
-import { db } from "~/server/db"
-import { accounts } from "~/server/db/schema"
 import {
     getAssignment,
     getOrCreateSubmission,
+    getSubmissionByStudent,
     markSubmissionTurnedIn,
 } from "~/server/repositories/classroom.repository"
 
@@ -31,13 +30,6 @@ export async function POST(
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    if (!session.user.email) {
-        return NextResponse.json(
-            { error: "Missing email on user account" },
-            { status: 400 },
-        )
-    }
-
     try {
         const { id } = await params
         const assignment = await getAssignment(id)
@@ -49,26 +41,15 @@ export async function POST(
             )
         }
 
-        const tokenRecord = await getValidTeacherToken(assignment.teacherUserId)
-        const accessToken = tokenRecord.accessToken
-
-        const googleAccount = await db.query.accounts.findFirst({
-            where: and(
-                eq(accounts.userId, session.user.id),
-                eq(accounts.provider, "google"),
-            ),
-        })
-        const googleUserId = googleAccount?.providerAccountId
-
-        if (!googleUserId) {
-            return NextResponse.json(
-                { error: "User not signed into a Google account" },
-                { status: 400 },
-            )
-        }
+        const teacherToken = await getValidTeacherToken(
+            assignment.teacherUserId,
+        )
+        const teacherAccessToken = teacherToken.accessToken
+        const { accessToken: studentAccessToken, googleUserId } =
+            await getValidStudentToken(session.user.id)
 
         const student = await getStudent(
-            accessToken,
+            teacherAccessToken,
             assignment.courseId,
             googleUserId,
         )
@@ -76,45 +57,63 @@ export async function POST(
         if (!student) {
             return NextResponse.json(
                 {
-                    error: "Student not signed into a Google account in this Classroom",
+                    error: "Student is not enrolled in this Classroom",
                 },
-                { status: 400 },
+                { status: 403 },
             )
         }
 
-        const classroomSubmission = await getStudentSubmission(
-            accessToken,
-            assignment.courseId,
-            assignment.courseWorkId,
-            student.userId,
+        let submissionRecord = await getSubmissionByStudent(
+            assignment.id,
+            session.user.id,
         )
+        let submissionId = submissionRecord?.submissionId ?? null
 
-        if (!classroomSubmission) {
+        if (!submissionId) {
+            const classroomSubmission = await getStudentSubmission(
+                teacherAccessToken,
+                assignment.courseId,
+                assignment.courseWorkId,
+                googleUserId,
+            )
+
+            if (!classroomSubmission) {
+                return NextResponse.json(
+                    { error: "Submission not found" },
+                    { status: 404 },
+                )
+            }
+
+            submissionRecord = await getOrCreateSubmission({
+                assignmentId: assignment.id,
+                studentUserId: session.user.id,
+                totalVerses: assignment.totalVerses,
+                submissionId: classroomSubmission.id,
+            })
+            submissionId = submissionRecord.submissionId ?? null
+        }
+
+        if (!submissionId) {
             return NextResponse.json(
                 { error: "Submission not found" },
                 { status: 404 },
             )
         }
 
-        const submission = await getOrCreateSubmission({
-            assignmentId: assignment.id,
-            studentUserId: session.user.id,
-            totalVerses: assignment.totalVerses,
-            submissionId: classroomSubmission.id,
-        })
-
-        if (submission.isTurnedIn === 1) {
+        if (submissionRecord?.isTurnedIn === 1) {
             return NextResponse.json({ success: true })
         }
 
         await turnInSubmission(
-            accessToken,
+            studentAccessToken,
             assignment.courseId,
             assignment.courseWorkId,
-            classroomSubmission.id,
+            submissionId,
         )
 
-        await markSubmissionTurnedIn(submission.id)
+        if (submissionRecord) {
+            await markSubmissionTurnedIn(submissionRecord.id)
+        }
 
         return NextResponse.json({ success: true })
     } catch (error) {

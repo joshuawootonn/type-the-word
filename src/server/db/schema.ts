@@ -69,6 +69,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
     chapterProgress: many(userChapterProgress),
     dailyActivity: many(userDailyActivity),
     classroomTeacherToken: one(classroomTeacherToken),
+    classroomStudentToken: one(classroomStudentToken),
     classroomAssignments: many(classroomAssignment),
     classroomSubmissions: many(classroomSubmission),
 }))
@@ -505,6 +506,38 @@ export const classroomTeacherTokenRelations = relations(
     ({ one }) => ({
         user: one(users, {
             fields: [classroomTeacherToken.userId],
+            references: [users.id],
+        }),
+    }),
+)
+
+// Stores OAuth tokens for students who connect their Google Classroom account
+export const classroomStudentToken = pgTable(
+    "classroomStudentToken",
+    {
+        userId: varchar("userId", { length: 255 }).notNull().primaryKey(),
+        googleUserId: varchar("googleUserId", { length: 255 }).notNull(),
+        accessToken: text("accessToken").notNull(),
+        refreshToken: text("refreshToken").notNull(),
+        expiresAt: timestamp("expiresAt", { mode: "date" }).notNull(),
+        scope: text("scope").notNull(),
+        createdAt: timestamp("createdAt", { mode: "date" })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+        updatedAt: timestamp("updatedAt", { mode: "date" })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+    },
+    table => ({
+        userIdIdx: index("classroomStudentToken_userId_idx").on(table.userId),
+    }),
+)
+
+export const classroomStudentTokenRelations = relations(
+    classroomStudentToken,
+    ({ one }) => ({
+        user: one(users, {
+            fields: [classroomStudentToken.userId],
             references: [users.id],
         }),
     }),

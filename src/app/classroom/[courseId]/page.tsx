@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth"
-import Link from "next/link"
 
+import { Link } from "~/components/ui/link"
 import { authOptions } from "~/server/auth"
 import { listCourses } from "~/server/clients/classroom.client"
 import { refreshAccessToken } from "~/server/clients/classroom.client"
@@ -26,7 +26,6 @@ export default async function CoursePage({ params }: PageProps) {
                 <p>Please sign in to view your dashboard.</p>
                 <Link
                     href={`/auth/login?callbackUrl=%2Fclassroom%2F${encodeURIComponent(courseId)}`}
-                    className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold no-underline"
                 >
                     Log in
                 </Link>
@@ -44,12 +43,7 @@ export default async function CoursePage({ params }: PageProps) {
                     <p className="text-error">
                         Please connect your Google Classroom account first.
                     </p>
-                    <Link
-                        href="/classroom"
-                        className="svg-outline relative mt-4 inline-block border-2 border-primary bg-secondary px-3 py-1 font-semibold no-underline"
-                    >
-                        Connect Google Classroom
-                    </Link>
+                    <Link href="/classroom">Connect Google Classroom</Link>
                 </div>
             </div>
         )

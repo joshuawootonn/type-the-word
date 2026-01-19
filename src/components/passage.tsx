@@ -83,7 +83,7 @@ export function Passage({
         toPassageSegment(passage.firstVerse.book, passage.firstVerse.chapter)
     const typingSession = useQuery({
         queryKey: ["typing-session"],
-        queryFn: fetchTypingSessionUpsert,
+        queryFn: () => fetchTypingSessionUpsert(props.classroomAssignmentId),
         enabled: sessionData?.user?.id != null,
         placeholderData: props.typingSession,
     })

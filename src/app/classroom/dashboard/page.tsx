@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth"
-import Link from "next/link"
 
+import { Link } from "~/components/ui/link"
 import { authOptions } from "~/server/auth"
 import { getTeacherToken } from "~/server/repositories/classroom.repository"
 
@@ -14,10 +14,7 @@ export default async function DashboardPage() {
             <div>
                 <h1>Dashboard</h1>
                 <p>Please sign in to view your dashboard.</p>
-                <Link
-                    href="/auth/login?callbackUrl=%2Fclassroom%2Fdashboard"
-                    className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold no-underline"
-                >
+                <Link href="/auth/login?callbackUrl=%2Fclassroom%2Fdashboard">
                     Log in
                 </Link>
             </div>
@@ -34,12 +31,7 @@ export default async function DashboardPage() {
                     <p className="text-error">
                         Please connect your Google Classroom account first.
                     </p>
-                    <Link
-                        href="/classroom"
-                        className="svg-outline relative mt-4 inline-block border-2 border-primary bg-secondary px-3 py-1 font-semibold no-underline"
-                    >
-                        Connect Google Classroom
-                    </Link>
+                    <Link href="/classroom">Connect Google Classroom</Link>
                 </div>
             </div>
         )

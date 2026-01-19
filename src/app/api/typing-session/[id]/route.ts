@@ -116,6 +116,7 @@ export const POST = async function POST(
               verse: verse.verse,
               createdAt: new Date(),
               typingData: verse.typingData,
+              classroomAssignmentId: verse.classroomAssignmentId ?? null,
           })
         : null
 
