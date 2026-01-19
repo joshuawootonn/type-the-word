@@ -239,6 +239,7 @@ export async function createCourseWork(
         title: string
         description?: string
         workType: "ASSIGNMENT"
+        state?: "DRAFT" | "PUBLISHED"
         maxPoints: number
         dueDate?: { year: number; month: number; day: number }
         dueTime?: { hours: number; minutes: number }
@@ -355,4 +356,37 @@ export async function turnInSubmission(
     // Return success - the API returns empty on success
     const result = { success: true as const }
     return turnInResponseSchema.parse(result)
+}
+
+/**
+ * Updates the state of a CourseWork (e.g., from DRAFT to PUBLISHED)
+ */
+export async function updateCourseWorkState(
+    accessToken: string,
+    courseId: string,
+    courseWorkId: string,
+    state: "DRAFT" | "PUBLISHED" | "DELETED",
+): Promise<CourseWork> {
+    const classroom = createClassroomClient(accessToken)
+
+    const response = await classroom.courses.courseWork.patch({
+        courseId,
+        id: courseWorkId,
+        updateMask: "state",
+        requestBody: {
+            state,
+        },
+    })
+
+    const result = {
+        id: response.data.id!,
+        courseId: response.data.courseId!,
+        title: response.data.title!,
+        description: response.data.description,
+        state: response.data.state,
+        alternateLink: response.data.alternateLink,
+        maxPoints: response.data.maxPoints,
+    }
+
+    return courseWorkSchema.parse(result)
 }

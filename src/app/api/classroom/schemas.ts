@@ -82,3 +82,54 @@ export type CreateAssignmentRequest = z.infer<
 export type CreateAssignmentResponse = z.infer<
     typeof createAssignmentResponseSchema
 >
+
+// GET /api/classroom/dashboard
+export const assignmentSchema = z.object({
+    id: z.string(),
+    courseId: z.string(),
+    courseWorkId: z.string(),
+    title: z.string(),
+    description: z.string().nullable(),
+    translation: z.string(),
+    book: z.string(),
+    startChapter: z.number(),
+    startVerse: z.number(),
+    endChapter: z.number(),
+    endVerse: z.number(),
+    totalVerses: z.number(),
+    maxPoints: z.number(),
+    dueDate: z.string().nullable(),
+    state: z.enum(["DRAFT", "PUBLISHED", "DELETED"]),
+    submissionCount: z.number(),
+    completedCount: z.number(),
+    averageCompletion: z.number(),
+})
+
+export const dashboardResponseSchema = z.object({
+    assignments: z.array(assignmentSchema),
+})
+
+export type Assignment = z.infer<typeof assignmentSchema>
+export type DashboardResponse = z.infer<typeof dashboardResponseSchema>
+
+// GET /api/classroom/assignments/[id]
+export const studentProgressSchema = z.object({
+    studentName: z.string().nullable(),
+    studentEmail: z.string(),
+    completedVerses: z.number(),
+    totalVerses: z.number(),
+    completionPercentage: z.number(),
+    averageWpm: z.number().nullable(),
+    averageAccuracy: z.number().nullable(),
+    isCompleted: z.boolean(),
+    startedAt: z.string().nullable(),
+    completedAt: z.string().nullable(),
+})
+
+export const assignmentDetailSchema = z.object({
+    assignment: assignmentSchema,
+    students: z.array(studentProgressSchema),
+})
+
+export type StudentProgress = z.infer<typeof studentProgressSchema>
+export type AssignmentDetail = z.infer<typeof assignmentDetailSchema>

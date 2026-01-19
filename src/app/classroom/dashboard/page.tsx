@@ -6,22 +6,16 @@ import { getTeacherToken } from "~/server/repositories/classroom.repository"
 
 import { ClientPage } from "./client-page"
 
-interface PageProps {
-    searchParams: Promise<{ courseId?: string }>
-}
-
-export default async function AssignPage({ searchParams }: PageProps) {
+export default async function DashboardPage() {
     const session = await getServerSession(authOptions)
-    const params = await searchParams
 
-    // If not authenticated, redirect to login
     if (!session?.user) {
         return (
             <div>
-                <h1>Create Assignment</h1>
-                <p>Please sign in to create assignments.</p>
+                <h1>Dashboard</h1>
+                <p>Please sign in to view your dashboard.</p>
                 <Link
-                    href="/auth/login?callbackUrl=%2Fclassroom%2Fassign"
+                    href="/auth/login?callbackUrl=%2Fclassroom%2Fdashboard"
                     className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold no-underline"
                 >
                     Log in
@@ -30,21 +24,19 @@ export default async function AssignPage({ searchParams }: PageProps) {
         )
     }
 
-    // Check if user has connected Google Classroom
     const token = await getTeacherToken(session.user.id)
 
     if (!token) {
         return (
             <div>
-                <h1>Create Assignment</h1>
+                <h1>Dashboard</h1>
                 <div className="not-prose border-2 border-error bg-secondary p-6">
-                    <p className="mb-4 text-error">
-                        Please connect your Google Classroom account before
-                        creating assignments.
+                    <p className="text-error">
+                        Please connect your Google Classroom account first.
                     </p>
                     <Link
                         href="/classroom"
-                        className="svg-outline relative border-2 border-primary bg-secondary px-3 py-1 font-semibold no-underline"
+                        className="svg-outline relative mt-4 inline-block border-2 border-primary bg-secondary px-3 py-1 font-semibold no-underline"
                     >
                         Connect Google Classroom
                     </Link>
@@ -53,5 +45,5 @@ export default async function AssignPage({ searchParams }: PageProps) {
         )
     }
 
-    return <ClientPage initialCourseId={params.courseId} />
+    return <ClientPage />
 }

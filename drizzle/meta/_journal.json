@@ -113,6 +113,20 @@
             "when": 1768745179304,
             "tag": "0015_motionless_omega_sentinel",
             "breakpoints": true
+        },
+        {
+            "idx": 16,
+            "version": "7",
+            "when": 1768843967001,
+            "tag": "0016_huge_scrambler",
+            "breakpoints": true
+        },
+        {
+            "idx": 17,
+            "version": "7",
+            "when": 1768846173995,
+            "tag": "0017_abandoned_norrin_radd",
+            "breakpoints": true
         }
     ]
 }

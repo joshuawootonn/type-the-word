@@ -83,19 +83,35 @@ export async function createAssignment(data: {
     startVerse: number
     endChapter: number
     endVerse: number
+    totalVerses: number
     maxPoints: number
     dueDate?: Date
+    state?: "DRAFT" | "PUBLISHED" | "DELETED"
 }) {
     const [assignment] = await db
         .insert(classroomAssignment)
         .values({
             ...data,
+            state: data.state || "DRAFT",
             createdAt: new Date(),
             updatedAt: new Date(),
         })
         .returning()
 
     return assignment!
+}
+
+export async function updateAssignmentState(
+    assignmentId: string,
+    state: "DRAFT" | "PUBLISHED" | "DELETED",
+) {
+    await db
+        .update(classroomAssignment)
+        .set({
+            state,
+            updatedAt: new Date(),
+        })
+        .where(eq(classroomAssignment.id, assignmentId))
 }
 
 export async function getAssignment(assignmentId: string) {

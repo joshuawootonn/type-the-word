@@ -1,0 +1,2 @@
+CREATE TYPE "public"."courseWork_state" AS ENUM('DRAFT', 'PUBLISHED', 'DELETED');--> statement-breakpoint
+ALTER TABLE "classroomAssignment" ADD COLUMN "state" "courseWork_state" DEFAULT 'DRAFT' NOT NULL;

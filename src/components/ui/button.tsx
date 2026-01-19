@@ -14,31 +14,46 @@ import { cn } from "~/lib/cn"
 
 type BaseButtonProps = ComponentPropsWithoutRef<typeof BaseButton>
 
-type LoadingProps =
-    | {
-          isLoading: boolean
-          loadingLabel: string
-      }
-    | {
-          isLoading?: undefined
-      }
-
+// Conditional type: if isLoading is provided, loadingLabel is REQUIRED
 type ButtonProps = Omit<
     BaseButtonProps,
     "disabled" | "children" | "className"
 > &
-    Pick<ButtonHTMLAttributes<HTMLButtonElement>, "type"> & {
-        children: ReactNode
-        disabled?: boolean
-        className?: string
-    } & LoadingProps
+    Pick<ButtonHTMLAttributes<HTMLButtonElement>, "type"> &
+    (
+        | {
+              children: ReactNode
+              isLoading: boolean
+              loadingLabel: string
+              disabled?: boolean
+              className?: string
+          }
+        | {
+              children: ReactNode
+              isLoading?: never
+              loadingLabel?: never
+              disabled?: boolean
+              className?: string
+          }
+    )
 
 const Button = forwardRef<ElementRef<typeof BaseButton>, ButtonProps>(
-    ({ className, children, disabled, type, ...props }, ref) => {
+    (
+        {
+            className,
+            children,
+            disabled,
+            type,
+            isLoading,
+            loadingLabel,
+            ...props
+        },
+        ref,
+    ) => {
         return (
             <BaseButton
                 ref={ref}
-                disabled={props.isLoading || disabled}
+                disabled={isLoading || disabled}
                 className={cn(
                     "svg-outline relative border-2 border-primary bg-secondary px-3 py-1 font-semibold disabled:cursor-wait",
                     className,
@@ -46,11 +61,11 @@ const Button = forwardRef<ElementRef<typeof BaseButton>, ButtonProps>(
                 {...props}
                 {...(type && { type })}
             >
-                {props.isLoading ? (
+                {isLoading ? (
                     <Loading
                         initialDots={1}
                         className="text-sm font-normal"
-                        label={props.loadingLabel}
+                        label={loadingLabel}
                     />
                 ) : (
                     children

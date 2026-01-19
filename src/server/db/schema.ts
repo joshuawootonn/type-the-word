@@ -41,6 +41,13 @@ export const typedVerseTranslation = pgEnum("typedVerse_translation", [
     "msg",
 ])
 
+// Google Classroom CourseWork state
+export const courseWorkState = pgEnum("courseWork_state", [
+    "DRAFT",
+    "PUBLISHED",
+    "DELETED",
+])
+
 export const users = pgTable("user", {
     id: varchar("id", { length: 255 }).notNull().primaryKey(),
     name: varchar("name", { length: 255 }),
@@ -505,7 +512,6 @@ export const classroomAssignment = pgTable(
         // Google Classroom IDs
         courseId: varchar("courseId", { length: 255 }).notNull(),
         courseWorkId: varchar("courseWorkId", { length: 255 }).notNull(),
-        // Assignment details
         title: text("title").notNull(),
         description: text("description"),
         // Passage details
@@ -516,8 +522,10 @@ export const classroomAssignment = pgTable(
         endChapter: integer("endChapter").notNull(),
         endVerse: integer("endVerse").notNull(),
         // Metadata
+        totalVerses: integer("totalVerses").notNull(),
         maxPoints: integer("maxPoints").notNull().default(100),
         dueDate: timestamp("dueDate", { mode: "date" }),
+        state: courseWorkState("state").notNull().default("DRAFT"),
         createdAt: timestamp("createdAt", { mode: "date" })
             .notNull()
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),

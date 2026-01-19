@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import { Loading } from "~/components/loading"
+import { Button } from "~/components/ui/button"
 import { Input, Textarea } from "~/components/ui/input"
 import {
     Select,
@@ -19,7 +20,11 @@ import { translationsSchema } from "~/server/db/schema"
 import { type Course } from "../../api/classroom/schemas"
 import { createAssignment, fetchCourses } from "./actions"
 
-export function ClientPage() {
+interface ClientPageProps {
+    initialCourseId?: string
+}
+
+export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
     const router = useRouter()
     const [courses, setCourses] = useState<Course[]>([])
     const [isLoadingCourses, setIsLoadingCourses] = useState(true)
@@ -28,7 +33,7 @@ export function ClientPage() {
     const [success, setSuccess] = useState(false)
 
     // Form state
-    const [selectedCourse, setSelectedCourse] = useState("")
+    const [selectedCourse, setSelectedCourse] = useState(initialCourseId || "")
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
     const [translation, setTranslation] = useState("esv")
@@ -42,24 +47,36 @@ export function ClientPage() {
 
     // Load courses on mount
     useEffect(() => {
-        loadCourses()
-    }, [])
+        async function loadCourses() {
+            try {
+                const result = await fetchCourses()
+                setCourses(result.courses)
 
-    async function loadCourses() {
-        try {
-            const result = await fetchCourses()
-            setCourses(result.courses)
-            if (result.courses.length > 0 && result.courses[0]) {
-                setSelectedCourse(result.courses[0].id)
+                // If initialCourseId provided, verify it exists in the courses list
+                if (initialCourseId) {
+                    const courseExists = result.courses.some(
+                        c => c.id === initialCourseId,
+                    )
+                    if (courseExists) {
+                        setSelectedCourse(initialCourseId)
+                    } else if (result.courses.length > 0 && result.courses[0]) {
+                        // Fall back to first course if initialCourseId invalid
+                        setSelectedCourse(result.courses[0].id)
+                    }
+                } else if (result.courses.length > 0 && result.courses[0]) {
+                    // No initialCourseId - use first course
+                    setSelectedCourse(result.courses[0].id)
+                }
+            } catch (_err) {
+                setError(
+                    "Failed to load courses. Please connect Google Classroom first.",
+                )
+            } finally {
+                setIsLoadingCourses(false)
             }
-        } catch (_err) {
-            setError(
-                "Failed to load courses. Please connect Google Classroom first.",
-            )
-        } finally {
-            setIsLoadingCourses(false)
         }
-    }
+        loadCourses()
+    }, [initialCourseId])
 
     // Update title when passage changes
     useEffect(() => {
@@ -93,7 +110,7 @@ export function ClientPage() {
             // Redirect to dashboard after a moment
             setTimeout(() => {
                 router.push("/classroom/dashboard")
-            }, 2000)
+            }, 5000)
         } catch (err) {
             setError(
                 err instanceof Error
@@ -147,7 +164,7 @@ export function ClientPage() {
                     )}
 
                     {success && (
-                        <div className="not-prose flex items-start gap-3 border-2 border-success bg-secondary p-4">
+                        <div className="not-prose mb-8 flex items-start gap-3 border-2 border-success bg-secondary p-4">
                             <svg
                                 className="mt-0.5 h-5 w-5 flex-shrink-0 text-success"
                                 fill="none"
@@ -347,7 +364,6 @@ export function ClientPage() {
                             </div>
                         </div>
 
-                        {/* Assignment Details */}
                         <div>
                             <label htmlFor="title" className="mb-2 block">
                                 Assignment Title
@@ -410,15 +426,13 @@ export function ClientPage() {
 
                         {/* Action Buttons */}
                         <div className="flex justify-end gap-3 border-t-2 border-primary pt-6">
-                            <button
+                            <Button
                                 type="submit"
-                                disabled={isCreating || success}
-                                className="svg-outline relative border-2 border-primary bg-secondary px-3 py-1 font-semibold disabled:opacity-50"
+                                isLoading={isCreating || success}
+                                loadingLabel="Creating"
                             >
-                                {isCreating
-                                    ? "Creating..."
-                                    : "Create Assignment"}
-                            </button>
+                                Create Assignment
+                            </Button>
                             <a
                                 href="/classroom"
                                 className="svg-outline relative border-2 border-primary bg-secondary px-3 py-1 font-semibold no-underline"

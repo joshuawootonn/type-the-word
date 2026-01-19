@@ -229,8 +229,10 @@ describe("POST /api/classroom/assignments", () => {
             startVerse: 1,
             endChapter: 1,
             endVerse: 5,
+            totalVerses: 5,
             maxPoints: 100,
             dueDate: null,
+            state: "DRAFT",
             createdAt: new Date(),
             updatedAt: new Date(),
         })
@@ -283,8 +285,10 @@ describe("POST /api/classroom/assignments", () => {
             startVerse: 1,
             endChapter: 1,
             endVerse: 5,
+            totalVerses: 5,
             maxPoints: 100,
             dueDate: null,
+            state: "DRAFT",
             createdAt: new Date(),
             updatedAt: new Date(),
         })

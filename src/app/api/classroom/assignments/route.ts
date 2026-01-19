@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth"
+import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 import { ZodError } from "zod"
 
@@ -96,31 +97,46 @@ export async function POST(request: NextRequest) {
         const passageRef = `${data.book} ${data.startChapter}:${data.startVerse}-${data.endChapter}:${data.endVerse}`
 
         // Parse due date and time if provided
-        // Set time to end of day (11:59 PM) for all assignments
+        // Set time to end of day (11:59 PM) in teacher's timezone
         let dueDateObj: { year: number; month: number; day: number } | undefined
         let dueTimeObj: { hours: number; minutes: number } | undefined
 
         if (data.dueDate) {
+            // Get teacher's timezone offset from cookie (in minutes)
+            const cookieStore = await cookies()
+            const timezoneOffset = parseInt(
+                cookieStore.get("timezoneOffset")?.value ?? "0",
+            )
+
             // Parse date (format: "YYYY-MM-DD")
-            const [year, month, day] = data.dueDate.split("-").map(Number)
+            // Create date at 11:59 PM in teacher's local timezone
+            const localDate = new Date(data.dueDate + "T23:59:00")
+
+            // Adjust for timezone offset to get UTC time
+            // getTimezoneOffset() returns positive for behind UTC
+            // e.g., UTC-6 returns 360 minutes
+            const utcDate = new Date(
+                localDate.getTime() + timezoneOffset * 60 * 1000,
+            )
+
             dueDateObj = {
-                year: year!,
-                month: month!,
-                day: day!,
+                year: utcDate.getFullYear(),
+                month: utcDate.getMonth() + 1,
+                day: utcDate.getDate(),
             }
-            // Set to 11:59 PM (end of day)
             dueTimeObj = {
-                hours: 23,
-                minutes: 59,
+                hours: utcDate.getHours(),
+                minutes: utcDate.getMinutes(),
             }
         }
 
-        // Create CourseWork in Google Classroom first
+        // Create CourseWork in Google Classroom as DRAFT
         const courseWork = await createCourseWork(accessToken, data.courseId, {
             title: data.title,
             description:
                 data.description || `Type ${passageRef} (${data.translation})`,
             workType: "ASSIGNMENT",
+            state: "DRAFT",
             maxPoints: data.maxPoints,
             dueDate: dueDateObj,
             dueTime: dueTimeObj,
@@ -134,7 +150,7 @@ export async function POST(request: NextRequest) {
             ],
         })
 
-        // Create assignment record in our database
+        // Create assignment record in our database as DRAFT
         const assignment = await createAssignment({
             teacherUserId: session.user.id,
             courseId: data.courseId,
@@ -147,8 +163,10 @@ export async function POST(request: NextRequest) {
             startVerse: data.startVerse,
             endChapter: data.endChapter,
             endVerse: data.endVerse,
+            totalVerses,
             maxPoints: data.maxPoints,
             dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+            state: "DRAFT",
         })
 
         // TODO: Update the CourseWork link to point to the actual assignment
