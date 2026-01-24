@@ -2370,3 +2370,189 @@ describe("Luke 10:27 NASB - Punct+quote merging", () => {
         expect(lastLetter).toBe(" ")
     })
 })
+
+// ============================================================================
+// REVELATION 4:11 NASB - LIST ITEM MERGED (lim class)
+// ============================================================================
+describe("Revelation 4:11 NASB - lim class paragraph", () => {
+    const nasbRev4Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            "src/server/api-bible/responses/nasb/revelation_4.html",
+        ),
+        "utf8",
+    )
+
+    test.concurrent("parses Revelation 4 successfully", () => {
+        const result = cachedParseApiBibleChapter(nasbRev4Html, "nasb")
+        expect(result.nodes.length).toBeGreaterThan(0)
+        expect(result.firstVerse.book).toBe("revelation")
+        expect(result.firstVerse.chapter).toBe(4)
+    })
+
+    test.concurrent("parses all 11 verses", () => {
+        const result = cachedParseApiBibleChapter(nasbRev4Html, "nasb")
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+
+        const verseNumbers = new Set<number>()
+        for (const p of paragraphs) {
+            for (const v of p.nodes) {
+                verseNumbers.add(v.verse.verse)
+            }
+        }
+
+        expect(verseNumbers.size).toBe(11)
+        for (let i = 1; i <= 11; i++) {
+            expect(verseNumbers.has(i)).toBe(true)
+        }
+    })
+
+    test.concurrent("verse 11 exists and has content", () => {
+        const result = cachedParseApiBibleChapter(nasbRev4Html, "nasb")
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+
+        const verse11 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 11),
+        )
+
+        expect(verse11.length).toBeGreaterThan(0)
+        const verse11Text = verse11.map(v => v.text).join("")
+
+        // Verse 11 content: "Worthy are You, our Lord and our God..."
+        expect(verse11Text).toContain("Worthy")
+        expect(verse11Text).toContain("Lord")
+        expect(verse11Text).toContain("God")
+        expect(verse11Text).toContain("created")
+    })
+
+    test.concurrent("verse 11 has typeable words", () => {
+        const result = cachedParseApiBibleChapter(nasbRev4Html, "nasb")
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+
+        const verse11 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 11),
+        )
+
+        const words = verse11.flatMap(v =>
+            v.nodes.filter((n): n is Word => n.type === "word"),
+        )
+
+        expect(words.length).toBeGreaterThan(10) // verse 11 has many words
+    })
+})
+
+// ============================================================================
+// REVELATION 7:5-8 NASB - LIST ITEM MERGED (lim class)
+// ============================================================================
+describe("Revelation 7:5-8 NASB - lim class paragraphs", () => {
+    const nasbRev7Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            "src/server/api-bible/responses/nasb/revelation_7.html",
+        ),
+        "utf8",
+    )
+
+    test.concurrent("parses Revelation 7 successfully", () => {
+        const result = cachedParseApiBibleChapter(nasbRev7Html, "nasb")
+        expect(result.nodes.length).toBeGreaterThan(0)
+        expect(result.firstVerse.book).toBe("revelation")
+        expect(result.firstVerse.chapter).toBe(7)
+    })
+
+    test.concurrent("parses all 17 verses", () => {
+        const result = cachedParseApiBibleChapter(nasbRev7Html, "nasb")
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+
+        const verseNumbers = new Set<number>()
+        for (const p of paragraphs) {
+            for (const v of p.nodes) {
+                verseNumbers.add(v.verse.verse)
+            }
+        }
+
+        expect(verseNumbers.size).toBe(17)
+        for (let i = 1; i <= 17; i++) {
+            expect(verseNumbers.has(i)).toBe(true)
+        }
+    })
+
+    test.concurrent("verses 5-8 exist and have content (lim class)", () => {
+        const result = cachedParseApiBibleChapter(nasbRev7Html, "nasb")
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+
+        for (const verseNum of [5, 6, 7, 8]) {
+            const verse = paragraphs.flatMap(p =>
+                p.nodes.filter(v => v.verse.verse === verseNum),
+            )
+
+            expect(verse.length).toBeGreaterThan(0)
+            const verseText = verse.map(v => v.text).join("")
+
+            // Each verse mentions "tribe" and "twelve thousand"
+            expect(verseText).toContain("tribe")
+            expect(verseText).toContain("twelve")
+        }
+    })
+
+    test.concurrent("verse 5 mentions Judah, Reuben, Gad", () => {
+        const result = cachedParseApiBibleChapter(nasbRev7Html, "nasb")
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+
+        const verse5 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 5),
+        )
+        const verse5Text = verse5.map(v => v.text).join("")
+
+        expect(verse5Text).toContain("Judah")
+        expect(verse5Text).toContain("Reuben")
+        expect(verse5Text).toContain("Gad")
+    })
+
+    test.concurrent("verse 8 mentions Zebulun, Joseph, Benjamin", () => {
+        const result = cachedParseApiBibleChapter(nasbRev7Html, "nasb")
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+
+        const verse8 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 8),
+        )
+        const verse8Text = verse8.map(v => v.text).join("")
+
+        expect(verse8Text).toContain("Zebulun")
+        expect(verse8Text).toContain("Joseph")
+        expect(verse8Text).toContain("Benjamin")
+    })
+
+    test.concurrent("verses 5-8 have typeable words", () => {
+        const result = cachedParseApiBibleChapter(nasbRev7Html, "nasb")
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+
+        for (const verseNum of [5, 6, 7, 8]) {
+            const verse = paragraphs.flatMap(p =>
+                p.nodes.filter(v => v.verse.verse === verseNum),
+            )
+
+            const words = verse.flatMap(v =>
+                v.nodes.filter((n): n is Word => n.type === "word"),
+            )
+
+            expect(words.length).toBeGreaterThan(5)
+        }
+    })
+})

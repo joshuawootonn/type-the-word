@@ -10,9 +10,12 @@ import { env } from "~/env.mjs"
 import { bookToApiBibleId } from "~/lib/api-bible-book-id"
 import { API_BIBLE_IDS, ApiBibleTranslation } from "~/lib/api-bible-ids"
 
-const TRANSLATION: ApiBibleTranslation = "nasb"
-const BOOK: keyof typeof bookToApiBibleId = "luke"
-const CHAPTER = 19
+// Default values - override via environment or command line args
+const TRANSLATION: ApiBibleTranslation =
+    (process.argv[2] as ApiBibleTranslation) || "nasb"
+const BOOK: keyof typeof bookToApiBibleId =
+    (process.argv[3] as keyof typeof bookToApiBibleId) || "revelation"
+const CHAPTER = parseInt(process.argv[4] || "4", 10)
 
 const apiBibleResponseSchema = z.object({
     data: z.object({

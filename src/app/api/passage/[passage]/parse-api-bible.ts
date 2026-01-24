@@ -561,6 +561,7 @@ export function parseApiBibleChapter(
             hasClass(node, "lh") || // List header (NIV)
             hasClass(node, "li1") ||
             hasClass(node, "li2") ||
+            hasClass(node, "lim") || // List item merged (NASB Revelation lists)
             hasClass(node, "qm1") ||
             hasClass(node, "qm2") ||
             hasClass(node, "mi") ||
