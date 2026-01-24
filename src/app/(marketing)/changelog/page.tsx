@@ -68,6 +68,13 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date("01/23/2026")} /> - Fixed
+                    missing verses in NASB Revelation chapters. Revelation 4:11
+                    and Revelation 7:5-8 were not being parsed because they use
+                    a &quot;list item merged&quot; paragraph format that
+                    wasn&apos;t recognized by the parser.
+                </li>
+                <li>
                     <DateComponent date={new Date("01/15/2026")} /> - Improved
                     the &quot;typed&quot; indicator line on passages. If you
                     type through consecutive verses, the left-side line is now
