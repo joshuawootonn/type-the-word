@@ -16,7 +16,6 @@ const STUDENT_SCOPES = [
     "email",
     "profile",
     "https://www.googleapis.com/auth/classroom.coursework.me",
-    "https://www.googleapis.com/auth/classroom.student-submissions.me",
 ]
 
 // Zod schemas for return types
