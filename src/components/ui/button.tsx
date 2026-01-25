@@ -63,8 +63,8 @@ const Button = forwardRef<ElementRef<typeof BaseButton>, ButtonProps>(
             >
                 {isLoading ? (
                     <Loading
+                        className="text-md font-medium"
                         initialDots={1}
-                        className="text-sm font-normal"
                         label={loadingLabel}
                     />
                 ) : (

@@ -2,6 +2,7 @@ import { Analytics } from "@vercel/analytics/react"
 import clsx from "clsx"
 import { Metadata } from "next"
 import { getServerSession } from "next-auth"
+import { cookies } from "next/headers"
 
 import { Footer } from "~/components/footer"
 import { Navigation } from "~/components/navigation/navigation"
@@ -65,6 +66,12 @@ export default async function RootLayout({
         })
     }
 
+    // Check if user has teacher or student Classroom token (via cookies)
+    const cookieStore = await cookies()
+    const hasClassroomAccess =
+        cookieStore.has("classroomTeacher") ||
+        cookieStore.has("classroomStudent")
+
     // added suppressHydrationWarning since `ThemeScript` adds classes to `html` onload
     return (
         <html lang="en" suppressHydrationWarning>
@@ -97,6 +104,7 @@ export default async function RootLayout({
                             userThemes={userThemes}
                             builtinThemes={builtinThemes}
                             lastTranslation={lastTranslation}
+                            hasClassroomAccess={hasClassroomAccess}
                         />
                         {children}
                         <Footer />

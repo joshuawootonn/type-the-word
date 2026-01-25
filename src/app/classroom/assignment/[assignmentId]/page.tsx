@@ -1,8 +1,8 @@
 import { getServerSession } from "next-auth"
-import Link from "next/link"
 
 import { getAssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
 import { getOrCreateTypingSession } from "~/app/api/typing-session/getOrCreateTypingSession"
+import { Link } from "~/components/ui/link"
 import { fetchPassage } from "~/lib/api"
 import { passageSegmentSchema } from "~/lib/passageSegment"
 import toProperCase from "~/lib/toProperCase"
@@ -75,7 +75,6 @@ export default async function ClassroomAssignmentPage({ params }: PageProps) {
                 <p>Please sign in to start this assignment.</p>
                 <Link
                     href={`/auth/login?callbackUrl=%2Fclassroom%2Fassignment%2F${encodeURIComponent(assignmentId)}`}
-                    className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold no-underline"
                 >
                     Log in
                 </Link>
@@ -90,12 +89,7 @@ export default async function ClassroomAssignmentPage({ params }: PageProps) {
             <div>
                 <h1>Assignment Not Found</h1>
                 <p>This assignment could not be found.</p>
-                <Link
-                    href="/"
-                    className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold no-underline"
-                >
-                    Back Home
-                </Link>
+                <Link href="/">Back home</Link>
             </div>
         )
     }
@@ -159,12 +153,7 @@ export default async function ClassroomAssignmentPage({ params }: PageProps) {
                         Please connect your student Google Classroom account
                         before starting this assignment.
                     </p>
-                    <Link
-                        href="/classroom"
-                        className="svg-outline relative mt-4 inline-block border-2 border-primary px-3 py-1 font-semibold no-underline"
-                    >
-                        Connect Student Account
-                    </Link>
+                    <Link href="/classroom">Connect Student Account</Link>
                 </div>
             </div>
         )

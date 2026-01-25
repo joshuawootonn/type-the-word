@@ -5,6 +5,7 @@ import { Session } from "next-auth"
 import { SessionProvider } from "next-auth/react"
 import { ReactNode } from "react"
 
+import { ClassroomCookieSync } from "~/components/classroom-cookie-sync"
 import { useSoliDeoGloria } from "~/components/use-soli-deo-gloria"
 import { useTimezoneOffsetCookie } from "~/components/use-time-zone-offset-cookie"
 import { BuiltinThemeRecord } from "~/server/repositories/builtinTheme.repository"
@@ -45,6 +46,7 @@ export function Providers({
                     >
                         {children}
                     </ThemeProvider>
+                    <ClassroomCookieSync />
                 </SessionProvider>
             </QueryClientProvider>
         </PostHogProvider>

@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth"
+import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 
 import { authOptions } from "~/server/auth"
@@ -19,6 +20,11 @@ export async function POST() {
 
     try {
         await deleteStudentToken(session.user.id)
+
+        // Delete student cookie
+        const cookieStore = await cookies()
+        cookieStore.delete("classroomStudent")
+
         const response: DisconnectResponse = { success: true }
         return NextResponse.json(response)
     } catch (error) {

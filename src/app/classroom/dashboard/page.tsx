@@ -13,7 +13,7 @@ export default async function DashboardPage() {
         return (
             <div>
                 <h1>Dashboard</h1>
-                <p>Please sign in to view your dashboard.</p>
+                <p>Sign in to view your dashboard.</p>
                 <Link href="/auth/login?callbackUrl=%2Fclassroom%2Fdashboard">
                     Log in
                 </Link>
@@ -27,12 +27,11 @@ export default async function DashboardPage() {
         return (
             <div>
                 <h1>Dashboard</h1>
-                <div className="not-prose border-2 border-error bg-secondary p-6">
-                    <p className="text-error">
-                        Please connect your Google Classroom account first.
-                    </p>
-                    <Link href="/classroom">Connect Google Classroom</Link>
-                </div>
+                <p className="text-error">
+                    Connect yourGoogle Classroom teacher account to view the
+                    dashboard for your classes.
+                </p>
+                <Link href="/classroom">Connect as a teacher</Link>
             </div>
         )
     }

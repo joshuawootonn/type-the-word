@@ -28,12 +28,14 @@ export function Navigation({
     builtinThemes: serverRenderedBuiltinThemes,
     userThemes: serverRenderedUserThemes,
     lastTranslation: serverLastTranslation,
+    hasClassroomAccess,
     ...props
 }: {
     userThemes: UserThemeRecord[]
     builtinThemes: BuiltinThemeRecord[]
     lastTypedVerse: TypedVerse | null
     lastTranslation: Translation
+    hasClassroomAccess: boolean
 }) {
     const { data: sessionData } = useSession()
     const isRootPath = usePathname() === "/"
@@ -218,6 +220,16 @@ export function Navigation({
                                             />
                                         </Link>
                                     </DropdownMenu.Item>
+                                    {hasClassroomAccess && (
+                                        <DropdownMenu.Item asChild={true}>
+                                            <Link
+                                                className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
+                                                href={"/classroom/dashboard"}
+                                            >
+                                                Classroom
+                                            </Link>
+                                        </DropdownMenu.Item>
+                                    )}
                                     <Popover.PopoverTrigger asChild>
                                         <DropdownMenu.Item className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary">
                                             Settings

@@ -1,3 +1,4 @@
+import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 
 import { exchangeCodeForTokens } from "~/server/clients/classroom.client"
@@ -44,6 +45,15 @@ export async function GET(request: NextRequest) {
             userId: state,
             googleUserId,
             ...tokens,
+        })
+
+        // Set cookie to indicate student is connected
+        const cookieStore = await cookies()
+        cookieStore.set("classroomStudent", "true", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 60 * 60 * 24 * 365, // 1 year
         })
 
         return NextResponse.redirect(
