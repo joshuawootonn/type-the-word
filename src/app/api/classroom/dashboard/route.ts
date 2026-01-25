@@ -3,9 +3,10 @@ import { getServerSession } from "next-auth"
 import { NextRequest, NextResponse } from "next/server"
 
 import { authOptions } from "~/server/auth"
+import { getValidTeacherToken } from "~/server/classroom/teacher-token"
+import { getCourseWork } from "~/server/clients/classroom.client"
 import { db } from "~/server/db"
 import { classroomAssignment, classroomSubmission } from "~/server/db/schema"
-import { getTeacherToken } from "~/server/repositories/classroom.repository"
 
 import { type DashboardResponse } from "../schemas"
 
@@ -21,15 +22,7 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        // Check if teacher is connected
-        const token = await getTeacherToken(session.user.id)
-
-        if (!token) {
-            return NextResponse.json(
-                { error: "Google Classroom not connected" },
-                { status: 403 },
-            )
-        }
+        const token = await getValidTeacherToken(session.user.id)
 
         const searchParams = request.nextUrl.searchParams
         const courseId = searchParams.get("courseId")
@@ -87,8 +80,63 @@ export async function GET(request: NextRequest) {
             .groupBy(classroomAssignment.id)
             .orderBy(classroomAssignment.createdAt)
 
+        const courseWorkUpdates = await Promise.all(
+            assignments.map(async assignment => {
+                try {
+                    const courseWork = await getCourseWork(
+                        token.accessToken,
+                        assignment.courseId,
+                        assignment.courseWorkId,
+                    )
+
+                    let dueDate: Date | null = null
+                    if (courseWork.dueDate) {
+                        const hours = courseWork.dueTime?.hours ?? 23
+                        const minutes = courseWork.dueTime?.minutes ?? 59
+                        dueDate = new Date(
+                            courseWork.dueDate.year,
+                            courseWork.dueDate.month - 1,
+                            courseWork.dueDate.day,
+                            hours,
+                            minutes,
+                        )
+                    }
+
+                    const nextState =
+                        courseWork.state === "DRAFT" ||
+                        courseWork.state === "PUBLISHED" ||
+                        courseWork.state === "DELETED"
+                            ? courseWork.state
+                            : assignment.state
+
+                    if (
+                        nextState !== assignment.state ||
+                        (dueDate &&
+                            assignment.dueDate?.getTime() !== dueDate.getTime())
+                    ) {
+                        await db
+                            .update(classroomAssignment)
+                            .set({
+                                state: nextState,
+                                dueDate: dueDate ?? assignment.dueDate,
+                                updatedAt: new Date(),
+                            })
+                            .where(eq(classroomAssignment.id, assignment.id))
+                    }
+
+                    return {
+                        ...assignment,
+                        state: nextState,
+                        dueDate: dueDate ?? assignment.dueDate,
+                    }
+                } catch (_error) {
+                    return assignment
+                }
+            }),
+        )
+
         const response: DashboardResponse = {
-            assignments: assignments.map(a => ({
+            assignments: courseWorkUpdates.map(a => ({
                 ...a,
                 dueDate: a.dueDate ? a.dueDate.toISOString() : null,
             })),

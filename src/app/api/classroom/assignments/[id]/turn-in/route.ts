@@ -1,18 +1,26 @@
+import { and, eq } from "drizzle-orm"
 import { getServerSession } from "next-auth"
 import { NextRequest, NextResponse } from "next/server"
 
+import { calculateStatsForVerse } from "~/app/history/wpm"
+import { env } from "~/env.mjs"
 import { authOptions } from "~/server/auth"
 import { getValidStudentToken } from "~/server/classroom/student-token"
 import { getValidTeacherToken } from "~/server/classroom/teacher-token"
 import {
+    addSubmissionLinkAttachment,
     getStudent,
     getStudentSubmission,
+    updateDraftGrade,
     turnInSubmission,
 } from "~/server/clients/classroom.client"
+import { db } from "~/server/db"
+import { typedVerses } from "~/server/db/schema"
 import {
     getAssignment,
     getOrCreateSubmission,
     getSubmissionByStudent,
+    updateSubmissionProgress,
     markSubmissionTurnedIn,
 } from "~/server/repositories/classroom.repository"
 
@@ -102,6 +110,79 @@ export async function POST(
 
         if (submissionRecord?.isTurnedIn === 1) {
             return NextResponse.json({ success: true })
+        }
+
+        const verseRows = await db.query.typedVerses.findMany({
+            where: and(
+                eq(typedVerses.userId, session.user.id),
+                eq(typedVerses.classroomAssignmentId, assignment.id),
+            ),
+        })
+        const latestVerseMap = new Map<string, (typeof verseRows)[number]>()
+        verseRows.forEach(row => {
+            const key = `${row.chapter}:${row.verse}`
+            const existing = latestVerseMap.get(key)
+            if (!existing || row.createdAt > existing.createdAt) {
+                latestVerseMap.set(key, row)
+            }
+        })
+
+        const completedVerses = latestVerseMap.size
+        const completionPercentage =
+            assignment.totalVerses > 0
+                ? completedVerses / assignment.totalVerses
+                : 0
+        const draftGrade = Math.round(
+            assignment.maxPoints * completionPercentage,
+        )
+        const stats = Array.from(latestVerseMap.values())
+            .map(row => calculateStatsForVerse(row))
+            .filter(
+                (value): value is NonNullable<typeof value> => value != null,
+            )
+        const averageWpm =
+            stats.length > 0
+                ? Math.round(
+                      stats.reduce((sum, stat) => sum + stat.wpm, 0) /
+                          stats.length,
+                  )
+                : undefined
+        const averageAccuracy =
+            stats.length > 0
+                ? Math.round(
+                      stats.reduce((sum, stat) => sum + stat.accuracy, 0) /
+                          stats.length,
+                  )
+                : undefined
+
+        if (submissionRecord) {
+            await updateSubmissionProgress(submissionRecord.id, {
+                completedVerses,
+                averageWpm,
+                averageAccuracy,
+                isCompleted: completedVerses >= assignment.totalVerses,
+                grade: draftGrade,
+            })
+        }
+
+        await updateDraftGrade(
+            teacherAccessToken,
+            assignment.courseId,
+            assignment.courseWorkId,
+            submissionId,
+            draftGrade,
+        )
+
+        if (averageWpm != null && averageAccuracy != null) {
+            await addSubmissionLinkAttachment(
+                studentAccessToken,
+                assignment.courseId,
+                assignment.courseWorkId,
+                submissionId,
+                {
+                    url: `${env.DEPLOYED_URL}/classroom/${assignment.courseId}/assignment/${assignment.id}`,
+                },
+            )
         }
 
         await turnInSubmission(

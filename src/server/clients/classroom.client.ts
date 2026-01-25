@@ -9,7 +9,6 @@ const SCOPES = [
     "https://www.googleapis.com/auth/classroom.coursework.students",
     "https://www.googleapis.com/auth/classroom.rosters.readonly",
     "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
-    "https://www.googleapis.com/auth/classroom.student-submissions.students",
 ]
 
 const STUDENT_SCOPES = [
@@ -17,6 +16,7 @@ const STUDENT_SCOPES = [
     "email",
     "profile",
     "https://www.googleapis.com/auth/classroom.coursework.me",
+    "https://www.googleapis.com/auth/classroom.student-submissions.me",
 ]
 
 // Zod schemas for return types
@@ -63,6 +63,10 @@ const courseWorkSchema = z.object({
     state: z.string().optional(),
     alternateLink: z.string().optional(),
     maxPoints: z.number().optional(),
+    dueDate: z
+        .object({ year: z.number(), month: z.number(), day: z.number() })
+        .optional(),
+    dueTime: z.object({ hours: z.number(), minutes: z.number() }).optional(),
 })
 
 const submissionSchema = z.object({
@@ -84,6 +88,10 @@ const turnInResponseSchema = z.object({
     success: z.literal(true),
 })
 
+const modifyAttachmentsResponseSchema = z.object({
+    id: z.string(),
+})
+
 // Export types inferred from schemas
 export type TokenResponse = z.infer<typeof tokenResponseSchema>
 export type RefreshTokenResponse = z.infer<typeof refreshTokenResponseSchema>
@@ -93,6 +101,9 @@ export type CourseWork = z.infer<typeof courseWorkSchema>
 export type Submission = z.infer<typeof submissionSchema>
 export type DraftGradeResponse = z.infer<typeof draftGradeResponseSchema>
 export type TurnInResponse = z.infer<typeof turnInResponseSchema>
+export type ModifyAttachmentsResponse = z.infer<
+    typeof modifyAttachmentsResponseSchema
+>
 
 /**
  * Creates an OAuth2 client for Google Classroom API
@@ -330,6 +341,8 @@ export async function createCourseWork(
         state: response.data.state,
         alternateLink: response.data.alternateLink,
         maxPoints: response.data.maxPoints,
+        dueDate: response.data.dueDate,
+        dueTime: response.data.dueTime,
     }
 
     return courseWorkSchema.parse(result)
@@ -426,6 +439,41 @@ export async function turnInSubmission(
 }
 
 /**
+ * Adds a link attachment to a student submission
+ */
+export async function addSubmissionLinkAttachment(
+    accessToken: string,
+    courseId: string,
+    courseWorkId: string,
+    submissionId: string,
+    link: { url: string },
+): Promise<ModifyAttachmentsResponse> {
+    const classroom = createClassroomClient(accessToken)
+
+    const response =
+        await classroom.courses.courseWork.studentSubmissions.modifyAttachments(
+            {
+                courseId,
+                courseWorkId,
+                id: submissionId,
+                requestBody: {
+                    addAttachments: [
+                        {
+                            link: { url: link.url },
+                        },
+                    ],
+                },
+            },
+        )
+
+    const result = {
+        id: response.data.id!,
+    }
+
+    return modifyAttachmentsResponseSchema.parse(result)
+}
+
+/**
  * Updates the state of a CourseWork (e.g., from DRAFT to PUBLISHED)
  */
 export async function updateCourseWorkState(
@@ -453,6 +501,38 @@ export async function updateCourseWorkState(
         state: response.data.state,
         alternateLink: response.data.alternateLink,
         maxPoints: response.data.maxPoints,
+        dueDate: response.data.dueDate,
+        dueTime: response.data.dueTime,
+    }
+
+    return courseWorkSchema.parse(result)
+}
+
+/**
+ * Gets a CourseWork from Google Classroom
+ */
+export async function getCourseWork(
+    accessToken: string,
+    courseId: string,
+    courseWorkId: string,
+): Promise<CourseWork> {
+    const classroom = createClassroomClient(accessToken)
+
+    const response = await classroom.courses.courseWork.get({
+        courseId,
+        id: courseWorkId,
+    })
+
+    const result = {
+        id: response.data.id!,
+        courseId: response.data.courseId!,
+        title: response.data.title!,
+        description: response.data.description,
+        state: response.data.state,
+        alternateLink: response.data.alternateLink,
+        maxPoints: response.data.maxPoints,
+        dueDate: response.data.dueDate,
+        dueTime: response.data.dueTime,
     }
 
     return courseWorkSchema.parse(result)
