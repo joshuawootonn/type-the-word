@@ -80,6 +80,13 @@ export function Footer() {
                     >
                         why?
                     </Link>
+                    <div>/</div>
+                    <Link
+                        className="svg-outline relative no-underline"
+                        href={"/classroom"}
+                    >
+                        classroom
+                    </Link>
                 </div>
                 <div className="hidden flex-grow md:block"> </div>
                 {/* <div className="block md:hidden">/</div> */}
