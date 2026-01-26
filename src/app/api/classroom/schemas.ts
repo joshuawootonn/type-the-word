@@ -107,6 +107,9 @@ export const assignmentSchema = z.object({
 
 export const dashboardResponseSchema = z.object({
     assignments: z.array(assignmentSchema),
+    total: z.number(),
+    hasMore: z.boolean(),
+    startingAfter: z.number().nullable(),
 })
 
 export type Assignment = z.infer<typeof assignmentSchema>

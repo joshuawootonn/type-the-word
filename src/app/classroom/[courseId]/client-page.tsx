@@ -1,7 +1,8 @@
 "use client"
 
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query"
 import NextLink from "next/link"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useState } from "react"
 
 import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
@@ -17,55 +18,85 @@ interface ClientPageProps {
 }
 
 export function ClientPage({ courseId, courseName }: ClientPageProps) {
-    const [assignments, setAssignments] = useState<Assignment[]>([])
-    const [isLoading, setIsLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
     const [publishingId, setPublishingId] = useState<string | null>(null)
+    const queryClient = useQueryClient()
 
-    const loadAssignments = useCallback(async () => {
-        try {
-            const result = await fetchCourseAssignments(courseId)
-            setAssignments(result.assignments)
-        } catch (_err) {
-            setError("Failed to load assignments")
-        } finally {
-            setIsLoading(false)
-        }
-    }, [courseId])
+    // Three separate infinite queries for each status
+    const currentQuery = useInfiniteQuery({
+        queryKey: ["assignments", courseId, "current"],
+        queryFn: ({ pageParam = 0 }) =>
+            fetchCourseAssignments({
+                courseId,
+                status: "current",
+                startingAfter: pageParam,
+            }),
+        getNextPageParam: lastPage =>
+            lastPage.hasMore ? lastPage.startingAfter : undefined,
+        initialPageParam: 0,
+    })
 
-    useEffect(() => {
-        void loadAssignments()
-    }, [loadAssignments])
+    const draftQuery = useInfiniteQuery({
+        queryKey: ["assignments", courseId, "draft"],
+        queryFn: ({ pageParam = 0 }) =>
+            fetchCourseAssignments({
+                courseId,
+                status: "draft",
+                startingAfter: pageParam,
+            }),
+        getNextPageParam: lastPage =>
+            lastPage.hasMore ? lastPage.startingAfter : undefined,
+        initialPageParam: 0,
+    })
+
+    const archivedQuery = useInfiniteQuery({
+        queryKey: ["assignments", courseId, "archived"],
+        queryFn: ({ pageParam = 0 }) =>
+            fetchCourseAssignments({
+                courseId,
+                status: "archived",
+                startingAfter: pageParam,
+            }),
+        getNextPageParam: lastPage =>
+            lastPage.hasMore ? lastPage.startingAfter : undefined,
+        initialPageParam: 0,
+    })
 
     const handlePublish = useCallback(
         async (assignmentId: string) => {
             setPublishingId(assignmentId)
             try {
                 await publishAssignment(assignmentId)
-                // Reload assignments to reflect new state
-                await loadAssignments()
+                // Invalidate all queries to refetch
+                await queryClient.invalidateQueries({
+                    queryKey: ["assignments", courseId],
+                })
             } catch (_err) {
-                setError("Failed to publish assignment")
+                // Error handling
             } finally {
                 setPublishingId(null)
             }
         },
-        [loadAssignments],
+        [courseId, queryClient],
     )
 
-    // Group assignments by state
-    const now = new Date()
-    const currentAssignments = assignments.filter(
-        a =>
-            a.state === "PUBLISHED" &&
-            (!a.dueDate || new Date(a.dueDate) >= now),
-    )
-    const draftAssignments = assignments.filter(a => a.state === "DRAFT")
-    const completedAssignments = assignments.filter(
-        a => a.state === "PUBLISHED" && a.dueDate && new Date(a.dueDate) < now,
-    )
-    const deletedAssignments = assignments.filter(a => a.state === "DELETED")
-    const archivedAssignments = [...completedAssignments, ...deletedAssignments]
+    // Extract assignments from pages
+    const currentAssignments =
+        currentQuery.data?.pages.flatMap(page => page.assignments) ?? []
+    const draftAssignments =
+        draftQuery.data?.pages.flatMap(page => page.assignments) ?? []
+    const archivedAssignments =
+        archivedQuery.data?.pages.flatMap(page => page.assignments) ?? []
+
+    const isInitialLoading =
+        currentQuery.isLoading ||
+        draftQuery.isLoading ||
+        archivedQuery.isLoading
+    const hasError =
+        currentQuery.error || draftQuery.error || archivedQuery.error
+    const totalAssignments =
+        currentAssignments.length +
+        draftAssignments.length +
+        archivedAssignments.length
 
     return (
         <div>
@@ -85,13 +116,13 @@ export function ClientPage({ courseId, courseName }: ClientPageProps) {
 
             <h1 className="">{courseName}</h1>
 
-            {isLoading ? (
+            {isInitialLoading ? (
                 <Loading />
-            ) : error ? (
+            ) : hasError ? (
                 <div className="not-prose border-2 border-error bg-secondary p-6">
-                    <p className="text-error">{error}</p>
+                    <p className="text-error">Failed to load assignments</p>
                 </div>
-            ) : assignments.length === 0 ? (
+            ) : totalAssignments === 0 ? (
                 <div className="not-prose">
                     <p>No assignments yet.</p>
                     <Link
@@ -118,6 +149,16 @@ export function ClientPage({ courseId, courseName }: ClientPageProps) {
                                     />
                                 ))}
                             </div>
+                            {currentQuery.hasNextPage && (
+                                <Button
+                                    onClick={() => currentQuery.fetchNextPage()}
+                                    isLoading={currentQuery.isFetchingNextPage}
+                                    loadingLabel="Loading"
+                                    className="mt-3 w-full"
+                                >
+                                    Load More
+                                </Button>
+                            )}
                         </section>
                     )}
 
@@ -140,6 +181,16 @@ export function ClientPage({ courseId, courseName }: ClientPageProps) {
                                     />
                                 ))}
                             </div>
+                            {draftQuery.hasNextPage && (
+                                <Button
+                                    onClick={() => draftQuery.fetchNextPage()}
+                                    isLoading={draftQuery.isFetchingNextPage}
+                                    loadingLabel="Loading"
+                                    className="mt-3 w-full"
+                                >
+                                    Load More
+                                </Button>
+                            )}
                         </section>
                     )}
 
@@ -159,6 +210,18 @@ export function ClientPage({ courseId, courseName }: ClientPageProps) {
                                     />
                                 ))}
                             </div>
+                            {archivedQuery.hasNextPage && (
+                                <Button
+                                    onClick={() =>
+                                        archivedQuery.fetchNextPage()
+                                    }
+                                    isLoading={archivedQuery.isFetchingNextPage}
+                                    loadingLabel="Loading"
+                                    className="mt-3 w-full"
+                                >
+                                    Load More
+                                </Button>
+                            )}
                         </details>
                     )}
                 </div>

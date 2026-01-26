@@ -26,6 +26,7 @@ function createTypedVerse(typingData: TypingData): TypedVerse {
         id: "test-id",
         userId: "test-user",
         typingSessionId: "test-session",
+        classroomAssignmentId: null,
         translation: "esv",
         book: "genesis",
         chapter: 1,

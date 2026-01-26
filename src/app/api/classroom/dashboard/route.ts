@@ -26,10 +26,24 @@ export async function GET(request: NextRequest) {
 
         const searchParams = request.nextUrl.searchParams
         const courseId = searchParams.get("courseId")
+        const limit = parseInt(searchParams.get("limit") ?? "5")
+        const startingAfter = parseInt(searchParams.get("startingAfter") ?? "0")
+        const status = searchParams.get("status") as
+            | "current"
+            | "draft"
+            | "archived"
+            | null
 
         if (!courseId) {
             return NextResponse.json(
                 { error: "courseId is required" },
+                { status: 400 },
+            )
+        }
+
+        if (!status) {
+            return NextResponse.json(
+                { error: "status is required" },
                 { status: 400 },
             )
         }
@@ -80,8 +94,35 @@ export async function GET(request: NextRequest) {
             .groupBy(classroomAssignment.id)
             .orderBy(classroomAssignment.createdAt)
 
-        const courseWorkUpdates = await Promise.all(
-            assignments.map(async assignment => {
+        // Group assignments by status
+        const now = new Date()
+        const grouped = {
+            current: assignments.filter(
+                a =>
+                    a.state === "PUBLISHED" &&
+                    (!a.dueDate || new Date(a.dueDate) >= now),
+            ),
+            draft: assignments.filter(a => a.state === "DRAFT"),
+            archived: assignments.filter(
+                a =>
+                    (a.state === "PUBLISHED" &&
+                        a.dueDate &&
+                        new Date(a.dueDate) < now) ||
+                    a.state === "DELETED",
+            ),
+        }
+
+        // Get assignments for the requested status and page
+        const statusAssignments = grouped[status]
+        const offset = startingAfter * limit
+        const assignmentsToSync = statusAssignments.slice(
+            offset,
+            offset + limit,
+        )
+
+        // Sync with Google Classroom API and filter out status changes
+        const syncedAssignments = await Promise.all(
+            assignmentsToSync.map(async assignment => {
                 try {
                     const courseWork = await getCourseWork(
                         token.accessToken,
@@ -109,6 +150,7 @@ export async function GET(request: NextRequest) {
                             ? courseWork.state
                             : assignment.state
 
+                    // Update DB if state or date changed
                     if (
                         nextState !== assignment.state ||
                         (dueDate &&
@@ -135,11 +177,36 @@ export async function GET(request: NextRequest) {
             }),
         )
 
+        // Filter out assignments whose status changed after syncing
+        const filteredAssignments = syncedAssignments.filter(a => {
+            if (status === "current") {
+                return (
+                    a.state === "PUBLISHED" &&
+                    (!a.dueDate || new Date(a.dueDate) >= now)
+                )
+            } else if (status === "draft") {
+                return a.state === "DRAFT"
+            } else if (status === "archived") {
+                return (
+                    (a.state === "PUBLISHED" &&
+                        a.dueDate &&
+                        new Date(a.dueDate) < now) ||
+                    a.state === "DELETED"
+                )
+            }
+            return false
+        })
+
+        const hasMore = offset + limit < statusAssignments.length
+
         const response: DashboardResponse = {
-            assignments: courseWorkUpdates.map(a => ({
+            assignments: filteredAssignments.map(a => ({
                 ...a,
                 dueDate: a.dueDate ? a.dueDate.toISOString() : null,
             })),
+            total: statusAssignments.length,
+            hasMore,
+            startingAfter: hasMore ? startingAfter + limit : null,
         }
 
         return NextResponse.json(response)

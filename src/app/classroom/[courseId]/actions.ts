@@ -6,12 +6,27 @@ import {
 } from "~/app/api/classroom/schemas"
 
 /**
- * Fetches assignments for a specific course
+ * Fetches assignments for a specific course and status
  */
-export async function fetchCourseAssignments(courseId: string) {
-    const response = await fetch(
-        `/api/classroom/dashboard?courseId=${encodeURIComponent(courseId)}`,
-    )
+export async function fetchCourseAssignments({
+    courseId,
+    status,
+    startingAfter = 0,
+    limit = 5,
+}: {
+    courseId: string
+    status: "current" | "draft" | "archived"
+    startingAfter?: number
+    limit?: number
+}) {
+    const params = new URLSearchParams({
+        courseId,
+        status,
+        startingAfter: String(startingAfter),
+        limit: String(limit),
+    })
+
+    const response = await fetch(`/api/classroom/dashboard?${params}`)
 
     if (!response.ok) {
         const errorData = await response.json()
