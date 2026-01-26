@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth"
 
+import { ClassroomNotice } from "~/components/classroom-notice"
 import { Link } from "~/components/ui/link"
 import { authOptions } from "~/server/auth"
 import { listCourses } from "~/server/clients/classroom.client"
@@ -39,12 +40,12 @@ export default async function CoursePage({ params }: PageProps) {
         return (
             <div>
                 <h1>Dashboard</h1>
-                <div className="not-prose border-2 border-error bg-secondary p-6">
-                    <p className="text-error">
-                        Please connect your Google Classroom account first.
-                    </p>
-                    <Link href="/classroom">Connect Google Classroom</Link>
-                </div>
+                <ClassroomNotice
+                    variant="error"
+                    message="Please connect your Google Classroom account first."
+                    linkHref="/classroom"
+                    linkLabel="Connect Google Classroom"
+                />
             </div>
         )
     }

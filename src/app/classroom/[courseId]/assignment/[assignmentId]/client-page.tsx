@@ -2,13 +2,15 @@
 
 import { useCallback, useEffect, useState } from "react"
 
+import { ClassroomNotice } from "~/components/classroom-notice"
 import { Loading } from "~/components/loading"
+import { Button } from "~/components/ui/button"
 import { Link } from "~/components/ui/link"
 import { Meter } from "~/components/ui/meter"
 import toProperCase from "~/lib/toProperCase"
 
 import { type AssignmentDetail } from "../../../../api/classroom/schemas"
-import { fetchAssignmentDetail } from "./actions"
+import { fetchAssignmentDetail, publishAssignment } from "./actions"
 
 interface ClientPageProps {
     assignmentId: string
@@ -24,6 +26,8 @@ export function ClientPage({
     const [data, setData] = useState<AssignmentDetail | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [isPublishing, setIsPublishing] = useState(false)
+    const [publishError, setPublishError] = useState<string | null>(null)
 
     const loadData = useCallback(async () => {
         try {
@@ -40,20 +44,35 @@ export function ClientPage({
         void loadData()
     }, [loadData])
 
+    const handlePublish = async () => {
+        setIsPublishing(true)
+        setPublishError(null)
+
+        try {
+            await publishAssignment(assignmentId)
+            // Reload data to get updated state
+            await loadData()
+        } catch (err) {
+            setPublishError(
+                err instanceof Error ? err.message : "Failed to publish",
+            )
+        } finally {
+            setIsPublishing(false)
+        }
+    }
+
     if (isLoading) {
         return <Loading />
     }
 
     if (error || !data) {
         return (
-            <div>
-                <div className="not-prose border-2 border-error bg-secondary p-6">
-                    <p className="text-error">
-                        {error || "Assignment not found"}
-                    </p>
-                    <Link href={`/classroom/${courseId}`}>Back to Course</Link>
-                </div>
-            </div>
+            <ClassroomNotice
+                variant="error"
+                message={error || "Assignment not found"}
+                linkHref={`/classroom/${courseId}`}
+                linkLabel="Back to Course"
+            />
         )
     }
 
@@ -77,6 +96,24 @@ export function ClientPage({
 
             <h1>{assignment.title}</h1>
 
+            {/* Publish Error */}
+            {publishError && (
+                <div className="not-prose mb-6 flex items-start gap-3 border-2 border-error bg-secondary p-4">
+                    <svg
+                        className="mt-1 h-5 w-5 flex-shrink-0 text-error"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-error">{publishError}</p>
+                </div>
+            )}
+
             {/* Assignment Info */}
             <div className="not-prose mb-6 space-y-2">
                 <div>
@@ -98,6 +135,26 @@ export function ClientPage({
                     {assignment.maxPoints}
                 </div>
             </div>
+
+            {/* Publish Button for Draft Assignments */}
+            {assignment.state === "DRAFT" && (
+                <div className="mb-6 space-y-3">
+                    <Button
+                        onClick={() => {
+                            void handlePublish()
+                        }}
+                        isLoading={isPublishing}
+                        loadingLabel="Publishing"
+                        disabled={isPublishing}
+                    >
+                        Publish Assignment
+                    </Button>
+                    <p className="mt-2 text-sm opacity-75">
+                        Publishing will make this assignment visible to
+                        students.
+                    </p>
+                </div>
+            )}
 
             {/* Student Progress */}
             <div className="not-prose">

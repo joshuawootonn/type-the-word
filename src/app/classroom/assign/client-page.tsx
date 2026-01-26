@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
+import { ClassroomNotice } from "~/components/classroom-notice"
 import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
 import { Input, Textarea } from "~/components/ui/input"
@@ -80,9 +81,17 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
 
     // Update title when passage changes
     useEffect(() => {
-        const passageRef = `${book} ${startChapter}:${startVerse}-${endChapter}:${endVerse}`
-        setTitle(`Type ${passageRef} (${translation.toUpperCase()})`)
-    }, [book, startChapter, startVerse, endChapter, endVerse, translation])
+        // Format book name with proper casing
+        const bookName = toProperCase(book.split("_").join(" "))
+
+        // Shorten reference if same chapter (e.g., "51:1-10" instead of "51:1-51:10")
+        const reference =
+            startChapter === endChapter
+                ? `${startChapter}:${startVerse}-${endVerse}`
+                : `${startChapter}:${startVerse}-${endChapter}:${endVerse}`
+
+        setTitle(`${bookName} ${reference}`)
+    }, [book, startChapter, startVerse, endChapter, endVerse])
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -91,7 +100,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
         setSuccess(false)
 
         try {
-            await createAssignment({
+            const result = await createAssignment({
                 courseId: selectedCourse,
                 title,
                 description: description || undefined,
@@ -107,9 +116,11 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
 
             setSuccess(true)
 
-            // Redirect to dashboard after a moment
+            // Redirect to the created assignment after a moment
             setTimeout(() => {
-                router.push("/classroom/dashboard")
+                router.push(
+                    `/classroom/${selectedCourse}/assignment/${result.assignmentId}`,
+                )
             }, 5000)
         } catch (err) {
             setError(
@@ -129,19 +140,12 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
             {isLoadingCourses ? (
                 <Loading />
             ) : courses.length === 0 ? (
-                <div className="not-prose border-2 border-error bg-secondary p-6">
-                    <p className="text-error">
-                        No courses found. Please make sure you have active
-                        courses in Google Classroom and try reconnecting your
-                        account.
-                    </p>
-                    <a
-                        href="/classroom"
-                        className="svg-outline relative mt-4 inline-block border-2 border-primary bg-secondary px-3 py-1 font-semibold no-underline"
-                    >
-                        Back to Classroom
-                    </a>
-                </div>
+                <ClassroomNotice
+                    variant="error"
+                    message="No courses found. Please make sure you have active courses in Google Classroom and try reconnecting your account."
+                    linkHref="/classroom"
+                    linkLabel="Back to Classroom"
+                />
             ) : (
                 <>
                     {error && (
@@ -166,7 +170,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                     {success && (
                         <div className="not-prose mb-8 flex items-start gap-3 border-2 border-success bg-secondary p-4">
                             <svg
-                                className="mt-0.5 h-5 w-5 flex-shrink-0 text-success"
+                                className="h-5 w-5 flex-shrink-0 text-success"
                                 fill="none"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -177,8 +181,8 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                 <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             <div className="text-sm text-success">
-                                Assignment created successfully! Redirecting to
-                                dashboard...
+                                Assignment created in draft mode. Publish it to
+                                make it visible to students.
                             </div>
                         </div>
                     )}
@@ -428,7 +432,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                         <div className="flex justify-end gap-3 border-t-2 border-primary pt-6">
                             <Button
                                 type="submit"
-                                isLoading={isCreating || success}
+                                isLoading={isCreating}
                                 loadingLabel="Creating"
                             >
                                 Create Assignment

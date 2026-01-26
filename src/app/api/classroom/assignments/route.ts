@@ -93,8 +93,13 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // Build passage reference for title/description
-        const passageRef = `${data.book} ${data.startChapter}:${data.startVerse}-${data.endChapter}:${data.endVerse}`
+        // Build passage reference for description (if no description provided)
+        const bookName = data.book.split("_").join(" ")
+        const reference =
+            data.startChapter === data.endChapter
+                ? `${data.startChapter}:${data.startVerse}-${data.endVerse}`
+                : `${data.startChapter}:${data.startVerse}-${data.endChapter}:${data.endVerse}`
+        const passageRef = `${bookName} ${reference}`
 
         // Parse due date and time if provided
         // Set time to end of day (11:59 PM) in teacher's timezone
@@ -135,8 +140,7 @@ export async function POST(request: NextRequest) {
         // Create CourseWork in Google Classroom as DRAFT
         const courseWork = await createCourseWork(accessToken, data.courseId, {
             title: data.title,
-            description:
-                data.description || `Type ${passageRef} (${data.translation})`,
+            description: data.description || `Type ${passageRef}`,
             workType: "ASSIGNMENT",
             state: "DRAFT",
             maxPoints: data.maxPoints,

@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth"
-import Link from "next/link"
 
+import { ClassroomNotice } from "~/components/classroom-notice"
+import { Link } from "~/components/ui/link"
 import { authOptions } from "~/server/auth"
 import { getTeacherToken } from "~/server/repositories/classroom.repository"
 
@@ -20,10 +21,7 @@ export default async function AssignPage({ searchParams }: PageProps) {
             <div>
                 <h1>Create Assignment</h1>
                 <p>Please sign in to create assignments.</p>
-                <Link
-                    href="/auth/login?callbackUrl=%2Fclassroom%2Fassign"
-                    className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold no-underline"
-                >
+                <Link href="/auth/login?callbackUrl=%2Fclassroom%2Fassign">
                     Log in
                 </Link>
             </div>
@@ -35,21 +33,13 @@ export default async function AssignPage({ searchParams }: PageProps) {
 
     if (!token) {
         return (
-            <div>
-                <h1>Create Assignment</h1>
-                <div className="not-prose border-2 border-error bg-secondary p-6">
-                    <p className="mb-4 text-error">
-                        Please connect your Google Classroom account before
-                        creating assignments.
-                    </p>
-                    <Link
-                        href="/classroom"
-                        className="svg-outline relative border-2 border-primary bg-secondary px-3 py-1 font-semibold no-underline"
-                    >
-                        Connect Google Classroom
-                    </Link>
-                </div>
-            </div>
+            <ClassroomNotice
+                title="Create Assignment"
+                variant="error"
+                message="Connect your Google Classroom teacher account to create assignments for your classes."
+                linkHref="/classroom"
+                linkLabel="Connect as a teacher"
+            />
         )
     }
 

@@ -4,8 +4,8 @@ import NextLink from "next/link"
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 
+import { ClassroomNotice } from "~/components/classroom-notice"
 import { Loading } from "~/components/loading"
-import { Link } from "~/components/ui/link"
 
 import { type Course } from "../../api/classroom/schemas"
 import { fetchCourses } from "./actions"
@@ -44,19 +44,19 @@ export function ClientPage() {
             {isLoading ? (
                 <Loading />
             ) : error ? (
-                <div className="not-prose border-2 border-error bg-secondary p-6">
-                    <p className="text-error">{error}</p>
-                    <Link href="/classroom" className="mt-4">
-                        Back to Classroom
-                    </Link>
-                </div>
+                <ClassroomNotice
+                    variant="error"
+                    message={error}
+                    linkHref="/classroom"
+                    linkLabel="Back to Classroom"
+                />
             ) : courses.length === 0 ? (
-                <div className="not-prose border-2 border-primary bg-secondary p-6">
-                    <p>No courses found.</p>
-                    <Link href="/classroom" className="mt-4">
-                        Back to Classroom
-                    </Link>
-                </div>
+                <ClassroomNotice
+                    variant="notice"
+                    message="No courses found."
+                    linkHref="/classroom"
+                    linkLabel="Back to Classroom"
+                />
             ) : (
                 <div className="not-prose space-y-4">
                     <p>Select a course to view assignments:</p>

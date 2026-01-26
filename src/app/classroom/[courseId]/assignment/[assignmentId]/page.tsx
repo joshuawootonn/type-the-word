@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth"
-import Link from "next/link"
 
+import { ClassroomNotice } from "~/components/classroom-notice"
+import { Link } from "~/components/ui/link"
 import { authOptions } from "~/server/auth"
 import {
     listCourses,
@@ -41,20 +42,13 @@ export default async function AssignmentDetailPage({ params }: PageProps) {
 
     if (!tokenRecord) {
         return (
-            <div>
-                <h1>Assignment Details</h1>
-                <div className="not-prose border-2 border-error bg-secondary p-6">
-                    <p className="text-error">
-                        Please connect your Google Classroom account first.
-                    </p>
-                    <Link
-                        href="/classroom"
-                        className="svg-outline relative mt-4 inline-block border-2 border-primary bg-secondary px-3 py-1 font-semibold no-underline"
-                    >
-                        Connect Google Classroom
-                    </Link>
-                </div>
-            </div>
+            <ClassroomNotice
+                title="Assignment Details"
+                variant="error"
+                message="Please connect your Google Classroom account first."
+                linkHref="/classroom"
+                linkLabel="Connect Google Classroom"
+            />
         )
     }
 
@@ -63,19 +57,13 @@ export default async function AssignmentDetailPage({ params }: PageProps) {
 
     if (!assignment || assignment.teacherUserId !== session.user.id) {
         return (
-            <div>
-                <h1>Assignment Not Found</h1>
-                <p>
-                    This assignment could not be found or you don't have access
-                    to it.
-                </p>
-                <Link
-                    href="/classroom/dashboard"
-                    className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold no-underline"
-                >
-                    Back to Dashboard
-                </Link>
-            </div>
+            <ClassroomNotice
+                title="Assignment Not Found"
+                variant="error"
+                message="This assignment could not be found or you don't have access to it."
+                linkHref="/classroom/dashboard"
+                linkLabel="Back to Dashboard"
+            />
         )
     }
 

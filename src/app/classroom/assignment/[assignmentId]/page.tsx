@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth"
 
 import { getAssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
 import { getOrCreateTypingSession } from "~/app/api/typing-session/getOrCreateTypingSession"
+import { ClassroomNotice } from "~/components/classroom-notice"
 import { Link } from "~/components/ui/link"
 import { fetchPassage } from "~/lib/api"
 import { passageSegmentSchema } from "~/lib/passageSegment"
@@ -109,17 +110,14 @@ export default async function ClassroomAssignmentPage({ params }: PageProps) {
         endVerse: assignment.endVerse,
     })
 
+    //todo(josh): is this true
     if (!passageSegment) {
         return (
-            <div>
-                <h1>{assignment.title}</h1>
-                <div className="not-prose border-2 border-error bg-secondary p-6">
-                    <p className="text-error">
-                        This assignment spans multiple chapters, which is not
-                        supported yet.
-                    </p>
-                </div>
-            </div>
+            <ClassroomNotice
+                title={assignment.title}
+                variant="error"
+                message="This assignment spans multiple chapters, which is not supported yet."
+            />
         )
     }
 
@@ -129,14 +127,11 @@ export default async function ClassroomAssignmentPage({ params }: PageProps) {
         accessToken = tokenRecord.accessToken
     } catch (_error) {
         return (
-            <div>
-                <h1>{assignment.title}</h1>
-                <div className="not-prose border-2 border-error bg-secondary p-6">
-                    <p className="text-error">
-                        This assignment is not connected to Google Classroom.
-                    </p>
-                </div>
-            </div>
+            <ClassroomNotice
+                title={assignment.title}
+                variant="error"
+                message="This assignment is not connected to Google Classroom."
+            />
         )
     }
 
@@ -146,16 +141,13 @@ export default async function ClassroomAssignmentPage({ params }: PageProps) {
         googleUserId = studentToken.googleUserId
     } catch (_error) {
         return (
-            <div>
-                <h1>{assignment.title}</h1>
-                <div className="not-prose border-2 border-error bg-secondary p-6">
-                    <p className="text-error">
-                        Please connect your student Google Classroom account
-                        before starting this assignment.
-                    </p>
-                    <Link href="/classroom">Connect Student Account</Link>
-                </div>
-            </div>
+            <ClassroomNotice
+                title={assignment.title}
+                variant="error"
+                message="Please connect your student Google Classroom account before starting this assignment."
+                linkHref="/classroom"
+                linkLabel="Connect Student Account"
+            />
         )
     }
 
@@ -167,15 +159,11 @@ export default async function ClassroomAssignmentPage({ params }: PageProps) {
 
     if (!student) {
         return (
-            <div>
-                <h1>{assignment.title}</h1>
-                <div className="not-prose border-2 border-error bg-secondary p-6">
-                    <p className="text-error">
-                        Please sign in with the Google account enrolled in this
-                        Classroom.
-                    </p>
-                </div>
-            </div>
+            <ClassroomNotice
+                title={assignment.title}
+                variant="error"
+                message="Please sign in with the Google account enrolled in this Classroom."
+            />
         )
     }
 
