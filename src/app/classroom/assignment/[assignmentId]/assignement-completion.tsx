@@ -1,8 +1,10 @@
+import { useQuery } from "@tanstack/react-query"
 import { useState, useMemo } from "react"
 
 import { AssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
 import { Button } from "~/components/ui/button"
 import { Meter } from "~/components/ui/meter"
+import { fetchAssignmentHistory } from "~/lib/api"
 
 import { turnInAssignment } from "./actions"
 
@@ -29,9 +31,20 @@ export function AssignmentCompletion({
     const [turnInError, setTurnInError] = useState<string | null>(null)
     const [isTurnedIn, setIsTurnedIn] = useState(submission.isTurnedIn)
 
+    // Use the same query key as the Passage component for automatic updates
+    const { data: liveAssignmentHistory } = useQuery({
+        queryKey: ["assignment-history", assignmentId],
+        queryFn: () => fetchAssignmentHistory(assignmentId),
+        placeholderData: assignmentHistory,
+        refetchInterval: false,
+    })
+
+    // Use the live data from the query, falling back to the initial prop
+    const currentHistory = liveAssignmentHistory ?? assignmentHistory
+
     const completedVerses = useMemo(
-        () => Object.keys(assignmentHistory?.verses ?? {}).map(Number).length,
-        [assignmentHistory?.verses],
+        () => Object.keys(currentHistory?.verses ?? {}).map(Number).length,
+        [currentHistory?.verses],
     )
     const completionPercentage =
         totalVerses > 0
