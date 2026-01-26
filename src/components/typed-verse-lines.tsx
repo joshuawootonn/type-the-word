@@ -86,8 +86,8 @@ export function TypedVerseLines({
                 const height = range.bottom - range.top + padding * 2
                 return (
                     <svg
-                        key={`${range.key}-${index}`}
-                        className="pointer-events-none absolute -left-3 right-full z-0 w-4 rounded-none md:-left-6"
+                        key={index}
+                        className="pointer-events-none absolute -left-3 right-full z-0 w-4 rounded-none transition-[height] duration-300 ease-in-out md:-left-6"
                         style={{
                             height,
                             top: range.top - padding,
