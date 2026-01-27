@@ -83,7 +83,7 @@ export const env = createEnv({
         CONVERTKIT_SUBSCRIBE_FORM_ID: process.env.CONVERTKIT_SUBSCRIBE_FORM_ID,
         MAILPACE_API_TOKEN: process.env.MAILPACE_API_TOKEN,
         API_BIBLE_API_KEY: process.env.API_BIBLE_API_KEY,
-        DEPLOYED_URL: process.env.VERCEL_URL ?? process.env.DEPLOYED_URL,
+        DEPLOYED_URL: process.env.DEPLOYED_URL ?? process.env.VERCEL_URL,
         STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     },
     /**
