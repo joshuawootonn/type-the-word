@@ -7,6 +7,9 @@ SELECT
   (SELECT COUNT(*) FROM "type-the-word"."session" WHERE "userId" = :user_id) AS sessions,
   (SELECT COUNT(*) FROM "type-the-word"."typedVerse" WHERE "userId" = :user_id) AS typed_verses,
   (SELECT COUNT(*) FROM "type-the-word"."typingSession" WHERE "userId" = :user_id) AS typing_sessions,
+  (SELECT COUNT(*) FROM "type-the-word"."userDailyActivity" WHERE "userId" = :user_id) AS user_daily_activity,
+  (SELECT COUNT(*) FROM "type-the-word"."userBookProgress" WHERE "userId" = :user_id) AS user_book_progress,
+  (SELECT COUNT(*) FROM "type-the-word"."userChapterProgress" WHERE "userId" = :user_id) AS user_chapter_progress,
   (SELECT COUNT(*) FROM "type-the-word"."userTheme" WHERE "userId" = :user_id) AS user_themes,
   (SELECT COUNT(*) FROM "type-the-word"."userCurrentTheme" WHERE "userId" = :user_id) AS user_current_theme,
   (SELECT COUNT(*) FROM "type-the-word"."userChangelog" WHERE "userId" = :user_id) AS user_changelog;
@@ -25,6 +28,18 @@ WHERE "userId" = :user_id;
 
 -- Delete typing sessions
 DELETE FROM "type-the-word"."typingSession"
+WHERE "userId" = :user_id;
+
+-- Delete daily activity
+DELETE FROM "type-the-word"."userDailyActivity"
+WHERE "userId" = :user_id;
+
+-- Delete chapter progress
+DELETE FROM "type-the-word"."userChapterProgress"
+WHERE "userId" = :user_id;
+
+-- Delete book progress
+DELETE FROM "type-the-word"."userBookProgress"
 WHERE "userId" = :user_id;
 
 -- Delete user themes
