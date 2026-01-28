@@ -1,6 +1,7 @@
 import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 
+import { env } from "~/env.mjs"
 import { exchangeCodeForTokens } from "~/server/clients/classroom.client"
 import { saveTeacherToken } from "~/server/repositories/classroom.repository"
 
@@ -32,10 +33,9 @@ export async function GET(request: NextRequest) {
 
     try {
         // Exchange code for tokens
-        const tokens = await exchangeCodeForTokens(
-            code,
-            `${request.nextUrl.origin}/api/classroom/callback`,
-        )
+        const redirectUri = `${env.DEPLOYED_URL}/api/classroom/callback`
+        console.log("Token exchange redirect URI:", redirectUri)
+        const tokens = await exchangeCodeForTokens(code, redirectUri)
 
         // Save tokens to database
         await saveTeacherToken({

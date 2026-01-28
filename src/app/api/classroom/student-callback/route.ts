@@ -1,6 +1,7 @@
 import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 
+import { env } from "~/env.mjs"
 import { exchangeCodeForTokens } from "~/server/clients/classroom.client"
 import { getGoogleUserId } from "~/server/clients/google.client"
 import { saveStudentToken } from "~/server/repositories/classroom.repository"
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
     try {
         const tokens = await exchangeCodeForTokens(
             code,
-            `${request.nextUrl.origin}/api/classroom/student-callback`,
+            `${env.DEPLOYED_URL}/api/classroom/student-callback`,
         )
         const googleUserId = await getGoogleUserId(tokens.accessToken)
 
