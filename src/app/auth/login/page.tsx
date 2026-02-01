@@ -5,7 +5,7 @@ import { Field, Formik } from "formik"
 import { signIn } from "next-auth/react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 
 import { Loading } from "~/components/loading"
 import { cn } from "~/lib/cn"
@@ -18,6 +18,15 @@ export default function LogInPage() {
     const [isLoading, setIsLoading] = useState(false)
     const emailRef = useRef<HTMLInputElement>(null)
     const passwordRef = useRef<HTMLInputElement>(null)
+
+    useEffect(() => {
+        const errorParam = searchParams?.get("error")
+        if (errorParam === "OAuthAccountNotLinked") {
+            setError(
+                "This email is already registered with a password. Please sign in with your email and password instead of Google.",
+            )
+        }
+    }, [searchParams])
 
     return (
         <div className="mt-8 flex min-h-screen items-start justify-center">
