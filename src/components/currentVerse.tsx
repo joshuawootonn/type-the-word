@@ -562,6 +562,10 @@ export function CurrentVerse({
                 onInput={handleInput}
                 onKeyDown={handleKeyDown}
                 tabIndex={-1}
+                autoCorrect="off"
+                spellCheck={false}
+                autoComplete="off"
+                autoCapitalize="off"
                 onFocus={() => {
                     document
                         .getElementById(`${passageId}-scroll-anchor`)
