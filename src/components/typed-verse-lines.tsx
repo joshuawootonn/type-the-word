@@ -9,7 +9,7 @@ export function TypedVerseLines({
     passageRect,
     typedVerses,
     verseRects,
-    padding = 12,
+    padding = 0,
 }: {
     orderedVerses: Verse[]
     passageRect: DOMRect | null
@@ -87,7 +87,7 @@ export function TypedVerseLines({
                 return (
                     <svg
                         key={index}
-                        className="pointer-events-none absolute -left-3 right-full z-0 w-4 rounded-none transition-[height] duration-300 ease-in-out md:-left-6"
+                        className="pointer-events-none absolute -left-3 right-full z-0 w-4 rounded-none transition-[height] duration-200 ease-in-out md:-left-6"
                         style={{
                             height,
                             top: range.top - padding,

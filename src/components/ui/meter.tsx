@@ -17,7 +17,7 @@ export function Meter({ value, label, className }: MeterProps) {
             </div>
             <BaseMeter.Track className="h-3 border-2 border-primary bg-secondary">
                 <BaseMeter.Indicator
-                    className="!h-full bg-primary transition-all duration-300 ease-in-out"
+                    className="!h-full bg-primary transition-all duration-200 ease-in-out"
                     style={{
                         width: `${value}%`,
                     }}

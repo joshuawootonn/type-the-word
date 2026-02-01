@@ -159,12 +159,6 @@ export function Passage({
                             updateVerseRect,
                         }}
                     >
-                        <TypedVerseLines
-                            orderedVerses={orderedVerses}
-                            passageRect={passageRect}
-                            typedVerses={typingSession.data?.typedVerses}
-                            verseRects={verseRects}
-                        />
                         {passage.nodes.map((node, pIndex) => {
                             switch (node.type) {
                                 case "paragraph":
@@ -214,6 +208,12 @@ export function Passage({
                                     break
                             }
                         })}
+                        <TypedVerseLines
+                            orderedVerses={orderedVerses}
+                            passageRect={passageRect}
+                            typedVerses={typingSession.data?.typedVerses}
+                            verseRects={verseRects}
+                        />
                     </PassageRectContext.Provider>
                     <Cursor passageId={passageId} />
                 </div>
