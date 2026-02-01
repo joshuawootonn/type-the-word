@@ -68,6 +68,11 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date("02/01/2026")} /> - Fixed a
+                    bug that was happening in Chromebooks due to their
+                    aggressive autocomplete / autocorrect features.
+                </li>
+                <li>
                     <DateComponent date={new Date("01/23/2026")} /> - Fixed
                     missing verses in NASB Revelation chapters. Revelation 4:11
                     and Revelation 7:5-8 were not being parsed because they use
