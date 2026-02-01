@@ -3,14 +3,19 @@ import { getServerSession } from "next-auth"
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Link } from "~/components/ui/link"
 import { authOptions } from "~/server/auth"
-import { listCourses } from "~/server/clients/classroom.client"
-import { refreshAccessToken } from "~/server/clients/classroom.client"
+import { getValidStudentToken } from "~/server/classroom/student-token"
+import { getValidTeacherToken } from "~/server/classroom/teacher-token"
+import {
+    listCourses,
+    listStudentCourses,
+} from "~/server/clients/classroom.client"
 import {
     getTeacherToken,
-    updateTeacherTokenAccess,
+    getStudentToken,
 } from "~/server/repositories/classroom.repository"
 
-import { ClientPage } from "./client-page"
+import { StudentClientPage } from "./student-client-page"
+import { TeacherClientPage } from "./teacher-client-page"
 
 interface PageProps {
     params: Promise<{ courseId: string }>
@@ -23,8 +28,8 @@ export default async function CoursePage({ params }: PageProps) {
     if (!session?.user) {
         return (
             <div>
-                <h1>Dashboard</h1>
-                <p>Please sign in to view your dashboard.</p>
+                <h1>Course</h1>
+                <p>Please sign in to view this course.</p>
                 <Link
                     href={`/auth/login?callbackUrl=%2Fclassroom%2F${encodeURIComponent(courseId)}`}
                 >
@@ -34,12 +39,18 @@ export default async function CoursePage({ params }: PageProps) {
         )
     }
 
-    const tokenRecord = await getTeacherToken(session.user.id)
+    // Check if user is a teacher
+    const teacherToken = await getTeacherToken(session.user.id).catch(
+        () => null,
+    )
+    const studentToken = await getStudentToken(session.user.id).catch(
+        () => null,
+    )
 
-    if (!tokenRecord) {
+    if (!teacherToken && !studentToken) {
         return (
             <div>
-                <h1>Dashboard</h1>
+                <h1>Course</h1>
                 <ClassroomNotice
                     variant="error"
                     message="Please connect your Google Classroom account first."
@@ -50,21 +61,18 @@ export default async function CoursePage({ params }: PageProps) {
         )
     }
 
-    // Get fresh access token
-    let accessToken = tokenRecord.accessToken
-    const now = new Date()
-    if (tokenRecord.expiresAt <= now) {
-        const refreshed = await refreshAccessToken(tokenRecord.refreshToken)
-        accessToken = refreshed.accessToken
-        await updateTeacherTokenAccess(
-            session.user.id,
-            refreshed.accessToken,
-            refreshed.expiresAt,
-        )
+    // Determine which token to use and get valid version, then fetch courses
+    let courses
+    if (teacherToken) {
+        const validToken = await getValidTeacherToken(session.user.id)
+        courses = await listCourses(validToken.accessToken)
+    } else if (studentToken) {
+        const validToken = await getValidStudentToken(session.user.id)
+        courses = await listStudentCourses(validToken.accessToken)
+    } else {
+        throw new Error("No valid token found")
     }
 
-    // Fetch course info from Google
-    const courses = await listCourses(accessToken)
     const course = courses.find(c => c.id === courseId)
 
     if (!course) {
@@ -85,5 +93,14 @@ export default async function CoursePage({ params }: PageProps) {
         )
     }
 
-    return <ClientPage courseId={courseId} courseName={course.name} />
+    // Render appropriate view based on role
+    if (teacherToken) {
+        return (
+            <TeacherClientPage courseId={courseId} courseName={course.name} />
+        )
+    } else {
+        return (
+            <StudentClientPage courseId={courseId} courseName={course.name} />
+        )
+    }
 }

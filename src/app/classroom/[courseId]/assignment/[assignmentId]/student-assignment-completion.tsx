@@ -6,9 +6,9 @@ import { Button } from "~/components/ui/button"
 import { Meter } from "~/components/ui/meter"
 import { fetchAssignmentHistory } from "~/lib/api"
 
-import { turnInAssignment } from "./actions"
+import { turnInAssignment } from "./student-actions"
 
-export function AssignmentCompletion({
+export function StudentAssignmentCompletion({
     submission,
     assignmentHistory,
     totalVerses,
@@ -52,6 +52,47 @@ export function AssignmentCompletion({
             : 0
     const isComplete = totalVerses > 0 && completedVerses >= totalVerses
 
+    // Calculate stats from assignment history
+    const stats = useMemo(() => {
+        if (!currentHistory?.verses) {
+            return { averageWpm: null, averageAccuracy: null }
+        }
+
+        const verses = Object.values(currentHistory.verses)
+        if (verses.length === 0) {
+            return { averageWpm: null, averageAccuracy: null }
+        }
+
+        // Filter to verses with valid stats
+        const versesWithWpm = verses.filter(v => v.wpm != null && v.wpm > 0)
+        const versesWithAccuracy = verses.filter(
+            v => v.accuracy != null && v.accuracy > 0,
+        )
+
+        const averageWpm =
+            versesWithWpm.length > 0
+                ? Math.round(
+                      versesWithWpm.reduce((sum, v) => sum + v.wpm!, 0) /
+                          versesWithWpm.length,
+                  )
+                : null
+
+        const averageAccuracy =
+            versesWithAccuracy.length > 0
+                ? Math.round(
+                      versesWithAccuracy.reduce(
+                          (sum, v) => sum + v.accuracy!,
+                          0,
+                      ) / versesWithAccuracy.length,
+                  )
+                : null
+
+        return {
+            averageWpm,
+            averageAccuracy,
+        }
+    }, [currentHistory?.verses])
+
     async function handleTurnIn(): Promise<void> {
         setIsTurningIn(true)
         setTurnInError(null)
@@ -88,6 +129,29 @@ export function AssignmentCompletion({
                         {completedVerses} of {totalVerses} verses completed
                     </div>
                 </div>
+
+                {/* Show stats if we have valid data */}
+                {(stats.averageWpm !== null ||
+                    stats.averageAccuracy !== null) && (
+                    <div className="grid grid-cols-2 gap-3 border-t-2 border-primary pt-3 text-sm">
+                        {stats.averageWpm !== null && (
+                            <div>
+                                <span className="opacity-75">Average WPM:</span>{" "}
+                                <span className="font-semibold">
+                                    {stats.averageWpm}
+                                </span>
+                            </div>
+                        )}
+                        {stats.averageAccuracy !== null && (
+                            <div>
+                                <span className="opacity-75">Accuracy:</span>{" "}
+                                <span className="font-semibold">
+                                    {stats.averageAccuracy}%
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {isComplete && (

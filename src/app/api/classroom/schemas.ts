@@ -145,3 +145,44 @@ export const turnInAssignmentResponseSchema = z.object({
 export type TurnInAssignmentResponse = z.infer<
     typeof turnInAssignmentResponseSchema
 >
+
+// GET /api/classroom/student/assignments
+export const studentAssignmentSchema = z.object({
+    id: z.string(),
+    courseId: z.string(),
+    courseWorkId: z.string(),
+    title: z.string(),
+    description: z.string().nullable(),
+    translation: z.string(),
+    book: z.string(),
+    startChapter: z.number(),
+    startVerse: z.number(),
+    endChapter: z.number(),
+    endVerse: z.number(),
+    totalVerses: z.number(),
+    maxPoints: z.number(),
+    dueDate: z.string().nullable(),
+    state: z.enum(["DRAFT", "PUBLISHED", "DELETED"]),
+    // Student's personal progress
+    submissionId: z.string().nullable(),
+    completedVerses: z.number().nullable(),
+    averageWpm: z.number().nullable(),
+    averageAccuracy: z.number().nullable(),
+    isCompleted: z.number().nullable(),
+    isTurnedIn: z.number().nullable(),
+    startedAt: z.string().nullable(),
+    completedAt: z.string().nullable(),
+    completionPercentage: z.number(),
+    hasStarted: z.boolean(),
+})
+
+export const studentAssignmentsResponseSchema = z.object({
+    current: z.array(studentAssignmentSchema),
+    completed: z.array(studentAssignmentSchema),
+    pastDue: z.array(studentAssignmentSchema),
+})
+
+export type StudentAssignment = z.infer<typeof studentAssignmentSchema>
+export type StudentAssignmentsResponse = z.infer<
+    typeof studentAssignmentsResponseSchema
+>

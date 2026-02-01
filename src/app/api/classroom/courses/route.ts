@@ -2,19 +2,21 @@ import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 
 import { authOptions } from "~/server/auth"
+import { getValidStudentToken } from "~/server/classroom/student-token"
+import { getValidTeacherToken } from "~/server/classroom/teacher-token"
 import {
     listCourses,
-    refreshAccessToken,
+    listStudentCourses,
 } from "~/server/clients/classroom.client"
 import {
     getTeacherToken,
-    updateTeacherTokenAccess,
+    getStudentToken,
 } from "~/server/repositories/classroom.repository"
 
 import { type CoursesResponse } from "../schemas"
 
 /**
- * Lists all active courses for the authenticated teacher
+ * Lists all active courses for the authenticated user (teacher or student)
  * GET /api/classroom/courses
  */
 export async function GET() {
@@ -25,37 +27,37 @@ export async function GET() {
     }
 
     try {
-        // Get teacher's stored token
-        const tokenRecord = await getTeacherToken(session.user.id)
+        // Check if user is a teacher first
+        const teacherToken = await getTeacherToken(session.user.id).catch(
+            () => null,
+        )
 
-        if (!tokenRecord) {
-            return NextResponse.json(
-                { error: "Google Classroom not connected" },
-                { status: 403 },
-            )
+        if (teacherToken) {
+            // Teacher flow
+            const validToken = await getValidTeacherToken(session.user.id)
+            const courses = await listCourses(validToken.accessToken)
+            const response: CoursesResponse = { courses }
+            return NextResponse.json(response)
         }
 
-        let accessToken = tokenRecord.accessToken
+        // Check if user is a student
+        const studentToken = await getStudentToken(session.user.id).catch(
+            () => null,
+        )
 
-        // Check if token is expired and refresh if needed
-        const now = new Date()
-        if (tokenRecord.expiresAt <= now) {
-            const refreshed = await refreshAccessToken(tokenRecord.refreshToken)
-            accessToken = refreshed.accessToken
-
-            // Update stored token
-            await updateTeacherTokenAccess(
-                session.user.id,
-                refreshed.accessToken,
-                refreshed.expiresAt,
-            )
+        if (studentToken) {
+            // Student flow
+            const validToken = await getValidStudentToken(session.user.id)
+            const courses = await listStudentCourses(validToken.accessToken)
+            const response: CoursesResponse = { courses }
+            return NextResponse.json(response)
         }
 
-        // Fetch courses from Google Classroom
-        const courses = await listCourses(accessToken)
-
-        const response: CoursesResponse = { courses }
-        return NextResponse.json(response)
+        // No Google Classroom connection
+        return NextResponse.json(
+            { error: "Google Classroom not connected" },
+            { status: 403 },
+        )
     } catch (error) {
         console.error("Error fetching courses:", error)
         return NextResponse.json(

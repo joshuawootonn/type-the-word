@@ -12,17 +12,17 @@ import toProperCase from "~/lib/toProperCase"
 import { type AssignmentDetail } from "../../../../api/classroom/schemas"
 import { fetchAssignmentDetail, publishAssignment } from "./actions"
 
-interface ClientPageProps {
+interface TeacherClientPageProps {
     assignmentId: string
     courseId: string
     courseName: string
 }
 
-export function ClientPage({
+export function TeacherClientPage({
     assignmentId,
     courseId,
     courseName,
-}: ClientPageProps) {
+}: TeacherClientPageProps) {
     const [data, setData] = useState<AssignmentDetail | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)

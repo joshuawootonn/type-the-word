@@ -15,6 +15,7 @@ const STUDENT_SCOPES = [
     "openid",
     "email",
     "profile",
+    "https://www.googleapis.com/auth/classroom.courses.readonly",
     "https://www.googleapis.com/auth/classroom.coursework.me",
 ]
 
@@ -220,6 +221,32 @@ export async function listCourses(accessToken: string): Promise<Course[]> {
 
     const response = await classroom.courses.list({
         teacherId: "me",
+        courseStates: ["ACTIVE"],
+    })
+
+    const courses =
+        response.data.courses?.map((course: classroom_v1.Schema$Course) => ({
+            id: course.id!,
+            name: course.name!,
+            section: course.section,
+            descriptionHeading: course.descriptionHeading,
+            room: course.room,
+            courseState: course.courseState,
+        })) ?? []
+
+    return z.array(courseSchema).parse(courses)
+}
+
+/**
+ * Lists all courses for the authenticated student
+ */
+export async function listStudentCourses(
+    accessToken: string,
+): Promise<Course[]> {
+    const classroom = createClassroomClient(accessToken)
+
+    const response = await classroom.courses.list({
+        studentId: "me",
         courseStates: ["ACTIVE"],
     })
 

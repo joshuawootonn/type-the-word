@@ -2,7 +2,10 @@ import { getServerSession } from "next-auth"
 
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { authOptions } from "~/server/auth"
-import { getTeacherToken } from "~/server/repositories/classroom.repository"
+import {
+    getTeacherToken,
+    getStudentToken,
+} from "~/server/repositories/classroom.repository"
 
 import { ClientPage } from "./client-page"
 
@@ -21,16 +24,22 @@ export default async function DashboardPage() {
         )
     }
 
-    const token = await getTeacherToken(session.user.id)
+    // Check for either teacher or student token
+    const teacherToken = await getTeacherToken(session.user.id).catch(
+        () => null,
+    )
+    const studentToken = await getStudentToken(session.user.id).catch(
+        () => null,
+    )
 
-    if (!token) {
+    if (!teacherToken && !studentToken) {
         return (
             <ClassroomNotice
                 title="Dashboard"
                 variant="error"
-                message="Connect your Google Classroom teacher account to view the dashboard for your classes."
+                message="Connect your Google Classroom account to view your dashboard."
                 linkHref="/classroom"
-                linkLabel="Connect as a teacher"
+                linkLabel="Connect to Google Classroom"
             />
         )
     }

@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
             materials: [
                 {
                     link: {
-                        url: `${env.DEPLOYED_URL}/classroom/assignment/${assignmentId}`,
+                        url: `${env.DEPLOYED_URL}/classroom/${data.courseId}/assignment/${assignmentId}`,
                         title: "Start Assignment",
                     },
                 },

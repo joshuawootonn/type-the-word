@@ -12,12 +12,15 @@ import toProperCase from "~/lib/toProperCase"
 import { type Assignment } from "../../api/classroom/schemas"
 import { fetchCourseAssignments, publishAssignment } from "./actions"
 
-interface ClientPageProps {
+interface TeacherClientPageProps {
     courseId: string
     courseName: string
 }
 
-export function ClientPage({ courseId, courseName }: ClientPageProps) {
+export function TeacherClientPage({
+    courseId,
+    courseName,
+}: TeacherClientPageProps) {
     const [publishingId, setPublishingId] = useState<string | null>(null)
     const queryClient = useQueryClient()
 
