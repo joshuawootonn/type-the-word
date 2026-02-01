@@ -3,7 +3,8 @@ import { Translation } from "~/lib/parseEsv"
 import { PassageObject } from "~/lib/passageObject"
 import { getBibleMetadata } from "~/server/bibleMetadata"
 import { db } from "~/server/db"
-import { TypingSessionRepository } from "~/server/repositories/typingSession.repository"
+import { TypedVerseRepository } from "~/server/repositories/typedVerse.repository"
+import { TypedVerse } from "~/server/repositories/typingSession.repository"
 
 import { ChapterHistory } from "./route"
 
@@ -12,13 +13,14 @@ export async function getChapterHistory(
     passageObject: PassageObject,
     translation: Translation,
 ): Promise<ChapterHistory> {
-    const typingSessionRepository = new TypingSessionRepository(db)
+    const typedVerseRepository = new TypedVerseRepository(db)
 
-    const typingSessions = await typingSessionRepository.getMany({
+    const typedVerses = await typedVerseRepository.getMany({
         userId,
         book: passageObject.book,
         chapter: passageObject.chapter,
         translation,
+        omitTypingData: true,
     })
 
     const bibleMetadata = getBibleMetadata()
@@ -34,41 +36,42 @@ export async function getChapterHistory(
 
     let verses: ChapterHistory["verses"] = {}
 
-    const chronologicalTypingSession = typingSessions.slice().reverse()
-    for (const session of chronologicalTypingSession) {
-        for (const verse of session.typedVerses) {
-            if (
-                verse.book !== passageObject.book ||
-                verse.chapter !== passageObject.chapter ||
-                verse.translation !== translation
-            ) {
-                continue
-            }
+    const chronologicalVerses = typedVerses.slice().reverse()
+    for (const verse of chronologicalVerses) {
+        verses[verse.verse] = true
 
-            verses[verse.verse] = true
+        if (Object.values(verses).length >= numberOfVersesInChapterBookCombo) {
+            verses = {}
+        }
+    }
 
-            if (
-                Object.values(verses).length >= numberOfVersesInChapterBookCombo
-            ) {
-                verses = {}
+    const versesBySession = new Map<string, TypedVerse[]>()
+    for (const verse of typedVerses) {
+        const sessionVerses = versesBySession.get(verse.typingSessionId) ?? []
+        sessionVerses.push(verse)
+        versesBySession.set(verse.typingSessionId, sessionVerses)
+    }
+
+    const sessionCreatedDates = new Map<string, Date>()
+    for (const verse of typedVerses) {
+        if (!sessionCreatedDates.has(verse.typingSessionId)) {
+            sessionCreatedDates.set(verse.typingSessionId, verse.createdAt)
+        } else {
+            const existingDate = sessionCreatedDates.get(verse.typingSessionId)!
+            if (verse.createdAt < existingDate) {
+                sessionCreatedDates.set(verse.typingSessionId, verse.createdAt)
             }
         }
     }
 
-    const chapterLogs = typingSessions.map(typingSession => ({
-        location: typingSessionToString(
-            typingSession.typedVerses.filter(
-                typedVerse =>
-                    typedVerse.chapter === passageObject.chapter &&
-                    typedVerse.book === passageObject.book &&
-                    typedVerse.translation === translation,
-            ),
-            {
+    const chapterLogs = Array.from(versesBySession.entries())
+        .map(([sessionId, verses]) => ({
+            location: typingSessionToString(verses, {
                 seperator: "\n",
-            },
-        ).split("\n"),
-        createdAt: typingSession.createdAt,
-    }))
+            }).split("\n"),
+            createdAt: sessionCreatedDates.get(sessionId)!,
+        }))
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
 
     return { verses, chapterLogs }
 }

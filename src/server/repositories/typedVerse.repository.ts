@@ -36,10 +36,14 @@ export class TypedVerseRepository {
         userId,
         book,
         chapter,
+        translation,
+        omitTypingData = false,
     }: {
         userId: string
         book?: schema.Book
         chapter?: number
+        translation?: schema.Translation
+        omitTypingData?: boolean
     }): Promise<TypedVerse[]> {
         const builder = this.db.query.typedVerses.findMany({
             where: and(
@@ -47,12 +51,35 @@ export class TypedVerseRepository {
                     eq(schema.typedVerses.userId, userId),
                     book ? eq(schema.typedVerses.book, book) : null,
                     chapter ? eq(schema.typedVerses.chapter, chapter) : null,
+                    translation
+                        ? eq(schema.typedVerses.translation, translation)
+                        : null,
                 ].flatMap(val => (val ? [val] : [])),
             ),
             orderBy: [desc(schema.typedVerses.createdAt)],
+            columns: omitTypingData
+                ? {
+                      id: true,
+                      userId: true,
+                      typingSessionId: true,
+                      translation: true,
+                      book: true,
+                      chapter: true,
+                      verse: true,
+                      createdAt: true,
+                      classroomAssignmentId: true,
+                      typingData: false,
+                  }
+                : undefined,
         })
 
-        return await builder
+        const result = await builder
+
+        if (omitTypingData) {
+            return result.map((v: TypedVerse) => ({ ...v, typingData: null }))
+        }
+
+        return result
     }
 
     async getManyByAssignment({
