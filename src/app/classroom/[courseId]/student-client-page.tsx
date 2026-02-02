@@ -116,7 +116,7 @@ function AssignmentCard({
             className="svg-outline relative block border-2 border-primary bg-secondary p-4 no-underline"
         >
             <div className="mb-2">
-                <div className="mb-2 flex items-center gap-2">
+                <div className="mb-2 flex items-center justify-between gap-2">
                     <div className="font-semibold text-primary">
                         {assignment.title}
                     </div>

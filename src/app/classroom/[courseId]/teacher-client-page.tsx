@@ -148,7 +148,7 @@ function AssignmentCard({
                 className="block p-4 no-underline"
             >
                 <div className="flex flex-col items-start justify-between gap-2">
-                    <div className="flex items-center gap-2">
+                    <div className="flex w-full items-center justify-between gap-2">
                         <div className="font-semibold text-primary">
                             {assignment.title}
                         </div>

@@ -57,7 +57,7 @@ export function AssignmentStatusBadge({
     } else {
         return (
             <span className="inline-block border-2 border-primary bg-secondary px-2 py-1 text-xs font-semibold opacity-40">
-                Archived
+                Deleted
             </span>
         )
     }
