@@ -1,0 +1,1 @@
+ALTER TABLE "classroomAssignment" ADD COLUMN "lastSyncedAt" timestamp;

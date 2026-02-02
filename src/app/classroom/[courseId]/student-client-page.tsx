@@ -1,16 +1,19 @@
 "use client"
 
+import { useInfiniteQuery } from "@tanstack/react-query"
 import NextLink from "next/link"
-import { useCallback, useEffect, useState } from "react"
+import { useMemo } from "react"
 
+import { AssignmentStatusBadge } from "~/components/assignment-status-badge"
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Loading } from "~/components/loading"
+import { Button } from "~/components/ui/button"
 import { Link } from "~/components/ui/link"
 import { Meter } from "~/components/ui/meter"
 import toProperCase from "~/lib/toProperCase"
 
 import { type StudentAssignment } from "../../api/classroom/schemas"
-import { fetchStudentAssignments } from "./student-actions"
+import { fetchAssignments } from "./actions"
 
 interface StudentClientPageProps {
     courseId: string
@@ -21,46 +24,42 @@ export function StudentClientPage({
     courseId,
     courseName,
 }: StudentClientPageProps) {
-    const [data, setData] = useState<{
-        current: StudentAssignment[]
-        completed: StudentAssignment[]
-        pastDue: StudentAssignment[]
-    } | null>(null)
-    const [isLoading, setIsLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
+    // Single unified query with pagination
+    const assignmentsQuery = useInfiniteQuery({
+        queryKey: ["assignments", courseId],
+        queryFn: ({ pageParam = 0 }) =>
+            fetchAssignments({ courseId, page: pageParam, limit: 10 }),
+        getNextPageParam: lastPage =>
+            lastPage.pagination.hasMore
+                ? lastPage.pagination.page + 1
+                : undefined,
+        initialPageParam: 0,
+    })
 
-    const loadAssignments = useCallback(async () => {
-        try {
-            const result = await fetchStudentAssignments(courseId)
-            setData(result)
-        } catch (_err) {
-            setError("Failed to load assignments")
-        } finally {
-            setIsLoading(false)
-        }
-    }, [courseId])
+    // Extract all assignments from pages (flat list)
+    const allAssignments = useMemo(
+        () =>
+            (assignmentsQuery.data?.pages.flatMap(page => page.assignments) ??
+                []) as StudentAssignment[],
+        [assignmentsQuery.data],
+    )
 
-    useEffect(() => {
-        void loadAssignments()
-    }, [loadAssignments])
-
-    if (isLoading) {
+    if (assignmentsQuery.isLoading) {
         return <Loading />
     }
 
-    if (error || !data) {
+    if (assignmentsQuery.error) {
         return (
             <ClassroomNotice
                 variant="error"
-                message={error || "Failed to load assignments"}
+                message="Failed to load assignments"
                 linkHref="/classroom/dashboard"
                 linkLabel="Back to Dashboard"
             />
         )
     }
 
-    const totalAssignments =
-        data.current.length + data.completed.length + data.pastDue.length
+    const totalAssignments = allAssignments.length
 
     return (
         <div>
@@ -78,59 +77,23 @@ export function StudentClientPage({
             {totalAssignments === 0 ? (
                 <p className="opacity-75">No assignments yet.</p>
             ) : (
-                <div className="not-prose space-y-8">
-                    {/* Current Assignments */}
-                    {data.current.length > 0 && (
-                        <div className="space-y-4">
-                            <h2 className="text-xl font-semibold">
-                                Current Assignments
-                            </h2>
-                            <div className="space-y-3">
-                                {data.current.map(assignment => (
-                                    <AssignmentCard
-                                        key={assignment.id}
-                                        assignment={assignment}
-                                        courseId={courseId}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Completed Assignments */}
-                    {data.completed.length > 0 && (
-                        <div className="space-y-4">
-                            <h2 className="text-xl font-semibold">
-                                Completed Assignments
-                            </h2>
-                            <div className="space-y-3">
-                                {data.completed.map(assignment => (
-                                    <AssignmentCard
-                                        key={assignment.id}
-                                        assignment={assignment}
-                                        courseId={courseId}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Past Due Assignments */}
-                    {data.pastDue.length > 0 && (
-                        <details className="space-y-4 border-2 border-primary bg-secondary p-4">
-                            <summary className="cursor-pointer text-xl font-semibold">
-                                Past Due Assignments ({data.pastDue.length})
-                            </summary>
-                            <div className="mt-4 space-y-3">
-                                {data.pastDue.map(assignment => (
-                                    <AssignmentCard
-                                        key={assignment.id}
-                                        assignment={assignment}
-                                        courseId={courseId}
-                                    />
-                                ))}
-                            </div>
-                        </details>
+                <div className="not-prose space-y-3">
+                    {allAssignments.map(assignment => (
+                        <AssignmentCard
+                            key={assignment.id}
+                            assignment={assignment}
+                            courseId={courseId}
+                        />
+                    ))}
+                    {assignmentsQuery.hasNextPage && (
+                        <Button
+                            onClick={() => assignmentsQuery.fetchNextPage()}
+                            isLoading={assignmentsQuery.isFetchingNextPage}
+                            loadingLabel="Loading"
+                            className="mt-3 w-full"
+                        >
+                            Load More
+                        </Button>
                     )}
                 </div>
             )}
@@ -146,27 +109,27 @@ function AssignmentCard({
     courseId: string
 }) {
     const passageRef = `${toProperCase(assignment.book.split("_").join(" "))} ${assignment.startChapter}:${assignment.startVerse}-${assignment.endChapter}:${assignment.endVerse}`
-    const isCompleted = assignment.isCompleted === 1
 
     return (
         <NextLink
             href={`/classroom/${courseId}/assignment/${assignment.id}`}
             className="svg-outline relative block border-2 border-primary bg-secondary p-4 no-underline"
         >
-            <div className="mb-2 flex items-start justify-between gap-4">
-                <div className="flex-grow">
+            <div className="mb-2">
+                <div className="mb-2 flex items-center gap-2">
                     <div className="font-semibold text-primary">
                         {assignment.title}
                     </div>
-                    <div className="text-sm text-primary">
-                        {passageRef} ({assignment.translation.toUpperCase()})
-                    </div>
+                    <AssignmentStatusBadge
+                        state={assignment.state}
+                        dueDate={assignment.dueDate}
+                        isCompleted={assignment.isCompleted}
+                        isStudent
+                    />
                 </div>
-                {isCompleted && (
-                    <div className="text-sm font-medium text-success">
-                        ✓ Completed
-                    </div>
-                )}
+                <div className="text-sm text-primary">
+                    {passageRef} ({assignment.translation.toUpperCase()})
+                </div>
             </div>
 
             {assignment.dueDate && (

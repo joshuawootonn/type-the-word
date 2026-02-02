@@ -186,3 +186,16 @@ export type StudentAssignment = z.infer<typeof studentAssignmentSchema>
 export type StudentAssignmentsResponse = z.infer<
     typeof studentAssignmentsResponseSchema
 >
+
+// GET /api/classroom/assignments (flat list endpoint)
+export const assignmentsResponseSchema = z.object({
+    assignments: z.array(z.union([assignmentSchema, studentAssignmentSchema])),
+    pagination: z.object({
+        page: z.number(),
+        limit: z.number(),
+        total: z.number(),
+        hasMore: z.boolean(),
+    }),
+})
+
+export type AssignmentsResponse = z.infer<typeof assignmentsResponseSchema>

@@ -148,6 +148,13 @@
             "when": 1768860106240,
             "tag": "0020_eager_punisher",
             "breakpoints": true
+        },
+        {
+            "idx": 21,
+            "version": "7",
+            "when": 1769989774889,
+            "tag": "0021_left_stephen_strange",
+            "breakpoints": true
         }
     ]
 }

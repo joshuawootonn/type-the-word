@@ -1,32 +1,30 @@
 "use client"
 
 import {
-    dashboardResponseSchema,
+    assignmentsResponseSchema,
     errorResponseSchema,
 } from "~/app/api/classroom/schemas"
 
 /**
- * Fetches assignments for a specific course and status
+ * Fetches assignments for a course with pagination
+ * Works for both teachers and students
  */
-export async function fetchCourseAssignments({
+export async function fetchAssignments({
     courseId,
-    status,
-    startingAfter = 0,
-    limit = 5,
+    page = 0,
+    limit = 10,
 }: {
     courseId: string
-    status: "current" | "draft" | "archived"
-    startingAfter?: number
+    page?: number
     limit?: number
 }) {
     const params = new URLSearchParams({
         courseId,
-        status,
-        startingAfter: String(startingAfter),
+        page: String(page),
         limit: String(limit),
     })
 
-    const response = await fetch(`/api/classroom/dashboard?${params}`)
+    const response = await fetch(`/api/classroom/assignments?${params}`)
 
     if (!response.ok) {
         const errorData = await response.json()
@@ -35,7 +33,7 @@ export async function fetchCourseAssignments({
     }
 
     const data = await response.json()
-    return dashboardResponseSchema.parse(data)
+    return assignmentsResponseSchema.parse(data)
 }
 
 /**

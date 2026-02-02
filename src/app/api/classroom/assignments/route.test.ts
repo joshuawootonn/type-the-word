@@ -233,6 +233,7 @@ describe("POST /api/classroom/assignments", () => {
             maxPoints: 100,
             dueDate: null,
             state: "DRAFT",
+            lastSyncedAt: null,
             createdAt: new Date(),
             updatedAt: new Date(),
         })
@@ -289,6 +290,7 @@ describe("POST /api/classroom/assignments", () => {
             maxPoints: 100,
             dueDate: null,
             state: "DRAFT",
+            lastSyncedAt: null,
             createdAt: new Date(),
             updatedAt: new Date(),
         })

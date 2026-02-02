@@ -1,0 +1,1715 @@
+{
+    "id": "bedeea69-d24a-4ee5-adf3-5e470dbcf7c8",
+    "prevId": "43501685-5b01-4bac-b120-0e8612cc25ad",
+    "version": "7",
+    "dialect": "postgresql",
+    "tables": {
+        "public.account": {
+            "name": "account",
+            "schema": "",
+            "columns": {
+                "userId": {
+                    "name": "userId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "type": {
+                    "name": "type",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "provider": {
+                    "name": "provider",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "providerAccountId": {
+                    "name": "providerAccountId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "refresh_token": {
+                    "name": "refresh_token",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "access_token": {
+                    "name": "access_token",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "expires_at": {
+                    "name": "expires_at",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "token_type": {
+                    "name": "token_type",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "scope": {
+                    "name": "scope",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "id_token": {
+                    "name": "id_token",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "session_state": {
+                    "name": "session_state",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {
+                "account_userId_idx": {
+                    "name": "account_userId_idx",
+                    "columns": [
+                        {
+                            "expression": "userId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {
+                "account_provider_providerAccountId_pk": {
+                    "name": "account_provider_providerAccountId_pk",
+                    "columns": ["provider", "providerAccountId"]
+                }
+            },
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.builtinTheme": {
+            "name": "builtinTheme",
+            "schema": "",
+            "columns": {
+                "themeId": {
+                    "name": "themeId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.classroomAssignment": {
+            "name": "classroomAssignment",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "varchar(255)",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "teacherUserId": {
+                    "name": "teacherUserId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "courseId": {
+                    "name": "courseId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "courseWorkId": {
+                    "name": "courseWorkId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "title": {
+                    "name": "title",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "description": {
+                    "name": "description",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "translation": {
+                    "name": "translation",
+                    "type": "typedVerse_translation",
+                    "typeSchema": "public",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "book": {
+                    "name": "book",
+                    "type": "typedVerse_book",
+                    "typeSchema": "public",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "startChapter": {
+                    "name": "startChapter",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "startVerse": {
+                    "name": "startVerse",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "endChapter": {
+                    "name": "endChapter",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "endVerse": {
+                    "name": "endVerse",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "totalVerses": {
+                    "name": "totalVerses",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "maxPoints": {
+                    "name": "maxPoints",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 100
+                },
+                "dueDate": {
+                    "name": "dueDate",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "state": {
+                    "name": "state",
+                    "type": "courseWork_state",
+                    "typeSchema": "public",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "'DRAFT'"
+                },
+                "lastSyncedAt": {
+                    "name": "lastSyncedAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "classroomAssignment_teacherUserId_idx": {
+                    "name": "classroomAssignment_teacherUserId_idx",
+                    "columns": [
+                        {
+                            "expression": "teacherUserId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                },
+                "classroomAssignment_courseId_idx": {
+                    "name": "classroomAssignment_courseId_idx",
+                    "columns": [
+                        {
+                            "expression": "courseId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                },
+                "classroomAssignment_courseWorkId_idx": {
+                    "name": "classroomAssignment_courseWorkId_idx",
+                    "columns": [
+                        {
+                            "expression": "courseWorkId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.classroomStudentToken": {
+            "name": "classroomStudentToken",
+            "schema": "",
+            "columns": {
+                "userId": {
+                    "name": "userId",
+                    "type": "varchar(255)",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "googleUserId": {
+                    "name": "googleUserId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "accessToken": {
+                    "name": "accessToken",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "refreshToken": {
+                    "name": "refreshToken",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "expiresAt": {
+                    "name": "expiresAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "scope": {
+                    "name": "scope",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "classroomStudentToken_userId_idx": {
+                    "name": "classroomStudentToken_userId_idx",
+                    "columns": [
+                        {
+                            "expression": "userId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.classroomSubmission": {
+            "name": "classroomSubmission",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "varchar(255)",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "assignmentId": {
+                    "name": "assignmentId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "studentUserId": {
+                    "name": "studentUserId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "submissionId": {
+                    "name": "submissionId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "completedVerses": {
+                    "name": "completedVerses",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "totalVerses": {
+                    "name": "totalVerses",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "averageWpm": {
+                    "name": "averageWpm",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "averageAccuracy": {
+                    "name": "averageAccuracy",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "isCompleted": {
+                    "name": "isCompleted",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "isTurnedIn": {
+                    "name": "isTurnedIn",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "grade": {
+                    "name": "grade",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "startedAt": {
+                    "name": "startedAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "completedAt": {
+                    "name": "completedAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "turnedInAt": {
+                    "name": "turnedInAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "classroomSubmission_assignmentId_idx": {
+                    "name": "classroomSubmission_assignmentId_idx",
+                    "columns": [
+                        {
+                            "expression": "assignmentId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                },
+                "classroomSubmission_studentUserId_idx": {
+                    "name": "classroomSubmission_studentUserId_idx",
+                    "columns": [
+                        {
+                            "expression": "studentUserId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                },
+                "classroomSubmission_submissionId_idx": {
+                    "name": "classroomSubmission_submissionId_idx",
+                    "columns": [
+                        {
+                            "expression": "submissionId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "classroomSubmission_studentUserId_assignmentId_unique": {
+                    "name": "classroomSubmission_studentUserId_assignmentId_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["studentUserId", "assignmentId"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.classroomTeacherToken": {
+            "name": "classroomTeacherToken",
+            "schema": "",
+            "columns": {
+                "userId": {
+                    "name": "userId",
+                    "type": "varchar(255)",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "accessToken": {
+                    "name": "accessToken",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "refreshToken": {
+                    "name": "refreshToken",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "expiresAt": {
+                    "name": "expiresAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "scope": {
+                    "name": "scope",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "classroomTeacherToken_userId_idx": {
+                    "name": "classroomTeacherToken_userId_idx",
+                    "columns": [
+                        {
+                            "expression": "userId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.passageResponse": {
+            "name": "passageResponse",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "varchar(255)",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "book": {
+                    "name": "book",
+                    "type": "passageResponse_book",
+                    "typeSchema": "public",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "chapter": {
+                    "name": "chapter",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "translation": {
+                    "name": "translation",
+                    "type": "passageResponse_translation",
+                    "typeSchema": "public",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "response": {
+                    "name": "response",
+                    "type": "json",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.session": {
+            "name": "session",
+            "schema": "",
+            "columns": {
+                "sessionToken": {
+                    "name": "sessionToken",
+                    "type": "varchar(255)",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "userId": {
+                    "name": "userId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "expires": {
+                    "name": "expires",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "session_userId_idx": {
+                    "name": "session_userId_idx",
+                    "columns": [
+                        {
+                            "expression": "userId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.theme": {
+            "name": "theme",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "varchar(255)",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "label": {
+                    "name": "label",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "primaryLightness": {
+                    "name": "primaryLightness",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "primaryChroma": {
+                    "name": "primaryChroma",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "primaryHue": {
+                    "name": "primaryHue",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "secondaryLightness": {
+                    "name": "secondaryLightness",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "secondaryChroma": {
+                    "name": "secondaryChroma",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "secondaryHue": {
+                    "name": "secondaryHue",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "successLightness": {
+                    "name": "successLightness",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "successChroma": {
+                    "name": "successChroma",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "successHue": {
+                    "name": "successHue",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "errorLightness": {
+                    "name": "errorLightness",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "errorChroma": {
+                    "name": "errorChroma",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "errorHue": {
+                    "name": "errorHue",
+                    "type": "real",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.typedVerse": {
+            "name": "typedVerse",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "varchar(255)",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "userId": {
+                    "name": "userId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "typingSessionId": {
+                    "name": "typingSessionId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "classroomAssignmentId": {
+                    "name": "classroomAssignmentId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "translation": {
+                    "name": "translation",
+                    "type": "typedVerse_translation",
+                    "typeSchema": "public",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "book": {
+                    "name": "book",
+                    "type": "typedVerse_book",
+                    "typeSchema": "public",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "chapter": {
+                    "name": "chapter",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "verse": {
+                    "name": "verse",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "typingData": {
+                    "name": "typingData",
+                    "type": "jsonb",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {
+                "typedVerse_userId_idx": {
+                    "name": "typedVerse_userId_idx",
+                    "columns": [
+                        {
+                            "expression": "userId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                },
+                "typingSessionId_userId_idx": {
+                    "name": "typingSessionId_userId_idx",
+                    "columns": [
+                        {
+                            "expression": "typingSessionId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        },
+                        {
+                            "expression": "userId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                },
+                "typingSessionId_idx": {
+                    "name": "typingSessionId_idx",
+                    "columns": [
+                        {
+                            "expression": "typingSessionId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                },
+                "typedVerse_classroomAssignmentId_idx": {
+                    "name": "typedVerse_classroomAssignmentId_idx",
+                    "columns": [
+                        {
+                            "expression": "classroomAssignmentId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.typingSession": {
+            "name": "typingSession",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "varchar(255)",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "userId": {
+                    "name": "userId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "typingSession_userId_idx": {
+                    "name": "typingSession_userId_idx",
+                    "columns": [
+                        {
+                            "expression": "userId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.userBookProgress": {
+            "name": "userBookProgress",
+            "schema": "",
+            "columns": {
+                "userId": {
+                    "name": "userId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "book": {
+                    "name": "book",
+                    "type": "typedVerse_book",
+                    "typeSchema": "public",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "translation": {
+                    "name": "translation",
+                    "type": "typedVerse_translation",
+                    "typeSchema": "public",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "prestige": {
+                    "name": "prestige",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "typedVerseCount": {
+                    "name": "typedVerseCount",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "totalVerses": {
+                    "name": "totalVerses",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "userBookProgress_userId_idx": {
+                    "name": "userBookProgress_userId_idx",
+                    "columns": [
+                        {
+                            "expression": "userId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {
+                "userBookProgress_userId_book_translation_pk": {
+                    "name": "userBookProgress_userId_book_translation_pk",
+                    "columns": ["userId", "book", "translation"]
+                }
+            },
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.userChangelog": {
+            "name": "userChangelog",
+            "schema": "",
+            "columns": {
+                "userId": {
+                    "name": "userId",
+                    "type": "varchar(255)",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "lastVisitedAt": {
+                    "name": "lastVisitedAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.userChapterProgress": {
+            "name": "userChapterProgress",
+            "schema": "",
+            "columns": {
+                "userId": {
+                    "name": "userId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "book": {
+                    "name": "book",
+                    "type": "typedVerse_book",
+                    "typeSchema": "public",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "chapter": {
+                    "name": "chapter",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "translation": {
+                    "name": "translation",
+                    "type": "typedVerse_translation",
+                    "typeSchema": "public",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "typedVerses": {
+                    "name": "typedVerses",
+                    "type": "jsonb",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "'{}'::jsonb"
+                },
+                "typedVerseCount": {
+                    "name": "typedVerseCount",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "totalVerses": {
+                    "name": "totalVerses",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "userChapterProgress_userId_idx": {
+                    "name": "userChapterProgress_userId_idx",
+                    "columns": [
+                        {
+                            "expression": "userId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                },
+                "userChapterProgress_userId_book_idx": {
+                    "name": "userChapterProgress_userId_book_idx",
+                    "columns": [
+                        {
+                            "expression": "userId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        },
+                        {
+                            "expression": "book",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {
+                "userChapterProgress_userId_book_chapter_translation_pk": {
+                    "name": "userChapterProgress_userId_book_chapter_translation_pk",
+                    "columns": ["userId", "book", "chapter", "translation"]
+                }
+            },
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.userCurrentTheme": {
+            "name": "userCurrentTheme",
+            "schema": "",
+            "columns": {
+                "userId": {
+                    "name": "userId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "colorScheme": {
+                    "name": "colorScheme",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "lightThemeId": {
+                    "name": "lightThemeId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "darkThemeId": {
+                    "name": "darkThemeId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "userCurrentTheme_userId_unique": {
+                    "name": "userCurrentTheme_userId_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["userId"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {
+                "schemeToThemeCheck": {
+                    "name": "schemeToThemeCheck",
+                    "value": "\n        (\"userCurrentTheme\".\"colorScheme\" IS 'system' AND \"userCurrentTheme\".\"lightThemeId\" IS NOT NULL AND \"userCurrentTheme\".\"darkThemeId\" IS NOT NULL) OR\n        (\"userCurrentTheme\".\"colorScheme\" IS 'light' AND \"userCurrentTheme\".\"lightThemeId\" IS NOT NULL AND \"userCurrentTheme\".\"darkThemeId\" IS NULL) OR\n        (\"userCurrentTheme\".\"colorScheme\" IS 'dark' AND \"userCurrentTheme\".\"lightThemeId\" IS NULL AND \"userCurrentTheme\".\"darkThemeId\" IS NOT NULL)\n        "
+                }
+            },
+            "isRLSEnabled": false
+        },
+        "public.userDailyActivity": {
+            "name": "userDailyActivity",
+            "schema": "",
+            "columns": {
+                "userId": {
+                    "name": "userId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "date": {
+                    "name": "date",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "verseCount": {
+                    "name": "verseCount",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "passages": {
+                    "name": "passages",
+                    "type": "jsonb",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "'[]'::jsonb"
+                },
+                "averageWpm": {
+                    "name": "averageWpm",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "averageAccuracy": {
+                    "name": "averageAccuracy",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "averageCorrectedAccuracy": {
+                    "name": "averageCorrectedAccuracy",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "versesWithStats": {
+                    "name": "versesWithStats",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "userDailyActivity_userId_idx": {
+                    "name": "userDailyActivity_userId_idx",
+                    "columns": [
+                        {
+                            "expression": "userId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                },
+                "userDailyActivity_userId_date_idx": {
+                    "name": "userDailyActivity_userId_date_idx",
+                    "columns": [
+                        {
+                            "expression": "userId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        },
+                        {
+                            "expression": "date",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {
+                "userDailyActivity_userId_date_pk": {
+                    "name": "userDailyActivity_userId_date_pk",
+                    "columns": ["userId", "date"]
+                }
+            },
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.userTheme": {
+            "name": "userTheme",
+            "schema": "",
+            "columns": {
+                "userId": {
+                    "name": "userId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "themeId": {
+                    "name": "themeId",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "userTheme_userId_idx": {
+                    "name": "userTheme_userId_idx",
+                    "columns": [
+                        {
+                            "expression": "userId",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.user": {
+            "name": "user",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "varchar(255)",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "email": {
+                    "name": "email",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "emailVerified": {
+                    "name": "emailVerified",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false,
+                    "default": "CURRENT_TIMESTAMP(3)"
+                },
+                "image": {
+                    "name": "image",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "hashedPassword": {
+                    "name": "hashedPassword",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.verificationToken": {
+            "name": "verificationToken",
+            "schema": "",
+            "columns": {
+                "identifier": {
+                    "name": "identifier",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "token": {
+                    "name": "token",
+                    "type": "varchar(255)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "expires": {
+                    "name": "expires",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {
+                "verificationToken_identifier_token_pk": {
+                    "name": "verificationToken_identifier_token_pk",
+                    "columns": ["identifier", "token"]
+                }
+            },
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        }
+    },
+    "enums": {
+        "public.courseWork_state": {
+            "name": "courseWork_state",
+            "schema": "public",
+            "values": ["DRAFT", "PUBLISHED", "DELETED"]
+        },
+        "public.passageResponse_book": {
+            "name": "passageResponse_book",
+            "schema": "public",
+            "values": [
+                "genesis",
+                "exodus",
+                "leviticus",
+                "numbers",
+                "deuteronomy",
+                "joshua",
+                "judges",
+                "ruth",
+                "1_samuel",
+                "2_samuel",
+                "1_kings",
+                "2_kings",
+                "1_chronicles",
+                "2_chronicles",
+                "ezra",
+                "nehemiah",
+                "esther",
+                "job",
+                "psalm",
+                "proverbs",
+                "ecclesiastes",
+                "song_of_solomon",
+                "isaiah",
+                "jeremiah",
+                "lamentations",
+                "ezekiel",
+                "daniel",
+                "hosea",
+                "joel",
+                "amos",
+                "obadiah",
+                "jonah",
+                "micah",
+                "nahum",
+                "habakkuk",
+                "zephaniah",
+                "haggai",
+                "zechariah",
+                "malachi",
+                "matthew",
+                "mark",
+                "luke",
+                "john",
+                "acts",
+                "romans",
+                "1_corinthians",
+                "2_corinthians",
+                "galatians",
+                "ephesians",
+                "philippians",
+                "colossians",
+                "1_thessalonians",
+                "2_thessalonians",
+                "1_timothy",
+                "2_timothy",
+                "titus",
+                "philemon",
+                "hebrews",
+                "james",
+                "1_peter",
+                "2_peter",
+                "1_john",
+                "2_john",
+                "3_john",
+                "jude",
+                "revelation"
+            ]
+        },
+        "public.passageResponse_translation": {
+            "name": "passageResponse_translation",
+            "schema": "public",
+            "values": [
+                "esv",
+                "bsb",
+                "nlt",
+                "niv",
+                "csb",
+                "nkjv",
+                "nasb",
+                "ntv",
+                "msg"
+            ]
+        },
+        "public.typedVerse_book": {
+            "name": "typedVerse_book",
+            "schema": "public",
+            "values": [
+                "genesis",
+                "exodus",
+                "leviticus",
+                "numbers",
+                "deuteronomy",
+                "joshua",
+                "judges",
+                "ruth",
+                "1_samuel",
+                "2_samuel",
+                "1_kings",
+                "2_kings",
+                "1_chronicles",
+                "2_chronicles",
+                "ezra",
+                "nehemiah",
+                "esther",
+                "job",
+                "psalm",
+                "proverbs",
+                "ecclesiastes",
+                "song_of_solomon",
+                "isaiah",
+                "jeremiah",
+                "lamentations",
+                "ezekiel",
+                "daniel",
+                "hosea",
+                "joel",
+                "amos",
+                "obadiah",
+                "jonah",
+                "micah",
+                "nahum",
+                "habakkuk",
+                "zephaniah",
+                "haggai",
+                "zechariah",
+                "malachi",
+                "matthew",
+                "mark",
+                "luke",
+                "john",
+                "acts",
+                "romans",
+                "1_corinthians",
+                "2_corinthians",
+                "galatians",
+                "ephesians",
+                "philippians",
+                "colossians",
+                "1_thessalonians",
+                "2_thessalonians",
+                "1_timothy",
+                "2_timothy",
+                "titus",
+                "philemon",
+                "hebrews",
+                "james",
+                "1_peter",
+                "2_peter",
+                "1_john",
+                "2_john",
+                "3_john",
+                "jude",
+                "revelation"
+            ]
+        },
+        "public.typedVerse_translation": {
+            "name": "typedVerse_translation",
+            "schema": "public",
+            "values": [
+                "esv",
+                "bsb",
+                "nlt",
+                "niv",
+                "csb",
+                "nkjv",
+                "nasb",
+                "ntv",
+                "msg"
+            ]
+        }
+    },
+    "schemas": {},
+    "sequences": {},
+    "roles": {},
+    "policies": {},
+    "views": {},
+    "_meta": {
+        "columns": {},
+        "schemas": {},
+        "tables": {}
+    }
+}

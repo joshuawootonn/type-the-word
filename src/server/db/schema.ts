@@ -569,6 +569,7 @@ export const classroomAssignment = pgTable(
         maxPoints: integer("maxPoints").notNull().default(100),
         dueDate: timestamp("dueDate", { mode: "date" }),
         state: courseWorkState("state").notNull().default("DRAFT"),
+        lastSyncedAt: timestamp("lastSyncedAt", { mode: "date" }),
         createdAt: timestamp("createdAt", { mode: "date" })
             .notNull()
             .$default(() => sql`CURRENT_TIMESTAMP(3)`),

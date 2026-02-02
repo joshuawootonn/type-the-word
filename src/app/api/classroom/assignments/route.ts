@@ -1,3 +1,4 @@
+import { eq, and, sql, or, gte, lt, isNull } from "drizzle-orm"
 import { getServerSession } from "next-auth"
 import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
@@ -9,21 +10,384 @@ import {
     validatePassageRange,
 } from "~/lib/validate-passage-range"
 import { authOptions } from "~/server/auth"
+import { getValidStudentToken } from "~/server/classroom/student-token"
+import { syncFutureAssignments } from "~/server/classroom/sync-assignments"
+import { getValidTeacherToken } from "~/server/classroom/teacher-token"
 import {
     createCourseWork,
     refreshAccessToken,
 } from "~/server/clients/classroom.client"
-import { type Book, type Translation } from "~/server/db/schema"
+import { db } from "~/server/db"
 import {
-    createAssignment,
+    classroomAssignment,
+    classroomSubmission,
+    type Book,
+    type Translation,
+} from "~/server/db/schema"
+import {
     getTeacherToken,
+    getStudentToken,
+    createAssignment,
     updateTeacherTokenAccess,
 } from "~/server/repositories/classroom.repository"
 
 import {
+    type AssignmentsResponse,
     createAssignmentRequestSchema,
     type CreateAssignmentResponse,
 } from "../schemas"
+
+/**
+ * Unified endpoint for getting assignments - works for both teachers and students
+ * GET /api/classroom/assignments?courseId=xxx&page=0&limit=10
+ */
+export async function GET(request: NextRequest) {
+    const session = await getServerSession(authOptions)
+
+    if (!session?.user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    try {
+        const searchParams = request.nextUrl.searchParams
+        const courseId = searchParams.get("courseId")
+        const page = parseInt(searchParams.get("page") ?? "0")
+        const limit = parseInt(searchParams.get("limit") ?? "10")
+
+        if (!courseId) {
+            return NextResponse.json(
+                { error: "courseId is required" },
+                { status: 400 },
+            )
+        }
+
+        // Determine user role
+        const teacherToken = await getTeacherToken(session.user.id).catch(
+            () => null,
+        )
+        const studentToken = await getStudentToken(session.user.id).catch(
+            () => null,
+        )
+
+        if (!teacherToken && !studentToken) {
+            return NextResponse.json(
+                { error: "Google Classroom not connected" },
+                { status: 403 },
+            )
+        }
+
+        const isTeacher = !!teacherToken
+
+        if (isTeacher) {
+            // TEACHER FLOW
+
+            // Sync assignments that haven't been synced in the last hour
+            try {
+                const token = await getValidTeacherToken(session.user.id)
+                const now = new Date()
+                const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
+
+                // Get assignments that need syncing:
+                // - DRAFT or future due dates
+                // - AND (never synced OR last synced > 1 hour ago)
+                const assignmentsToSync = await db
+                    .select({
+                        id: classroomAssignment.id,
+                        courseId: classroomAssignment.courseId,
+                        courseWorkId: classroomAssignment.courseWorkId,
+                        title: classroomAssignment.title,
+                        description: classroomAssignment.description,
+                        dueDate: classroomAssignment.dueDate,
+                        state: classroomAssignment.state,
+                    })
+                    .from(classroomAssignment)
+                    .where(
+                        and(
+                            eq(
+                                classroomAssignment.teacherUserId,
+                                session.user.id,
+                            ),
+                            eq(classroomAssignment.courseId, courseId),
+                            or(
+                                eq(classroomAssignment.state, "DRAFT"),
+                                gte(classroomAssignment.dueDate, now),
+                            ),
+                            or(
+                                isNull(classroomAssignment.lastSyncedAt),
+                                lt(
+                                    classroomAssignment.lastSyncedAt,
+                                    oneHourAgo,
+                                ),
+                            ),
+                        ),
+                    )
+
+                if (assignmentsToSync.length > 0) {
+                    await syncFutureAssignments(
+                        token.accessToken,
+                        assignmentsToSync,
+                    )
+
+                    // Update lastSyncedAt for all synced assignments
+                    await Promise.all(
+                        assignmentsToSync.map(assignment =>
+                            db
+                                .update(classroomAssignment)
+                                .set({ lastSyncedAt: now })
+                                .where(
+                                    eq(classroomAssignment.id, assignment.id),
+                                ),
+                        ),
+                    )
+                }
+            } catch (error) {
+                console.error("Error syncing with Google Classroom:", error)
+                // Continue with request even if sync fails
+            }
+
+            // Get total count
+            const countResult = await db
+                .select({ count: sql<number>`CAST(COUNT(*) AS INTEGER)` })
+                .from(classroomAssignment)
+                .where(
+                    and(
+                        eq(classroomAssignment.teacherUserId, session.user.id),
+                        eq(classroomAssignment.courseId, courseId),
+                    ),
+                )
+            const totalCount = countResult[0]?.count ?? 0
+
+            // Fetch paginated assignments with submission stats
+            const assignments = await db
+                .select({
+                    id: classroomAssignment.id,
+                    courseId: classroomAssignment.courseId,
+                    courseWorkId: classroomAssignment.courseWorkId,
+                    title: classroomAssignment.title,
+                    description: classroomAssignment.description,
+                    translation: classroomAssignment.translation,
+                    book: classroomAssignment.book,
+                    startChapter: classroomAssignment.startChapter,
+                    startVerse: classroomAssignment.startVerse,
+                    endChapter: classroomAssignment.endChapter,
+                    endVerse: classroomAssignment.endVerse,
+                    totalVerses: classroomAssignment.totalVerses,
+                    maxPoints: classroomAssignment.maxPoints,
+                    dueDate: classroomAssignment.dueDate,
+                    state: classroomAssignment.state,
+                    submissionCount: sql<number>`CAST(COUNT(${classroomSubmission.id}) AS INTEGER)`,
+                    completedCount: sql<number>`CAST(SUM(CASE WHEN ${classroomSubmission.isCompleted} = 1 THEN 1 ELSE 0 END) AS INTEGER)`,
+                    averageCompletion: sql<number>`
+                        CAST(
+                            COALESCE(
+                                AVG(
+                                    CAST(${classroomSubmission.completedVerses} AS FLOAT) / 
+                                    NULLIF(CAST(${classroomSubmission.totalVerses} AS FLOAT), 0) * 100
+                                ),
+                                0
+                            ) AS INTEGER
+                        )
+                    `,
+                })
+                .from(classroomAssignment)
+                .leftJoin(
+                    classroomSubmission,
+                    eq(
+                        classroomSubmission.assignmentId,
+                        classroomAssignment.id,
+                    ),
+                )
+                .where(
+                    and(
+                        eq(classroomAssignment.teacherUserId, session.user.id),
+                        eq(classroomAssignment.courseId, courseId),
+                    ),
+                )
+                .groupBy(classroomAssignment.id)
+                .orderBy(
+                    // Group by state: DRAFT → PUBLISHED → DELETED
+                    sql`CASE 
+                        WHEN ${classroomAssignment.state} = 'DRAFT' THEN 1
+                        WHEN ${classroomAssignment.state} = 'PUBLISHED' THEN 2
+                        WHEN ${classroomAssignment.state} = 'DELETED' THEN 3
+                    END`,
+                    // Then by due date (nulls last)
+                    sql`${classroomAssignment.dueDate} NULLS LAST`,
+                )
+                .limit(limit)
+                .offset(page * limit)
+
+            const response: AssignmentsResponse = {
+                assignments: assignments.map(a => ({
+                    ...a,
+                    dueDate: a.dueDate ? a.dueDate.toISOString() : null,
+                })),
+                pagination: {
+                    page,
+                    limit,
+                    total: totalCount,
+                    hasMore: (page + 1) * limit < totalCount,
+                },
+            }
+
+            return NextResponse.json(response)
+        } else {
+            // STUDENT FLOW
+
+            // Sync assignments that haven't been synced in the last hour
+            try {
+                const token = await getValidStudentToken(session.user.id)
+                const now = new Date()
+                const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
+
+                // Get assignments that need syncing:
+                // - PUBLISHED and future due dates
+                // - AND (never synced OR last synced > 1 hour ago)
+                const assignmentsToSync = await db
+                    .select({
+                        id: classroomAssignment.id,
+                        courseId: classroomAssignment.courseId,
+                        courseWorkId: classroomAssignment.courseWorkId,
+                        title: classroomAssignment.title,
+                        description: classroomAssignment.description,
+                        dueDate: classroomAssignment.dueDate,
+                        state: classroomAssignment.state,
+                    })
+                    .from(classroomAssignment)
+                    .where(
+                        and(
+                            eq(classroomAssignment.courseId, courseId),
+                            eq(classroomAssignment.state, "PUBLISHED"),
+                            gte(classroomAssignment.dueDate, now),
+                            or(
+                                isNull(classroomAssignment.lastSyncedAt),
+                                lt(
+                                    classroomAssignment.lastSyncedAt,
+                                    oneHourAgo,
+                                ),
+                            ),
+                        ),
+                    )
+
+                if (assignmentsToSync.length > 0) {
+                    await syncFutureAssignments(
+                        token.accessToken,
+                        assignmentsToSync,
+                    )
+
+                    // Update lastSyncedAt for all synced assignments
+                    await Promise.all(
+                        assignmentsToSync.map(assignment =>
+                            db
+                                .update(classroomAssignment)
+                                .set({ lastSyncedAt: now })
+                                .where(
+                                    eq(classroomAssignment.id, assignment.id),
+                                ),
+                        ),
+                    )
+                }
+            } catch (error) {
+                console.error("Error syncing with Google Classroom:", error)
+                // Continue with request even if sync fails
+            }
+
+            // Get total count
+            const countResult = await db
+                .select({ count: sql<number>`CAST(COUNT(*) AS INTEGER)` })
+                .from(classroomAssignment)
+                .where(
+                    and(
+                        eq(classroomAssignment.courseId, courseId),
+                        eq(classroomAssignment.state, "PUBLISHED"),
+                    ),
+                )
+            const totalCount = countResult[0]?.count ?? 0
+
+            // Fetch paginated published assignments with student's submission data
+            const assignments = await db
+                .select({
+                    id: classroomAssignment.id,
+                    courseId: classroomAssignment.courseId,
+                    courseWorkId: classroomAssignment.courseWorkId,
+                    title: classroomAssignment.title,
+                    description: classroomAssignment.description,
+                    translation: classroomAssignment.translation,
+                    book: classroomAssignment.book,
+                    startChapter: classroomAssignment.startChapter,
+                    startVerse: classroomAssignment.startVerse,
+                    endChapter: classroomAssignment.endChapter,
+                    endVerse: classroomAssignment.endVerse,
+                    totalVerses: classroomAssignment.totalVerses,
+                    maxPoints: classroomAssignment.maxPoints,
+                    dueDate: classroomAssignment.dueDate,
+                    state: classroomAssignment.state,
+                    // Student's submission data
+                    submissionId: classroomSubmission.id,
+                    completedVerses: classroomSubmission.completedVerses,
+                    averageWpm: classroomSubmission.averageWpm,
+                    averageAccuracy: classroomSubmission.averageAccuracy,
+                    isCompleted: classroomSubmission.isCompleted,
+                    isTurnedIn: classroomSubmission.isTurnedIn,
+                    startedAt: classroomSubmission.startedAt,
+                    completedAt: classroomSubmission.completedAt,
+                })
+                .from(classroomAssignment)
+                .leftJoin(
+                    classroomSubmission,
+                    and(
+                        eq(
+                            classroomSubmission.assignmentId,
+                            classroomAssignment.id,
+                        ),
+                        eq(classroomSubmission.studentUserId, session.user.id),
+                    ),
+                )
+                .where(
+                    and(
+                        eq(classroomAssignment.courseId, courseId),
+                        eq(classroomAssignment.state, "PUBLISHED"),
+                    ),
+                )
+                .orderBy(sql`${classroomAssignment.dueDate} NULLS LAST`)
+                .limit(limit)
+                .offset(page * limit)
+
+            const response: AssignmentsResponse = {
+                assignments: assignments.map(a => ({
+                    ...a,
+                    dueDate: a.dueDate ? a.dueDate.toISOString() : null,
+                    startedAt: a.startedAt ? a.startedAt.toISOString() : null,
+                    completedAt: a.completedAt
+                        ? a.completedAt.toISOString()
+                        : null,
+                    completionPercentage:
+                        a.totalVerses > 0
+                            ? Math.round(
+                                  ((a.completedVerses ?? 0) / a.totalVerses) *
+                                      100,
+                              )
+                            : 0,
+                    hasStarted: a.submissionId !== null,
+                })),
+                pagination: {
+                    page,
+                    limit,
+                    total: totalCount,
+                    hasMore: (page + 1) * limit < totalCount,
+                },
+            }
+
+            return NextResponse.json(response)
+        }
+    } catch (error) {
+        console.error("Error fetching assignments:", error)
+        return NextResponse.json(
+            { error: "Failed to fetch assignments" },
+            { status: 500 },
+        )
+    }
+}
 
 /**
  * Creates a new assignment in our DB and in Google Classroom
@@ -175,9 +539,6 @@ export async function POST(request: NextRequest) {
             dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
             state: "DRAFT",
         })
-
-        // TODO: Update the CourseWork link to point to the actual assignment
-        // For now, we'll return the assignment ID so the frontend can construct the link
 
         const response: CreateAssignmentResponse = {
             assignmentId: assignment.id,

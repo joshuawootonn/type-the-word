@@ -206,7 +206,7 @@ export function CurrentVerse({
                             ...prevChapterHistory,
                             verses: {
                                 ...prevChapterHistory.verses,
-                                [verse.verse]: true,
+                                [verse.verse]: true
                             },
                         }
                     },

@@ -2,15 +2,16 @@
 
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query"
 import NextLink from "next/link"
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 
+import { AssignmentStatusBadge } from "~/components/assignment-status-badge"
 import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
 import { Link } from "~/components/ui/link"
 import toProperCase from "~/lib/toProperCase"
 
 import { type Assignment } from "../../api/classroom/schemas"
-import { fetchCourseAssignments, publishAssignment } from "./actions"
+import { fetchAssignments, publishAssignment } from "./actions"
 
 interface TeacherClientPageProps {
     courseId: string
@@ -24,43 +25,15 @@ export function TeacherClientPage({
     const [publishingId, setPublishingId] = useState<string | null>(null)
     const queryClient = useQueryClient()
 
-    // Three separate infinite queries for each status
-    const currentQuery = useInfiniteQuery({
-        queryKey: ["assignments", courseId, "current"],
+    // Single unified query with pagination
+    const assignmentsQuery = useInfiniteQuery({
+        queryKey: ["assignments", courseId],
         queryFn: ({ pageParam = 0 }) =>
-            fetchCourseAssignments({
-                courseId,
-                status: "current",
-                startingAfter: pageParam,
-            }),
+            fetchAssignments({ courseId, page: pageParam, limit: 10 }),
         getNextPageParam: lastPage =>
-            lastPage.hasMore ? lastPage.startingAfter : undefined,
-        initialPageParam: 0,
-    })
-
-    const draftQuery = useInfiniteQuery({
-        queryKey: ["assignments", courseId, "draft"],
-        queryFn: ({ pageParam = 0 }) =>
-            fetchCourseAssignments({
-                courseId,
-                status: "draft",
-                startingAfter: pageParam,
-            }),
-        getNextPageParam: lastPage =>
-            lastPage.hasMore ? lastPage.startingAfter : undefined,
-        initialPageParam: 0,
-    })
-
-    const archivedQuery = useInfiniteQuery({
-        queryKey: ["assignments", courseId, "archived"],
-        queryFn: ({ pageParam = 0 }) =>
-            fetchCourseAssignments({
-                courseId,
-                status: "archived",
-                startingAfter: pageParam,
-            }),
-        getNextPageParam: lastPage =>
-            lastPage.hasMore ? lastPage.startingAfter : undefined,
+            lastPage.pagination.hasMore
+                ? lastPage.pagination.page + 1
+                : undefined,
         initialPageParam: 0,
     })
 
@@ -69,7 +42,7 @@ export function TeacherClientPage({
             setPublishingId(assignmentId)
             try {
                 await publishAssignment(assignmentId)
-                // Invalidate all queries to refetch
+                // Invalidate query to refetch
                 await queryClient.invalidateQueries({
                     queryKey: ["assignments", courseId],
                 })
@@ -82,24 +55,17 @@ export function TeacherClientPage({
         [courseId, queryClient],
     )
 
-    // Extract assignments from pages
-    const currentAssignments =
-        currentQuery.data?.pages.flatMap(page => page.assignments) ?? []
-    const draftAssignments =
-        draftQuery.data?.pages.flatMap(page => page.assignments) ?? []
-    const archivedAssignments =
-        archivedQuery.data?.pages.flatMap(page => page.assignments) ?? []
+    // Extract all assignments from pages (flat list)
+    const allAssignments = useMemo(
+        () =>
+            (assignmentsQuery.data?.pages.flatMap(page => page.assignments) ??
+                []) as Assignment[],
+        [assignmentsQuery.data],
+    )
 
-    const isInitialLoading =
-        currentQuery.isLoading ||
-        draftQuery.isLoading ||
-        archivedQuery.isLoading
-    const hasError =
-        currentQuery.error || draftQuery.error || archivedQuery.error
-    const totalAssignments =
-        currentAssignments.length +
-        draftAssignments.length +
-        archivedAssignments.length
+    const isInitialLoading = assignmentsQuery.isLoading
+    const hasError = !!assignmentsQuery.error
+    const totalAssignments = allAssignments.length
 
     return (
         <div>
@@ -136,96 +102,25 @@ export function TeacherClientPage({
                     </Link>
                 </div>
             ) : (
-                <div className="not-prose space-y-8">
-                    {/* Current Assignments */}
-                    {currentAssignments.length > 0 && (
-                        <section>
-                            <h2 className="mb-4 text-xl font-semibold">
-                                Current Assignments
-                            </h2>
-                            <div className="space-y-3">
-                                {currentAssignments.map(assignment => (
-                                    <AssignmentCard
-                                        key={assignment.id}
-                                        assignment={assignment}
-                                        courseId={courseId}
-                                    />
-                                ))}
-                            </div>
-                            {currentQuery.hasNextPage && (
-                                <Button
-                                    onClick={() => currentQuery.fetchNextPage()}
-                                    isLoading={currentQuery.isFetchingNextPage}
-                                    loadingLabel="Loading"
-                                    className="mt-3 w-full"
-                                >
-                                    Load More
-                                </Button>
-                            )}
-                        </section>
-                    )}
-
-                    {/* Draft Assignments */}
-                    {draftAssignments.length > 0 && (
-                        <section>
-                            <h2 className="mb-4 text-xl font-semibold">
-                                Draft Assignments
-                            </h2>
-                            <div className="space-y-3">
-                                {draftAssignments.map(assignment => (
-                                    <AssignmentCard
-                                        key={assignment.id}
-                                        assignment={assignment}
-                                        courseId={courseId}
-                                        onPublish={handlePublish}
-                                        isPublishing={
-                                            publishingId === assignment.id
-                                        }
-                                    />
-                                ))}
-                            </div>
-                            {draftQuery.hasNextPage && (
-                                <Button
-                                    onClick={() => draftQuery.fetchNextPage()}
-                                    isLoading={draftQuery.isFetchingNextPage}
-                                    loadingLabel="Loading"
-                                    className="mt-3 w-full"
-                                >
-                                    Load More
-                                </Button>
-                            )}
-                        </section>
-                    )}
-
-                    {/* Archived Assignments (Expandable) */}
-                    {archivedAssignments.length > 0 && (
-                        <details className="border-t-2 border-primary pt-6">
-                            <summary className="cursor-pointer font-semibold">
-                                Archived Assignments (
-                                {archivedAssignments.length})
-                            </summary>
-                            <div className="mt-4 space-y-3">
-                                {archivedAssignments.map(assignment => (
-                                    <AssignmentCard
-                                        key={assignment.id}
-                                        assignment={assignment}
-                                        courseId={courseId}
-                                    />
-                                ))}
-                            </div>
-                            {archivedQuery.hasNextPage && (
-                                <Button
-                                    onClick={() =>
-                                        archivedQuery.fetchNextPage()
-                                    }
-                                    isLoading={archivedQuery.isFetchingNextPage}
-                                    loadingLabel="Loading"
-                                    className="mt-3 w-full"
-                                >
-                                    Load More
-                                </Button>
-                            )}
-                        </details>
+                <div className="not-prose space-y-3">
+                    {allAssignments.map(assignment => (
+                        <AssignmentCard
+                            key={assignment.id}
+                            assignment={assignment}
+                            courseId={courseId}
+                            onPublish={handlePublish}
+                            isPublishing={publishingId === assignment.id}
+                        />
+                    ))}
+                    {assignmentsQuery.hasNextPage && (
+                        <Button
+                            onClick={() => assignmentsQuery.fetchNextPage()}
+                            isLoading={assignmentsQuery.isFetchingNextPage}
+                            loadingLabel="Loading"
+                            className="mt-3 w-full"
+                        >
+                            Load More
+                        </Button>
                     )}
                 </div>
             )}
@@ -253,8 +148,14 @@ function AssignmentCard({
                 className="block p-4 no-underline"
             >
                 <div className="flex flex-col items-start justify-between gap-2">
-                    <div className="font-semibold text-primary">
-                        {assignment.title}
+                    <div className="flex items-center gap-2">
+                        <div className="font-semibold text-primary">
+                            {assignment.title}
+                        </div>
+                        <AssignmentStatusBadge
+                            state={assignment.state}
+                            dueDate={assignment.dueDate}
+                        />
                     </div>
                     <div className="text-sm opacity-75">
                         {passageRef} ({assignment.translation.toUpperCase()})
@@ -276,12 +177,6 @@ function AssignmentCard({
                                 average)
                             </div>
                         )}
-
-                    {assignment.state === "DRAFT" && (
-                        <div className="text-sm opacity-75">
-                            Draft - Not visible to students
-                        </div>
-                    )}
                 </div>
             </NextLink>
 
