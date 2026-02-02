@@ -10,10 +10,14 @@ import { useSession } from "next-auth/react"
 import React, { FormEvent, KeyboardEvent, useEffect, useRef } from "react"
 import { z } from "zod"
 
-import { AssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
+import {
+    AssignmentHistory,
+    VerseStats,
+} from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
 import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
 import { AddTypedVerseBody } from "~/app/api/typing-session/[id]/route"
 import { getOS } from "~/app/global-hotkeys"
+import { calculateStatsForVerse } from "~/app/history/wpm"
 import {
     passageIdAtom,
     autofocusAtom,
@@ -202,12 +206,47 @@ export function CurrentVerse({
                             return undefined
                         }
 
-                        return {
-                            ...prevChapterHistory,
-                            verses: {
-                                ...prevChapterHistory.verses,
-                                [verse.verse]: true
-                            },
+                        const isChapterHistory = classroomAssignmentId == null
+
+                        if (isChapterHistory) {
+                            // ChapterHistory: set verse to true
+                            return {
+                                ...prevChapterHistory,
+                                verses: {
+                                    ...prevChapterHistory.verses,
+                                    [verse.verse]: true,
+                                },
+                            } as ChapterHistory
+                        } else {
+                            // AssignmentHistory: calculate stats and set verse to VerseStats
+                            const stats = verse.typingData
+                                ? calculateStatsForVerse({
+                                      id: crypto.randomUUID(),
+                                      userId: crypto.randomUUID(),
+                                      typingSessionId: verse.typingSessionId,
+                                      translation: verse.translation,
+                                      book: verse.book,
+                                      chapter: verse.chapter,
+                                      verse: verse.verse,
+                                      createdAt: new Date(),
+                                      typingData: verse.typingData,
+                                      classroomAssignmentId:
+                                          verse.classroomAssignmentId ?? null,
+                                  })
+                                : null
+
+                            const verseStats: VerseStats = {
+                                wpm: stats?.wpm ?? null,
+                                accuracy: stats?.accuracy ?? null,
+                            }
+
+                            return {
+                                ...prevChapterHistory,
+                                verses: {
+                                    ...prevChapterHistory.verses,
+                                    [verse.verse]: verseStats,
+                                },
+                            } as AssignmentHistory
                         }
                     },
                 )
