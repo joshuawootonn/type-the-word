@@ -135,158 +135,167 @@ export function ClientPage({
                 </div>
             )}
 
-            <div className="space-y-6">
-                <h2>Student Connection</h2>
-                <p>
-                    Connect as a student to submit your assignments back to
-                    Classroom.
-                </p>
+            {!isConnected && (
+                <div className="space-y-6">
+                    <h2>Student Connection</h2>
+                    <p>
+                        Connect as a student to submit your assignments back to
+                        Classroom.
+                    </p>
 
-                {isStudentConnected && studentSuccess && (
-                    <div className="flex items-start gap-3 border-2 border-success bg-secondary p-4">
-                        <div className="text-sm text-success">
-                            Student account connected successfully.
-                        </div>
-                    </div>
-                )}
-
-                {isStudentConnected ? (
-                    <>
-                        <div className="flex items-center gap-4 border-2 border-primary bg-secondary p-4">
-                            <svg
-                                className="h-8 w-8 text-success"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path d="M5 13l4 4L19 7" />
-                            </svg>
-                            <div>
-                                <div className="font-medium text-primary">
-                                    Connected as Student
-                                </div>
-                                <div className="text-sm text-primary opacity-75">
-                                    Your student account is linked and ready to
-                                    submit assignments
-                                </div>
+                    {isStudentConnected && studentSuccess && (
+                        <div className="flex items-start gap-3 border-2 border-success bg-secondary p-4">
+                            <div className="text-sm text-success">
+                                Student account connected successfully.
                             </div>
                         </div>
+                    )}
 
-                        <Button
-                            onClick={() => {
-                                void handleStudentDisconnect()
-                            }}
-                            disabled={isStudentLoading}
-                        >
-                            Disconnect Student Account
-                        </Button>
-                    </>
-                ) : (
-                    <div>
-                        {isInitiallyAuthed ? (
-                            <Button
-                                onClick={() => {
-                                    void handleStudentConnect()
-                                }}
-                                disabled={isStudentLoading}
-                            >
-                                {isStudentLoading ? (
-                                    <>Connecting...</>
-                                ) : (
-                                    <>Connect as Student</>
-                                )}
-                            </Button>
-                        ) : (
-                            <Link href="/auth/login?callbackUrl=%2Fclassroom">
-                                Log in
-                            </Link>
-                        )}
-                    </div>
-                )}
-            </div>
-
-            <div className="space-y-6">
-                <h2>Teacher Connection</h2>
-                <p>
-                    Connect as a teacher to create assignments and track student
-                    progress.
-                </p>
-
-                {isConnected && success && (
-                    <div className="flex items-start gap-3 border-2 border-success bg-secondary p-4">
-                        <div className="text-sm text-success">
-                            Teacher account connected successfully.
-                        </div>
-                    </div>
-                )}
-
-                {isConnected ? (
-                    <>
-                        <div className="flex items-center gap-4 border-2 border-primary bg-secondary p-4">
-                            <svg
-                                className="h-8 w-8 text-success"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path d="M5 13l4 4L19 7" />
-                            </svg>
-                            <div>
-                                <div className="font-medium text-primary">
-                                    Connected as teacher
-                                </div>
-                                <div className="text-pretty text-sm text-primary opacity-75">
-                                    Your teacher account is linked. Create
-                                    assigments or head to the dashboard to track
-                                    how current assignments are going.
+                    {isStudentConnected ? (
+                        <>
+                            <div className="flex items-center gap-4 border-2 border-primary bg-secondary p-4">
+                                <svg
+                                    className="h-8 w-8 text-success"
+                                    fill="none"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path d="M5 13l4 4L19 7" />
+                                </svg>
+                                <div>
+                                    <div className="font-medium text-primary">
+                                        Connected as Student
+                                    </div>
+                                    <div className="text-sm text-primary opacity-75">
+                                        Your student account is linked and ready
+                                        to submit assignments
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="flex flex-wrap gap-3">
-                            <Link href="/classroom/assign">
-                                Create assignment
-                            </Link>
-                            <Link href="/classroom/dashboard">
-                                View dashboard
-                            </Link>
-                            <Button
-                                onClick={() => {
-                                    void handleDisconnect()
-                                }}
-                                disabled={isLoading}
-                            >
-                                Disconnect from Google Classroom
-                            </Button>
+                            <div className="flex flex-wrap gap-3">
+                                <Link href="/classroom/dashboard">
+                                    View dashboard
+                                </Link>
+                                <Button
+                                    onClick={() => {
+                                        void handleStudentDisconnect()
+                                    }}
+                                    disabled={isStudentLoading}
+                                >
+                                    Disconnect Student Account
+                                </Button>
+                            </div>
+                        </>
+                    ) : (
+                        <div>
+                            {isInitiallyAuthed ? (
+                                <Button
+                                    onClick={() => {
+                                        void handleStudentConnect()
+                                    }}
+                                    disabled={isStudentLoading}
+                                >
+                                    {isStudentLoading ? (
+                                        <>Connecting...</>
+                                    ) : (
+                                        <>Connect as Student</>
+                                    )}
+                                </Button>
+                            ) : (
+                                <Link href="/auth/login?callbackUrl=%2Fclassroom">
+                                    Log in
+                                </Link>
+                            )}
                         </div>
-                    </>
-                ) : (
-                    <div>
-                        {isInitiallyAuthed ? (
-                            <Button
-                                onClick={() => {
-                                    void handleConnect()
-                                }}
-                                disabled={isLoading}
-                                loadingLabel="Connecting"
-                                isLoading={isLoading}
-                            >
-                                Connect as Teacher
-                            </Button>
-                        ) : (
-                            <Link href="/auth/login?callbackUrl=%2Fclassroom">
-                                Log in
-                            </Link>
-                        )}
-                    </div>
-                )}
-            </div>
+                    )}
+                </div>
+            )}
+
+            {!isStudentConnected && (
+                <div className="space-y-6">
+                    <h2>Teacher Connection</h2>
+                    <p>
+                        Connect as a teacher to create assignments and track
+                        student progress.
+                    </p>
+
+                    {isConnected && success && (
+                        <div className="flex items-start gap-3 border-2 border-success bg-secondary p-4">
+                            <div className="text-sm text-success">
+                                Teacher account connected successfully.
+                            </div>
+                        </div>
+                    )}
+
+                    {isConnected ? (
+                        <>
+                            <div className="flex items-center gap-4 border-2 border-primary bg-secondary p-4">
+                                <svg
+                                    className="h-8 w-8 text-success"
+                                    fill="none"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path d="M5 13l4 4L19 7" />
+                                </svg>
+                                <div>
+                                    <div className="font-medium text-primary">
+                                        Connected as teacher
+                                    </div>
+                                    <div className="text-pretty text-sm text-primary opacity-75">
+                                        Your teacher account is linked. Create
+                                        assigments or head to the dashboard to
+                                        track how current assignments are going.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-wrap gap-3">
+                                <Link href="/classroom/assign">
+                                    Create assignment
+                                </Link>
+                                <Link href="/classroom/dashboard">
+                                    View dashboard
+                                </Link>
+                                <Button
+                                    onClick={() => {
+                                        void handleDisconnect()
+                                    }}
+                                    disabled={isLoading}
+                                >
+                                    Disconnect from Google Classroom
+                                </Button>
+                            </div>
+                        </>
+                    ) : (
+                        <div>
+                            {isInitiallyAuthed ? (
+                                <Button
+                                    onClick={() => {
+                                        void handleConnect()
+                                    }}
+                                    disabled={isLoading}
+                                    loadingLabel="Connecting"
+                                    isLoading={isLoading}
+                                >
+                                    Connect as Teacher
+                                </Button>
+                            ) : (
+                                <Link href="/auth/login?callbackUrl=%2Fclassroom">
+                                    Log in
+                                </Link>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
         </>
     )
 }
