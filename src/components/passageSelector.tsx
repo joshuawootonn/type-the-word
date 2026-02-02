@@ -201,7 +201,11 @@ export function PassageSelector({
             <label htmlFor="passage" className={clsx(labelClassName)}>
                 {label ?? "Passage:"}
             </label>
-            <div className={"not-prose svg-outline relative flex flex-row"}>
+            <div
+                className={
+                    "not-prose svg-outline relative flex flex-row text-base"
+                }
+            >
                 <Combobox
                     as="div"
                     className="relative"
@@ -225,13 +229,13 @@ export function PassageSelector({
                             translations.find(tr => tr.value === t)?.label ?? t
                         }
                         className={
-                            "w-20 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none"
+                            "w-[8ch] rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none"
                         }
                         autoComplete="false"
                         data-1p-ignore={true}
                     />
                     {isFirstRender && (
-                        <div className="absolute left-1 top-1 translate-y-0.5 font-medium text-primary">
+                        <div className="absolute left-1 top-1 translate-x-0.5 translate-y-0.5 font-medium text-primary">
                             {translations.find(t => t.value === translation)
                                 ?.label ?? translation}
                         </div>
@@ -321,7 +325,7 @@ export function PassageSelector({
                     />
                     {/* `ComboBox` from headlessui has to be in a client component, which is why I have to fake the SSR to prevent flickering.*/}
                     {isFirstRender && (
-                        <div className="absolute left-1 top-1 -translate-x-0.5 translate-y-0.5 font-medium text-primary">
+                        <div className="absolute left-1 top-1 translate-y-0.5 font-medium text-primary">
                             {simpleBibleMetadata[book]?.name ?? ""}
                         </div>
                     )}
@@ -409,7 +413,7 @@ export function PassageSelector({
                     />
                     {/* `ComboBox` from headlessui has to be in a client component, which is why I have to fake the SSR to prevent flickering.*/}
                     {isFirstRender && (
-                        <div className="absolute left-1 top-1 -translate-x-1 translate-y-0.5 font-medium text-primary">
+                        <div className="absolute left-1 top-1 -translate-x-0.5 translate-y-0.5 font-medium text-primary">
                             {chapter}
                         </div>
                     )}
