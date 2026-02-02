@@ -1,6 +1,7 @@
 import { ReactNode } from "react"
 
 import { PassageSelector } from "~/components/passageSelector"
+import { getLastTranslation } from "~/lib/last-translation"
 import { passageReferenceSchema } from "~/lib/passageReference"
 
 const DEFAULT_PASSAGE_REFERENCE = "psalm_23"
@@ -12,6 +13,7 @@ export default async function PassageLayout({
     children: ReactNode
     params: Promise<{ passage?: string }>
 }) {
+    const lastTranslation = await getLastTranslation()
     const { passage } = await params
     const value = passageReferenceSchema.parse(
         passage ?? DEFAULT_PASSAGE_REFERENCE,
@@ -22,6 +24,7 @@ export default async function PassageLayout({
                 <PassageSelector
                     value={value}
                     labelClassName="text-lg font-medium text-primary"
+                    initialTranslation={lastTranslation}
                 />
             </div>
             <main className="relative mx-auto w-full flex-grow">
