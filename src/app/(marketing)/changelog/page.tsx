@@ -68,6 +68,48 @@ export default async function Changelog() {
             <hr className="mx-0 w-full border-t-2 border-primary" />
             <ul>
                 <li>
+                    <DateComponent date={new Date("02/02/2026")} /> - New Bible
+                    translations are now generally available! You can now choose
+                    from ESV, BSB, NLT, NIV, CSB, NKJV, NASB, NTV, and MSG.
+                    <Image
+                        src={"/assets/2026-02-02-translation-selector.png"}
+                        alt={"Screenshot of the translation selector"}
+                        className="mt-3 border-2 border-primary"
+                        width={800}
+                        height={494}
+                    />
+                    To swap the translation you're using, you can either:
+                    <ul>
+                        <li>
+                            Change translations directly in the passage
+                            selector.
+                        </li>
+                        <li>Change translations by editing the URL bar.</li>
+                        <li>
+                            Or change translation in the "Overview" section
+                            within the <Link href="/history">/history</Link>{" "}
+                            page.
+                        </li>
+                    </ul>
+                    When you do your translation will be remebered across the
+                    site.
+                    <br />
+                    <br />
+                    Special thanks to{" "}
+                    <Link href="https://discord.com/channels/1197196234595778560/1452015526573506701">
+                        Justinian01 from the Discord server
+                    </Link>{" "}
+                    for sharing all the formatting issues he ran into. This was
+                    super helpful for finding, handling, and testing all the
+                    ways the Bible can be formatted.
+                    <br />
+                    <br />
+                    NIV and NASB are the most stable so far, and some of the
+                    other translations may still have formatting quirks. If you
+                    see any issues, please{" "}
+                    <EmailLink className="underline">email me</EmailLink>.
+                </li>
+                <li>
                     <DateComponent date={new Date("02/01/2026")} /> - Fixed a
                     bug that was happening in Chromebooks due to their
                     aggressive autocomplete / autocorrect features.
