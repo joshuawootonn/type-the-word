@@ -22,7 +22,6 @@ import {
     classroomAssignment,
     classroomSubmission,
     type Book,
-    type Translation,
 } from "~/server/db/schema"
 import {
     getTeacherToken,
@@ -406,13 +405,16 @@ export async function POST(request: NextRequest) {
         const data = createAssignmentRequestSchema.parse(body)
 
         // Validate passage range
-        const rangeValidation = validatePassageRange({
-            book: data.book as Book,
-            startChapter: data.startChapter,
-            startVerse: data.startVerse,
-            endChapter: data.endChapter,
-            endVerse: data.endVerse,
-        })
+        const rangeValidation = await validatePassageRange(
+            {
+                book: data.book as Book,
+                startChapter: data.startChapter,
+                startVerse: data.startVerse,
+                endChapter: data.endChapter,
+                endVerse: data.endVerse,
+            },
+            data.translation,
+        )
 
         if (!rangeValidation.valid) {
             return NextResponse.json(
@@ -422,13 +424,16 @@ export async function POST(request: NextRequest) {
         }
 
         // Calculate total verses in range
-        const totalVerses = countVersesInRange({
-            book: data.book as Book,
-            startChapter: data.startChapter,
-            startVerse: data.startVerse,
-            endChapter: data.endChapter,
-            endVerse: data.endVerse,
-        })
+        const totalVerses = await countVersesInRange(
+            {
+                book: data.book as Book,
+                startChapter: data.startChapter,
+                startVerse: data.startVerse,
+                endChapter: data.endChapter,
+                endVerse: data.endVerse,
+            },
+            data.translation,
+        )
 
         console.log(`Assignment will contain ${totalVerses} verses`)
 
@@ -528,7 +533,7 @@ export async function POST(request: NextRequest) {
             courseWorkId: courseWork.id,
             title: data.title,
             description: data.description,
-            translation: data.translation as Translation,
+            translation: data.translation,
             book: data.book as Book,
             startChapter: data.startChapter,
             startVerse: data.startVerse,

@@ -1,18 +1,24 @@
 import toProperCase from "~/lib/toProperCase"
 import { getBibleMetadata } from "~/server/bibleMetadata"
-import { Book } from "~/server/db/schema"
+import { Book, Translation } from "~/server/db/schema"
 import { TypedVerse } from "~/server/repositories/typingSession.repository"
 
-export function typingSessionToString(
+export async function typingSessionToString(
     typedVerses: TypedVerse[],
     {
         seperator,
         filter: _filter,
-    }: { seperator?: string; filter?: { book?: Book; chapter?: number } } = {
+        translation,
+    }: {
+        seperator?: string
+        filter?: { book?: Book; chapter?: number }
+        translation: Translation
+    } = {
         seperator: ",",
+        translation: "esv",
     },
 ) {
-    const bibleMetadata = getBibleMetadata()
+    const bibleMetadata = await getBibleMetadata(translation)
 
     const books = Array.from(new Set(typedVerses.map(verse => verse.book)))
         .sort(function (a, b) {

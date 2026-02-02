@@ -129,9 +129,9 @@ async function backfillDailyActivity() {
 
             for (const [dayKey, dayData] of dayMap.entries()) {
                 // Format passages using same logic as getLog2
-                const passagesString = typingSessionToString(
+                const passagesString = await typingSessionToString(
                     dayData.typedVerses,
-                    { seperator: "\n" },
+                    { seperator: "\n", translation: "esv" },
                 )
                 const passages = passagesString
                     .split("\n")

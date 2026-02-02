@@ -16,7 +16,7 @@ export async function getOverviewData(
         userId,
         translation,
     )
-    return getBookOverviewFromCache(progressData)
+    return getBookOverviewFromCache(progressData, translation)
 }
 
 export async function getLogData(

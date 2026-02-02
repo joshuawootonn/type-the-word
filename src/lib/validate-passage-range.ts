@@ -1,4 +1,4 @@
-import { getBibleMetadata } from "~/server/bibleMetadata"
+import { getBibleMetadata, Translation } from "~/server/bibleMetadata"
 import { type Book } from "~/server/db/schema"
 
 export interface PassageRange {
@@ -20,8 +20,11 @@ export interface ValidationResult {
  * - Chapters exist in the book
  * - Verses exist in the chapters
  */
-export function validatePassageRange(range: PassageRange): ValidationResult {
-    const metadata = getBibleMetadata()
+export async function validatePassageRange(
+    range: PassageRange,
+    translation: Translation,
+): Promise<ValidationResult> {
+    const metadata = await getBibleMetadata(translation)
     const bookMetadata = metadata[range.book]
 
     if (!bookMetadata) {
@@ -113,8 +116,11 @@ export function validatePassageRange(range: PassageRange): ValidationResult {
 /**
  * Calculates the total number of verses in a passage range
  */
-export function countVersesInRange(range: PassageRange): number {
-    const metadata = getBibleMetadata()
+export async function countVersesInRange(
+    range: PassageRange,
+    translation: Translation,
+): Promise<number> {
+    const metadata = await getBibleMetadata(translation)
     const bookMetadata = metadata[range.book]
 
     if (!bookMetadata) {

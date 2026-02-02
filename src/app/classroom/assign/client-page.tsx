@@ -16,7 +16,7 @@ import {
 } from "~/components/ui/select"
 import toProperCase from "~/lib/toProperCase"
 import { bookSchema } from "~/lib/types/book"
-import { translationsSchema } from "~/server/db/schema"
+import { Translation, translationsSchema } from "~/server/db/schema"
 
 import { type Course } from "../../api/classroom/schemas"
 import { createAssignment, fetchCourses } from "./actions"
@@ -37,7 +37,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
     const [selectedCourse, setSelectedCourse] = useState(initialCourseId || "")
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
-    const [translation, setTranslation] = useState("esv")
+    const [translation, setTranslation] = useState<Translation>("esv")
     const [book, setBook] = useState("genesis")
     const [startChapter, setStartChapter] = useState(1)
     const [startVerse, setStartVerse] = useState(1)
@@ -236,7 +236,9 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                     </label>
                                     <Select
                                         value={translation}
-                                        onValueChange={setTranslation}
+                                        onValueChange={val =>
+                                            setTranslation(val as Translation)
+                                        }
                                     >
                                         <SelectTrigger className="w-full">
                                             <SelectValue />

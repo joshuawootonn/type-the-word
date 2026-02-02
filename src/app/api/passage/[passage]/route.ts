@@ -97,7 +97,7 @@ async function fetchESVPassage(
             const content = fs.readFileSync(filePath, {
                 encoding: "utf8",
             })
-            return { data: parseChapter(content) }
+            return { data: await parseChapter(content) }
         } catch (error) {
             console.warn(
                 `Tried to read passage: (${filePath}) and failed with error:`,
@@ -120,7 +120,7 @@ async function fetchESVPassage(
         const data: unknown = await response.json()
         const parsedData = esvPassageSchema.parse(data)
 
-        return { data: parseChapter(parsedData.passages.at(0) ?? "") }
+        return { data: await parseChapter(parsedData.passages.at(0) ?? "") }
     }
 
     const existingPassageResponse = await db.query.passageResponse.findFirst({
@@ -144,7 +144,7 @@ async function fetchESVPassage(
         const parsedData = esvPassageSchema.parse(
             existingPassageResponse.response,
         )
-        return { data: parseChapter(parsedData.passages.at(0) ?? "") }
+        return { data: await parseChapter(parsedData.passages.at(0) ?? "") }
     }
 
     const response = await fetch(createESVURL(passageData), {
@@ -185,7 +185,7 @@ async function fetchESVPassage(
             })
             .where(eq(passageResponse.id, existingPassageResponse.id))
     }
-    return { data: parseChapter(parsedData.passages.at(0) ?? "") }
+    return { data: await parseChapter(parsedData.passages.at(0) ?? "") }
 }
 
 async function fetchApiBiblePassage(
@@ -213,7 +213,7 @@ async function fetchApiBiblePassage(
         const parsedData = apiBiblePassageSchema.parse(data)
 
         return {
-            data: parseApiBibleChapter(
+            data: await parseApiBibleChapter(
                 parsedData.data.content,
                 translation,
                 parsedData.data.copyright,
@@ -241,7 +241,7 @@ async function fetchApiBiblePassage(
             existingPassageResponse.response,
         )
         return {
-            data: parseApiBibleChapter(
+            data: await parseApiBibleChapter(
                 parsedData.data.content,
                 translation,
                 parsedData.data.copyright,
@@ -284,7 +284,7 @@ async function fetchApiBiblePassage(
             .where(eq(passageResponse.id, existingPassageResponse.id))
     }
     return {
-        data: parseApiBibleChapter(
+        data: await parseApiBibleChapter(
             parsedData.data.content,
             translation,
             parsedData.data.copyright,

@@ -127,12 +127,11 @@ export type ParsedPassage = {
     copyright: CopyrightMetadata
 }
 
-const metadata = getBibleMetadata()
-
-export function parsePrevChapter(
+export async function parsePrevChapter(
     book: Book,
     chapter: number,
-): { url: PassageSegment; label: PassageReference } | null {
+    translation: Translation,
+): Promise<{ url: PassageSegment; label: PassageReference } | null> {
     if (chapter > 1) {
         const url = toPassageSegment(book, `${chapter - 1}`)
         return {
@@ -141,6 +140,7 @@ export function parsePrevChapter(
         }
     }
 
+    const metadata = await getBibleMetadata(translation)
     const arrayBookMetadata = Object.entries(metadata)
     const currentBookIndex = arrayBookMetadata.findIndex(([b]) => b === book)
 
@@ -163,10 +163,12 @@ export function parsePrevChapter(
     return null
 }
 
-export function parseNextChapter(
+export async function parseNextChapter(
     book: Book,
     chapter: number,
-): { url: PassageSegment; label: PassageReference } | null {
+    translation: Translation,
+): Promise<{ url: PassageSegment; label: PassageReference } | null> {
+    const metadata = await getBibleMetadata(translation)
     const bookMetadata = metadata[book]
 
     const numberOfBooksInCurrentBook = bookMetadata?.chapters.length ?? 0
@@ -195,7 +197,7 @@ export function parseNextChapter(
     return null
 }
 
-export function parseChapter(passage: string): ParsedPassage {
+export async function parseChapter(passage: string): Promise<ParsedPassage> {
     const dom = new JSDOM(passage)
     dom.window.document.querySelectorAll("sup.footnote").forEach(node => {
         node.parentNode?.removeChild(node)
@@ -471,8 +473,16 @@ export function parseChapter(passage: string): ParsedPassage {
     return {
         nodes,
         firstVerse: context.firstVerseOfPassage,
-        prevChapter: parsePrevChapter(context.book, context.chapter),
-        nextChapter: parseNextChapter(context.book, context.chapter),
+        prevChapter: await parsePrevChapter(
+            context.book,
+            context.chapter,
+            "esv",
+        ),
+        nextChapter: await parseNextChapter(
+            context.book,
+            context.chapter,
+            "esv",
+        ),
         copyright: {
             text: "Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved.",
             abbreviation: "ESV",

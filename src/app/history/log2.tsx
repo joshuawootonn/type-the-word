@@ -1,5 +1,6 @@
 import { format, startOfMonth } from "date-fns"
 
+import { Translation } from "~/server/db/schema"
 import {
     TypedVerse,
     TypingSession,
@@ -107,10 +108,11 @@ export function getLogFromCache(
         )
 }
 
-export function getLog2(
+export async function getLog2(
     typingSessions: TypingSession[],
     clientTimezoneOffset: number,
-): MonthlyLogDTO[] {
+    translation: Translation = "esv",
+): Promise<MonthlyLogDTO[]> {
     const monthLogs: Record<string, MonthlyLog> = {}
 
     for (const typingSession of typingSessions) {
@@ -162,28 +164,36 @@ export function getLog2(
         }
     }
 
-    return Object.entries(monthLogs)
-        .sort((a, b) => (a[0] > b[0] ? -1 : 1))
-        .map(([_, monthlyLog]): MonthlyLogDTO => {
-            const days = Object.entries(monthlyLog.days).reduce(
-                (acc, [key, day]) => ({
-                    ...acc,
-                    [key]: {
-                        numberOfVersesTyped: day.numberOfVersesTyped,
-                        location: typingSessionToString(day.typedVerses, {
-                            seperator: "\n",
-                        }).split("\n"),
-                        createdAt: day.createdAt,
+    const sortedMonths = Object.entries(monthLogs).sort((a, b) =>
+        a[0] > b[0] ? -1 : 1,
+    )
+
+    return await Promise.all(
+        sortedMonths.map(async ([_, monthlyLog]): Promise<MonthlyLogDTO> => {
+            const daysEntries = Object.entries(monthlyLog.days)
+            const daysData: MonthlyLogDTO["days"] = {}
+
+            for (const [key, day] of daysEntries) {
+                const locationString = await typingSessionToString(
+                    day.typedVerses,
+                    {
+                        seperator: "\n",
+                        translation,
                     },
-                }),
-                {} as MonthlyLogDTO["days"],
-            )
+                )
+                daysData[key] = {
+                    numberOfVersesTyped: day.numberOfVersesTyped,
+                    location: locationString.split("\n"),
+                    createdAt: day.createdAt,
+                }
+            }
 
             return {
                 numberOfVersesTyped: monthlyLog.numberOfVersesTyped,
                 month: monthlyLog.month.getMonth(),
                 year: monthlyLog.month.getFullYear(),
-                days,
+                days: daysData,
             }
-        })
+        }),
+    )
 }

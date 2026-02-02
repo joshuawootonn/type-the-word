@@ -1,6 +1,10 @@
 import { passageReferenceSchema } from "~/lib/passageReference"
 import { Book, bookSchema } from "~/lib/types/book"
-import { BookMetadata, getBibleMetadata } from "~/server/bibleMetadata"
+import {
+    BookMetadata,
+    getBibleMetadata,
+    Translation,
+} from "~/server/bibleMetadata"
 import { TypingSession } from "~/server/repositories/typingSession.repository"
 import { UserProgressData } from "~/server/repositories/userProgress.repository"
 
@@ -72,10 +76,11 @@ function getInitialAggregatedBookData(
     }
 }
 
-export function aggregateBookData(
+export async function aggregateBookData(
     typingSessions: TypingSession[],
-): AggregatedData {
-    const bibleMetadata = getBibleMetadata()
+    translation: Translation,
+): Promise<AggregatedData> {
+    const bibleMetadata = await getBibleMetadata(translation)
 
     let bookData: AggregatedData = Object.entries(bibleMetadata).reduce(
         (acc, [book, bookData]) => ({
@@ -171,8 +176,11 @@ export function aggregateBookData(
     return bookData
 }
 
-export function formatBookData(bookData: AggregatedData): BookOverview[] {
-    const bibleMetadata = getBibleMetadata()
+export async function formatBookData(
+    bookData: AggregatedData,
+    translation: Translation,
+): Promise<BookOverview[]> {
+    const bibleMetadata = await getBibleMetadata(translation)
     const result = Object.keys(bibleMetadata)
         .map(bookSlug => {
             const validatedBook = bookSchema.parse(bookSlug)
@@ -224,11 +232,12 @@ export function formatBookData(bookData: AggregatedData): BookOverview[] {
     return result
 }
 
-export function getBookOverview(
+export async function getBookOverview(
     typingSessions: TypingSession[],
-): BookOverview[] {
-    const bookData = aggregateBookData(typingSessions)
-    return formatBookData(bookData)
+    translation: Translation,
+): Promise<BookOverview[]> {
+    const bookData = await aggregateBookData(typingSessions, translation)
+    return formatBookData(bookData, translation)
 }
 
 /**
@@ -238,10 +247,11 @@ export function getBookOverview(
  * For any book with progress, we show ALL chapters (using Bible metadata),
  * not just the chapters the user has typed. This matches the original behavior.
  */
-export function getBookOverviewFromCache(
+export async function getBookOverviewFromCache(
     progressData: UserProgressData,
-): BookOverview[] {
-    const bibleMetadata = getBibleMetadata()
+    translation: Translation,
+): Promise<BookOverview[]> {
+    const bibleMetadata = await getBibleMetadata(translation)
 
     // Group chapter rows by book for quick lookup
     type ChapterRow = (typeof progressData.chapters)[number]

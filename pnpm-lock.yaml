@@ -124,7 +124,7 @@ dependencies:
     version: 10.18.0
   next:
     specifier: ^16.1.0
-    version: 16.1.1(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.2.3)(react@19.2.3)
+    version: 16.1.1(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.1)(react-dom@19.2.3)(react@19.2.3)
   next-auth:
     specifier: ^4.23.0
     version: 4.24.11(next@16.1.1)(react-dom@19.2.3)(react@19.2.3)
@@ -169,6 +169,9 @@ devDependencies:
   '@csstools/postcss-oklab-function':
     specifier: ^4.0.5
     version: 4.0.7(postcss@8.5.1)
+  '@playwright/test':
+    specifier: ^1.58.1
+    version: 1.58.1
   '@tailwindcss/typography':
     specifier: ^0.5.14
     version: 0.5.16(tailwindcss@3.4.17)
@@ -3651,6 +3654,13 @@ packages:
     engines: {node: '>=16'}
     dev: false
 
+  /@playwright/test@1.58.1:
+    resolution: {integrity: sha512-6LdVIUERWxQMmUSSQi0I53GgCBYgM2RpGngCPY7hSeju+VrKjq3lvs7HpJoPbDiY5QM5EYRtRX5fvrinnMAz3w==}
+    engines: {node: '>=18'}
+    hasBin: true
+    dependencies:
+      playwright: 1.58.1
+
   /@posthog/core@1.6.0:
     resolution: {integrity: sha512-Tbh8UACwbb7jFdDC7wwXHtfNzO+4wKh3VbyMHmp2UBe6w1jliJixexTJNfkqdGZm+ht3M10mcKvGGPnoZ2zLBg==}
     dependencies:
@@ -5231,7 +5241,7 @@ packages:
       '@sentry/vercel-edge': 8.51.0
       '@sentry/webpack-plugin': 2.22.7(webpack@5.104.1)
       chalk: 3.0.0
-      next: 16.1.1(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.2.3)(react@19.2.3)
+      next: 16.1.1(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.1)(react-dom@19.2.3)(react@19.2.3)
       resolve: 1.22.8
       rollup: 3.29.5
       stacktrace-parser: 0.1.10
@@ -6054,7 +6064,7 @@ packages:
       vue-router:
         optional: true
     dependencies:
-      next: 16.1.1(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.2.3)(react@19.2.3)
+      next: 16.1.1(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.1)(react-dom@19.2.3)(react@19.2.3)
       react: 19.2.3
     dev: false
 
@@ -7829,6 +7839,13 @@ packages:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
     dev: false
 
+  /fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
+    requiresBuild: true
+    optional: true
+
   /fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -8617,7 +8634,7 @@ packages:
       '@panva/hkdf': 1.2.1
       cookie: 0.7.2
       jose: 4.15.9
-      next: 16.1.1(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.2.3)(react@19.2.3)
+      next: 16.1.1(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.1)(react-dom@19.2.3)(react@19.2.3)
       oauth: 0.9.15
       openid-client: 5.7.1
       preact: 10.25.4
@@ -8627,7 +8644,7 @@ packages:
       uuid: 8.3.2
     dev: false
 
-  /next@16.1.1(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.2.3)(react@19.2.3):
+  /next@16.1.1(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.1)(react-dom@19.2.3)(react@19.2.3):
     resolution: {integrity: sha512-QI+T7xrxt1pF6SQ/JYFz95ro/mg/1Znk5vBebsWwbpejj1T0A23hO7GYEaVac9QUOT2BIMiuzm0L99ooq7k0/w==}
     engines: {node: '>=20.9.0'}
     hasBin: true
@@ -8650,6 +8667,7 @@ packages:
     dependencies:
       '@next/env': 16.1.1
       '@opentelemetry/api': 1.9.0
+      '@playwright/test': 1.58.1
       '@swc/helpers': 0.5.15
       baseline-browser-mapping: 2.9.2
       caniuse-lite: 1.0.30001759
@@ -8919,6 +8937,20 @@ packages:
     resolution: {integrity: sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==}
     engines: {node: '>= 6'}
     dev: true
+
+  /playwright-core@1.58.1:
+    resolution: {integrity: sha512-bcWzOaTxcW+VOOGBCQgnaKToLJ65d6AqfLVKEWvexyS3AS6rbXl+xdpYRMGSRBClPvyj44njOWoxjNdL/H9UNg==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  /playwright@1.58.1:
+    resolution: {integrity: sha512-+2uTZHxSCcxjvGc5C891LrS1/NlxglGxzrC4seZiVjcYVQfUa87wBL6rTDqzGjuoWNjnBzRqKmF6zRYGMvQUaQ==}
+    engines: {node: '>=18'}
+    hasBin: true
+    dependencies:
+      playwright-core: 1.58.1
+    optionalDependencies:
+      fsevents: 2.3.2
 
   /postcss-import@15.1.0(postcss@8.5.1):
     resolution: {integrity: sha512-hpr+J05B2FVYUAXHeK1YyI267J/dDDhMU6B6civm8hSY1jYJnBXxzKDKDswzJmtLHryrjhnDjqqp/49t8FALew==}

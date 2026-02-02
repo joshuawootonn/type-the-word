@@ -1,0 +1,3965 @@
+{
+    "genesis": {
+        "name": "Genesis",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 12
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 21
+            },
+            {
+                "length": 21
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 28
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 29
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 21
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 24
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 24
+            },
+            {
+                "length": 23
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 24
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 16
+            }
+        ]
+    },
+    "exodus": {
+        "name": "Exodus",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 9
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 23
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 24
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 23
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 20
+            }
+        ]
+    },
+    "leviticus": {
+        "name": "Leviticus",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 4
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 21
+            },
+            {
+                "length": 26
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 10
+            }
+        ]
+    },
+    "numbers": {
+        "name": "Numbers",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 29
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 26
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 27
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 28
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 23
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 5
+            }
+        ]
+    },
+    "deuteronomy": {
+        "name": "Deuteronomy",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 19
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 29
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 6
+            }
+        ]
+    },
+    "joshua": {
+        "name": "Joshua",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 4
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 26
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 27
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 22
+            }
+        ]
+    },
+    "judges": {
+        "name": "Judges",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 22
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 25
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 23
+            },
+            {
+                "length": 25
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 21
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 24
+            },
+            {
+                "length": 16
+            }
+        ]
+    },
+    "ruth": {
+        "name": "Ruth",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 12
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 14
+            }
+        ]
+    },
+    "1_samuel": {
+        "name": "1 Samuel",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 13
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 32
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 31
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 6
+            }
+        ]
+    },
+    "2_samuel": {
+        "name": "2 Samuel",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 18
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 21
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 24
+            },
+            {
+                "length": 23
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 13
+            }
+        ]
+    },
+    "1_kings": {
+        "name": "1 Kings",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 22
+            },
+            {
+                "length": 28
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 24
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 25
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 32
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 31
+            }
+        ]
+    },
+    "2_kings": {
+        "name": "2 Kings",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 16
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 35
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 28
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 26
+            },
+            {
+                "length": 25
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 21
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 26
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 10
+            }
+        ]
+    },
+    "1_chronicles": {
+        "name": "1 Chronicles",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 19
+            },
+            {
+                "length": 21
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 1
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 23
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 9
+            }
+        ]
+    },
+    "2_chronicles": {
+        "name": "2 Chronicles",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 6
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 24
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 12
+            }
+        ]
+    },
+    "ezra": {
+        "name": "Ezra",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 4
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 29
+            }
+        ]
+    },
+    "nehemiah": {
+        "name": "Nehemiah",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 6
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 14
+            }
+        ]
+    },
+    "esther": {
+        "name": "Esther",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 8
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 2
+            }
+        ]
+    },
+    "job": {
+        "name": "Job",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 14
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 1
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 6
+            }
+        ]
+    },
+    "psalm": {
+        "name": "Psalm",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 21
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 1
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 1
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 36
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 1
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 1
+            },
+            {
+                "length": 1
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 1
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 1
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 1
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 1
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 1
+            },
+            {
+                "length": 1
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 1
+            }
+        ]
+    },
+    "proverbs": {
+        "name": "Proverbs",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 7
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 32
+            },
+            {
+                "length": 31
+            },
+            {
+                "length": 28
+            },
+            {
+                "length": 25
+            },
+            {
+                "length": 34
+            },
+            {
+                "length": 33
+            },
+            {
+                "length": 33
+            },
+            {
+                "length": 28
+            },
+            {
+                "length": 24
+            },
+            {
+                "length": 29
+            },
+            {
+                "length": 29
+            },
+            {
+                "length": 31
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 25
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 28
+            },
+            {
+                "length": 27
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 5
+            }
+        ]
+    },
+    "ecclesiastes": {
+        "name": "Ecclesiastes",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 6
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 8
+            }
+        ]
+    },
+    "song_of_solomon": {
+        "name": "Song of Solomon",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 10
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 9
+            }
+        ]
+    },
+    "isaiah": {
+        "name": "Isaiah",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 9
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 12
+            }
+        ]
+    },
+    "jeremiah": {
+        "name": "Jeremiah",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 10
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 24
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 24
+            },
+            {
+                "length": 13
+            }
+        ]
+    },
+    "lamentations": {
+        "name": "Lamentations",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 22
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 1
+            }
+        ]
+    },
+    "ezekiel": {
+        "name": "Ezekiel",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 9
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 23
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 21
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 25
+            }
+        ]
+    },
+    "daniel": {
+        "name": "Daniel",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 9
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 10
+            }
+        ]
+    },
+    "hosea": {
+        "name": "Hosea",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 7
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 3
+            }
+        ]
+    },
+    "joel": {
+        "name": "Joel",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 8
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 8
+            }
+        ]
+    },
+    "amos": {
+        "name": "Amos",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 7
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 6
+            }
+        ]
+    },
+    "obadiah": {
+        "name": "Obadiah",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 5
+            }
+        ]
+    },
+    "jonah": {
+        "name": "Jonah",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 14
+            },
+            {
+                "length": 2
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 8
+            }
+        ]
+    },
+    "micah": {
+        "name": "Micah",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 6
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 6
+            }
+        ]
+    },
+    "nahum": {
+        "name": "Nahum",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 7
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 6
+            }
+        ]
+    },
+    "habakkuk": {
+        "name": "Habakkuk",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 5
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 4
+            }
+        ]
+    },
+    "zephaniah": {
+        "name": "Zephaniah",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 6
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 8
+            }
+        ]
+    },
+    "haggai": {
+        "name": "Haggai",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 10
+            },
+            {
+                "length": 12
+            }
+        ]
+    },
+    "zechariah": {
+        "name": "Zechariah",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 14
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 10
+            }
+        ]
+    },
+    "malachi": {
+        "name": "Malachi",
+        "testament": "OT",
+        "chapters": [
+            {
+                "length": 11
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 3
+            }
+        ]
+    },
+    "matthew": {
+        "name": "Matthew",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 8
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 24
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 27
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 24
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 21
+            },
+            {
+                "length": 41
+            },
+            {
+                "length": 28
+            },
+            {
+                "length": 7
+            }
+        ]
+    },
+    "mark": {
+        "name": "Mark",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 18
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 27
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 27
+            },
+            {
+                "length": 27
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 36
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 9
+            }
+        ]
+    },
+    "luke": {
+        "name": "Luke",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 24
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 21
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 27
+            },
+            {
+                "length": 32
+            },
+            {
+                "length": 26
+            },
+            {
+                "length": 25
+            },
+            {
+                "length": 24
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 24
+            },
+            {
+                "length": 28
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 37
+            },
+            {
+                "length": 27
+            },
+            {
+                "length": 18
+            }
+        ]
+    },
+    "john": {
+        "name": "John",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 26
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 29
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 30
+            },
+            {
+                "length": 21
+            },
+            {
+                "length": 28
+            },
+            {
+                "length": 27
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 30
+            },
+            {
+                "length": 21
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 28
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 15
+            }
+        ]
+    },
+    "acts": {
+        "name": "Acts",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 10
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 22
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 21
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 15
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 17
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 14
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 12
+            }
+        ]
+    },
+    "romans": {
+        "name": "Romans",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 9
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 20
+            }
+        ]
+    },
+    "1_corinthians": {
+        "name": "1 Corinthians",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 11
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 13
+            }
+        ]
+    },
+    "2_corinthians": {
+        "name": "2 Corinthians",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 10
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 5
+            }
+        ]
+    },
+    "galatians": {
+        "name": "Galatians",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 6
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 13
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 9
+            }
+        ]
+    },
+    "ephesians": {
+        "name": "Ephesians",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 7
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 12
+            },
+            {
+                "length": 9
+            }
+        ]
+    },
+    "philippians": {
+        "name": "Philippians",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 9
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 11
+            }
+        ]
+    },
+    "colossians": {
+        "name": "Colossians",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 10
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 11
+            }
+        ]
+    },
+    "1_thessalonians": {
+        "name": "1 Thessalonians",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 4
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 10
+            }
+        ]
+    },
+    "2_thessalonians": {
+        "name": "2 Thessalonians",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 4
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 8
+            }
+        ]
+    },
+    "1_timothy": {
+        "name": "1 Timothy",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 7
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 8
+            }
+        ]
+    },
+    "2_timothy": {
+        "name": "2 Timothy",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 7
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 9
+            }
+        ]
+    },
+    "titus": {
+        "name": "Titus",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 3
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 6
+            }
+        ]
+    },
+    "philemon": {
+        "name": "Philemon",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 8
+            }
+        ]
+    },
+    "hebrews": {
+        "name": "Hebrews",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 7
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 19
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 12
+            }
+        ]
+    },
+    "james": {
+        "name": "James",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 11
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 9
+            }
+        ]
+    },
+    "1_peter": {
+        "name": "1 Peter",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 9
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 6
+            }
+        ]
+    },
+    "2_peter": {
+        "name": "2 Peter",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 7
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 8
+            }
+        ]
+    },
+    "1_john": {
+        "name": "1 John",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 5
+            },
+            {
+                "length": 16
+            },
+            {
+                "length": 11
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 8
+            }
+        ]
+    },
+    "2_john": {
+        "name": "2 John",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 7
+            }
+        ]
+    },
+    "3_john": {
+        "name": "3 John",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 6
+            }
+        ]
+    },
+    "jude": {
+        "name": "Jude",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 11
+            }
+        ]
+    },
+    "revelation": {
+        "name": "Revelation",
+        "testament": "NT",
+        "chapters": [
+            {
+                "length": 6
+            },
+            {
+                "length": 20
+            },
+            {
+                "length": 18
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 5
+            },
+            {
+                "length": 7
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 3
+            },
+            {
+                "length": 10
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 6
+            },
+            {
+                "length": 9
+            },
+            {
+                "length": 4
+            },
+            {
+                "length": 8
+            },
+            {
+                "length": 11
+            }
+        ]
+    }
+}

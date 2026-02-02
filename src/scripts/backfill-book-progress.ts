@@ -20,7 +20,8 @@ import { UserProgressRepository } from "~/server/repositories/userProgress.repos
 async function backfillUserBookProgress() {
     console.log("Starting backfill of book/chapter progress tables...")
 
-    const bibleMetadata = getBibleMetadata()
+    const translation: Translation = "esv" // Default to ESV for backfill
+    const bibleMetadata = await getBibleMetadata(translation)
 
     // Get all users
     const allUsers = await db.select({ id: users.id }).from(users)
@@ -45,7 +46,10 @@ async function backfillUserBookProgress() {
             }
 
             // Compute book progress using existing aggregation logic
-            const bookData = aggregateBookData(typingSessions)
+            const bookData = await aggregateBookData(
+                typingSessions,
+                translation,
+            )
 
             // Convert aggregated data to rows for the cache tables
             const bookRows: Array<{

@@ -42,11 +42,11 @@ import { Book } from "~/lib/types/book"
  * - Verse spans: <span class="verse-span"> (content wrapper, parse children)
  * - Divine names: <span class="nd"> (content, parse children)
  */
-export function parseApiBibleChapter(
+export async function parseApiBibleChapter(
     passage: string,
     translation: Exclude<Translation, "esv"> = "bsb",
     copyrightText = "",
-): ParsedPassage {
+): Promise<ParsedPassage> {
     const dom = new JSDOM(passage)
 
     const html = parseFragment(dom.serialize())
@@ -866,8 +866,16 @@ export function parseApiBibleChapter(
     return {
         nodes,
         firstVerse: context.firstVerseOfPassage,
-        prevChapter: parsePrevChapter(context.book, context.chapter),
-        nextChapter: parseNextChapter(context.book, context.chapter),
+        prevChapter: await parsePrevChapter(
+            context.book,
+            context.chapter,
+            translation,
+        ),
+        nextChapter: await parseNextChapter(
+            context.book,
+            context.chapter,
+            translation,
+        ),
         copyright: {
             text: copyrightText,
             abbreviation: translation.toUpperCase(),

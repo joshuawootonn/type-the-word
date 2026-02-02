@@ -23,7 +23,7 @@ export async function getChapterHistory(
         omitTypingData: true,
     })
 
-    const bibleMetadata = getBibleMetadata()
+    const bibleMetadata = await getBibleMetadata(translation)
     const numberOfVersesInChapterBookCombo =
         bibleMetadata[passageObject.book]?.chapters?.[passageObject.chapter - 1]
             ?.length
@@ -64,14 +64,20 @@ export async function getChapterHistory(
         }
     }
 
-    const chapterLogs = Array.from(versesBySession.entries())
-        .map(([sessionId, verses]) => ({
-            location: typingSessionToString(verses, {
-                seperator: "\n",
-            }).split("\n"),
-            createdAt: sessionCreatedDates.get(sessionId)!,
-        }))
-        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    const chapterLogs = await Promise.all(
+        Array.from(versesBySession.entries()).map(
+            async ([sessionId, verses]) => ({
+                location: (
+                    await typingSessionToString(verses, {
+                        seperator: "\n",
+                        translation,
+                    })
+                ).split("\n"),
+                createdAt: sessionCreatedDates.get(sessionId)!,
+            }),
+        ),
+    )
+    chapterLogs.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
 
     return { verses, chapterLogs }
 }

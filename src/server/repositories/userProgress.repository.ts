@@ -90,7 +90,7 @@ export class UserProgressRepository {
         verse: number,
         translation: schema.Translation,
     ): Promise<{ prestiged: boolean }> {
-        const bibleMetadata = getBibleMetadata()
+        const bibleMetadata = await getBibleMetadata(translation)
         const bookMetadata = bibleMetadata[book]
 
         if (!bookMetadata) {

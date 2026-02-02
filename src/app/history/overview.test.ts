@@ -17,7 +17,7 @@ describe("History Overview", () => {
             userId: user.id,
         })
 
-        const overview = aggregateBookData(typingSessions)
+        const overview = await aggregateBookData(typingSessions, "esv")
 
         const secondTimothy = overview[Book["2_timothy"]]
         const chapterOne = secondTimothy.chapters["1"]!

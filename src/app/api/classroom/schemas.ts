@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+import { translationSchema } from "~/lib/translations"
+
 /**
  * Shared Zod schemas for classroom API endpoints
  * Used for both client-side and server-side validation
@@ -55,7 +57,7 @@ export const createAssignmentRequestSchema = z.object({
     courseId: z.string(),
     title: z.string(),
     description: z.string().optional(),
-    translation: z.string(),
+    translation: translationSchema,
     book: z.string(),
     startChapter: z.number().int().positive(),
     startVerse: z.number().int().positive(),
@@ -90,7 +92,7 @@ export const assignmentSchema = z.object({
     courseWorkId: z.string(),
     title: z.string(),
     description: z.string().nullable(),
-    translation: z.string(),
+    translation: translationSchema,
     book: z.string(),
     startChapter: z.number(),
     startVerse: z.number(),
@@ -153,7 +155,7 @@ export const studentAssignmentSchema = z.object({
     courseWorkId: z.string(),
     title: z.string(),
     description: z.string().nullable(),
-    translation: z.string(),
+    translation: translationSchema,
     book: z.string(),
     startChapter: z.number(),
     startVerse: z.number(),
