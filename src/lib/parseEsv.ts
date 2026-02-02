@@ -197,7 +197,10 @@ export async function parseNextChapter(
     return null
 }
 
-export async function parseChapter(passage: string): Promise<ParsedPassage> {
+export async function parseChapter(
+    passage: string,
+    options?: { book?: Book; chapter?: number },
+): Promise<ParsedPassage> {
     const dom = new JSDOM(passage)
     dom.window.document.querySelectorAll("sup.footnote").forEach(node => {
         node.parentNode?.removeChild(node)
@@ -210,7 +213,10 @@ export async function parseChapter(passage: string): Promise<ParsedPassage> {
         firstVerseOfPassage?: VerseNumber
         chapter?: number
         book?: Book
-    } = {}
+    } = {
+        book: options?.book,
+        chapter: options?.chapter,
+    }
 
     function parseInline(node: ChildNode): Inline[] {
         if (node.nodeName === "#text" && "value" in node) {
@@ -265,7 +271,17 @@ export async function parseChapter(passage: string): Promise<ParsedPassage> {
                 throw new Error("Attempted to create verse without book")
             }
             if (context.chapter == undefined) {
-                throw new Error("Attempted to create verse without chapter")
+                const isSingleChapterBook =
+                    context.book === "obadiah" ||
+                    context.book === "philemon" ||
+                    context.book === "jude" ||
+                    context.book === "2_john" ||
+                    context.book === "3_john"
+                if (isSingleChapterBook) {
+                    context.chapter = 1
+                } else {
+                    throw new Error("Attempted to create verse without chapter")
+                }
             }
 
             return [

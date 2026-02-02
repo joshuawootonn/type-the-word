@@ -138,6 +138,15 @@ describe("parseEsv", () => {
             thirteenthVerse.nodes.filter(node => node.type === "word").length,
         ).toBe(27)
     })
+
+    test.concurrent("parse single-chapter book verse numbers without chapter", async () => {
+        const verseHtml = `<h2 class=extra_text>3 John</h2><p><b class=verse-num id=v64001010-1>10 </b>Demetrius has received a good testimony from everyone, and from the truth itself. <b class=verse-num id=v64001011-1>11 </b>Beloved, do not imitate evil but imitate good.</p><p>(<a href=http://www.esv.org class=copyright>ESV</a>)</p>`
+        const result = await parseChapter(verseHtml)
+
+        expect(result.firstVerse.book).toBe("3_john")
+        expect(result.firstVerse.chapter).toBe(1)
+        expect(result.firstVerse.verse).toBe(10)
+    })
 })
 
 describe("parsePrevChapter", () => {
