@@ -1,6 +1,7 @@
 "use client"
 
 import { AssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
+import { CopyrightCitation } from "~/components/copyright-citation"
 import { Passage } from "~/components/passage"
 import { Link } from "~/components/ui/link"
 import { ParsedPassage, Translation } from "~/lib/parseEsv"
@@ -73,6 +74,7 @@ export function StudentClientPage({
                     assignmentTitle={assignmentTitle}
                     assignmentId={assignmentId}
                 />
+                <CopyrightCitation copyright={passage.copyright} />
             </div>
         </div>
     )
