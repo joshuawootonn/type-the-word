@@ -21,6 +21,16 @@ import { Translation, translationsSchema } from "~/server/db/schema"
 import { type Course } from "../../api/classroom/schemas"
 import { createAssignment, fetchCourses } from "./actions"
 
+type ChapterMetadata = {
+    length: number
+}
+
+type BookMetadata = {
+    chapters: ChapterMetadata[]
+}
+
+type BibleMetadata = Record<string, BookMetadata>
+
 interface ClientPageProps {
     initialCourseId?: string
 }
@@ -45,6 +55,45 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
     const [endVerse, setEndVerse] = useState(1)
     const [maxPoints, setMaxPoints] = useState(100)
     const [dueDate, setDueDate] = useState("")
+    const [metadata, setMetadata] = useState<BibleMetadata | null>(null)
+
+    useEffect(() => {
+        let isMounted = true
+
+        async function loadMetadata() {
+            try {
+                const metadataModule = await import(
+                    "../../../server/bible-metadata/" + translation + ".json"
+                )
+                if (isMounted) {
+                    setMetadata(metadataModule.default)
+                }
+            } catch (_err) {
+                if (isMounted) {
+                    setMetadata(null)
+                }
+            }
+        }
+
+        loadMetadata()
+
+        return () => {
+            isMounted = false
+        }
+    }, [translation])
+
+    const bookMetadata = metadata?.[book]
+    const chapterCount = Math.max(bookMetadata?.chapters.length ?? 1, 1)
+    const startChapterMax = chapterCount
+    const endChapterMax = chapterCount
+    const startChapterVerseMax = Math.max(
+        bookMetadata?.chapters[startChapter - 1]?.length ?? 1,
+        1,
+    )
+    const endChapterVerseMax = Math.max(
+        bookMetadata?.chapters[endChapter - 1]?.length ?? 1,
+        1,
+    )
 
     // Load courses on mount
     useEffect(() => {
@@ -295,6 +344,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                         type="number"
                                         id="startChapter"
                                         min="1"
+                                        max={startChapterMax}
                                         value={startChapter}
                                         onChange={e =>
                                             setStartChapter(
@@ -316,6 +366,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                         type="number"
                                         id="startVerse"
                                         min="1"
+                                        max={startChapterVerseMax}
                                         value={startVerse}
                                         onChange={e =>
                                             setStartVerse(
@@ -337,6 +388,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                         type="number"
                                         id="endChapter"
                                         min="1"
+                                        max={endChapterMax}
                                         value={endChapter}
                                         onChange={e =>
                                             setEndChapter(
@@ -358,6 +410,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                         type="number"
                                         id="endVerse"
                                         min="1"
+                                        max={endChapterVerseMax}
                                         value={endVerse}
                                         onChange={e =>
                                             setEndVerse(
