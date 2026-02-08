@@ -1,6 +1,6 @@
 "use client"
 
-import { Combobox } from "@headlessui/react"
+import { Combobox, ComboboxOption } from "@headlessui/react"
 import * as ScrollArea from "@radix-ui/react-scroll-area"
 import clsx from "clsx"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -254,7 +254,7 @@ export function PassageSelector({
                                         as={Fragment}
                                     >
                                         {({ active }) => (
-                                            <li
+                                            <div
                                                 className={clsx(
                                                     "cursor-pointer px-2 py-1",
                                                     active
@@ -268,7 +268,7 @@ export function PassageSelector({
                                                 }}
                                             >
                                                 {t.label}
-                                            </li>
+                                            </div>
                                         )}
                                     </Combobox.Option>
                                 ))}
@@ -343,7 +343,7 @@ export function PassageSelector({
                                         as={Fragment}
                                     >
                                         {({ active }) => (
-                                            <li
+                                            <div
                                                 className={clsx(
                                                     "cursor-pointer px-2 py-1",
                                                     active
@@ -358,7 +358,7 @@ export function PassageSelector({
                                             >
                                                 {simpleBibleMetadata[book]
                                                     ?.name ?? book}
-                                            </li>
+                                            </div>
                                         )}
                                     </Combobox.Option>
                                 ))}
@@ -431,7 +431,7 @@ export function PassageSelector({
                                         as={Fragment}
                                     >
                                         {({ active }) => (
-                                            <li
+                                            <div
                                                 className={clsx(
                                                     "cursor-pointer px-2 py-1",
                                                     active
@@ -440,7 +440,7 @@ export function PassageSelector({
                                                 )}
                                             >
                                                 {number}
-                                            </li>
+                                            </div>
                                         )}
                                     </Combobox.Option>
                                 ))}
