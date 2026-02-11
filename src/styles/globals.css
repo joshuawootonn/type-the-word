@@ -1,8 +1,90 @@
-@import url("https://fonts.googleapis.com/css2?family=Google+Sans+Mono:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Google+Sans+Mono:wght@400&display=swap")
+layer(base);
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@plugin '@tailwindcss/typography';
+
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+/*
+  Tailwind v4 currently emits typography plugin rules in a way that can make
+  prose defaults override regular utilities (like `m-0`) in some cases.
+  This custom variant forces prose rules into a child layer
+  (`utilities.typography`), which has lower precedence than `utilities`.
+  Result: normal utility classes can override prose defaults without `!important`.
+*/
+@custom-variant typo {
+    @layer typography {
+        @slot;
+    }
+}
+
+@theme {
+    --font-*: initial;
+    --font-sans:
+        var(--font-poppins), ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+        "Noto Color Emoji";
+    --font-mono:
+        "Google Sans Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+        Consolas, "Liberation Mono", "Courier New", monospace;
+
+    --color-transparent: transparent;
+    --color-current: currentColor;
+
+    --color-white: #ffffff;
+
+    --color-primary: oklch(var(--oklch-primary));
+    --color-secondary: oklch(var(--oklch-secondary));
+    --color-success: oklch(var(--oklch-success));
+    --color-error: oklch(var(--oklch-error));
+
+    --border-width-0: 0;
+    --border-width-1: 1px;
+    --border-width-2: 2px;
+    --border-width-3: 3px;
+    --border-width-4: 4px;
+    --border-width-6: 6px;
+    --border-width-8: 8px;
+    --default-border-width: 1px;
+    --border-width-1_5: 1.5px;
+
+    --shadow-lg: 12px 12px 0px oklch(var(--oklch-primary) / 0.5);
+
+    --container-page: 65ch;
+
+    --breakpoint-sm: 540px;
+
+    --animate-spin-every-once-in-a-while: spin-every-once-in-a-while 7s
+        ease-in-out infinite;
+
+    @keyframes spin-every-once-in-a-while {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(90deg);
+        }
+    }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentcolor);
+    }
+}
 
 /*
   Radix ui popups use `margin-right` to prevent overflow hidden from causing layout shift when popups come up.
@@ -20,13 +102,13 @@ body[style] {
 .svg-outline:focus,
 .svg-outline-sm:focus,
 .svg-outline-within:focus-within * {
-    @apply outline-none;
+    @apply outline-hidden;
 }
 
 .svg-outline-within:focus-within:before {
     @apply -inset-2;
     content: " ";
-    background-color: oklch(var(--color-primary));
+    background-color: oklch(var(--oklch-primary));
     -webkit-mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     position: absolute;
@@ -39,7 +121,7 @@ body[style] {
 .svg-outline-stubby:focus:before {
     @apply -inset-2;
     content: " ";
-    background-color: oklch(var(--color-primary));
+    background-color: oklch(var(--oklch-primary));
     -webkit-mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     position: absolute;
@@ -56,7 +138,7 @@ body[style] {
 .svg-outline-stubby:focus:before {
     @apply -bottom-0.5 -left-3 -right-3 -top-0.5;
 
-    background-color: oklch(var(--color-primary));
+    background-color: oklch(var(--oklch-primary));
     -webkit-mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="var(--color-primary)" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
     mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" %3E%3Crect x="0" y="0" width="100%25" height="100%25" stroke-width="4" stroke="black" fill="transparent" stroke-dasharray="6 5" /%3E%3C/svg%3E');
 }
@@ -72,7 +154,7 @@ body[style] {
 }
 
 .min-h-screen-1px {
-    @apply min-h-[calc(100vh_-_1px)];
+    @apply min-h-[calc(100vh-1px)];
 }
 
 body {

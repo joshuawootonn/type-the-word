@@ -21,7 +21,7 @@ export default async function Home() {
 
     return (
         <>
-            <div className={"prose-h2:text-3xl prose-p:text-xl"}>
+            <div className={"typo:prose-h2:text-3xl typo:prose-p:text-xl"}>
                 <h1>Welcome</h1>
                 <p>
                     I&apos;m glad you are joining me and the {userCount} other

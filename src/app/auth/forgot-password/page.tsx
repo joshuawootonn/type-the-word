@@ -17,16 +17,16 @@ export default function ForgotPasswordPage() {
         return (
             <div className="mt-8 flex min-h-screen items-start justify-center">
                 <div className="w-full max-w-md text-center">
-                    <h1 className="mb-4 text-3xl font-semibold text-primary">
+                    <h1 className="text-primary mb-4 text-3xl font-semibold">
                         Check your email
                     </h1>
-                    <p className="mb-8 text-pretty text-primary">
+                    <p className="text-primary mb-8 text-pretty">
                         If an account exists with that email address, we&apos;ve
                         sent you a password reset link.
                     </p>
                     <Link
                         href="/auth/login"
-                        className="svg-outline relative inline-block border-2 border-primary bg-secondary px-3 py-1 font-semibold text-primary"
+                        className="svg-outline border-primary bg-secondary text-primary relative inline-block border-2 px-3 py-1 font-semibold"
                     >
                         Back to log in
                     </Link>
@@ -38,10 +38,10 @@ export default function ForgotPasswordPage() {
     return (
         <div className="mt-8 flex min-h-screen items-start justify-center">
             <div className="w-full max-w-md">
-                <h1 className="mb-4 text-center text-3xl font-semibold text-primary">
+                <h1 className="text-primary mb-4 text-center text-3xl font-semibold">
                     Forgot your password?
                 </h1>
-                <p className="mb-8 text-pretty text-center text-primary">
+                <p className="text-primary mb-8 text-center text-pretty">
                     Enter your email address and we&apos;ll send you a link to
                     reset your password.
                 </p>
@@ -114,7 +114,7 @@ export default function ForgotPasswordPage() {
                             className="space-y-6"
                         >
                             {error && (
-                                <div className="border-2 border-error bg-error/10 px-4 py-3 text-error">
+                                <div className="border-error bg-error/10 text-error border-2 px-4 py-3">
                                     {error}
                                 </div>
                             )}
@@ -122,7 +122,7 @@ export default function ForgotPasswordPage() {
                             <div>
                                 <label
                                     htmlFor="email"
-                                    className="mb-2 block font-medium text-primary"
+                                    className="text-primary mb-2 block font-medium"
                                 >
                                     Email
                                 </label>
@@ -132,14 +132,14 @@ export default function ForgotPasswordPage() {
                                         type="email"
                                         id="email"
                                         innerRef={emailRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary px-3 py-1.5 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="border-primary bg-secondary text-primary placeholder:text-primary/50 w-full rounded-none border-2 px-3 py-1.5 font-medium outline-hidden"
                                         placeholder="Enter your email..."
                                         autoComplete="email"
                                     />
                                 </div>
                                 {props.errors.email &&
                                     props.submitCount > 0 && (
-                                        <div className="mt-2 text-error">
+                                        <div className="text-error mt-2">
                                             {props.errors.email}
                                         </div>
                                     )}
@@ -148,13 +148,13 @@ export default function ForgotPasswordPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="svg-outline relative w-full cursor-pointer border-2 border-primary bg-primary px-3 py-1 font-semibold text-secondary disabled:cursor-not-allowed"
+                                className="svg-outline border-primary bg-primary text-secondary relative w-full cursor-pointer border-2 px-3 py-1 font-semibold disabled:cursor-not-allowed"
                             >
                                 {isLoading ? (
                                     <>
                                         <Loading
                                             className={cn(
-                                                "text-md absolute left-1/2 top-1/2 -translate-x-8 -translate-y-1/2 font-semibold",
+                                                "text-md absolute top-1/2 left-1/2 -translate-x-8 -translate-y-1/2 font-semibold",
                                                 isLoading
                                                     ? "text-secondary"
                                                     : "text-primary",
@@ -171,7 +171,7 @@ export default function ForgotPasswordPage() {
                     )}
                 </Formik>
 
-                <p className="mt-8 text-center text-primary">
+                <p className="text-primary mt-8 text-center">
                     Remember your password?{" "}
                     <Link
                         href="/auth/login"

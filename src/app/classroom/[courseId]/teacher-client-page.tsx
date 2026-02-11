@@ -77,7 +77,7 @@ export function TeacherClientPage({
                 <span className="mx-2 opacity-50">/</span>
                 <span>{courseName}</span>
 
-                <div className="flex-grow" />
+                <div className="grow" />
                 <Link href={`/classroom/assign?courseId=${courseId}`}>
                     Create Assignment
                 </Link>
@@ -88,7 +88,7 @@ export function TeacherClientPage({
             {isInitialLoading ? (
                 <Loading />
             ) : hasError ? (
-                <div className="not-prose border-2 border-error bg-secondary p-6">
+                <div className="not-prose border-error bg-secondary border-2 p-6">
                     <p className="text-error">Failed to load assignments</p>
                 </div>
             ) : totalAssignments === 0 ? (
@@ -142,14 +142,14 @@ function AssignmentCard({
     const passageRef = `${toProperCase(assignment.book.split("_").join(" "))} ${assignment.startChapter}:${assignment.startVerse}-${assignment.endChapter}:${assignment.endVerse}`
 
     return (
-        <div className="relative border-2 border-primary bg-secondary">
+        <div className="border-primary bg-secondary relative border-2">
             <NextLink
                 href={`/classroom/${courseId}/assignment/${assignment.id}`}
                 className="block p-4 no-underline"
             >
                 <div className="flex flex-col items-start justify-between gap-2">
                     <div className="flex w-full items-center justify-between gap-2">
-                        <div className="font-semibold text-primary">
+                        <div className="text-primary font-semibold">
                             {assignment.title}
                         </div>
                         <AssignmentStatusBadge
@@ -189,7 +189,7 @@ function AssignmentCard({
                     }}
                     isLoading={!!isPublishing}
                     loadingLabel="Publishing"
-                    className="absolute right-4 top-4 text-sm"
+                    className="absolute top-4 right-4 text-sm"
                 >
                     Publish
                 </Button>

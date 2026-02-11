@@ -114,11 +114,11 @@ export default async function PassagePage(props: {
                 typingSession={typingSession}
                 chapterHistory={chapterHistory}
             />
-            <div className="not-prose mb-24 mt-8 flex w-full justify-between">
+            <div className="not-prose mt-8 mb-24 flex w-full justify-between">
                 {passage?.prevChapter ? (
                     <Link
                         href={`/passage/${passage.prevChapter.url}${translationParam}`}
-                        className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary"
+                        className="svg-outline border-primary text-primary relative border-2 px-3 py-1 font-semibold"
                     >
                         {passage.prevChapter.label}
                     </Link>
@@ -128,7 +128,7 @@ export default async function PassagePage(props: {
                 {passage?.nextChapter ? (
                     <Link
                         href={`/passage/${passage.nextChapter.url}${translationParam}`}
-                        className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary"
+                        className="svg-outline border-primary text-primary relative border-2 px-3 py-1 font-semibold"
                     >
                         {passage.nextChapter.label}
                     </Link>

@@ -127,12 +127,12 @@ export default async function CopyrightPage() {
 
             <div className="mt-8 space-y-8">
                 {allCopyrights.map(({ key, copyright }) => (
-                    <div key={key} className="border-l-4 border-primary pl-4">
+                    <div key={key} className="border-primary border-l-4 pl-4">
                         <h2 className="mb-2 text-xl font-semibold">
                             {copyright.name} ({copyright.abbreviation})
                         </h2>
                         <p
-                            className="text-sm text-primary/80"
+                            className="text-primary/80 text-sm"
                             dangerouslySetInnerHTML={{
                                 __html: copyright.copyright,
                             }}
@@ -142,7 +142,7 @@ export default async function CopyrightPage() {
                                 href={copyright.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="mt-2 inline-block text-sm text-primary underline"
+                                className="text-primary mt-2 inline-block text-sm underline"
                             >
                                 Publisher Website
                             </a>
@@ -151,10 +151,10 @@ export default async function CopyrightPage() {
                 ))}
             </div>
 
-            <hr className="my-8 border-t-2 border-primary" />
+            <hr className="border-primary my-8 border-t-2" />
 
             <h2 className="text-xl font-semibold">Additional Information</h2>
-            <p className="mb-16 mt-4 text-sm text-primary">
+            <p className="text-primary mt-4 mb-16 text-sm">
                 Scripture data for non-ESV translations is provided by{" "}
                 <a
                     href="https://api.bible"

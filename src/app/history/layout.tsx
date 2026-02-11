@@ -26,7 +26,7 @@ export default async function HistoryLayout({
     )
 
     return (
-        <main className="prose mx-auto mb-8 w-full flex-grow pt-4 text-lg text-primary dark:prose-invert prose-headings:text-primary prose-p:text-primary lg:pt-8">
+        <main className="typo:prose text-primary dark:typo:prose-invert typo:prose-headings:text-primary typo:prose-p:text-primary mx-auto mb-8 w-full grow pt-4 text-lg lg:pt-8">
             <h1 className="">History</h1>
             <HistoryTabsNav showWpmChart={showWpmChart ?? false} />
             {children}

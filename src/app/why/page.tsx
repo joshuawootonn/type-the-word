@@ -37,11 +37,11 @@ export default async function Home() {
         <>
             <div
                 className={
-                    "prose-h2:text-3xl prose-p:text-xl prose-code:before:content-none prose-code:after:content-none"
+                    "typo:prose-h2:text-3xl typo:prose-p:text-xl typo:prose-code:before:content-none typo:prose-code:after:content-none"
                 }
             >
                 <h1>Why?</h1>
-                <hr className="mx-0 w-full border-t-2 border-primary" />
+                <hr className="border-primary mx-0 w-full border-t-2" />
                 <h2>Why did I make typetheword.site?</h2>
                 <p>
                     A couple of years ago, I typed out Psalms 1 to 137 over a 6
@@ -49,7 +49,7 @@ export default async function Home() {
                     also encouraged me daily. When I later discovered{" "}
                     <a
                         href={"https://monkeytype.com"}
-                        className="svg-outline-sm relative text-primary"
+                        className="svg-outline-sm text-primary relative"
                     >
                         monkeytype
                     </a>
@@ -58,7 +58,7 @@ export default async function Home() {
                     I was developing this site, I used{" "}
                     <Link
                         href={"/passage/john_11:34-36"}
-                        className="svg-outline-sm relative text-primary"
+                        className="svg-outline-sm text-primary relative"
                     >
                         John 11:35
                     </Link>{" "}
@@ -71,7 +71,7 @@ export default async function Home() {
                     My hope is that by typing the word you will also see the
                     Bible in a deeper way.
                 </p>
-                <hr className="mx-0 w-full border-t-2 border-primary" />
+                <hr className="border-primary mx-0 w-full border-t-2" />
                 <h2>Why meditate on God&apos;s word?</h2>
                 <p>
                     In the process of making typetheword.site, these scriptures
@@ -85,7 +85,7 @@ export default async function Home() {
                     word.
                 </p>
             </div>
-            <div className={"prose-h2:text-2xl"}>
+            <div className={"typo:prose-h2:text-2xl"}>
                 <Passage
                     autofocus={false}
                     passage={passages[0]}

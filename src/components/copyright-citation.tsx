@@ -10,7 +10,7 @@ export function CopyrightCitation({ copyright }: Props) {
     const normalizedText = copyright.text.trim().replace(/\.?$/, ".")
 
     return (
-        <p className="mt-16 !text-sm text-primary">
+        <p className="text-primary mt-16 text-sm!">
             ({copyright.abbreviation}) {normalizedText} Click{" "}
             <Link href="/copyright" className="text-primary underline">
                 here

@@ -32,7 +32,7 @@ export function EmailLink({
             <Popover.Trigger asChild>
                 <button
                     tabIndex={0}
-                    className={clsx("relative z-[5] font-medium", className)}
+                    className={clsx("relative z-5 font-medium", className)}
                     onClick={_ => {
                         setIsOpen(true)
                         const el = document.createElement("textarea")
@@ -54,7 +54,7 @@ export function EmailLink({
             >
                 <span
                     className={clsx(
-                        "block border-2 border-primary bg-secondary px-2 py-1 font-medium outline-none",
+                        "border-primary bg-secondary block border-2 px-2 py-1 font-medium outline-hidden",
                         popoverClassName,
                     )}
                 >

@@ -15,7 +15,7 @@ const TabsList = forwardRef<
     <TabsPrimitive.List
         ref={ref}
         className={clsx(
-            "relative flex gap-1 border-b-2 border-primary",
+            "border-primary relative flex gap-1 border-b-2",
             className,
         )}
         {...props}
@@ -35,15 +35,15 @@ const TabsTab = forwardRef<
             className={clsx(
                 "flex cursor-pointer",
                 "group",
-                "svg-outline relative outline-none",
+                "svg-outline relative outline-hidden",
                 className,
             )}
             {...props}
         >
             <div
                 className={cn(
-                    "px-4 py-2 text-primary",
-                    "group-aria-[selected='true']:bg-secondary group-aria-[selected='true']:invert",
+                    "text-primary px-4 py-2",
+                    "group-aria-selected:bg-secondary group-aria-selected:invert",
                 )}
             >
                 {children}
@@ -58,7 +58,7 @@ const TabsPanel = forwardRef<
 >(({ className, children, ...props }, ref) => (
     <TabsPrimitive.Panel
         ref={ref}
-        className={clsx("pt-4 outline-none", className)}
+        className={clsx("pt-4 outline-hidden", className)}
         {...props}
     >
         {children}

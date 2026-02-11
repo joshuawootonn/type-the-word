@@ -55,7 +55,7 @@ const Button = forwardRef<ElementRef<typeof BaseButton>, ButtonProps>(
                 ref={ref}
                 disabled={isLoading || disabled}
                 className={cn(
-                    "svg-outline relative border-2 border-primary bg-secondary px-3 py-1 font-semibold disabled:cursor-wait",
+                    "svg-outline border-primary bg-secondary relative border-2 px-3 py-1 font-semibold disabled:cursor-wait",
                     className,
                 )}
                 {...props}

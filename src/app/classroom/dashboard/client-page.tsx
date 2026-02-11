@@ -65,7 +65,7 @@ export function ClientPage() {
                             <NextLink
                                 key={course.id}
                                 href={`/classroom/${course.id}`}
-                                className="svg-outline relative block border-2 border-primary bg-secondary p-4 no-underline"
+                                className="svg-outline border-primary bg-secondary relative block border-2 p-4 no-underline"
                             >
                                 <div className="font-semibold">
                                     {course.name}

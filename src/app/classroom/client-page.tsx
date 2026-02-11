@@ -119,9 +119,9 @@ export function ClientPage({
         <>
             <h1>Google Classroom</h1>
             {error && (
-                <div className="not-prose mb-6 flex items-start gap-3 border-2 border-error bg-secondary p-4">
+                <div className="not-prose border-error bg-secondary mb-6 flex items-start gap-3 border-2 p-4">
                     <svg
-                        className="mt-1 h-5 w-5 flex-shrink-0 text-error"
+                        className="text-error mt-1 h-5 w-5 shrink-0"
                         fill="none"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -144,8 +144,8 @@ export function ClientPage({
                     </p>
 
                     {isStudentConnected && studentSuccess && (
-                        <div className="flex items-start gap-3 border-2 border-success bg-secondary p-4">
-                            <div className="text-sm text-success">
+                        <div className="border-success bg-secondary flex items-start gap-3 border-2 p-4">
+                            <div className="text-success text-sm">
                                 Student account connected successfully.
                             </div>
                         </div>
@@ -153,9 +153,9 @@ export function ClientPage({
 
                     {isStudentConnected ? (
                         <>
-                            <div className="flex items-center gap-4 border-2 border-primary bg-secondary p-4">
+                            <div className="border-primary bg-secondary flex items-center gap-4 border-2 p-4">
                                 <svg
-                                    className="h-8 w-8 text-success"
+                                    className="text-success h-8 w-8"
                                     fill="none"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
@@ -166,10 +166,10 @@ export function ClientPage({
                                     <path d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <div className="font-medium text-primary">
+                                    <div className="text-primary font-medium">
                                         Connected as Student
                                     </div>
-                                    <div className="text-sm text-primary opacity-75">
+                                    <div className="text-primary text-sm opacity-75">
                                         Your student account is linked and ready
                                         to submit assignments
                                     </div>
@@ -224,8 +224,8 @@ export function ClientPage({
                     </p>
 
                     {isConnected && success && (
-                        <div className="flex items-start gap-3 border-2 border-success bg-secondary p-4">
-                            <div className="text-sm text-success">
+                        <div className="border-success bg-secondary flex items-start gap-3 border-2 p-4">
+                            <div className="text-success text-sm">
                                 Teacher account connected successfully.
                             </div>
                         </div>
@@ -233,9 +233,9 @@ export function ClientPage({
 
                     {isConnected ? (
                         <>
-                            <div className="flex items-center gap-4 border-2 border-primary bg-secondary p-4">
+                            <div className="border-primary bg-secondary flex items-center gap-4 border-2 p-4">
                                 <svg
-                                    className="h-8 w-8 text-success"
+                                    className="text-success h-8 w-8"
                                     fill="none"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
@@ -246,10 +246,10 @@ export function ClientPage({
                                     <path d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <div className="font-medium text-primary">
+                                    <div className="text-primary font-medium">
                                         Connected as teacher
                                     </div>
-                                    <div className="text-pretty text-sm text-primary opacity-75">
+                                    <div className="text-primary text-sm text-pretty opacity-75">
                                         Your teacher account is linked. Create
                                         assigments or head to the dashboard to
                                         track how current assignments are going.

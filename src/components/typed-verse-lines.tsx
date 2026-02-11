@@ -87,7 +87,7 @@ export function TypedVerseLines({
                 return (
                     <svg
                         key={index}
-                        className="pointer-events-none absolute -left-3 right-full z-0 w-4 rounded-none transition-[height] duration-200 ease-in-out md:-left-6"
+                        className="pointer-events-none absolute right-full -left-3 z-0 w-4 rounded-none transition-[height] duration-200 ease-in-out md:-left-6"
                         style={{
                             height,
                             top: range.top - padding,

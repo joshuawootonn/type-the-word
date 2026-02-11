@@ -30,7 +30,7 @@ export function EarlyAccess() {
                                     {feature.name}
                                 </label>
                                 {feature.description && (
-                                    <span className="text-xs text-primary/60">
+                                    <span className="text-primary/60 text-xs">
                                         {feature.description}
                                     </span>
                                 )}
@@ -49,7 +49,7 @@ export function EarlyAccess() {
     }
 
     return (
-        <p className="text-sm text-primary/60">
+        <p className="text-primary/60 text-sm">
             There are currently no early access features available.
         </p>
     )

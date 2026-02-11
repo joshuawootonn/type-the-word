@@ -14,7 +14,7 @@ export function ColorInput(props: Props) {
                     {...props}
                     {...field}
                     type="color"
-                    className="border-2 border-primary outline-none"
+                    className="border-primary border-2 outline-hidden"
                     value={new Color(`oklch(${field.value})`)
                         .to("srgb")
                         .toString({
@@ -31,7 +31,7 @@ export function ColorInput(props: Props) {
                             .replace("oklch(", "")
                             .replace("none", "0")
                         document.documentElement.style.setProperty(
-                            `--color-${field.name}`,
+                            `--oklch-${field.name}`,
                             colorString,
                         )
 

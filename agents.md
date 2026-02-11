@@ -222,7 +222,7 @@ All reusable UI primitives should be located in `src/components/ui/`. These comp
 
 ### 1. No Rounded Corners
 
-**Never use `rounded` classes.** This application uses sharp, rectangular design throughout.
+**Never use `rounded-sm` classes.** This application uses sharp, rectangular design throughout.
 
 ```tsx
 // ❌ BAD: Using rounded corners
@@ -360,13 +360,13 @@ Standard form structure:
 ```tsx
 // Error message
 <div className="not-prose flex items-start gap-3 border-2 border-error bg-secondary p-4">
-    <svg className="h-5 w-5 flex-shrink-0 text-error" {/* icon */} />
+    <svg className="h-5 w-5 shrink-0 text-error" {/* icon */} />
     <div className="text-sm text-error">{error}</div>
 </div>
 
 // Success message
 <div className="not-prose flex items-start gap-3 border-2 border-success bg-secondary p-4">
-    <svg className="h-5 w-5 flex-shrink-0 text-success" {/* icon */} />
+    <svg className="h-5 w-5 shrink-0 text-success" {/* icon */} />
     <div className="text-sm text-success">{message}</div>
 </div>
 ```
@@ -382,7 +382,7 @@ The application uses a custom dashed-border focus state (`.svg-outline`):
 // Input/Textarea primitives handle this automatically via wrapper:
 <div className="group svg-outline relative">
     <div className="svg-outline-override absolute -z-10 hidden group-focus-within:block" />
-    <input className="outline-none ..." />
+    <input className="outline-hidden ..." />
 </div>
 ```
 

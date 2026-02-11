@@ -52,15 +52,15 @@ const accessors = {
 const chartTheme = buildChartTheme({
     backgroundColor: "transparent",
     colors: [
-        "oklch(var(--color-primary))",
-        "oklch(var(--color-primary))", // wpm-points same as wpm
-        "oklch(var(--color-success))",
-        "oklch(var(--color-success))", // accuracy-points same as accuracy
-        "oklch(var(--color-success))",
-        "oklch(var(--color-success))", // corrected-accuracy-points same as corrected-accuracy
+        "oklch(var(--oklch-primary))",
+        "oklch(var(--oklch-primary))", // wpm-points same as wpm
+        "oklch(var(--oklch-success))",
+        "oklch(var(--oklch-success))", // accuracy-points same as accuracy
+        "oklch(var(--oklch-success))",
+        "oklch(var(--oklch-success))", // corrected-accuracy-points same as corrected-accuracy
     ],
-    gridColor: "oklch(var(--color-primary))",
-    gridColorDark: "oklch(var(--color-primary))",
+    gridColor: "oklch(var(--oklch-primary))",
+    gridColorDark: "oklch(var(--oklch-primary))",
     tickLength: 4,
 })
 
@@ -74,7 +74,7 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
 
     if (!hasAnyData) {
         return (
-            <div className="flex h-[200px] items-center justify-center text-primary/60">
+            <div className="text-primary/60 flex h-[200px] items-center justify-center">
                 No data available for this time range
             </div>
         )
@@ -101,13 +101,13 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                     <Axis
                         orientation="bottom"
                         tickLabelProps={{
-                            fill: "oklch(var(--color-primary))",
+                            fill: "oklch(var(--oklch-primary))",
                             fontFamily: "var(--font-poppins)",
                             fontSize: 12,
                         }}
                         strokeWidth={2}
-                        stroke="oklch(var(--color-primary))"
-                        tickStroke="oklch(var(--color-primary))"
+                        stroke="oklch(var(--oklch-primary))"
+                        tickStroke="oklch(var(--oklch-primary))"
                         numTicks={Math.min(data.length, 7)}
                     />
                     <Axis
@@ -116,18 +116,18 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                         label="WPM"
                         labelOffset={30}
                         labelProps={{
-                            fill: "oklch(var(--color-primary))",
+                            fill: "oklch(var(--oklch-primary))",
                             fontFamily: "var(--font-poppins)",
                             fontSize: 12,
                         }}
                         tickLabelProps={{
-                            fill: "oklch(var(--color-primary))",
+                            fill: "oklch(var(--oklch-primary))",
                             fontFamily: "var(--font-poppins)",
                             fontSize: 12,
                         }}
                         strokeWidth={2}
-                        stroke="oklch(var(--color-primary))"
-                        tickStroke="oklch(var(--color-primary))"
+                        stroke="oklch(var(--oklch-primary))"
+                        tickStroke="oklch(var(--oklch-primary))"
                     />
                     <Axis
                         orientation="right"
@@ -135,25 +135,25 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                         label="Accuracy %"
                         labelOffset={30}
                         labelProps={{
-                            fill: "oklch(var(--color-success))",
+                            fill: "oklch(var(--oklch-success))",
                             fontFamily: "var(--font-poppins)",
                             fontSize: 12,
                         }}
                         tickLabelProps={{
-                            fill: "oklch(var(--color-success))",
+                            fill: "oklch(var(--oklch-success))",
                             fontFamily: "var(--font-poppins)",
                             fontSize: 12,
                         }}
                         strokeWidth={2}
-                        stroke="oklch(var(--color-success))"
-                        tickStroke="oklch(var(--color-success))"
+                        stroke="oklch(var(--oklch-success))"
+                        tickStroke="oklch(var(--oklch-success))"
                     />
                     <LineSeries
                         dataKey="wpm"
                         data={wpmData}
                         xAccessor={accessors.xAccessor}
                         yAccessor={accessors.yAccessorWpm}
-                        stroke="oklch(var(--color-primary))"
+                        stroke="oklch(var(--oklch-primary))"
                         strokeWidth={2}
                     />
                     <GlyphSeries
@@ -161,14 +161,14 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                         data={wpmData}
                         xAccessor={accessors.xAccessor}
                         yAccessor={accessors.yAccessorWpm}
-                        colorAccessor={() => "oklch(var(--color-primary))"}
+                        colorAccessor={() => "oklch(var(--oklch-primary))"}
                     />
                     <LineSeries
                         dataKey="accuracy"
                         data={accuracyData}
                         xAccessor={accessors.xAccessor}
                         yAccessor={accessors.yAccessorAccuracy}
-                        stroke="oklch(var(--color-success))"
+                        stroke="oklch(var(--oklch-success))"
                         strokeWidth={2}
                     />
                     <GlyphSeries
@@ -176,14 +176,14 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                         data={accuracyData}
                         xAccessor={accessors.xAccessor}
                         yAccessor={accessors.yAccessorAccuracy}
-                        colorAccessor={() => "oklch(var(--color-success))"}
+                        colorAccessor={() => "oklch(var(--oklch-success))"}
                     />
                     <LineSeries
                         dataKey="corrected-accuracy"
                         data={correctedAccuracyData}
                         xAccessor={accessors.xAccessor}
                         yAccessor={accessors.yAccessorCorrectedAccuracy}
-                        stroke="oklch(var(--color-success))"
+                        stroke="oklch(var(--oklch-success))"
                         strokeWidth={2}
                         strokeDasharray="4 2"
                     />
@@ -192,7 +192,7 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                         data={correctedAccuracyData}
                         xAccessor={accessors.xAccessor}
                         yAccessor={accessors.yAccessorCorrectedAccuracy}
-                        colorAccessor={() => "oklch(var(--color-success))"}
+                        colorAccessor={() => "oklch(var(--oklch-success))"}
                     />
                     <Tooltip
                         snapTooltipToDatumX
@@ -203,14 +203,14 @@ function WPMChartInner({ data }: { data: AggregatedStats[] }) {
                             ...defaultTooltipStyles,
                             padding: "0",
                             borderRadius: "0",
-                            border: "1.5px solid oklch(var(--color-primary))",
+                            border: "1.5px solid oklch(var(--oklch-primary))",
                         }}
                         renderTooltip={({ tooltipData }) => {
                             const datum = tooltipData?.nearestDatum
                                 ?.datum as AggregatedStats
                             if (!datum) return null
                             return (
-                                <div className="bg-secondary px-3 py-2 text-primary">
+                                <div className="bg-secondary text-primary px-3 py-2">
                                     <div className="mb-1 text-base font-medium">
                                         {datum.dateLabel}
                                     </div>
@@ -258,7 +258,7 @@ function ChartSelect<T extends string>({
     label: string
 }) {
     return (
-        <div className="flex items-center gap-2 text-sm text-primary">
+        <div className="text-primary flex items-center gap-2 text-sm">
             <span>{label}:</span>
             <Select value={value} onValueChange={onChange}>
                 <SelectTrigger>
@@ -302,17 +302,17 @@ export function WPMChart({ chartData }: { chartData: WpmChartData }) {
                     />
                 </div>
             </div>
-            <div className="mb-2 mt-4 flex flex-wrap gap-4 text-sm">
+            <div className="mt-4 mb-2 flex flex-wrap gap-4 text-sm">
                 <div className="flex items-center gap-2">
-                    <div className="h-0.5 w-4 bg-primary" />
+                    <div className="bg-primary h-0.5 w-4" />
                     <span className="text-primary">WPM</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="h-0.5 w-4 bg-success" />
+                    <div className="bg-success h-0.5 w-4" />
                     <span className="text-success">Accuracy</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="h-0.5 w-4 border-t-2 border-dashed border-success" />
+                    <div className="border-success h-0.5 w-4 border-t-2 border-dashed" />
                     <span className="text-success">Corrected</span>
                 </div>
             </div>

@@ -42,7 +42,7 @@ export function TranslationSelector() {
     )
 
     return (
-        <div className="flex items-center gap-2 text-sm text-primary">
+        <div className="text-primary flex items-center gap-2 text-sm">
             <span>Translation:</span>
             <Select value={currentTranslation} onValueChange={handleChange}>
                 <SelectTrigger className="min-w-[80px]">

@@ -25,7 +25,7 @@ export function Cursor({ passageId }: { passageId: string }) {
             <div
                 id={`${passageId}-cursor`}
                 className={clsx(
-                    "absolute rounded-lg bg-primary",
+                    "bg-primary absolute rounded-lg",
                     !isPassageActive && "blink",
                     isPassageFocused ? "opacity-100" : "opacity-0",
                 )}

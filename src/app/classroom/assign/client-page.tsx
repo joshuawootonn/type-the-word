@@ -198,9 +198,9 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
             ) : (
                 <>
                     {error && (
-                        <div className="not-prose mb-8 flex items-start gap-3 border-2 border-error bg-secondary p-4">
+                        <div className="not-prose border-error bg-secondary mb-8 flex items-start gap-3 border-2 p-4">
                             <svg
-                                className="h-5 w-5 flex-shrink-0 text-error"
+                                className="text-error h-5 w-5 shrink-0"
                                 fill="none"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -210,16 +210,16 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                             >
                                 <path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <div className="translate-y-[1px] text-sm text-error">
+                            <div className="text-error translate-y-px text-sm">
                                 {error}
                             </div>
                         </div>
                     )}
 
                     {success && (
-                        <div className="not-prose mb-8 flex items-start gap-3 border-2 border-success bg-secondary p-4">
+                        <div className="not-prose border-success bg-secondary mb-8 flex items-start gap-3 border-2 p-4">
                             <svg
-                                className="h-5 w-5 flex-shrink-0 text-success"
+                                className="text-success h-5 w-5 shrink-0"
                                 fill="none"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -229,7 +229,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                             >
                                 <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <div className="text-sm text-success">
+                            <div className="text-success text-sm">
                                 Assignment created in draft mode. Publish it to
                                 make it visible to students.
                             </div>
@@ -484,7 +484,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex justify-end gap-3 border-t-2 border-primary pt-6">
+                        <div className="border-primary flex justify-end gap-3 border-t-2 pt-6">
                             <Button
                                 type="submit"
                                 isLoading={isCreating}
@@ -494,7 +494,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                             </Button>
                             <a
                                 href="/classroom"
-                                className="svg-outline relative border-2 border-primary bg-secondary px-3 py-1 font-semibold no-underline"
+                                className="svg-outline border-primary bg-secondary relative border-2 px-3 py-1 font-semibold no-underline"
                             >
                                 Cancel
                             </a>

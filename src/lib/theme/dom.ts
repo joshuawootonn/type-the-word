@@ -11,10 +11,10 @@ export function isThemeClassname(className: string) {
 }
 
 export function cleanUpdateDocumentStyles() {
-    document.documentElement.style.removeProperty(`--color-primary`)
-    document.documentElement.style.removeProperty(`--color-secondary`)
-    document.documentElement.style.removeProperty(`--color-success`)
-    document.documentElement.style.removeProperty(`--color-error`)
+    document.documentElement.style.removeProperty(`--oklch-primary`)
+    document.documentElement.style.removeProperty(`--oklch-secondary`)
+    document.documentElement.style.removeProperty(`--oklch-success`)
+    document.documentElement.style.removeProperty(`--oklch-error`)
 }
 
 export function injectNewClassIntoStyle(theme: ThemeRecord) {

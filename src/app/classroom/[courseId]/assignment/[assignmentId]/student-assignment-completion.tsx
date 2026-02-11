@@ -113,19 +113,19 @@ export function StudentAssignmentCompletion({
 
     return (
         <>
-            <div className="not-prose space-y-4 border-2 border-primary bg-secondary p-6">
+            <div className="not-prose border-primary bg-secondary space-y-4 border-2 p-6">
                 <div className="space-y-1">
-                    <p className="text-sm uppercase tracking-wide text-primary">
+                    <p className="text-primary text-sm tracking-wide uppercase">
                         Classroom Assignment
                     </p>
-                    <h1 className="text-2xl font-semibold text-primary">
+                    <h1 className="text-primary text-2xl font-semibold">
                         {assignmentTitle}
                     </h1>
-                    <p className="text-sm text-primary">{referenceLabel}</p>
+                    <p className="text-primary text-sm">{referenceLabel}</p>
                 </div>
                 <div className="space-y-3">
                     <Meter value={completionPercentage} label="Completion" />
-                    <div className="text-sm text-primary">
+                    <div className="text-primary text-sm">
                         {completedVerses} of {totalVerses} verses completed
                     </div>
                 </div>
@@ -133,7 +133,7 @@ export function StudentAssignmentCompletion({
                 {/* Show stats if we have valid data */}
                 {(stats.averageWpm !== null ||
                     stats.averageAccuracy !== null) && (
-                    <div className="grid grid-cols-2 gap-3 border-t-2 border-primary pt-3 text-sm">
+                    <div className="border-primary grid grid-cols-2 gap-3 border-t-2 pt-3 text-sm">
                         {stats.averageWpm !== null && (
                             <div>
                                 <span className="opacity-75">Average WPM:</span>{" "}
@@ -156,10 +156,10 @@ export function StudentAssignmentCompletion({
 
             {isComplete && (
                 <>
-                    <div className="not-prose space-y-4 border-2 border-success bg-secondary p-6">
+                    <div className="not-prose border-success bg-secondary space-y-4 border-2 p-6">
                         <div className="flex items-center gap-3">
                             <svg
-                                className="mt-0.5 h-5 w-5 flex-shrink-0 text-success"
+                                className="text-success mt-0.5 h-5 w-5 shrink-0"
                                 fill="none"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -169,11 +169,11 @@ export function StudentAssignmentCompletion({
                             >
                                 <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <div className="flex-shrink-0 flex-grow text-sm text-success">
+                            <div className="text-success shrink-0 grow text-sm">
                                 Nice work! Assignment completed.
                             </div>
                             {isTurnedIn ? (
-                                <div className="text-sm text-success">
+                                <div className="text-success text-sm">
                                     This assignment is turned in.
                                 </div>
                             ) : (
@@ -189,9 +189,9 @@ export function StudentAssignmentCompletion({
                             )}
                         </div>
                     </div>
-                    <div className="!mb-32">
+                    <div className="mb-32!">
                         {turnInError && (
-                            <div className="not-prose text-sm text-error">
+                            <div className="not-prose text-error text-sm">
                                 {turnInError}
                             </div>
                         )}

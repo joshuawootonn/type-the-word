@@ -26,7 +26,7 @@ const Link = forwardRef<
         <NextLink
             ref={ref}
             className={clsx(
-                "svg-outline relative inline-block border-2 border-primary bg-secondary px-3 py-1 font-medium text-primary no-underline",
+                "svg-outline border-primary bg-secondary text-primary relative inline-block border-2 px-3 py-1 font-medium no-underline",
                 className,
             )}
             {...props}

@@ -21,15 +21,15 @@ export default function ResetPasswordPage() {
         return (
             <div className="mt-8 flex min-h-screen items-start justify-center">
                 <div className="w-full max-w-md text-center">
-                    <h1 className="mb-4 text-3xl font-semibold text-primary">
+                    <h1 className="text-primary mb-4 text-3xl font-semibold">
                         Invalid reset link
                     </h1>
-                    <p className="mb-8 text-pretty text-primary">
+                    <p className="text-primary mb-8 text-pretty">
                         This password reset link is invalid or has expired.
                     </p>
                     <Link
                         href="/auth/forgot-password"
-                        className="svg-outline relative inline-block border-2 border-primary bg-secondary px-3 py-1 font-semibold text-primary transition-colors hover:bg-primary hover:text-secondary"
+                        className="svg-outline border-primary bg-secondary text-primary hover:bg-primary hover:text-secondary relative inline-block border-2 px-3 py-1 font-semibold transition-colors"
                     >
                         Request new link
                     </Link>
@@ -42,16 +42,16 @@ export default function ResetPasswordPage() {
         return (
             <div className="mt-8 flex min-h-screen items-start justify-center">
                 <div className="w-full max-w-md text-center">
-                    <h1 className="mb-4 text-3xl font-semibold text-primary">
+                    <h1 className="text-primary mb-4 text-3xl font-semibold">
                         Password reset successful
                     </h1>
-                    <p className="mb-8 text-pretty text-primary">
+                    <p className="text-primary mb-8 text-pretty">
                         Your password has been reset. You can now log in with
                         your new password.
                     </p>
                     <Link
                         href="/auth/login"
-                        className="svg-outline relative inline-block border-2 border-primary bg-primary px-3 py-1 font-semibold text-secondary"
+                        className="svg-outline border-primary bg-primary text-secondary relative inline-block border-2 px-3 py-1 font-semibold"
                     >
                         Log in
                     </Link>
@@ -63,10 +63,10 @@ export default function ResetPasswordPage() {
     return (
         <div className="mt-8 flex min-h-screen items-start justify-center">
             <div className="w-full max-w-md">
-                <h1 className="mb-4 text-center text-3xl font-semibold text-primary">
+                <h1 className="text-primary mb-4 text-center text-3xl font-semibold">
                     Reset your password
                 </h1>
-                <p className="mb-8 text-center text-primary">
+                <p className="text-primary mb-8 text-center">
                     Enter your new password below.
                 </p>
 
@@ -162,7 +162,7 @@ export default function ResetPasswordPage() {
                             className="space-y-6"
                         >
                             {error && (
-                                <div className="border-2 border-error bg-error/10 px-4 py-3 text-error">
+                                <div className="border-error bg-error/10 text-error border-2 px-4 py-3">
                                     {error}
                                 </div>
                             )}
@@ -170,7 +170,7 @@ export default function ResetPasswordPage() {
                             <div>
                                 <label
                                     htmlFor="password"
-                                    className="mb-2 block font-medium text-primary"
+                                    className="text-primary mb-2 block font-medium"
                                 >
                                     New Password
                                 </label>
@@ -180,14 +180,14 @@ export default function ResetPasswordPage() {
                                         type="password"
                                         id="password"
                                         innerRef={passwordRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary px-3 py-1.5 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="border-primary bg-secondary text-primary placeholder:text-primary/50 w-full rounded-none border-2 px-3 py-1.5 font-medium outline-hidden"
                                         placeholder="Enter new password..."
                                         autoComplete="new-password"
                                     />
                                 </div>
                                 {props.errors.password &&
                                     props.submitCount > 0 && (
-                                        <div className="mt-2 text-error">
+                                        <div className="text-error mt-2">
                                             {props.errors.password}
                                         </div>
                                     )}
@@ -196,7 +196,7 @@ export default function ResetPasswordPage() {
                             <div>
                                 <label
                                     htmlFor="confirmPassword"
-                                    className="mb-2 block font-medium text-primary"
+                                    className="text-primary mb-2 block font-medium"
                                 >
                                     Confirm New Password
                                 </label>
@@ -206,14 +206,14 @@ export default function ResetPasswordPage() {
                                         type="password"
                                         id="confirmPassword"
                                         innerRef={confirmPasswordRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary px-3 py-1.5 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="border-primary bg-secondary text-primary placeholder:text-primary/50 w-full rounded-none border-2 px-3 py-1.5 font-medium outline-hidden"
                                         placeholder="Confirm new password..."
                                         autoComplete="new-password"
                                     />
                                 </div>
                                 {props.errors.confirmPassword &&
                                     props.submitCount > 0 && (
-                                        <div className="mt-2 text-error">
+                                        <div className="text-error mt-2">
                                             {props.errors.confirmPassword}
                                         </div>
                                     )}
@@ -222,13 +222,13 @@ export default function ResetPasswordPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="svg-outline relative w-full cursor-pointer border-2 border-primary bg-primary px-3 py-1 font-semibold text-secondary disabled:cursor-not-allowed"
+                                className="svg-outline border-primary bg-primary text-secondary relative w-full cursor-pointer border-2 px-3 py-1 font-semibold disabled:cursor-not-allowed"
                             >
                                 {isLoading ? (
                                     <>
                                         <Loading
                                             className={cn(
-                                                "text-md absolute left-1/2 top-1/2 -translate-x-8 -translate-y-1/2 font-semibold",
+                                                "text-md absolute top-1/2 left-1/2 -translate-x-8 -translate-y-1/2 font-semibold",
                                                 isLoading
                                                     ? "text-secondary"
                                                     : "text-primary",

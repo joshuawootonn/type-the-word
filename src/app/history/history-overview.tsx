@@ -59,15 +59,15 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
 
     return (
         <Tooltip.Provider delayDuration={0}>
-            <div className="flex flex-col text-primary">
+            <div className="text-primary flex flex-col">
                 {overview.map(book => {
                     return (
                         <details key={book.book}>
                             <Tooltip.Root>
                                 <Tooltip.Trigger asChild>
-                                    <summary className="svg-outline-stubby relative select-none outline-none">
+                                    <summary className="svg-outline-stubby relative outline-hidden select-none">
                                         <div className="ml-3 inline-flex w-[calc(100%-32px)] items-center justify-between">
-                                            <h3 className="m-0 flex-grow">
+                                            <h3 className="m-0 grow">
                                                 {book.label}
                                             </h3>
 
@@ -99,7 +99,7 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                 </Tooltip.Trigger>
                             </Tooltip.Root>
                             <div>
-                                <div className="prose flex flex-col gap-x-3 gap-y-2 pt-4 leading-4 text-primary">
+                                <div className="typo:prose text-primary flex flex-col gap-x-3 gap-y-2 pt-4 leading-4">
                                     {book.prestige > 0 && (
                                         <div>
                                             Times completed: {book.prestige}
@@ -114,14 +114,14 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                     </div>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-[repeat(auto-fill,_minmax(max(36px),_1fr))] py-4">
+                            <div className="grid grid-cols-[repeat(auto-fill,minmax(max(36px),1fr))] py-4">
                                 {book.chapters.map((chapterOverview, j) => (
                                     <Tooltip.Root key={j}>
                                         <Tooltip.Trigger asChild>
                                             <Link
                                                 href={`/passage/${book.book}_${chapterOverview.chapter}?translation=${currentTranslation}`}
                                                 prefetch={false}
-                                                className="svg-outline-xs relative aspect-square h-full p-1 outline-none"
+                                                className="svg-outline-xs relative aspect-square h-full p-1 outline-hidden"
                                             >
                                                 <Box
                                                     percentage={
@@ -131,7 +131,7 @@ export function HistoryOverview({ overview }: { overview: BookOverview[] }) {
                                             </Link>
                                         </Tooltip.Trigger>
                                         <Tooltip.Content
-                                            className="prose grid select-none grid-cols-[1fr_minmax(30px,min-content)] gap-x-3 gap-y-1 border-2 border-primary bg-secondary px-3 py-2 font-sans leading-none text-primary"
+                                            className="typo:prose border-primary bg-secondary text-primary grid grid-cols-[1fr_minmax(30px,min-content)] gap-x-3 gap-y-1 border-2 px-3 py-2 font-sans leading-none select-none"
                                             sideOffset={2}
                                         >
                                             <div>Chapter: </div>

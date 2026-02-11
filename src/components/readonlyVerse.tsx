@@ -56,7 +56,7 @@ export function ReadonlyVerse({
                 if (atom.type === "verseNumber") {
                     return (
                         <b
-                            className={clsx(isIndented && "absolute -left-0")}
+                            className={clsx(isIndented && "absolute left-0")}
                             key={aIndexPrime}
                         >
                             {atom.text.split(":").at(-1)}
@@ -113,7 +113,7 @@ export function ReadonlyVerse({
             {rect && passageRect ? (
                 <button
                     className={clsx(
-                        "svg-outline absolute z-10 border-2 border-primary bg-secondary/80 text-primary opacity-0 backdrop-blur-sm transition-opacity duration-100",
+                        "svg-outline border-primary bg-secondary/80 text-primary absolute z-10 border-2 opacity-0 backdrop-blur-xs transition-opacity duration-100",
                         !isPassageActive && "hover:opacity-100",
                         "focus:opacity-100",
                     )}

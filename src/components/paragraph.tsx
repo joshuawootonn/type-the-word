@@ -26,7 +26,12 @@ export function Paragraph({
 }) {
     const [currentVerse] = useAtom(currentVerseAtom)
     return (
-        <p className={clsx("text-lg", node.metadata.blockIndent && "ml-3")}>
+        <p
+            className={clsx(
+                "text-lg leading-7",
+                node.metadata.blockIndent && "ml-3",
+            )}
+        >
             {node.nodes.map((verse, vIndex) => {
                 const isCurrentVerse = verse.verse.value === currentVerse
 

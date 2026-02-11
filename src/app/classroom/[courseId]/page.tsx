@@ -85,7 +85,7 @@ export default async function CoursePage({ params }: PageProps) {
                 </p>
                 <Link
                     href="/classroom/dashboard"
-                    className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold no-underline"
+                    className="svg-outline border-primary relative border-2 px-3 py-1 font-semibold no-underline"
                 >
                     Back to Dashboard
                 </Link>

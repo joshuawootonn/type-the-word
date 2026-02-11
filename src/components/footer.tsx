@@ -28,7 +28,7 @@ export function Footer() {
 
     return (
         <>
-            <footer className="flex w-full flex-col items-center justify-between py-2 text-sm text-primary sm:flex-row">
+            <footer className="text-primary flex w-full flex-col items-center justify-between py-2 text-sm sm:flex-row">
                 <div className="mb-3 flex items-center justify-between space-x-3 sm:mb-0">
                     <DropdownMenu.Root>
                         <DropdownMenu.Trigger asChild>
@@ -41,14 +41,14 @@ export function Footer() {
                         </DropdownMenu.Trigger>
 
                         <DropdownMenu.Content
-                            className="flex flex-col border-2 border-primary bg-secondary"
+                            className="border-primary bg-secondary flex flex-col border-2"
                             sideOffset={4}
                             align="center"
                             side="top"
                         >
                             <DropdownMenu.Item asChild={true}>
                                 <Link
-                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
+                                    className="focus:bg-primary focus:text-secondary cursor-pointer px-2 py-1 no-underline outline-hidden"
                                     href={"/copyright"}
                                 >
                                     copyright
@@ -56,7 +56,7 @@ export function Footer() {
                             </DropdownMenu.Item>
                             <DropdownMenu.Item asChild={true}>
                                 <Link
-                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
+                                    className="focus:bg-primary focus:text-secondary cursor-pointer px-2 py-1 no-underline outline-hidden"
                                     href={"/privacy-policy"}
                                 >
                                     privacy
@@ -64,7 +64,7 @@ export function Footer() {
                             </DropdownMenu.Item>
                             <DropdownMenu.Item asChild={true}>
                                 <Link
-                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
+                                    className="focus:bg-primary focus:text-secondary cursor-pointer px-2 py-1 no-underline outline-hidden"
                                     href={"/terms-of-service"}
                                 >
                                     terms
@@ -88,7 +88,7 @@ export function Footer() {
                         classroom
                     </Link>
                 </div>
-                <div className="hidden flex-grow md:block"> </div>
+                <div className="hidden grow md:block"> </div>
                 {/* <div className="block md:hidden">/</div> */}
                 <div className="flex items-center justify-between space-x-3">
                     <Link
@@ -109,7 +109,7 @@ export function Footer() {
                                 height="10"
                                 viewBox="0 0 8 8"
                                 fill="currentColor"
-                                className="absolute -right-1.5 -top-1.5 origin-center animate-spin-every-once-in-a-while text-primary"
+                                className="animate-spin-every-once-in-a-while text-primary absolute -top-1.5 -right-1.5 origin-center"
                                 xmlns="http://www.w3.org/2000/svg"
                             >
                                 <path
@@ -141,14 +141,14 @@ export function Footer() {
                         </DropdownMenu.Trigger>
 
                         <DropdownMenu.Content
-                            className="flex flex-col border-2 border-primary bg-secondary"
+                            className="border-primary bg-secondary flex flex-col border-2"
                             sideOffset={4}
                             align="center"
                             side="top"
                         >
                             <DropdownMenu.Item asChild>
                                 <Link
-                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
+                                    className="focus:bg-primary focus:text-secondary cursor-pointer px-2 py-1 no-underline outline-hidden"
                                     href={
                                         "https://github.com/joshuawootonn/type-the-word"
                                     }
@@ -160,7 +160,7 @@ export function Footer() {
                             </DropdownMenu.Item>
                             <DropdownMenu.Item asChild={true}>
                                 <Link
-                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
+                                    className="focus:bg-primary focus:text-secondary cursor-pointer px-2 py-1 no-underline outline-hidden"
                                     href={"https://typetheword.kit.com"}
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -170,7 +170,7 @@ export function Footer() {
                             </DropdownMenu.Item>
                             <DropdownMenu.Item asChild={true}>
                                 <Link
-                                    className="cursor-pointer px-2 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
+                                    className="focus:bg-primary focus:text-secondary cursor-pointer px-2 py-1 no-underline outline-hidden"
                                     href={
                                         "https://discord.com/invite/a9eYv4sgWp "
                                     }

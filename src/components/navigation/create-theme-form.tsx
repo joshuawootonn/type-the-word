@@ -62,28 +62,28 @@ export function getCreateThemeInitialProps(
     firstBuiltinTheme: BuiltinThemeRecord,
 ): z.infer<typeof formSchema> {
     const primary =
-        getCSSVarValue("--color-primary") ||
+        getCSSVarValue("--oklch-primary") ||
         oklchToString({
             lightness: firstBuiltinTheme.theme.primaryLightness,
             chroma: firstBuiltinTheme.theme.primaryChroma,
             hue: firstBuiltinTheme.theme.primaryHue,
         })
     const secondary =
-        getCSSVarValue("--color-secondary") ||
+        getCSSVarValue("--oklch-secondary") ||
         oklchToString({
             lightness: firstBuiltinTheme.theme.secondaryLightness,
             chroma: firstBuiltinTheme.theme.secondaryChroma,
             hue: firstBuiltinTheme.theme.secondaryHue,
         })
     const success =
-        getCSSVarValue("--color-success") ||
+        getCSSVarValue("--oklch-success") ||
         oklchToString({
             lightness: firstBuiltinTheme.theme.successLightness,
             chroma: firstBuiltinTheme.theme.successChroma,
             hue: firstBuiltinTheme.theme.successHue,
         })
     const error =
-        getCSSVarValue("--color-error") ||
+        getCSSVarValue("--oklch-error") ||
         oklchToString({
             lightness: firstBuiltinTheme.theme.errorLightness,
             chroma: firstBuiltinTheme.theme.errorChroma,
@@ -199,7 +199,7 @@ export function CreateThemeForm({
                                         e: FocusEvent<HTMLInputElement>,
                                     ) => e.currentTarget.select()}
                                     className={
-                                        "w-40 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        "border-primary bg-secondary text-primary placeholder:text-primary/50 w-40 rounded-none border-2 p-1 font-medium outline-hidden"
                                     }
                                     id="theme-name"
                                     autoComplete="off"
@@ -207,7 +207,7 @@ export function CreateThemeForm({
                                 />
                             </div>
                             {props.errors.label && props.submitCount > 0 && (
-                                <div className="mt-2 text-right text-error">
+                                <div className="text-error mt-2 text-right">
                                     {props.errors.label}
                                 </div>
                             )}
@@ -239,10 +239,10 @@ export function CreateThemeForm({
                     </div>
 
                     <div className="flex flex-col items-start justify-start">
-                        <div className="-mb-0.5 border-2 border-primary px-2 text-lg">
+                        <div className="border-primary -mb-0.5 border-2 px-2 text-lg">
                             Preview
                         </div>
-                        <p className="prose w-full border-2 border-primary p-3 text-primary">
+                        <p className="typo:prose border-primary text-primary w-full border-2 p-3">
                             <span className="correct">The L</span>
                             <span className="incorrect">o</span>
                             <span className="correct">rd is my</span>{" "}
@@ -251,13 +251,13 @@ export function CreateThemeForm({
                         </p>
                     </div>
                     {generalError && props.submitCount > 0 && (
-                        <div className="text-right text-error">
+                        <div className="text-error text-right">
                             {generalError}
                         </div>
                     )}
                     <button
                         type="submit"
-                        className="svg-outline relative col-span-2 border-2 border-primary px-3 py-1 font-semibold text-primary"
+                        className="svg-outline border-primary text-primary relative col-span-2 border-2 px-3 py-1 font-semibold"
                         disabled={isPending}
                     >
                         {isPending ? "Loading..." : "Save"}

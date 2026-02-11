@@ -12,7 +12,7 @@ export function NewLineIndicator({
             <span
                 className={clsx(
                     className,
-                    "indicator absolute left-0 top-0 inline-flex h-full items-center justify-center px-2 opacity-0 transition-opacity",
+                    "indicator absolute top-0 left-0 inline-flex h-full items-center justify-center px-2 opacity-0 transition-opacity",
                     isActive && "active-space opacity-100",
                 )}
             >

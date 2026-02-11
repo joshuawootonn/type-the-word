@@ -41,7 +41,7 @@ export default async function PassagePage() {
     return (
         <div
             className={
-                "prose-h2:text-3xl prose-p:text-xl prose-code:before:content-none prose-code:after:content-none prose-li:text-xl"
+                "typo:prose-h2:text-3xl typo:prose-p:text-xl typo:prose-code:before:content-none typo:prose-code:after:content-none typo:prose-li:text-xl"
             }
         >
             <h1>Welcome to Type the Word</h1>
@@ -55,7 +55,7 @@ export default async function PassagePage() {
                 As you type, TTW highlights correct letters in green and
                 incorrect letters in red. Here is an example from Psalm 23:
             </p>
-            <div className="relative z-0 flex flex-col items-end justify-end border-2 border-primary px-4 pb-5 pt-1">
+            <div className="border-primary relative z-0 flex flex-col items-end justify-end border-2 px-4 pt-1 pb-5">
                 <Passage
                     autofocus={true}
                     passage={passage}
@@ -63,7 +63,7 @@ export default async function PassagePage() {
                     chapterHistory={chapterHistory}
                     passageSegmentOverride={value}
                 />
-                <div className="absolute bottom-[-2px] left-[-2px] right-[-2px] border-2 border-primary px-3 text-center sm:left-[unset]">
+                <div className="border-primary absolute right-[-2px] bottom-[-2px] left-[-2px] border-2 px-3 text-center sm:left-[unset]">
                     Example of typing experience in PS 23
                 </div>
             </div>
@@ -71,7 +71,7 @@ export default async function PassagePage() {
             <p>
                 {session == null ? "Once you create an account, your" : "Your"}{" "}
                 <Link
-                    className="svg-outline-sm relative text-primary"
+                    className="svg-outline-sm text-primary relative"
                     href="/history"
                 >
                     typing history
@@ -89,7 +89,7 @@ export default async function PassagePage() {
             <ol>
                 <li>Create an account so your typing history is saved</li>
                 <li>
-                    <div className="flex flex-col items-start justify-start space-y-2 md:flex-row md:items-center md:space-x-2 md:space-y-0">
+                    <div className="flex flex-col items-start justify-start space-y-2 md:flex-row md:items-center md:space-y-0 md:space-x-2">
                         <PassageSelector
                             label="Find your favorite scripture: "
                             initialTranslation={lastTranslation}

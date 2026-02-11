@@ -34,12 +34,12 @@ function TabLink({
             onClick={onClick}
             className={clsx(
                 "flex cursor-pointer",
-                "svg-outline relative no-underline outline-none",
+                "svg-outline relative no-underline outline-hidden",
             )}
         >
             <div
                 className={cn(
-                    "px-4 py-2 text-primary",
+                    "text-primary px-4 py-2",
                     isActive ? "bg-secondary invert" : undefined,
                 )}
             >
@@ -62,7 +62,7 @@ export function HistoryTabsNav({ showWpmChart }: { showWpmChart: boolean }) {
     const translationParam = `?translation=${currentTranslation}`
 
     return (
-        <div className="relative mb-8 flex gap-1 border-b-2 border-primary">
+        <div className="border-primary relative mb-8 flex gap-1 border-b-2">
             <TabLink
                 href={`/history${translationParam}`}
                 isActive={activeTab === "overview"}
@@ -84,7 +84,7 @@ export function HistoryTabsNav({ showWpmChart }: { showWpmChart: boolean }) {
                     onClick={() => setActiveTab("wpm")}
                 >
                     WPM + Accuracy
-                    <div className="ml-2 inline-block -translate-y-[1px] border-1.5 border-primary px-1.5 py-0.5 text-xs font-medium text-primary">
+                    <div className="border-1.5 border-primary text-primary ml-2 inline-block -translate-y-px px-1.5 py-0.5 text-xs font-medium">
                         beta
                     </div>
                 </TabLink>

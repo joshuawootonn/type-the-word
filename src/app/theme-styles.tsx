@@ -8,10 +8,10 @@ import { UserThemeRecord } from "~/server/repositories/userTheme.repository"
 export function themeCSS({ theme }: { theme: ThemeRecord }): string {
     return `
 .${uuidToThemeClassname(theme.id)} {
-  --color-primary: ${theme.primaryLightness}% ${theme.primaryChroma} ${theme.primaryHue};
-  --color-secondary: ${theme.secondaryLightness}% ${theme.secondaryChroma} ${theme.secondaryHue};
-  --color-success: ${theme.successLightness}% ${theme.successChroma} ${theme.successHue};
-  --color-error: ${theme.errorLightness}% ${theme.errorChroma} ${theme.errorHue};
+  --oklch-primary: ${theme.primaryLightness}% ${theme.primaryChroma} ${theme.primaryHue};
+  --oklch-secondary: ${theme.secondaryLightness}% ${theme.secondaryChroma} ${theme.secondaryHue};
+  --oklch-success: ${theme.successLightness}% ${theme.successChroma} ${theme.successHue};
+  --oklch-error: ${theme.errorLightness}% ${theme.errorChroma} ${theme.errorHue};
 }
 `
 }

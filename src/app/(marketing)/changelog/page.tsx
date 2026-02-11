@@ -14,7 +14,7 @@ import { changelogUpdatedAt } from "./updated-at"
 function Link({ href, children }: { href: string; children: React.ReactNode }) {
     return (
         <a
-            className="svg-outline-sm relative cursor-pointer whitespace-nowrap underline outline-none"
+            className="svg-outline-sm relative cursor-pointer whitespace-nowrap underline outline-hidden"
             href={href}
             target="_blank"
             rel="noopener noreferrer"
@@ -27,7 +27,7 @@ function Link({ href, children }: { href: string; children: React.ReactNode }) {
 function DateComponent({ date }: { date: Date }) {
     return (
         <time
-            className={"font-bold text-primary"}
+            className={"text-primary font-bold"}
             dateTime={format(date, "yyyy-MM-dd")}
         >
             {format(date, "LLLL do")}
@@ -47,7 +47,7 @@ export default async function Changelog() {
     return (
         <div
             className={
-                "marker:text-primary prose-h2:text-3xl prose-p:text-xl prose-a:text-primary prose-kbd:text-primary prose-code:text-primary prose-code:before:content-none prose-code:after:content-none prose-ul:text-primary prose-li:text-primary"
+                "marker:text-primary typo:prose-h2:text-3xl typo:prose-p:text-xl typo:prose-a:text-primary typo:prose-kbd:text-primary typo:prose-code:text-primary typo:prose-code:before:content-none typo:prose-code:after:content-none typo:prose-ul:text-primary typo:prose-li:text-primary"
             }
         >
             <div className="mb-10 flex items-center justify-between">
@@ -65,7 +65,7 @@ export default async function Changelog() {
                     subscription&quot; and click &quot;Confirm.&quot;
                 </p>
             )}
-            <hr className="mx-0 w-full border-t-2 border-primary" />
+            <hr className="border-primary mx-0 w-full border-t-2" />
             <ul>
                 <li>
                     <DateComponent date={new Date("02/02/2026")} /> - New Bible
@@ -74,7 +74,7 @@ export default async function Changelog() {
                     <Image
                         src={"/assets/2026-02-02-translation-selector.png"}
                         alt={"Screenshot of the translation selector"}
-                        className="mt-3 border-2 border-primary"
+                        className="border-primary mt-3 border-2"
                         width={800}
                         height={494}
                     />
@@ -269,7 +269,7 @@ export default async function Changelog() {
                     <Image
                         src={"/assets/2025-12-24-translation-selector.png"}
                         alt={"Screenshot of the new translation selector"}
-                        className="mt-3 border-2 border-primary"
+                        className="border-primary mt-3 border-2"
                         width={800}
                         height={400}
                     />
@@ -316,7 +316,7 @@ export default async function Changelog() {
                         alt={
                             "Screenshot of the new early access features section"
                         }
-                        className="mt-3 border-2 border-primary"
+                        className="border-primary mt-3 border-2"
                         width={800}
                         height={400}
                     />
@@ -329,7 +329,7 @@ export default async function Changelog() {
                     <Image
                         src={"/assets/2025-12-05-WPM.png"}
                         alt={"Screenshot of the new WPM and accuracy chart"}
-                        className="mt-3 border-2 border-primary"
+                        className="border-primary mt-3 border-2"
                         width={800}
                         height={400}
                     />
@@ -537,7 +537,7 @@ export default async function Changelog() {
                                         alt={
                                             'Screen shot of the new "Log" section for each chapter'
                                         }
-                                        className="mt-3 border-2 border-primary"
+                                        className="border-primary mt-3 border-2"
                                         width={2454}
                                         height={2252}
                                     />
@@ -566,7 +566,7 @@ export default async function Changelog() {
                                 alt={
                                     'Screen shot of the new "Log" section for each chapter'
                                 }
-                                className="mt-3 border-2 border-primary"
+                                className="border-primary mt-3 border-2"
                                 width={2226}
                                 height={1842}
                             />
@@ -716,7 +716,7 @@ export default async function Changelog() {
                         <li>
                             You can now create your own themes for Type the
                             Word.
-                            <div className="px-8 pb-4 pt-4">
+                            <div className="px-8 pt-4 pb-4">
                                 <video
                                     className="m-0 rounded-lg"
                                     autoPlay={true}
@@ -744,7 +744,7 @@ export default async function Changelog() {
                             settings, and preview your theme throughout Type the
                             Word, before opening up the Theme Creator again to
                             save it.
-                            <div className="px-8 pb-4 pt-4">
+                            <div className="px-8 pt-4 pb-4">
                                 <video
                                     className="m-0 rounded-lg"
                                     autoPlay={true}
@@ -767,7 +767,7 @@ export default async function Changelog() {
                             The &quot;System&quot; theme now allows you to
                             choose what particular light and dark themes you
                             want to use.
-                            <div className="px-8 pb-4 pt-4">
+                            <div className="px-8 pt-4 pb-4">
                                 <video
                                     className="m-0 rounded-lg"
                                     autoPlay={true}
@@ -790,7 +790,7 @@ export default async function Changelog() {
                             And if you match the &quot;Secondary&quot; color and
                             &quot;Success&quot; colors you get this fun
                             disappearing effect.
-                            <div className="px-8 pb-4 pt-4">
+                            <div className="px-8 pt-4 pb-4">
                                 <video
                                     className="m-0 rounded-lg"
                                     autoPlay={true}
@@ -882,7 +882,7 @@ export default async function Changelog() {
                             <Image
                                 src={"/assets/updated-log-v2.png"}
                                 alt={'Screen shot of the new "Log" section'}
-                                className="mt-3 border-2 border-primary"
+                                className="border-primary mt-3 border-2"
                                 width={2684}
                                 height={3410}
                             />
@@ -920,7 +920,7 @@ export default async function Changelog() {
                     <DateComponent date={new Date("8/22/2024")} /> - Created
                     &quot;Settings&quot; section so you can manually change the
                     color scheme
-                    <div className="px-8 pb-8 pt-4">
+                    <div className="px-8 pt-4 pb-8">
                         <video
                             className="m-0 rounded-lg"
                             autoPlay={true}
@@ -953,7 +953,7 @@ export default async function Changelog() {
                             restarts the current verse
                         </li>
                     </ul>
-                    <div className="px-8 pb-8 pt-4">
+                    <div className="px-8 pt-4 pb-8">
                         <video
                             className="m-0 rounded-lg"
                             autoPlay={true}
@@ -999,7 +999,7 @@ export default async function Changelog() {
                 <li>
                     <DateComponent date={new Date("7/07/2024")} /> - Updated
                     Type the Word to remember where you last typed.
-                    <div className="px-8 pb-8 pt-4">
+                    <div className="px-8 pt-4 pb-8">
                         <video
                             className="m-0 rounded-lg"
                             autoPlay={true}
@@ -1134,7 +1134,7 @@ export default async function Changelog() {
                     <DateComponent date={new Date("2/9/2024")} /> - Update the{" "}
                     <code>/history</code> page with an overview section to see
                     what passages you&apos;ve typed.
-                    <div className="px-8 pb-8 pt-4">
+                    <div className="px-8 pt-4 pb-8">
                         <video
                             className="m-0 rounded-lg"
                             autoPlay={true}
@@ -1207,7 +1207,7 @@ export default async function Changelog() {
                     >
                         Added smooth scrolling
                     </Link>
-                    <div className="px-8 pb-8 pt-4">
+                    <div className="px-8 pt-4 pb-8">
                         <video
                             className="m-0 rounded-lg"
                             autoPlay={true}

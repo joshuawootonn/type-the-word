@@ -150,7 +150,7 @@ export function Passage({
                 <div
                     ref={passageRef}
                     id={passageId}
-                    className="passage prose relative z-0 w-full dark:prose-invert"
+                    className="passage typo:prose dark:typo:prose-invert relative z-0 w-full"
                 >
                     <PassageRectContext.Provider
                         value={{
@@ -180,7 +180,7 @@ export function Passage({
                                     return (
                                         <H2Component
                                             key={pIndex}
-                                            className="prose-h2 mb-4 mt-2 text-2xl text-primary"
+                                            className="typo:prose-h2 text-primary mt-2 mb-4 text-2xl"
                                         >
                                             {node.text}
                                         </H2Component>
@@ -188,7 +188,7 @@ export function Passage({
                                 case "h3":
                                     return (
                                         <h3
-                                            className="prose-h3 mt-0 text-xl font-semibold tracking-wide text-primary"
+                                            className="typo:prose-h3 text-primary mt-0 text-xl font-semibold tracking-wide"
                                             key={pIndex}
                                         >
                                             {node.text}
@@ -197,7 +197,7 @@ export function Passage({
                                 case "h4":
                                     return (
                                         <h4
-                                            className="prose-h4 text-lg font-medium tracking-wide text-primary"
+                                            className="typo:prose-h4 text-primary text-lg font-medium tracking-wide"
                                             key={pIndex}
                                         >
                                             {node.text}

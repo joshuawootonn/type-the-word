@@ -114,18 +114,8 @@ export function Navigation({
                         }
                     }
                     
-                    .icon {
-                        display: block;
-                        transform: translateY(1px);
-                        width: 39px;
-                        height: 33px;
-                    }
                     .animated-icon {
-                        display: none;
-                        transform: translateY(1px);
-                        width: 39px;
-                        height: 33px;
-                        background-color: oklch(var(--color-primary));
+                        background-color: oklch(var(--oklch-primary));
                         -webkit-mask-image: url("/bible.svg");
                         mask-image: url("/bible.svg");
                         mask-repeat: no-repeat;
@@ -144,14 +134,14 @@ export function Navigation({
                 `}</style>
                 <Link
                     className={
-                        "link svg-outline relative flex items-center space-x-1"
+                        "link svg-outline relative flex items-center gap-1"
                     }
                     href={rootPathname}
                     aria-label={"Type the Word logo"}
                 >
                     <RootLinkComponent className="text-xl font-semibold">
                         <span className="text-primary/50">Type th</span>
-                        <span className="relative text-primary">
+                        <span className="text-primary relative">
                             <span className="absolute -left-[3px] scale-y-125 font-normal">
                                 |
                             </span>
@@ -164,7 +154,7 @@ export function Navigation({
                         height="33"
                         viewBox="0 0 39 33"
                         fill="none"
-                        className="icon translate-y-[1px] stroke-primary"
+                        className="icon stroke-primary block h-[33px] w-[39px]"
                         xmlns="http://www.w3.org/2000/svg"
                     >
                         <path
@@ -177,7 +167,7 @@ export function Navigation({
                         />
                     </svg>
 
-                    <div className="animated-icon stroke-primary"></div>
+                    <div className="animated-icon stroke-primary hidden h-[33px] w-[39px]"></div>
                 </Link>
                 <div className="flex flex-col gap-4">
                     {sessionData ? (
@@ -195,7 +185,7 @@ export function Navigation({
                                     <DropdownMenu.Trigger asChild>
                                         <button
                                             ref={dropDownTriggerRef}
-                                            className="svg-outline relative border-2 border-primary px-3 py-1 font-medium text-primary"
+                                            className="svg-outline border-primary text-primary relative border-2 px-3 py-1 font-medium"
                                         >
                                             {sessionData.user.name}
                                         </button>
@@ -203,18 +193,18 @@ export function Navigation({
                                 </Popover.PopoverAnchor>
 
                                 <DropdownMenu.Content
-                                    className="z-50 border-2 border-primary bg-secondary text-primary"
+                                    className="border-primary bg-secondary text-primary z-50 border-2"
                                     sideOffset={-2}
                                     align="end"
                                 >
                                     <DropdownMenu.Item asChild={true}>
                                         <Link
-                                            className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
+                                            className="text-medium group focus:bg-primary focus:text-secondary flex cursor-pointer items-center px-3 py-1 no-underline outline-hidden"
                                             href={"/history"}
                                         >
                                             History
                                             <HotkeyLabel
-                                                className="ml-auto pl-5 text-sm text-primary/80 group-focus:text-secondary/80"
+                                                className="text-primary/80 group-focus:text-secondary/80 ml-auto pl-5 text-sm"
                                                 mac="⌘+↑+Y"
                                                 nonMac="^+↑+Y"
                                             />
@@ -223,7 +213,7 @@ export function Navigation({
                                     {hasClassroomAccess && (
                                         <DropdownMenu.Item asChild={true}>
                                             <Link
-                                                className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary"
+                                                className="text-medium group focus:bg-primary focus:text-secondary flex cursor-pointer items-center px-3 py-1 no-underline outline-hidden"
                                                 href={"/classroom/dashboard"}
                                             >
                                                 Classroom
@@ -231,17 +221,17 @@ export function Navigation({
                                         </DropdownMenu.Item>
                                     )}
                                     <Popover.PopoverTrigger asChild>
-                                        <DropdownMenu.Item className="text-medium group flex cursor-pointer items-center px-3 py-1 no-underline outline-none focus:bg-primary focus:text-secondary">
+                                        <DropdownMenu.Item className="text-medium group focus:bg-primary focus:text-secondary flex cursor-pointer items-center px-3 py-1 no-underline outline-hidden">
                                             Settings
                                             <HotkeyLabel
-                                                className="ml-auto pl-5 text-sm text-primary/80 group-focus:text-secondary/80"
+                                                className="text-primary/80 group-focus:text-secondary/80 ml-auto pl-5 text-sm"
                                                 mac="⌘+↑+,"
                                                 nonMac="^+↑+,"
                                             />
                                         </DropdownMenu.Item>
                                     </Popover.PopoverTrigger>
                                     <DropdownMenu.Item
-                                        className="cursor-pointer px-3 py-1 outline-none focus:bg-primary focus:text-secondary"
+                                        className="focus:bg-primary focus:text-secondary cursor-pointer px-3 py-1 outline-hidden"
                                         onClick={() =>
                                             void signOut({ redirect: true })
                                         }
@@ -254,7 +244,7 @@ export function Navigation({
                                         settingsState === "create-theme"
                                             ? "min-w-100"
                                             : "min-w-52",
-                                        "z-50 border-2 border-primary bg-secondary px-3 py-3 text-primary outline-none",
+                                        "border-primary bg-secondary text-primary z-50 border-2 px-3 py-3 outline-hidden",
                                     )}
                                     sideOffset={-2}
                                     align="end"
@@ -282,7 +272,7 @@ export function Navigation({
                                                     userThemes.data ?? []
                                                 }
                                             />
-                                            <div className="-mx-3 my-3 border-t-2 border-primary" />
+                                            <div className="border-primary -mx-3 my-3 border-t-2" />
                                             <h2 className="mb-2 text-xl">
                                                 Early Access Features
                                             </h2>
@@ -309,7 +299,7 @@ export function Navigation({
                     ) : (
                         <Link
                             href="/auth/login"
-                            className="svg-outline relative border-2 border-primary px-3 py-1 font-semibold text-primary"
+                            className="svg-outline border-primary text-primary relative border-2 px-3 py-1 font-semibold"
                         >
                             Log in
                         </Link>

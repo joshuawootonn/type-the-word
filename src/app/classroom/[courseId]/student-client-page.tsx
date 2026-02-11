@@ -113,11 +113,11 @@ function AssignmentCard({
     return (
         <NextLink
             href={`/classroom/${courseId}/assignment/${assignment.id}`}
-            className="svg-outline relative block border-2 border-primary bg-secondary p-4 no-underline"
+            className="svg-outline border-primary bg-secondary relative block border-2 p-4 no-underline"
         >
             <div className="mb-2">
                 <div className="mb-2 flex items-center justify-between gap-2">
-                    <div className="font-semibold text-primary">
+                    <div className="text-primary font-semibold">
                         {assignment.title}
                     </div>
                     <AssignmentStatusBadge
@@ -127,13 +127,13 @@ function AssignmentCard({
                         isStudent
                     />
                 </div>
-                <div className="text-sm text-primary">
+                <div className="text-primary text-sm">
                     {passageRef} ({assignment.translation.toUpperCase()})
                 </div>
             </div>
 
             {assignment.dueDate && (
-                <div className="mb-2 text-sm text-primary">
+                <div className="text-primary mb-2 text-sm">
                     Due: {new Date(assignment.dueDate).toLocaleDateString()}
                 </div>
             )}
@@ -147,7 +147,7 @@ function AssignmentCard({
                             className="w-full"
                         />
                     </div>
-                    <div className="grid grid-cols-2 gap-3 text-sm text-primary">
+                    <div className="text-primary grid grid-cols-2 gap-3 text-sm">
                         <div>
                             <span className="opacity-75">Verses:</span>{" "}
                             {assignment.completedVerses ?? 0} /{" "}

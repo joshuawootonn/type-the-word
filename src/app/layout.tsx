@@ -73,7 +73,7 @@ export default async function RootLayout({
 
     // added suppressHydrationWarning since `ThemeScript` adds classes to `html` onload
     return (
-        <html lang="en" suppressHydrationWarning>
+        <html lang="en" suppressHydrationWarning className={poppins.variable}>
             <head>
                 <ThemeStyles
                     builtinThemes={builtinThemes}
@@ -85,13 +85,8 @@ export default async function RootLayout({
                     userThemes={userThemes}
                 />
             </head>
-            <body
-                className={clsx(
-                    "min-h-screen-1px flex w-full font-sans",
-                    poppins.variable,
-                )}
-            >
-                <div className="container mx-auto flex max-w-page flex-col px-4 lg:px-0">
+            <body className={clsx("min-h-screen-1px flex w-full font-sans")}>
+                <div className="max-w-page container mx-auto flex flex-col px-4 lg:px-0">
                     <Providers
                         currentTheme={currentTheme}
                         userThemes={userThemes}

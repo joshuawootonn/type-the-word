@@ -12,7 +12,7 @@ const Input = forwardRef<
         <input
             ref={ref}
             className={clsx(
-                "w-full border-2 border-primary bg-secondary px-3 py-2 outline-none",
+                "border-primary bg-secondary w-full border-2 px-3 py-2 outline-hidden",
                 className,
             )}
             {...props}
@@ -30,7 +30,7 @@ const Textarea = forwardRef<
         <textarea
             ref={ref}
             className={clsx(
-                "w-full border-2 border-primary bg-secondary px-3 py-2 outline-none",
+                "border-primary bg-secondary w-full border-2 px-3 py-2 outline-hidden",
                 className,
             )}
             {...props}

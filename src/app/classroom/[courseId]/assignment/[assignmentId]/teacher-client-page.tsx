@@ -98,9 +98,9 @@ export function TeacherClientPage({
 
             {/* Publish Error */}
             {publishError && (
-                <div className="not-prose mb-6 flex items-start gap-3 border-2 border-error bg-secondary p-4">
+                <div className="not-prose border-error bg-secondary mb-6 flex items-start gap-3 border-2 p-4">
                     <svg
-                        className="mt-1 h-5 w-5 flex-shrink-0 text-error"
+                        className="text-error mt-1 h-5 w-5 shrink-0"
                         fill="none"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -169,7 +169,7 @@ export function TeacherClientPage({
                         {students.map((student, idx) => (
                             <div
                                 key={idx}
-                                className="border-2 border-primary bg-secondary p-4"
+                                className="border-primary bg-secondary border-2 p-4"
                             >
                                 <div className="mb-3 flex items-start justify-between gap-4">
                                     <div>
@@ -184,7 +184,7 @@ export function TeacherClientPage({
                                         )}
                                     </div>
                                     {student.isCompleted && (
-                                        <div className="text-sm font-medium text-success">
+                                        <div className="text-success text-sm font-medium">
                                             ✓ Completed
                                         </div>
                                     )}

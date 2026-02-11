@@ -22,19 +22,19 @@ export function AssignmentStatusBadge({
 
         if (isCompleted === 1) {
             return (
-                <span className="inline-block border-2 border-success bg-secondary px-2 py-1 text-xs font-semibold text-success">
+                <span className="border-success bg-secondary text-success inline-block border-2 px-2 py-1 text-xs font-semibold">
                     Completed
                 </span>
             )
         } else if (due && due < now) {
             return (
-                <span className="inline-block border-2 border-error bg-secondary px-2 py-1 text-xs font-semibold text-error">
+                <span className="border-error bg-secondary text-error inline-block border-2 px-2 py-1 text-xs font-semibold">
                     Past Due
                 </span>
             )
         } else {
             return (
-                <span className="inline-block border-2 border-primary bg-secondary px-2 py-1 text-xs font-semibold text-primary">
+                <span className="border-primary bg-secondary text-primary inline-block border-2 px-2 py-1 text-xs font-semibold">
                     Current
                 </span>
             )
@@ -44,19 +44,19 @@ export function AssignmentStatusBadge({
     // For teachers, show state
     if (state === "DRAFT") {
         return (
-            <span className="inline-block border-2 border-primary bg-secondary px-2 py-1 text-xs font-semibold opacity-60">
+            <span className="border-primary bg-secondary inline-block border-2 px-2 py-1 text-xs font-semibold opacity-60">
                 Draft
             </span>
         )
     } else if (state === "PUBLISHED") {
         return (
-            <span className="inline-block border-2 border-primary bg-secondary px-2 py-1 text-xs font-semibold text-primary">
+            <span className="border-primary bg-secondary text-primary inline-block border-2 px-2 py-1 text-xs font-semibold">
                 Published
             </span>
         )
     } else {
         return (
-            <span className="inline-block border-2 border-primary bg-secondary px-2 py-1 text-xs font-semibold opacity-40">
+            <span className="border-primary bg-secondary inline-block border-2 px-2 py-1 text-xs font-semibold opacity-40">
                 Deleted
             </span>
         )

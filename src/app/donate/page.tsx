@@ -50,10 +50,10 @@ export default async function DonatePage() {
         oneOffCosts
 
     return (
-        <main className="prose relative mx-auto w-full flex-grow pt-4 text-lg dark:prose-invert prose-headings:text-primary prose-p:text-primary prose-a:text-primary prose-strong:text-primary prose-code:text-primary prose-table:text-primary prose-th:text-primary prose-td:text-primary lg:pt-8">
+        <main className="typo:prose dark:typo:prose-invert typo:prose-headings:text-primary typo:prose-p:text-primary typo:prose-a:text-primary typo:prose-strong:text-primary typo:prose-code:text-primary typo:prose-table:text-primary typo:prose-th:text-primary typo:prose-td:text-primary relative mx-auto w-full grow pt-4 text-lg lg:pt-8">
             <div
                 className={
-                    "prose-h2:text-3xl prose-p:text-xl prose-code:before:content-none prose-code:after:content-none"
+                    "typo:prose-h2:text-3xl typo:prose-p:text-xl typo:prose-code:before:content-none typo:prose-code:after:content-none"
                 }
             >
                 <h1>Donate</h1>
@@ -68,7 +68,7 @@ export default async function DonatePage() {
                         })}
                     </strong>
                 </p>
-                <hr className="mx-0 w-full border-t-2 border-primary" />
+                <hr className="border-primary mx-0 w-full border-t-2" />
                 <h2>Why donate?</h2>
                 <p>
                     I love typing through the Bible and when I created TTW, I
@@ -91,7 +91,7 @@ export default async function DonatePage() {
             <div className="my-20 flex justify-center">
                 <Link
                     href="https://buy.stripe.com/28EcN49tMdztcaA6XAdby00"
-                    className="svg-outline relative border-2 border-primary px-3 py-1 font-medium text-primary no-underline"
+                    className="svg-outline border-primary text-primary relative border-2 px-3 py-1 font-medium no-underline"
                 >
                     Donate here
                 </Link>
@@ -137,7 +137,7 @@ export default async function DonatePage() {
                             <td>
                                 $10 <br />
                                 <br />
-                                <span className="whitespace-nowrap text-xs">
+                                <span className="text-xs whitespace-nowrap">
                                     (50% of $20/month) *
                                 </span>
                             </td>
@@ -247,7 +247,7 @@ export default async function DonatePage() {
                             <td>
                                 $11 <br />
                                 <br />
-                                <span className="whitespace-nowrap text-xs">
+                                <span className="text-xs whitespace-nowrap">
                                     (50% of $22/month)
                                 </span>
                             </td>

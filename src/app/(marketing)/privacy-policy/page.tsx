@@ -11,9 +11,9 @@ export const metadata: Metadata = {
 export default function Home() {
     return (
         <>
-            <div className={"prose-h2:text-3xl prose-p:text-xl"}>
+            <div className={"typo:prose-h2:text-3xl typo:prose-p:text-xl"}>
                 <h1>Privacy Policy</h1>
-                <hr className="mx-0 w-full border-t-2 border-primary" />
+                <hr className="border-primary mx-0 w-full border-t-2" />
 
                 <h2>What data does Type the Word collect?</h2>
                 <p>

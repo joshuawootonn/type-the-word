@@ -39,7 +39,7 @@ export function Word({
                                 isEqual && "correct",
                                 typedLetter && !isEqual && "incorrect",
                                 isErrored &&
-                                    "error underline decoration-error decoration-2",
+                                    "error decoration-error underline decoration-2",
                                 Boolean(word.divineName) &&
                                     (lIndex > 0 ? "divine-name" : ""),
                             )}
@@ -55,7 +55,7 @@ export function Word({
                             className={clsx(
                                 "letter extra",
                                 isErrored &&
-                                    "error underline decoration-error decoration-2",
+                                    "error decoration-error underline decoration-2",
                             )}
                         >
                             {letter}

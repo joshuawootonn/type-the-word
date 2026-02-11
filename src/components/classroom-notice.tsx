@@ -21,10 +21,10 @@ export function ClassroomNotice({
 }: ClassroomNoticeProps) {
     const textColor =
         variant === "error"
-            ? "!text-error"
+            ? "text-error!"
             : variant === "success"
-              ? "!text-success"
-              : "!text-primary"
+              ? "text-success!"
+              : "text-primary!"
 
     return (
         <div>
@@ -32,7 +32,7 @@ export function ClassroomNotice({
             <div
                 className={
                     variant === "error"
-                        ? "border-2 border-error bg-secondary px-6"
+                        ? "border-error bg-secondary border-2 px-6"
                         : ""
                 }
             >

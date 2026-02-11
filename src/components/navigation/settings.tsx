@@ -154,7 +154,7 @@ export function Settings({
                 <DropdownMenu.Root>
                     <DropdownMenu.Trigger
                         id="theme-selector"
-                        className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                        className="svg-outline border-primary focus:bg-primary focus:text-secondary relative h-full cursor-pointer border-2 px-3 py-1 font-medium outline-hidden"
                         ref={ref}
                     >
                         {currentTheme.colorScheme === "system"
@@ -169,7 +169,7 @@ export function Settings({
                     <DropdownMenu.Portal>
                         <DropdownMenu.Content
                             side="bottom"
-                            className="z-50 w-40 border-2 border-primary bg-secondary text-primary"
+                            className="border-primary bg-secondary text-primary z-50 w-40 border-2"
                             align="end"
                             sideOffset={-2}
                             loop
@@ -186,7 +186,7 @@ export function Settings({
                                             darkThemeId,
                                     })
                                 }
-                                className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                className="focus:bg-primary focus:text-secondary cursor-pointer px-3 py-1 font-medium outline-hidden"
                             >
                                 System
                             </DropdownMenu.Item>
@@ -194,15 +194,15 @@ export function Settings({
                                 <DropdownMenu.Item
                                     key={t.themeId}
                                     onSelect={() => selectTheme(t)}
-                                    className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                    className="focus:bg-primary focus:text-secondary cursor-pointer px-3 py-1 font-medium outline-hidden"
                                 >
                                     {t.theme.label}
                                 </DropdownMenu.Item>
                             ))}
                             {userThemes.map(t => (
                                 <DropdownMenu.Sub key={t.themeId}>
-                                    <DropdownMenu.SubTrigger className="flex cursor-pointer flex-row items-center px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary">
-                                        <span className="flex-grow truncate">
+                                    <DropdownMenu.SubTrigger className="focus:bg-primary focus:text-secondary flex cursor-pointer flex-row items-center px-3 py-1 font-medium outline-hidden">
+                                        <span className="grow truncate">
                                             {t.theme.label}
                                         </span>
                                         <svg
@@ -223,17 +223,17 @@ export function Settings({
                                     <DropdownMenu.Portal>
                                         <DropdownMenu.SubContent
                                             loop
-                                            className="z-50 border-2 border-primary bg-secondary text-primary"
+                                            className="border-primary bg-secondary text-primary z-50 border-2"
                                         >
                                             <DropdownMenu.Item
                                                 onSelect={() => selectTheme(t)}
-                                                className="h-[31px] cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                                className="focus:bg-primary focus:text-secondary h-[31px] cursor-pointer px-3 py-1 font-medium outline-hidden"
                                             >
                                                 Select
                                             </DropdownMenu.Item>
                                             <DropdownMenu.Item
                                                 onSelect={() => deleteTheme(t)}
-                                                className="h-[31px] cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                                className="focus:bg-primary focus:text-secondary h-[31px] cursor-pointer px-3 py-1 font-medium outline-hidden"
                                             >
                                                 Delete
                                             </DropdownMenu.Item>
@@ -242,7 +242,7 @@ export function Settings({
                                 </DropdownMenu.Sub>
                             ))}
                             <DropdownMenu.Item
-                                className="flex cursor-pointer flex-row items-center justify-between space-x-2 px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                className="focus:bg-primary focus:text-secondary flex cursor-pointer flex-row items-center justify-between space-x-2 px-3 py-1 font-medium outline-hidden"
                                 onKeyDown={e => {
                                     if (SELECTION_KEYS.includes(e.key)) {
                                         e.preventDefault()
@@ -286,7 +286,7 @@ export function Settings({
                         <DropdownMenu.Root>
                             <DropdownMenu.Trigger
                                 id="theme-selector"
-                                className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                className="svg-outline border-primary focus:bg-primary focus:text-secondary relative h-full cursor-pointer border-2 px-3 py-1 font-medium outline-hidden"
                             >
                                 {
                                     getLightTheme(
@@ -300,7 +300,7 @@ export function Settings({
                             <DropdownMenu.Portal>
                                 <DropdownMenu.Content
                                     side="bottom"
-                                    className="z-50 w-40 border-2 border-primary bg-secondary text-primary"
+                                    className="border-primary bg-secondary text-primary z-50 w-40 border-2"
                                     align="end"
                                     sideOffset={-2}
                                     loop
@@ -311,7 +311,7 @@ export function Settings({
                                             onSelect={() =>
                                                 selectLightSystemTheme(t)
                                             }
-                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                            className="focus:bg-primary focus:text-secondary cursor-pointer px-3 py-1 font-medium outline-hidden"
                                         >
                                             {t.theme.label}
                                         </DropdownMenu.Item>
@@ -322,7 +322,7 @@ export function Settings({
                                             onSelect={() =>
                                                 selectLightSystemTheme(t)
                                             }
-                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                            className="focus:bg-primary focus:text-secondary cursor-pointer px-3 py-1 font-medium outline-hidden"
                                         >
                                             {t.theme.label}
                                         </DropdownMenu.Item>
@@ -339,7 +339,7 @@ export function Settings({
                         <DropdownMenu.Root>
                             <DropdownMenu.Trigger
                                 id="theme-selector"
-                                className="svg-outline relative h-full cursor-pointer border-2 border-primary px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                className="svg-outline border-primary focus:bg-primary focus:text-secondary relative h-full cursor-pointer border-2 px-3 py-1 font-medium outline-hidden"
                             >
                                 {
                                     getDarkTheme(
@@ -353,7 +353,7 @@ export function Settings({
                             <DropdownMenu.Portal>
                                 <DropdownMenu.Content
                                     side="bottom"
-                                    className="z-50 w-40 border-2 border-primary bg-secondary text-primary"
+                                    className="border-primary bg-secondary text-primary z-50 w-40 border-2"
                                     align="end"
                                     sideOffset={-2}
                                     loop
@@ -364,7 +364,7 @@ export function Settings({
                                             onSelect={() =>
                                                 selectDarkSystemTheme(t)
                                             }
-                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                            className="focus:bg-primary focus:text-secondary cursor-pointer px-3 py-1 font-medium outline-hidden"
                                         >
                                             {t.theme.label}
                                         </DropdownMenu.Item>
@@ -375,7 +375,7 @@ export function Settings({
                                             onSelect={() =>
                                                 selectDarkSystemTheme(t)
                                             }
-                                            className="cursor-pointer px-3 py-1 font-medium outline-none focus:bg-primary focus:text-secondary"
+                                            className="focus:bg-primary focus:text-secondary cursor-pointer px-3 py-1 font-medium outline-hidden"
                                         >
                                             {t.theme.label}
                                         </DropdownMenu.Item>

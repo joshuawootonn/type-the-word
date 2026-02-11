@@ -229,13 +229,13 @@ export function PassageSelector({
                             translations.find(tr => tr.value === t)?.label ?? t
                         }
                         className={
-                            "w-[8ch] rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none"
+                            "border-primary bg-secondary text-primary w-[8ch] rounded-none border-2 p-1 font-medium outline-hidden"
                         }
                         autoComplete="false"
                         data-1p-ignore={true}
                     />
                     {isFirstRender && (
-                        <div className="absolute left-1 top-1 translate-x-0.5 translate-y-0.5 font-medium text-primary">
+                        <div className="text-primary absolute top-1 left-1 translate-x-0.5 translate-y-0.5 font-medium">
                             {translations.find(t => t.value === translation)
                                 ?.label ?? translation}
                         </div>
@@ -244,7 +244,7 @@ export function PassageSelector({
                         <ScrollArea.Viewport>
                             <Combobox.Options
                                 className={
-                                    "absolute z-50 max-h-60 w-full -translate-y-0.5 overflow-auto border-2 border-primary bg-secondary"
+                                    "border-primary bg-secondary absolute z-50 max-h-60 w-full -translate-y-0.5 overflow-auto border-2"
                                 }
                             >
                                 {filteredTranslations.map(t => (
@@ -285,7 +285,7 @@ export function PassageSelector({
                             viewBox="0 0 20 20"
                             fill="currentColor"
                             aria-hidden="true"
-                            className="h-5 w-5 text-primary"
+                            className="text-primary h-5 w-5"
                         >
                             <path
                                 fillRule="evenodd"
@@ -318,14 +318,14 @@ export function PassageSelector({
                             simpleBibleMetadata[book]?.name ?? ""
                         }
                         className={
-                            "w-44 -translate-x-0.5 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none"
+                            "border-primary bg-secondary text-primary w-44 -translate-x-0.5 rounded-none border-2 p-1 font-medium outline-hidden"
                         }
                         autoComplete="false"
                         data-1p-ignore={true}
                     />
                     {/* `ComboBox` from headlessui has to be in a client component, which is why I have to fake the SSR to prevent flickering.*/}
                     {isFirstRender && (
-                        <div className="absolute left-1 top-1 translate-y-0.5 font-medium text-primary">
+                        <div className="text-primary absolute top-1 left-1 translate-y-0.5 font-medium">
                             {simpleBibleMetadata[book]?.name ?? ""}
                         </div>
                     )}
@@ -333,7 +333,7 @@ export function PassageSelector({
                         <ScrollArea.Viewport>
                             <Combobox.Options
                                 className={
-                                    "absolute z-50 max-h-60 w-full -translate-x-0.5 -translate-y-0.5 overflow-auto border-2 border-primary bg-secondary"
+                                    "border-primary bg-secondary absolute z-50 max-h-60 w-full -translate-x-0.5 -translate-y-0.5 overflow-auto border-2"
                                 }
                             >
                                 {filteredBooks.map(book => (
@@ -375,7 +375,7 @@ export function PassageSelector({
                             viewBox="0 0 20 20"
                             fill="currentColor"
                             aria-hidden="true"
-                            className="h-5 w-5 text-primary"
+                            className="text-primary h-5 w-5"
                         >
                             <path
                                 fillRule="evenodd"
@@ -406,14 +406,14 @@ export function PassageSelector({
                             }
                         }}
                         className={
-                            "w-16 -translate-x-1 rounded-none border-2 border-primary bg-secondary p-1 font-medium text-primary outline-none"
+                            "border-primary bg-secondary text-primary w-16 -translate-x-1 rounded-none border-2 p-1 font-medium outline-hidden"
                         }
                         autoComplete="false"
                         data-1p-ignore={true}
                     />
                     {/* `ComboBox` from headlessui has to be in a client component, which is why I have to fake the SSR to prevent flickering.*/}
                     {isFirstRender && (
-                        <div className="absolute left-1 top-1 -translate-x-0.5 translate-y-0.5 font-medium text-primary">
+                        <div className="text-primary absolute top-1 left-1 -translate-x-0.5 translate-y-0.5 font-medium">
                             {chapter}
                         </div>
                     )}
@@ -421,7 +421,7 @@ export function PassageSelector({
                         <ScrollArea.Viewport>
                             <Combobox.Options
                                 className={
-                                    "absolute z-50 max-h-60 w-full -translate-x-1 -translate-y-0.5 overflow-auto border-2 border-primary bg-secondary"
+                                    "border-primary bg-secondary absolute z-50 max-h-60 w-full -translate-x-1 -translate-y-0.5 overflow-auto border-2"
                                 }
                             >
                                 {filteredChapters.map((number, i) => (
@@ -457,7 +457,7 @@ export function PassageSelector({
                             viewBox="0 0 20 20"
                             fill="currentColor"
                             aria-hidden="true"
-                            className="h-5 w-5 text-primary"
+                            className="text-primary h-5 w-5"
                         >
                             <path
                                 fillRule="evenodd"

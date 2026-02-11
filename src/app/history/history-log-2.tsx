@@ -94,7 +94,7 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                                                     "justify-end",
                                                 isLastWeekOfMonth &&
                                                     !isWeekContainedInMonth &&
-                                                    "block md:absolute md:bottom-0 md:right-0 md:translate-y-[calc(100%+8px)]",
+                                                    "block md:absolute md:right-0 md:bottom-0 md:translate-y-[calc(100%+8px)]",
                                             )}
                                             key={j}
                                         >
@@ -122,14 +122,14 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                                                         >
                                                             <div
                                                                 className={clsx(
-                                                                    "relative flex aspect-square items-center justify-center border-2 border-primary md:size-14",
+                                                                    "border-primary relative flex aspect-square items-center justify-center border-2 md:size-14",
                                                                     dayLog &&
                                                                         "border-primary bg-primary text-secondary",
                                                                     isFuture &&
                                                                         "opacity-20",
                                                                 )}
                                                             >
-                                                                <div className="absolute left-0 top-0 px-[1px] text-xs">
+                                                                <div className="absolute top-0 left-0 px-px text-xs">
                                                                     {format(
                                                                         day,
                                                                         "d",
@@ -143,7 +143,7 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                                                         {dayLog && (
                                                             <Tooltip.Content
                                                                 sideOffset={8}
-                                                                className="prose grid select-none grid-cols-[1fr_minmax(30px,min-content)] gap-x-3 gap-y-2 border-2 border-primary bg-secondary px-3 py-2 font-sans leading-none text-primary"
+                                                                className="typo:prose border-primary bg-secondary text-primary grid grid-cols-[1fr_minmax(30px,min-content)] gap-x-3 gap-y-2 border-2 px-3 py-2 font-sans leading-none select-none"
                                                             >
                                                                 <div className="font-medium">
                                                                     Date:{" "}

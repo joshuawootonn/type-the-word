@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 
 export default function Home() {
     return (
-        <div className={"prose-h2:text-3xl prose-p:text-xl"}>
+        <div className={"typo:prose-h2:text-3xl typo:prose-p:text-xl"}>
             <h1>Terms of Service</h1>
-            <hr className="mx-0 w-full border-t-2 border-primary" />
+            <hr className="border-primary mx-0 w-full border-t-2" />
             <p>
                 These terms of service were last updated on December 13, 2023.
             </p>

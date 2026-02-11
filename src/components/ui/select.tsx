@@ -15,7 +15,7 @@ const SelectTrigger = forwardRef<
     <SelectPrimitive.Trigger
         ref={ref}
         className={clsx(
-            "svg-outline relative flex items-center justify-between gap-2 border-2 border-primary bg-secondary px-2 py-1 text-primary outline-none focus:bg-primary focus:text-secondary",
+            "svg-outline border-primary bg-secondary text-primary focus:bg-primary focus:text-secondary relative flex items-center justify-between gap-2 border-2 px-2 py-1 outline-hidden",
             className,
         )}
         {...props}
@@ -44,7 +44,7 @@ const SelectContent = forwardRef<
         <SelectPrimitive.Content
             ref={ref}
             className={clsx(
-                "z-50 border-2 border-primary bg-secondary text-primary",
+                "border-primary bg-secondary text-primary z-50 border-2",
                 position === "popper" && "max-h-96",
                 className,
             )}
@@ -55,7 +55,7 @@ const SelectContent = forwardRef<
             <SelectPrimitive.Viewport
                 className={clsx(
                     position === "popper" &&
-                        "h-[var(--radix-select-trigger-height)] w-full min-w-[calc(var(--radix-select-trigger-width)_-_4px)]",
+                        "h-(--radix-select-trigger-height) w-full min-w-[calc(var(--radix-select-trigger-width)-4px)]",
                 )}
             >
                 {children}
@@ -72,7 +72,7 @@ const SelectItem = forwardRef<
     <SelectPrimitive.Item
         ref={ref}
         className={clsx(
-            "cursor-pointer px-3 py-1 outline-none focus:bg-primary focus:text-secondary data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+            "focus:bg-primary focus:text-secondary cursor-pointer px-3 py-1 outline-hidden data-disabled:pointer-events-none data-disabled:opacity-50",
             className,
         )}
         {...props}

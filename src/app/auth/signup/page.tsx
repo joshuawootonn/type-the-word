@@ -21,7 +21,7 @@ export default function SignUpPage() {
     return (
         <div className="mt-8 flex min-h-screen items-start justify-center">
             <div className="w-full max-w-md">
-                <h1 className="mb-8 text-center text-3xl font-semibold text-primary">
+                <h1 className="text-primary mb-8 text-center text-3xl font-semibold">
                     Sign up
                 </h1>
 
@@ -157,7 +157,7 @@ export default function SignUpPage() {
                             className="space-y-6"
                         >
                             {error && (
-                                <div className="border-2 border-error bg-error/10 px-4 py-3 text-error">
+                                <div className="border-error bg-error/10 text-error border-2 px-4 py-3">
                                     {error}
                                 </div>
                             )}
@@ -165,7 +165,7 @@ export default function SignUpPage() {
                             <div>
                                 <label
                                     htmlFor="firstName"
-                                    className="mb-2 block font-medium text-primary"
+                                    className="text-primary mb-2 block font-medium"
                                 >
                                     First Name
                                 </label>
@@ -175,14 +175,14 @@ export default function SignUpPage() {
                                         type="text"
                                         id="firstName"
                                         innerRef={firstNameRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary px-3 py-1.5 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="border-primary bg-secondary text-primary placeholder:text-primary/50 w-full rounded-none border-2 px-3 py-1.5 font-medium outline-hidden"
                                         placeholder="Enter your first name..."
                                         autoComplete="given-name"
                                     />
                                 </div>
                                 {props.errors.firstName &&
                                     props.submitCount > 0 && (
-                                        <div className="mt-2 text-error">
+                                        <div className="text-error mt-2">
                                             {props.errors.firstName}
                                         </div>
                                     )}
@@ -191,7 +191,7 @@ export default function SignUpPage() {
                             <div>
                                 <label
                                     htmlFor="email"
-                                    className="mb-2 block font-medium text-primary"
+                                    className="text-primary mb-2 block font-medium"
                                 >
                                     Email
                                 </label>
@@ -201,14 +201,14 @@ export default function SignUpPage() {
                                         type="email"
                                         id="email"
                                         innerRef={emailRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary px-3 py-1.5 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="border-primary bg-secondary text-primary placeholder:text-primary/50 w-full rounded-none border-2 px-3 py-1.5 font-medium outline-hidden"
                                         placeholder="Enter your email..."
                                         autoComplete="email"
                                     />
                                 </div>
                                 {props.errors.email &&
                                     props.submitCount > 0 && (
-                                        <div className="mt-2 text-error">
+                                        <div className="text-error mt-2">
                                             {props.errors.email}
                                         </div>
                                     )}
@@ -217,7 +217,7 @@ export default function SignUpPage() {
                             <div>
                                 <label
                                     htmlFor="password"
-                                    className="mb-2 block font-medium text-primary"
+                                    className="text-primary mb-2 block font-medium"
                                 >
                                     Password
                                 </label>
@@ -227,14 +227,14 @@ export default function SignUpPage() {
                                         type="password"
                                         id="password"
                                         innerRef={passwordRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary px-3 py-1.5 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="border-primary bg-secondary text-primary placeholder:text-primary/50 w-full rounded-none border-2 px-3 py-1.5 font-medium outline-hidden"
                                         placeholder="Create a password..."
                                         autoComplete="new-password"
                                     />
                                 </div>
                                 {props.errors.password &&
                                     props.submitCount > 0 && (
-                                        <div className="mt-2 text-error">
+                                        <div className="text-error mt-2">
                                             {props.errors.password}
                                         </div>
                                     )}
@@ -243,7 +243,7 @@ export default function SignUpPage() {
                             <div>
                                 <label
                                     htmlFor="confirmPassword"
-                                    className="mb-2 block font-medium text-primary"
+                                    className="text-primary mb-2 block font-medium"
                                 >
                                     Confirm Password
                                 </label>
@@ -253,14 +253,14 @@ export default function SignUpPage() {
                                         type="password"
                                         id="confirmPassword"
                                         innerRef={confirmPasswordRef}
-                                        className="w-full rounded-none border-2 border-primary bg-secondary px-3 py-1.5 font-medium text-primary outline-none placeholder:text-primary/50"
+                                        className="border-primary bg-secondary text-primary placeholder:text-primary/50 w-full rounded-none border-2 px-3 py-1.5 font-medium outline-hidden"
                                         placeholder="Confirm your password..."
                                         autoComplete="new-password"
                                     />
                                 </div>
                                 {props.errors.confirmPassword &&
                                     props.submitCount > 0 && (
-                                        <div className="mt-2 text-error">
+                                        <div className="text-error mt-2">
                                             {props.errors.confirmPassword}
                                         </div>
                                     )}
@@ -269,13 +269,13 @@ export default function SignUpPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="svg-outline relative w-full cursor-pointer border-2 border-primary bg-primary px-3 py-1 font-semibold text-secondary disabled:cursor-not-allowed"
+                                className="svg-outline border-primary bg-primary text-secondary relative w-full cursor-pointer border-2 px-3 py-1 font-semibold disabled:cursor-not-allowed"
                             >
                                 {isLoading ? (
                                     <>
                                         <Loading
                                             className={cn(
-                                                "text-md absolute left-1/2 top-1/2 -translate-x-8 -translate-y-1/2 font-semibold",
+                                                "text-md absolute top-1/2 left-1/2 -translate-x-8 -translate-y-1/2 font-semibold",
                                                 isLoading
                                                     ? "text-secondary"
                                                     : "text-primary",
@@ -292,7 +292,7 @@ export default function SignUpPage() {
                     )}
                 </Formik>
 
-                <p className="mt-8 text-center text-primary">
+                <p className="text-primary mt-8 text-center">
                     Already have an account?{" "}
                     <Link
                         href="/auth/login"
