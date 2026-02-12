@@ -16,7 +16,8 @@
         "db:generate": "drizzle-kit generate",
         "db:migrate": "drizzle-kit migrate",
         "worktree:add": "bash ./scripts/worktree-add.sh",
-        "worktree:bootstrap": "bash ./scripts/worktree-bootstrap.sh"
+        "worktree:bootstrap": "bash ./scripts/worktree-bootstrap.sh",
+        "worktree:install-hooks": "bash ./scripts/install-worktree-hooks.sh"
     },
     "dependencies": {
         "@auth/drizzle-adapter": "0.3.2",

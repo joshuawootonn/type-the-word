@@ -4,12 +4,12 @@ set -euo pipefail
 
 usage() {
     cat <<'EOF'
-Usage: scripts/worktree-add.sh [--source <path>] [--force-env] [--skip-install] <path> <branch> [start-point]
+Usage: scripts/worktree-add.sh [--source <path>] [--force-env] [--skip-install] [--always-install] <path> <branch> [start-point]
 
 Creates a worktree and bootstraps it:
   1) git worktree add ...
   2) copy .env from primary worktree (or --source path)
-  3) pnpm install (unless --skip-install)
+  3) install dependencies when needed (unless --skip-install)
 
 Positional arguments:
   path         Path where the new worktree will be created
@@ -20,6 +20,7 @@ Options:
   --source <path>  Source worktree to copy .env from during bootstrap
   --force-env      Overwrite .env in target worktree if present
   --skip-install   Skip pnpm install during bootstrap
+  --always-install Always run pnpm install during bootstrap
   -h, --help       Show this help
 EOF
 }
@@ -27,6 +28,7 @@ EOF
 SOURCE_WORKTREE=""
 FORCE_ENV=0
 SKIP_INSTALL=0
+ALWAYS_INSTALL=0
 
 POSITIONAL=()
 while (($#)); do
@@ -49,6 +51,10 @@ while (($#)); do
             ;;
         --skip-install)
             SKIP_INSTALL=1
+            shift
+            ;;
+        --always-install)
+            ALWAYS_INSTALL=1
             shift
             ;;
         -h|--help)
@@ -115,6 +121,10 @@ fi
 
 if [[ "$SKIP_INSTALL" -eq 1 ]]; then
     BOOTSTRAP_ARGS+=(--skip-install)
+fi
+
+if [[ "$ALWAYS_INSTALL" -eq 1 ]]; then
+    BOOTSTRAP_ARGS+=(--always-install)
 fi
 
 (

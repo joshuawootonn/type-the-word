@@ -4,16 +4,17 @@ set -euo pipefail
 
 usage() {
     cat <<'EOF'
-Usage: scripts/worktree-bootstrap.sh [--source <path>] [--force-env] [--skip-install]
+Usage: scripts/worktree-bootstrap.sh [--source <path>] [--force-env] [--skip-install] [--always-install]
 
 Bootstraps a git worktree by:
   1) Copying .env from the primary worktree (or --source path)
-  2) Running pnpm install
+  2) Installing dependencies if node_modules is missing/stale
 
 Options:
   --source <path>  Copy .env from this path instead of auto-detecting
   --force-env      Overwrite .env in the current worktree if it exists
   --skip-install   Skip pnpm install
+  --always-install Always run pnpm install, even when dependencies look up to date
   -h, --help       Show this help
 EOF
 }
@@ -21,6 +22,7 @@ EOF
 SOURCE_WORKTREE=""
 FORCE_ENV=0
 SKIP_INSTALL=0
+ALWAYS_INSTALL=0
 
 while (($#)); do
     case "$1" in
@@ -42,6 +44,10 @@ while (($#)); do
             ;;
         --skip-install)
             SKIP_INSTALL=1
+            shift
+            ;;
+        --always-install)
+            ALWAYS_INSTALL=1
             shift
             ;;
         -h|--help)
@@ -114,5 +120,28 @@ if ! command -v pnpm >/dev/null 2>&1; then
     exit 1
 fi
 
-echo "Running pnpm install in $REPO_ROOT"
-pnpm install
+should_install_deps() {
+    local modules_manifest="$REPO_ROOT/node_modules/.modules.yaml"
+    local lockfile="$REPO_ROOT/pnpm-lock.yaml"
+
+    if [[ ! -d "$REPO_ROOT/node_modules" ]]; then
+        return 0
+    fi
+
+    if [[ ! -f "$modules_manifest" ]]; then
+        return 0
+    fi
+
+    if [[ -f "$lockfile" && "$lockfile" -nt "$modules_manifest" ]]; then
+        return 0
+    fi
+
+    return 1
+}
+
+if [[ "$ALWAYS_INSTALL" -eq 1 ]] || should_install_deps; then
+    echo "Running pnpm install in $REPO_ROOT"
+    pnpm install
+else
+    echo "Dependencies look up to date. Skipping pnpm install."
+fi

@@ -2,6 +2,16 @@
 
 This document outlines best practices for managing database migrations in this project using Drizzle ORM.
 
+## Agent Worktree Bootstrap
+
+In a newly created worktree/background worker, run this before tests/build/dev commands:
+
+```bash
+pnpm worktree:bootstrap
+```
+
+This command copies `.env` from the primary worktree (if needed) and installs dependencies only when `node_modules` is missing or stale.
+
 ## Core Principle
 
 **Always use Drizzle CLI for database migrations. Never modify the database schema directly.**

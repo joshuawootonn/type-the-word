@@ -42,7 +42,15 @@ kill $(lsof -t -i:1199) || true && colima start --cpu 10 --memory 8 --disk 10 &&
 
 ## Working with git worktrees
 
-Use the helper command from your main worktree:
+Run this once from your main worktree to auto-bootstrap on every checkout/worktree:
+
+```bash
+pnpm worktree:install-hooks
+```
+
+This installs a `post-checkout` hook in the repo's shared hooks directory. Cursor's managed hooks dispatcher will still run, and then your local `post-checkout` hook will run `scripts/worktree-bootstrap.sh`.
+
+Use the helper command from your main worktree for new worktrees:
 
 ```bash
 pnpm worktree:add ../type-the-word-my-fix my-fix-branch
@@ -52,7 +60,7 @@ This command will:
 
 1. Create a new worktree
 2. Copy `.env` from your primary worktree (if `.env` is missing)
-3. Run `pnpm install` in the new worktree
+3. Install dependencies when `node_modules` is missing/outdated
 
 If you already created a worktree and only need setup, run:
 
@@ -68,6 +76,9 @@ pnpm worktree:add -- --skip-install ../type-the-word-my-fix my-fix-branch
 
 # Overwrite an existing .env in target worktree
 pnpm worktree:add -- --force-env ../type-the-word-my-fix my-fix-branch
+
+# Always run pnpm install even when dependencies look up to date
+pnpm worktree:add -- --always-install ../type-the-word-my-fix my-fix-branch
 
 # Copy .env from a specific source path
 pnpm worktree:add -- --source /path/to/main/repo ../type-the-word-my-fix my-fix-branch
