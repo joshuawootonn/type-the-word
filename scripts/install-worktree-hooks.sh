@@ -72,11 +72,12 @@ ACTIVE_HOOKS_DIR="$(resolve_active_hooks_dir)"
 TARGET_HOOKS_DIR="$(resolve_target_hooks_dir "$ACTIVE_HOOKS_DIR")"
 HOOK_PATH="$TARGET_HOOKS_DIR/post-checkout"
 MARKER_START="# >>> ttw-worktree-bootstrap >>>"
+MARKER_END="# <<< ttw-worktree-bootstrap <<<"
 
 read -r -d '' HOOK_SNIPPET <<'EOF' || true
 # >>> ttw-worktree-bootstrap >>>
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
-if [ -n "$REPO_ROOT" ] && [ -x "$REPO_ROOT/scripts/worktree-bootstrap.sh" ]; then
+if [ -n "$REPO_ROOT" ] && [ -f "$REPO_ROOT/scripts/worktree-bootstrap.sh" ]; then
     # Never block checkout from proceeding if bootstrap fails.
     bash "$REPO_ROOT/scripts/worktree-bootstrap.sh" || true
 fi
@@ -89,9 +90,13 @@ ensure_cursor_post_checkout_dispatcher "$ACTIVE_HOOKS_DIR"
 
 if [[ -f "$HOOK_PATH" ]]; then
     HOOK_CONTENT="$(<"$HOOK_PATH")"
-    if [[ "$HOOK_CONTENT" == *"$MARKER_START"* ]]; then
-        echo "Worktree bootstrap post-checkout hook is already installed at $HOOK_PATH"
-        exit 0
+    if [[ "$HOOK_CONTENT" == *"$MARKER_START"* && "$HOOK_CONTENT" == *"$MARKER_END"* ]]; then
+        awk -v marker_start="$MARKER_START" -v marker_end="$MARKER_END" '
+            $0 == marker_start { in_block = 1; next }
+            in_block == 1 && $0 == marker_end { in_block = 0; next }
+            in_block == 0 { print }
+        ' "$HOOK_PATH" > "$HOOK_PATH.tmp"
+        mv "$HOOK_PATH.tmp" "$HOOK_PATH"
     fi
 else
     printf '#!/usr/bin/env bash\nset -euo pipefail\n' > "$HOOK_PATH"
@@ -100,4 +105,4 @@ fi
 printf '\n%s\n' "$HOOK_SNIPPET" >> "$HOOK_PATH"
 chmod +x "$HOOK_PATH"
 
-echo "Installed worktree bootstrap post-checkout hook at $HOOK_PATH"
+echo "Installed/updated worktree bootstrap post-checkout hook at $HOOK_PATH"
