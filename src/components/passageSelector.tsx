@@ -1,6 +1,6 @@
 "use client"
 
-import { Combobox, ComboboxOption } from "@headlessui/react"
+import { Combobox } from "@headlessui/react"
 import * as ScrollArea from "@radix-ui/react-scroll-area"
 import clsx from "clsx"
 import { useRouter, useSearchParams } from "next/navigation"
