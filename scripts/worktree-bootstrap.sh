@@ -24,6 +24,10 @@ SKIP_INSTALL=0
 
 while (($#)); do
     case "$1" in
+        --)
+            shift
+            continue
+            ;;
         --source)
             if (($# < 2)); then
                 echo "Error: --source requires a path argument." >&2
