@@ -4,7 +4,15 @@ This document outlines best practices for managing database migrations in this p
 
 ## Agent Worktree Bootstrap
 
-In a newly created worktree/background worker, run this before tests/build/dev commands:
+One-time install (run from main worktree):
+
+```bash
+pnpm worktree:install-hooks
+```
+
+This ensures Cursor-created worktrees trigger bootstrap automatically via `post-checkout`.
+
+Per-worker safety step (run in each new worker/worktree before tests/build/dev):
 
 ```bash
 pnpm worktree:bootstrap
