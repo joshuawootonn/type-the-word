@@ -39,3 +39,36 @@ Here is a how I startup the app
 ```bash
 kill $(lsof -t -i:1199) || true && colima start --cpu 10 --memory 8 --disk 10 && docker compose --project-directory ./docker up -d && pnpm dev -p 1199
 ```
+
+## Working with git worktrees
+
+Use the helper command from your main worktree:
+
+```bash
+pnpm worktree:add ../type-the-word-my-fix my-fix-branch
+```
+
+This command will:
+
+1. Create a new worktree
+2. Copy `.env` from your primary worktree (if `.env` is missing)
+3. Run `pnpm install` in the new worktree
+
+If you already created a worktree and only need setup, run:
+
+```bash
+pnpm worktree:bootstrap
+```
+
+Useful options:
+
+```bash
+# Skip pnpm install
+pnpm worktree:add -- --skip-install ../type-the-word-my-fix my-fix-branch
+
+# Overwrite an existing .env in target worktree
+pnpm worktree:add -- --force-env ../type-the-word-my-fix my-fix-branch
+
+# Copy .env from a specific source path
+pnpm worktree:add -- --source /path/to/main/repo ../type-the-word-my-fix my-fix-branch
+```

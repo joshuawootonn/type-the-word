@@ -14,7 +14,9 @@
         "test": "vitest --run",
         "test-watch": "dotenv --env-file .env.test vitest --watch --reporter=verbose",
         "db:generate": "drizzle-kit generate",
-        "db:migrate": "drizzle-kit migrate"
+        "db:migrate": "drizzle-kit migrate",
+        "worktree:add": "bash ./scripts/worktree-add.sh",
+        "worktree:bootstrap": "bash ./scripts/worktree-bootstrap.sh"
     },
     "dependencies": {
         "@auth/drizzle-adapter": "0.3.2",
