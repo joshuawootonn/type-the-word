@@ -19,32 +19,57 @@ resolve_abs_path() {
     fi
 }
 
-resolve_target_hooks_dir() {
+resolve_active_hooks_dir() {
     local active_hooks_path=""
     active_hooks_path="$(git config --get core.hooksPath || true)"
 
     if [[ -z "$active_hooks_path" ]]; then
-        resolve_abs_path "$(git rev-parse --git-common-dir)/hooks"
-        return 0
+        printf '%s\n' "$(resolve_abs_path "$(git rev-parse --git-common-dir)/hooks")"
+        return
     fi
 
-    local active_hooks_dir=""
-    active_hooks_dir="$(resolve_abs_path "$active_hooks_path")"
+    resolve_abs_path "$active_hooks_path"
+}
+
+resolve_target_hooks_dir() {
+    local active_hooks_dir="$1"
 
     if [[ -f "$active_hooks_dir/.cursor-original-hooks-path" ]]; then
         local original_hooks_path=""
         original_hooks_path="$(<"$active_hooks_dir/.cursor-original-hooks-path")"
 
         if [[ -n "$original_hooks_path" ]]; then
-            resolve_abs_path "$original_hooks_path"
-            return 0
+            printf '%s\n' "$(resolve_abs_path "$original_hooks_path")"
+            return
         fi
     fi
 
     printf '%s\n' "$active_hooks_dir"
 }
 
-TARGET_HOOKS_DIR="$(resolve_target_hooks_dir)"
+ensure_cursor_post_checkout_dispatcher() {
+    local active_hooks_dir="$1"
+    local dispatcher_path="$active_hooks_dir/.dispatcher"
+    local hook_entry_path="$active_hooks_dir/post-checkout"
+
+    if [[ ! -f "$dispatcher_path" ]]; then
+        return
+    fi
+
+    if [[ -e "$hook_entry_path" ]]; then
+        return
+    fi
+
+    if ln -s ".dispatcher" "$hook_entry_path" 2>/dev/null; then
+        return
+    fi
+
+    printf '#!/usr/bin/env bash\nset -e\nHOOKS_DIR="$(cd "$(dirname "$0")" && pwd)"\n"$HOOKS_DIR/.dispatcher" "$@"\n' > "$hook_entry_path"
+    chmod +x "$hook_entry_path"
+}
+
+ACTIVE_HOOKS_DIR="$(resolve_active_hooks_dir)"
+TARGET_HOOKS_DIR="$(resolve_target_hooks_dir "$ACTIVE_HOOKS_DIR")"
 HOOK_PATH="$TARGET_HOOKS_DIR/post-checkout"
 MARKER_START="# >>> ttw-worktree-bootstrap >>>"
 
@@ -59,6 +84,8 @@ fi
 EOF
 
 mkdir -p "$TARGET_HOOKS_DIR"
+mkdir -p "$ACTIVE_HOOKS_DIR"
+ensure_cursor_post_checkout_dispatcher "$ACTIVE_HOOKS_DIR"
 
 if [[ -f "$HOOK_PATH" ]]; then
     HOOK_CONTENT="$(<"$HOOK_PATH")"
