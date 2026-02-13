@@ -68,6 +68,42 @@ export default async function Changelog() {
             <hr className="border-primary mx-0 w-full border-t-2" />
             <ul>
                 <li>
+                    <DateComponent date={new Date("02/10/2026")} /> - Fixed a
+                    large batch of NASB formatting issues that were making some
+                    verses hard (or impossible) to type:
+                    <ul>
+                        <li>
+                            Fixed Acts 10:34 where <code>I most</code> could be
+                            merged into one token.
+                        </li>
+                        <li>
+                            Fixed Hebrews 7:17 split small-caps OT reference
+                            words like <code>Y OU</code>,{" "}
+                            <code>A CCORDING</code>, and{" "}
+                            <code>M ELCHIZEDEK</code>.
+                        </li>
+                        <li>
+                            Fixed Hebrews 7:21 punctuation merging so the ending{" "}
+                            <code>&apos;”);</code> stays attached and typable
+                            (including the semicolon).
+                        </li>
+                        <li>
+                            Fixed Psalm 11:4 possessive splitting where{" "}
+                            <code>LORD&apos;S</code> could break into{" "}
+                            <code>LORD&apos;</code> + <code>S™throne</code>.
+                        </li>
+                        <li>
+                            Fixed Psalm 11 chapter title rendering so{" "}
+                            <code>The LORD, a Refuge and Defense.</code> no
+                            longer appears as <code>The L ORD, ...</code>.
+                        </li>
+                        <li>
+                            Started handling formatting for Old Testament
+                            references in NASP correctly.
+                        </li>
+                    </ul>
+                </li>
+                <li>
                     <DateComponent date={new Date("02/02/2026")} /> - New Bible
                     translations are now generally available! You can now choose
                     from ESV, BSB, NLT, NIV, CSB, NKJV, NASB, NTV, and MSG.
