@@ -183,6 +183,7 @@ body {
 
 /* Divine name styling (e.g., LORD in NLT) - small caps effect */
 
-.divine-name {
+.divine-name,
+.old-testament-reference {
     font-size: calc(1em - 3px);
 }

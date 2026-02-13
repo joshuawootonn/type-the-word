@@ -24,6 +24,11 @@ export function Word({
         .filter(l => !isLetterEqual(l, ender))
 
     const isErrored = typedWord && isWordTyped && !isAtomEqual(word, typedWord)
+    const styleClass = word.divineName
+        ? "divine-name"
+        : word.oldTestamentReference
+          ? "old-testament-reference"
+          : ""
 
     return (
         <>
@@ -40,8 +45,7 @@ export function Word({
                                 typedLetter && !isEqual && "incorrect",
                                 isErrored &&
                                     "error decoration-error underline decoration-2",
-                                Boolean(word.divineName) &&
-                                    (lIndex > 0 ? "divine-name" : ""),
+                                styleClass && (lIndex > 0 ? styleClass : ""),
                             )}
                         >
                             {letter}
@@ -63,12 +67,7 @@ export function Word({
                     )
                 })}
 
-                <span
-                    className={clsx(
-                        "letter relative z-0",
-                        word.divineName && "divine-name",
-                    )}
-                >
+                <span className={clsx("letter relative z-0", styleClass)}>
                     {ender === "\n" ? (
                         <NewLineIndicator isActive={active} />
                     ) : ender === " " ? (

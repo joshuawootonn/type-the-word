@@ -85,15 +85,21 @@ export function ReadonlyVerse({
                     const wordText = atom.letters
                         .join("")
                         .replace(" ", "\u00a0")
+                    const styleClass = atom.divineName
+                        ? "divine-name"
+                        : atom.oldTestamentReference
+                          ? "old-testament-reference"
+                          : ""
 
-                    // For divine names, split first letter from rest for styling
-                    if (atom.divineName && wordText.length > 1) {
+                    // Use small-caps-like rendering for divine names and NASB OT quote text.
+                    // Keep spans adjacent to avoid preserved whitespace with break-spaces.
+                    if (styleClass && wordText.length > 1) {
                         const firstLetter = wordText[0]
                         const rest = wordText.slice(1)
                         return (
                             <span key={aIndexPrime} className="word">
                                 <span>{firstLetter}</span>
-                                <span className="divine-name">{rest}</span>
+                                <span className={styleClass}>{rest}</span>
                                 <span className="text-[0px]"> </span>
                             </span>
                         )

@@ -41,7 +41,12 @@ export type VerseNumber = {
     translation: Translation
 }
 
-export type Word = { type: "word"; letters: string[]; divineName?: boolean }
+export type Word = {
+    type: "word"
+    letters: string[]
+    divineName?: boolean
+    oldTestamentReference?: boolean
+}
 
 export type Decoration = { type: "decoration"; text: string }
 

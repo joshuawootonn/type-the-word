@@ -100,15 +100,25 @@ export async function parseApiBibleChapter(
 
     function parseInline(
         node: ChildNode,
-        options?: { divineName?: boolean },
+        options?: { divineName?: boolean; oldTestamentReference?: boolean },
     ): Inline[] {
         if (node.nodeName === "#text" && "value" in node) {
             const result: Inline[] = []
             let textValue = node.value
 
+            // Some NASB OT reference spans use thin/non-breaking spaces between
+            // an initial capital and the rest of a lowercase word (e.g. "Y\u2009ou").
+            // Normalize those to keep the word typeable as one token.
+            if (options?.oldTestamentReference) {
+                textValue = textValue.replace(
+                    /([A-Z])[\u2009\u200A\u202F\u00A0]+([a-z])/g,
+                    "$1$2",
+                )
+            }
+
             // Uppercase divine names for correct typing validation
             // (user must type "LORD" not "Lord")
-            if (options?.divineName) {
+            if (options?.divineName || options?.oldTestamentReference) {
                 textValue = textValue.toUpperCase()
             }
 
@@ -159,6 +169,9 @@ export async function parseApiBibleChapter(
                               // Mark divine names for CSS styling (uppercase + smaller font)
                               if (options?.divineName) {
                                   result.divineName = true
+                              }
+                              if (options?.oldTestamentReference) {
+                                  result.oldTestamentReference = true
                               }
                               return result
                           })
@@ -227,6 +240,14 @@ export async function parseApiBibleChapter(
             if (hasClass(node, "nd") && "childNodes" in node) {
                 return node.childNodes.flatMap((child: ChildNode) =>
                     parseInline(child, { divineName: true }),
+                )
+            }
+
+            // Handle small caps class (sc) similarly to divine names:
+            // uppercase + smaller rendered letters for the rest of each word.
+            if (hasClass(node, "sc") && "childNodes" in node) {
+                return node.childNodes.flatMap((child: ChildNode) =>
+                    parseInline(child, { oldTestamentReference: true }),
                 )
             }
 
@@ -342,7 +363,8 @@ export async function parseApiBibleChapter(
                     lastLetter !== " " &&
                     lastLetter !== "\n" &&
                     /[A-Z]/.test(lastLetter) &&
-                    actualLetters.length <= 2 &&
+                    actualLetters.length === 1 &&
+                    !(actualLetters.length === 1 && actualLetters[0] === "I") &&
                     firstLetter &&
                     /^[a-z]/.test(firstLetter)
 
@@ -352,18 +374,67 @@ export async function parseApiBibleChapter(
                     continue
                 }
 
+                // NASB OT reference split pattern:
+                // first letter is often outside <span class="sc"> and rest inside it.
+                // Example tokens: "Y " + "OU " => "YOU "
+                // Merge only when current is OT-reference text and previous is a
+                // single non-reference letter token.
+                const lastTrimmed = lastResult.letters.join("").trim()
+                const lastTrimmedWithoutOpeners = lastTrimmed.replace(
+                    /^[\u201C\u2018"'([]+/,
+                    "",
+                )
+                const currentTrimmed = current.letters.join("").trim()
+                const shouldMergeOtReferenceSplit =
+                    current.oldTestamentReference === true &&
+                    /^[A-Z]$/.test(lastTrimmedWithoutOpeners) &&
+                    /^[A-Z][A-Z0-9'’"-]*$/.test(currentTrimmed) &&
+                    // Merge when previous token is non-OT-ref (first letter outside sc)
+                    // OR when both are OT-ref but this looks like a split marker:
+                    // - no trailing space on previous token (special whitespace split), or
+                    // - very short suffix like "OU" in "Y OU".
+                    (lastResult.oldTestamentReference !== true ||
+                        (lastResult.oldTestamentReference === true &&
+                            ((lastLetter !== " " && lastLetter !== "\n") ||
+                                currentTrimmed.length <= 2)))
+
+                if (shouldMergeOtReferenceSplit) {
+                    if (lastLetter === " " || lastLetter === "\n") {
+                        lastResult.letters.pop()
+                    }
+                    lastResult.letters.push(...current.letters)
+                    lastResult.oldTestamentReference = true
+                    continue
+                }
+
                 // Check if current word is closing punctuation that should attach to previous word
                 const currentWordStr = current.letters.join("")
-                const currentTrimmed = currentWordStr.trim()
+                const currentTrimmedPunctuation = currentWordStr.trim()
 
                 // Possessive merge: LORD + 's → LORD's
                 // When previous word has no trailing space and current starts with 's or similar
                 const isPossessive =
                     lastLetter !== " " &&
                     lastLetter !== "\n" &&
-                    /^[''\u2019]s\b/.test(currentTrimmed)
+                    /^[''\u2019]s\b/.test(currentTrimmedPunctuation)
 
                 if (isPossessive) {
+                    lastResult.letters.push(...current.letters)
+                    continue
+                }
+
+                // Possessive split merge: LORD’ + S → LORD’S
+                // API.Bible sometimes splits apostrophe and trailing S across word tokens.
+                const prevTrimmed = lastResult.letters.join("").trimEnd()
+                const isDanglingPossessiveS =
+                    /['\u2019]$/.test(prevTrimmed) &&
+                    /^[Ss]$/.test(currentTrimmedPunctuation)
+
+                if (isDanglingPossessiveS) {
+                    // Remove trailing space from previous token if present, then append S
+                    if (lastLetter === " " || lastLetter === "\n") {
+                        lastResult.letters.pop()
+                    }
                     lastResult.letters.push(...current.letters)
                     continue
                 }
@@ -377,30 +448,49 @@ export async function parseApiBibleChapter(
 
                 // Pattern 1: closing quote after punctuation (e.g., it. + " → it.")
                 const isClosingQuote =
-                    /^[\u201D\u2019"']+$/.test(currentTrimmed) &&
+                    /^[\u201D\u2019"']+$/.test(currentTrimmedPunctuation) &&
                     lastNonSpace != null &&
                     /[.!?,;:'"'\u2018\u2019\u201C\u201D]/.test(lastNonSpace)
 
+                // Pattern 1b: quote-only token after a word (e.g., forever + ’”)
+                // API.Bible sometimes splits closing quotes into their own span.
+                const isQuoteOnlyAfterWord =
+                    /^[\u201D\u2019"']+$/.test(currentTrimmedPunctuation) &&
+                    lastNonSpace != null &&
+                    /[a-zA-Z0-9)\]]/.test(lastNonSpace)
+
                 // Pattern 2: punct+quote after word (e.g., yourself + ." → yourself.")
                 const isPunctPlusQuote = /^[.!?,;:]+[\u201D\u2019"']+$/.test(
-                    currentTrimmed,
+                    currentTrimmedPunctuation,
                 )
 
                 // Pattern 3: quote+punct after word (e.g., gods + '? → gods'?)
                 const isQuotePlusPunct = /^[\u201D\u2019"']+[.!?,;:]+$/.test(
-                    currentTrimmed,
+                    currentTrimmedPunctuation,
                 )
 
-                // Pattern 4: closing paren/bracket (e.g., were + ), → were), or longer." + ]] → longer."]])
-                const isClosingParen = /^[)\]]+[.!?,;:]*$/.test(currentTrimmed)
+                // Pattern 4: quote+closing paren+punct (e.g., forever + '"); → forever'");)
+                const isQuotePlusParenAndPunct =
+                    /^[\u201D\u2019"']+[)\]]+[.!?,;:]*$/.test(
+                        currentTrimmedPunctuation,
+                    )
 
-                // Pattern 5: standalone punctuation (e.g., Lord + ; → Lord; or report + ? → report?)
-                const isStandalonePunct = /^[;:,.?!]+$/.test(currentTrimmed)
+                // Pattern 5: closing paren/bracket (e.g., were + ), → were), or longer." + ]] → longer."]])
+                const isClosingParen = /^[)\]]+[.!?,;:]*$/.test(
+                    currentTrimmedPunctuation,
+                )
+
+                // Pattern 6: standalone punctuation (e.g., Lord + ; → Lord; or report + ? → report?)
+                const isStandalonePunct = /^[;:,.?!]+$/.test(
+                    currentTrimmedPunctuation,
+                )
 
                 if (
                     isClosingQuote ||
+                    isQuoteOnlyAfterWord ||
                     isPunctPlusQuote ||
                     isQuotePlusPunct ||
+                    isQuotePlusParenAndPunct ||
                     isClosingParen ||
                     isStandalonePunct
                 ) {
@@ -466,6 +556,13 @@ export async function parseApiBibleChapter(
         return null
     }
 
+    function parseHeadingText(node: Element): string {
+        const mergedNodes = mergeAdjacentWords(
+            node.childNodes.flatMap((child: ChildNode) => parseInline(child)),
+        )
+        return inlineToString(mergedNodes).trim()
+    }
+
     type ParsedBlock =
         | Block
         | { type: "stanzaBreak" }
@@ -490,11 +587,7 @@ export async function parseApiBibleChapter(
 
         // Hebrew letter headers (qa) - treat as section headers (h4)
         if (hasClass(node, "qa")) {
-            const text = node.childNodes
-                .flatMap((child: ChildNode) => parseInline(child))
-                .filter((n): n is Word => n.type === "word")
-                .map((n: Word) => n.letters.join("").trim())
-                .join(" ")
+            const text = parseHeadingText(node)
             return {
                 type: "h4",
                 text,
@@ -508,11 +601,7 @@ export async function parseApiBibleChapter(
 
         // Section headers: s1 (main title), s2 (subsection)
         if (hasClass(node, "s1")) {
-            const text = node.childNodes
-                .flatMap((child: ChildNode) => parseInline(child))
-                .filter((node): node is Word => node.type === "word")
-                .map((node: Word) => node.letters.join(""))
-                .join("")
+            const text = parseHeadingText(node)
             return {
                 type: "h2",
                 text,
@@ -520,11 +609,7 @@ export async function parseApiBibleChapter(
         }
 
         if (hasClass(node, "s2")) {
-            const text = node.childNodes
-                .flatMap((child: ChildNode) => parseInline(child))
-                .filter((node): node is Word => node.type === "word")
-                .map((node: Word) => node.letters.join(""))
-                .join("")
+            const text = parseHeadingText(node)
             return {
                 type: "h3",
                 text,
@@ -535,11 +620,7 @@ export async function parseApiBibleChapter(
         // Section headers: s (e.g., "The Banquet", "Solomon's Love for a Shulamite Girl")
         // These are headings indicating who is speaking or section titles, not typeable content
         if (hasClass(node, "sp") || hasClass(node, "s")) {
-            const text = node.childNodes
-                .flatMap((child: ChildNode) => parseInline(child))
-                .filter((n): n is Word => n.type === "word")
-                .map((n: Word) => n.letters.join("").trim())
-                .join(" ")
+            const text = parseHeadingText(node)
             return {
                 type: "h4",
                 text,

@@ -855,13 +855,13 @@ describe("Luke 19:38 poetry continuation (NASB)", () => {
 
         // Small caps words should be merged (not split like "B" + "lessed")
         // The actual word includes the opening quote: "Blessed
-        expect(wordTexts.some(w => w.includes("Blessed"))).toBe(true)
+        expect(wordTexts.some(w => /blessed/i.test(w))).toBe(true)
         expect(wordTexts).not.toContain('"B')
         expect(wordTexts).not.toContain("lessed")
-        expect(wordTexts.some(w => w.includes("One"))).toBe(true)
+        expect(wordTexts.some(w => /one/i.test(w))).toBe(true)
         expect(wordTexts).not.toContain("O")
         expect(wordTexts).not.toContain("ne")
-        expect(wordTexts.some(w => w.includes("Lord"))).toBe(true)
+        expect(wordTexts.some(w => /lord/i.test(w))).toBe(true)
         expect(wordTexts).not.toContain("L")
         expect(wordTexts).not.toContain("ord;")
     })
@@ -1532,10 +1532,9 @@ describe("Luke 19 NASB - Poetry continuation typing", () => {
         )
 
         // Should have content from "shouting:" AND the poetry lines
-        // Note: "Blessed" appears as "B lessed" due to small caps span splitting
         const allText = verse38Sections.map(v => v.text).join(" ")
         expect(allText).toContain("shouting")
-        expect(allText).toContain("lessed") // Part of "Blessed" (after small caps split)
+        expect(allText).toMatch(/blessed/i)
         expect(allText).toContain("King")
         expect(allText).toContain("Peace")
         expect(allText).toContain("heaven")
@@ -1618,7 +1617,7 @@ describe("Luke 19 NASB - Poetry continuation typing", () => {
         // Note: "Blessed" is now correctly merged with small caps spans
         const allLetters = verse38Words.map(w => w.letters.join("")).join(" ")
         expect(allLetters).toContain("shouting")
-        expect(allLetters).toContain("Blessed")
+        expect(allLetters).toMatch(/blessed/i)
         expect(allLetters).toContain("King")
         expect(allLetters).toContain("Peace")
         expect(allLetters).toContain("heaven")
@@ -1937,7 +1936,7 @@ describe("Psalm 6 NASB - Pilcrow decoration handling", () => {
         expect(allText).not.toContain("¶")
 
         // But should contain the actual verse content
-        expect(allText).toContain("Lord")
+        expect(allText).toMatch(/lord/i)
         expect(allText).toContain("Return")
         expect(allText).toContain("weary")
     })
@@ -2126,7 +2125,7 @@ describe("John 6:1 NASB - Opening parenthesis", () => {
         expect(verse45Text).not.toMatch(/\u2018A\s+nd/)
 
         // Should have proper "'And" with quote attached (curly quote)
-        expect(verse45Text).toContain("\u2018And")
+        expect(verse45Text).toMatch(/\u2018AND/i)
     })
 
     // Test cases for "I am" and "It is" - should NOT merge when in same text node
@@ -2262,7 +2261,7 @@ describe("John 10:34 NASB - Quote+punctuation merge", () => {
 
         // Should have gods'? with no space before the closing quote
         // Uses U+2019 (RIGHT SINGLE QUOTATION MARK)
-        expect(verse34Text).toMatch(/gods['\u2019]\?/)
+        expect(verse34Text).toMatch(/gods['\u2019]\?/i)
         // Should NOT have space before '?
         expect(verse34Text).not.toMatch(/gods\s+['\u2019]\?/)
     })
@@ -2293,7 +2292,7 @@ describe("John 12:38 NASB - Standalone question mark", () => {
         const verse38Text = verse38.map(v => v.text).join("")
 
         // Should have "report?" with no space before the question mark
-        expect(verse38Text).toContain("report?")
+        expect(verse38Text).toMatch(/report\?/i)
         // Should NOT have space before ?
         expect(verse38Text).not.toMatch(/report\s+\?/)
     })
@@ -2397,6 +2396,333 @@ describe("Proverbs 20 NLT - Divine name and possessive", () => {
 })
 
 // ============================================================================
+// ACTS 10:34 / HEBREWS 7:21 NASB - TYPABILITY REGRESSIONS
+// ============================================================================
+describe("NASB typability regressions", () => {
+    test.concurrent('Acts 10:34 keeps "I most" as two words', async () => {
+        const acts10Html = `
+            <p class="p">
+                <span data-number="34" data-sid="ACT 10:34" class="v">34</span>
+                <span class="sc">I</span>
+                <span> most certainly understand now that God is not one to show partiality,</span>
+            </p>
+        `
+
+        const result = await cachedParseApiBibleChapter(acts10Html, "nasb")
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+        const verse34 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 34),
+        )
+
+        expect(verse34.length).toBeGreaterThan(0)
+        const verse34Text = verse34.map(v => v.text).join("")
+        expect(verse34Text).toContain("I most")
+        expect(verse34Text).not.toContain("Imost")
+
+        const words = verse34.flatMap(v =>
+            v.nodes.filter((n): n is Word => n.type === "word"),
+        )
+        const wordTexts = words.map(w => w.letters.join(""))
+        expect(wordTexts).toContain("I ")
+        expect(wordTexts).toContain("most ")
+    })
+
+    test.concurrent("Hebrews 7:21 merges quote+paren+semicolon with preceding word", async () => {
+        const hebrews7Html = `
+            <p class="p">
+                <span data-number="21" data-sid="HEB 7:21" class="v">21</span>
+                <span> (for they indeed became priests without an oath, but He with an oath through the One who said to Him, </span>
+                <span class="sc">FOREVER</span>
+                <span>'");</span>
+            </p>
+        `
+
+        const result = await cachedParseApiBibleChapter(hebrews7Html, "nasb")
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+        const verse21 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 21),
+        )
+
+        expect(verse21.length).toBeGreaterThan(0)
+        const verse21Text = verse21.map(v => v.text).join("")
+        const trailingSequence = "FOREVER'\");"
+        expect(verse21Text).toContain(trailingSequence)
+        expect(verse21Text).not.toContain("FOREVER '")
+        expect(verse21Text).not.toMatch(/FOREVER\s+['"]/)
+
+        const words = verse21.flatMap(v =>
+            v.nodes.filter((n): n is Word => n.type === "word"),
+        )
+        const wordTexts = words.map(w => w.letters.join(""))
+        expect(wordTexts.some(w => w.includes(trailingSequence))).toBe(true)
+    })
+
+    test.concurrent("Hebrews 7:21 handles split closing quote tokens and keeps semicolon typable", async () => {
+        const hebrews7Html = `
+            <p class="q1">
+                <span data-number="21" data-sid="HEB 7:21" class="v">21</span>
+                <span class="sc">YOU ARE A PRIEST FOREVER</span>
+                <span>’”</span>
+                <span>);</span>
+            </p>
+        `
+
+        const result = await cachedParseApiBibleChapter(hebrews7Html, "nasb")
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+        const verse21 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 21),
+        )
+
+        expect(verse21.length).toBeGreaterThan(0)
+        const verse21Text = verse21.map(v => v.text).join("")
+        expect(verse21Text).toContain("FOREVER’”);")
+        expect(verse21Text).not.toContain("FOREVER ’”")
+
+        const words = verse21.flatMap(v =>
+            v.nodes.filter((n): n is Word => n.type === "word"),
+        )
+        const lastWord = words[words.length - 1]
+        expect(lastWord).toBeDefined()
+        expect(lastWord!.letters.join("")).toContain("FOREVER’”);")
+        // Last word must end in a trailing space so verse completion is reachable.
+        expect(lastWord!.letters[lastWord!.letters.length - 1]).toBe(" ")
+
+        // Whole small-caps quote should be marked with OT reference styling metadata.
+        const allSmallCapsWordsAreStyled = words.every(
+            w => w.oldTestamentReference === true,
+        )
+        expect(allSmallCapsWordsAreStyled).toBe(true)
+        expect(words.some(w => w.divineName === true)).toBe(false)
+    })
+
+    test.concurrent("NASB OT reference split markers combine into full words", async () => {
+        const hebrews7Html = `
+            <p class="q1">
+                <span data-number="17" data-sid="HEB 7:17" class="v">17</span>
+                <span class="sc">Y\u2009ou A\u2009ccording M\u2009elchizedek</span>
+            </p>
+        `
+
+        const result = await cachedParseApiBibleChapter(hebrews7Html, "nasb")
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+        const verse17 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 17),
+        )
+
+        expect(verse17.length).toBeGreaterThan(0)
+        const words = verse17.flatMap(v =>
+            v.nodes.filter((n): n is Word => n.type === "word"),
+        )
+        const wordTexts = words.map(w => w.letters.join("").trim())
+
+        expect(wordTexts).toEqual(["YOU", "ACCORDING", "MELCHIZEDEK"])
+    })
+
+    test.concurrent("NASB OT reference split keeps standalone one-letter words separate", async () => {
+        const hebrews7Html = `
+            <p class="q1">
+                <span data-number="17" data-sid="HEB 7:17" class="v">17</span>
+                <span>A </span>
+                <span>P</span><span class="sc">riest</span>
+            </p>
+        `
+
+        const result = await cachedParseApiBibleChapter(hebrews7Html, "nasb")
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+        const verse17 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 17),
+        )
+
+        expect(verse17.length).toBeGreaterThan(0)
+        const words = verse17.flatMap(v =>
+            v.nodes.filter((n): n is Word => n.type === "word"),
+        )
+        const wordTexts = words.map(w => w.letters.join("").trim())
+
+        expect(wordTexts).toEqual(["A", "PRIEST"])
+    })
+
+    test.concurrent("NASB OT reference in same sc span merges Y OU but keeps A PRIEST separate", async () => {
+        const hebrews7Html = `
+            <p class="q1">
+                <span data-number="17" data-sid="HEB 7:17" class="v">17</span>
+                <span class="sc">Y OU ARE A PRIEST</span>
+            </p>
+        `
+
+        const result = await cachedParseApiBibleChapter(hebrews7Html, "nasb")
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+        const verse17 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 17),
+        )
+
+        expect(verse17.length).toBeGreaterThan(0)
+        const words = verse17.flatMap(v =>
+            v.nodes.filter((n): n is Word => n.type === "word"),
+        )
+        const wordTexts = words.map(w => w.letters.join("").trim())
+
+        expect(wordTexts).toEqual(["YOU", "ARE", "A", "PRIEST"])
+    })
+})
+
+describe("NASB typability regressions (real API.Bible fixtures)", () => {
+    const nasbActs10Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            "src/server/api-bible/responses/nasb/acts_10.html",
+        ),
+        "utf8",
+    )
+
+    const nasbHebrews7Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            "src/server/api-bible/responses/nasb/hebrews_7.html",
+        ),
+        "utf8",
+    )
+
+    test.concurrent('Acts 10:34 keeps "I most" as separate words in real fixture', async () => {
+        const result = await cachedParseApiBibleChapter(nasbActs10Html, "nasb")
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+        const verse34 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 34),
+        )
+
+        expect(verse34.length).toBeGreaterThan(0)
+        const verse34Text = verse34.map(v => v.text).join("")
+        expect(verse34Text).toContain("I most")
+        expect(verse34Text).not.toContain("Imost")
+    })
+
+    test.concurrent("Hebrews 7:17 combines split OT-reference words in real fixture", async () => {
+        const result = await cachedParseApiBibleChapter(
+            nasbHebrews7Html,
+            "nasb",
+        )
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+        const verse17 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 17),
+        )
+
+        expect(verse17.length).toBeGreaterThan(0)
+        const words = verse17.flatMap(v =>
+            v.nodes.filter((n): n is Word => n.type === "word"),
+        )
+        const text = words.map(w => w.letters.join("")).join("")
+
+        expect(text).toContain("YOU")
+        expect(text).toContain("ACCORDING")
+        expect(text).toContain("MELCHIZEDEK")
+        expect(text).not.toContain("Y OU")
+        expect(text).not.toContain("A CCORDING")
+        expect(text).not.toContain("M ELCHIZEDEK")
+    })
+
+    test.concurrent("Hebrews 7:21 keeps closing quote+paren+semicolon typable in real fixture", async () => {
+        const result = await cachedParseApiBibleChapter(
+            nasbHebrews7Html,
+            "nasb",
+        )
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+        const verse21 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 21),
+        )
+
+        expect(verse21.length).toBeGreaterThan(0)
+        const verse21Text = verse21.map(v => v.text).join("")
+        expect(verse21Text).toContain("FOREVER’”);")
+        expect(verse21Text).not.toContain("FOREVER ’”);")
+        expect(verse21Text).not.toContain("FOREVER’”) ;")
+
+        const words = verse21.flatMap(v =>
+            v.nodes.filter((n): n is Word => n.type === "word"),
+        )
+        const lastWord = words[words.length - 1]
+        expect(lastWord).toBeDefined()
+        expect(lastWord!.letters.join("")).toContain("FOREVER’”);")
+        expect(lastWord!.letters[lastWord!.letters.length - 1]).toBe(" ")
+    })
+
+    test.concurrent("Psalm 11:4 keeps LORD’S and throne as separate words in real fixture", async () => {
+        const nasbPsalm11Html = fs.readFileSync(
+            path.join(
+                process.cwd(),
+                "src/server/api-bible/responses/nasb/psalm_11.html",
+            ),
+            "utf8",
+        )
+
+        const result = await cachedParseApiBibleChapter(nasbPsalm11Html, "nasb")
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+        const verse4 = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 4),
+        )
+
+        expect(verse4.length).toBeGreaterThan(0)
+
+        const words = verse4.flatMap(v =>
+            v.nodes.filter((n): n is Word => n.type === "word"),
+        )
+        const wordTexts = words.map(w => w.letters.join(""))
+        const verse4Text = verse4.map(v => v.text).join("")
+
+        // Should render as "... temple; the LORD’S throne is ..."
+        expect(verse4Text).toMatch(
+            /temple;\s+the\s+LORD['\u2019]S\s+throne\s+is/i,
+        )
+
+        // Regression checks for broken split shape
+        expect(wordTexts.some(w => /LORD['\u2019]S\s$/i.test(w))).toBe(true)
+        expect(wordTexts).toContain("throne ")
+        expect(wordTexts.some(w => /Sthrone/i.test(w))).toBe(false)
+    })
+
+    test.concurrent("Psalm 11 title does not split LORD in real fixture", async () => {
+        const nasbPsalm11Html = fs.readFileSync(
+            path.join(
+                process.cwd(),
+                "src/server/api-bible/responses/nasb/psalm_11.html",
+            ),
+            "utf8",
+        )
+
+        const result = await cachedParseApiBibleChapter(nasbPsalm11Html, "nasb")
+        const h4Headings = result.nodes.filter(
+            (n): n is { type: "h4"; text: string } => n.type === "h4",
+        )
+
+        const heading = h4Headings.find(h =>
+            h.text.includes("Refuge and Defense"),
+        )
+        expect(heading).toBeDefined()
+        expect(heading?.text).toContain("The LORD, a Refuge and Defense.")
+        expect(heading?.text).not.toContain("L ORD")
+    })
+})
+
+// ============================================================================
 // JOHN 1:15 NASB - NESTED QUOTES (single quote followed by double quote)
 // ============================================================================
 describe("John 1:15 NASB - Nested quote handling", () => {
@@ -2463,7 +2789,7 @@ describe("Luke 10:27 NASB - Punct+quote merging", () => {
         const verse27Text = verse27.map(v => v.text).join("")
 
         // Should have "yourself." with no space before the period+quote
-        expect(verse27Text).toContain("yourself.\u201D")
+        expect(verse27Text).toMatch(/yourself\.\u201D/i)
         expect(verse27Text).not.toContain("yourself .\u201D")
         expect(verse27Text).not.toContain('yourself ."')
     })
