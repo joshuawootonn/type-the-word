@@ -41,11 +41,11 @@ export function useCursor(passageId: string): void {
                     }
                 }
 
-                const heightDelta = activeElement?.classList.contains(
-                    "divine-name",
-                )
-                    ? -3
-                    : 0
+                const heightDelta =
+                    activeElement?.classList.contains("divine-name") ||
+                    activeElement?.classList.contains("old-testament-reference")
+                        ? -3
+                        : 0
 
                 const nextTop = activeRect.top - passageRect.top + heightDelta
                 const nextLeft = activeRect.left - passageRect.left
