@@ -194,6 +194,31 @@ async function fetchApiBiblePassage(
     translation: Exclude<Translation, "esv">,
 ) {
     const includesVerses = passageData.lastVerse != null
+    const localResponsePath = path.join(
+        process.cwd(),
+        "/src/server/api-bible/responses",
+        translation,
+        `${toPassageSegment(passageData.book, passageData.chapter)}.html`,
+    )
+
+    // Check for local cached chapter files for non-ESV translations
+    if (!includesVerses) {
+        try {
+            const localResponse = fs.readFileSync(localResponsePath, "utf8")
+            return {
+                data: await parseApiBibleChapter(
+                    localResponse,
+                    translation,
+                    "",
+                ),
+            }
+        } catch (error) {
+            console.warn(
+                `Tried to read passage: (${localResponsePath}) and failed with error:`,
+                error,
+            )
+        }
+    }
 
     // Only optimize whole chapter fetches for caching
     if (passageData.chapter != null && includesVerses) {

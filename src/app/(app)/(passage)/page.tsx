@@ -22,18 +22,19 @@ export const metadata: Metadata = {
 export default async function PassagePage() {
     const session = await getServerSession(authOptions)
     const lastTranslation = await getLastTranslation()
+    const demoTranslation = "nlt"
 
-    const value = passageSegmentSchema.parse("psalm 23:1-2")
+    const value = passageSegmentSchema.parse("psalm 23")
 
     const [passage, typingSession, chapterHistory] = await Promise.all([
-        fetchPassage(value, lastTranslation),
+        fetchPassage(value, demoTranslation),
         session == null ? undefined : getOrCreateTypingSession(session.user.id),
         session == null
             ? undefined
             : getChapterHistory(
                   session.user.id,
                   segmentToPassageObject(value),
-                  lastTranslation,
+                  demoTranslation,
               ),
     ])
 
@@ -58,6 +59,7 @@ export default async function PassagePage() {
                 <Passage
                     autofocus={true}
                     passage={passage}
+                    translation={demoTranslation}
                     typingSession={typingSession}
                     chapterHistory={chapterHistory}
                     passageSegmentOverride={value}
