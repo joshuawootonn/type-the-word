@@ -15,6 +15,7 @@ import { StudentAssignmentCompletion } from "./student-assignment-completion"
 interface StudentClientPageProps {
     typingSession?: TypingSession
     assignmentHistory?: AssignmentHistory
+    assignmentChapterHistory?: AssignmentHistory
     assignmentId: string
     assignmentTitle: string
     referenceLabel: string
@@ -49,6 +50,7 @@ export function StudentClientPage({
     submission,
     typingSession,
     assignmentHistory,
+    assignmentChapterHistory,
     courseId,
     courseName,
 }: StudentClientPageProps) {
@@ -57,6 +59,7 @@ export function StudentClientPage({
     const hasMultipleChapters = chapterSegments.length > 1
     const canGoToPreviousChapter = activeChapterIndex > 0
     const canGoToNextChapter = activeChapterIndex < chapterSegments.length - 1
+    const passageRenderKey = `${assignmentId}:${activeChapter?.chapter ?? "default"}`
 
     function navigateToChapter(index: number): void {
         const chapter = chapterSegments[index]
@@ -85,12 +88,13 @@ export function StudentClientPage({
 
             <div className="space-y-8">
                 <Passage
+                    key={passageRenderKey}
                     autofocus
                     passage={passage}
                     translation={translation}
                     typingSession={typingSession}
                     classroomAssignmentId={assignmentId}
-                    assignmentHistory={assignmentHistory}
+                    assignmentHistory={assignmentChapterHistory}
                     historyType="assignment"
                 />
 

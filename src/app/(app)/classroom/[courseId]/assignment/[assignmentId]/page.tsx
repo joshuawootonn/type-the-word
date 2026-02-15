@@ -327,12 +327,20 @@ export default async function AssignmentDetailPage({
     const courses = await listStudentCourses(studentAccessToken)
     const course = courses.find(c => c.id === courseId)
 
-    const [rawPassage, typingSession, assignmentHistory] = await Promise.all([
+    const [
+        rawPassage,
+        typingSession,
+        assignmentChapterHistory,
+        assignmentHistory,
+    ] = await Promise.all([
         fetchPassage(
             activeChapterSegment.passageSegment,
             assignment.translation,
         ),
         getOrCreateTypingSession(session.user.id, assignmentId),
+        getAssignmentHistory(session.user.id, assignmentId, {
+            chapter: activeChapterSegment.chapter,
+        }),
         getAssignmentHistory(session.user.id, assignmentId),
     ])
     const passage = trimPassageToVerseRange(
@@ -357,6 +365,7 @@ export default async function AssignmentDetailPage({
                 isTurnedIn: submission.isTurnedIn === 1,
             }}
             typingSession={typingSession}
+            assignmentChapterHistory={assignmentChapterHistory}
             assignmentHistory={assignmentHistory}
             courseId={courseId}
             courseName={course?.name || "Unknown Course"}

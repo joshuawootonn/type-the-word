@@ -17,6 +17,19 @@ const mockMetadata = {
 }
 
 describe("buildAssignmentChapterSegments", () => {
+    test.concurrent("returns empty array when book metadata is missing", () => {
+        const segments = buildAssignmentChapterSegments({
+            book: "exodus",
+            startChapter: 1,
+            startVerse: 1,
+            endChapter: 1,
+            endVerse: 5,
+            metadata: mockMetadata,
+        })
+
+        expect(segments).toEqual([])
+    })
+
     test.concurrent("builds a single-chapter slice with provided verse bounds", () => {
         const segments = buildAssignmentChapterSegments({
             book: "genesis",
@@ -86,6 +99,24 @@ describe("buildAssignmentChapterSegments", () => {
             endVerse: 26,
         })
     })
+
+    test.concurrent("normalizes inverted verse range inside a single chapter", () => {
+        const segments = buildAssignmentChapterSegments({
+            book: "genesis",
+            startChapter: 2,
+            startVerse: 20,
+            endChapter: 2,
+            endVerse: 4,
+            metadata: mockMetadata,
+        })
+
+        expect(segments).toHaveLength(1)
+        expect(segments[0]).toMatchObject({
+            chapter: 2,
+            startVerse: 20,
+            endVerse: 20,
+        })
+    })
 })
 
 describe("getActiveChapterIndex", () => {
@@ -112,5 +143,13 @@ describe("getActiveChapterIndex", () => {
 
     test.concurrent("selects the matching chapter when query param is valid", () => {
         expect(getActiveChapterIndex(segments, "3")).toBe(1)
+    })
+
+    test.concurrent("falls back to first chapter when query param is not numeric", () => {
+        expect(getActiveChapterIndex(segments, "chapter-two")).toBe(0)
+    })
+
+    test.concurrent("returns first chapter for empty segments", () => {
+        expect(getActiveChapterIndex([], "10")).toBe(0)
     })
 })

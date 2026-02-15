@@ -97,10 +97,18 @@ export function Passage({
         placeholderData: props.chapterHistory,
     })
     const shouldFetchAssignmentHistory = historyType === "assignment"
+    const assignmentHistoryChapter = passage.firstVerse.chapter
     const assignmentHistoryQuery = useQuery({
-        queryKey: ["assignment-history", props.classroomAssignmentId],
+        queryKey: [
+            "assignment-history",
+            props.classroomAssignmentId,
+            assignmentHistoryChapter,
+        ],
         queryFn: () =>
-            fetchAssignmentHistory(props.classroomAssignmentId ?? ""),
+            fetchAssignmentHistory(
+                props.classroomAssignmentId ?? "",
+                assignmentHistoryChapter,
+            ),
         enabled:
             sessionData?.user?.id != null &&
             shouldFetchAssignmentHistory &&
@@ -114,7 +122,11 @@ export function Passage({
     const historyQueryKey =
         historyType === "assignment"
             ? props.classroomAssignmentId
-                ? ["assignment-history", props.classroomAssignmentId]
+                ? [
+                      "assignment-history",
+                      props.classroomAssignmentId,
+                      assignmentHistoryChapter,
+                  ]
                 : undefined
             : ["chapter-history", passageSegementOrOverride, translation]
 
