@@ -136,7 +136,7 @@ export function ClientPage({
             )}
 
             {!isConnected && (
-                <div className="space-y-6">
+                <>
                     <h2>Student Connection</h2>
                     <p>
                         Connect as a student to submit your assignments back to
@@ -153,7 +153,7 @@ export function ClientPage({
 
                     {isStudentConnected ? (
                         <>
-                            <div className="border-primary bg-secondary flex items-center gap-4 border-2 p-4">
+                            <div className="border-primary bg-secondary mb-3 flex items-center gap-4 border-2 p-4">
                                 <svg
                                     className="text-success h-8 w-8"
                                     fill="none"
@@ -212,11 +212,11 @@ export function ClientPage({
                             )}
                         </div>
                     )}
-                </div>
+                </>
             )}
 
             {!isStudentConnected && (
-                <div className="space-y-6">
+                <>
                     <h2>Teacher Connection</h2>
                     <p>
                         Connect as a teacher to create assignments and track
@@ -233,7 +233,7 @@ export function ClientPage({
 
                     {isConnected ? (
                         <>
-                            <div className="border-primary bg-secondary flex items-center gap-4 border-2 p-4">
+                            <div className="border-primary bg-secondary mb-3 flex items-center gap-4 border-2 p-4">
                                 <svg
                                     className="text-success h-8 w-8"
                                     fill="none"
@@ -294,7 +294,7 @@ export function ClientPage({
                             )}
                         </div>
                     )}
-                </div>
+                </>
             )}
         </>
     )
