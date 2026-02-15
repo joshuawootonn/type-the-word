@@ -24,6 +24,21 @@ type AssignmentCompletedProperties = {
     completedVerses: number
 }
 
+type AssignmentCreatedProperties = {
+    assignmentId: string
+    courseId: string
+    courseWorkId: string
+    translation: string
+    book: string
+    startChapter: number
+    startVerse: number
+    endChapter: number
+    endVerse: number
+    maxPoints: number
+    hasDescription: boolean
+    hasDueDate: boolean
+}
+
 type ThemeCreatedProperties = {
     theme_name: string
 }
@@ -63,6 +78,13 @@ export function useAnalytics() {
         [posthog],
     )
 
+    const trackAssignmentCreated = useCallback(
+        (properties: AssignmentCreatedProperties) => {
+            posthog.capture("assignment_created", properties)
+        },
+        [posthog],
+    )
+
     const trackThemeDeleted = useCallback(
         (properties: ThemeDeletedProperties) => {
             posthog.capture("theme_deleted", properties)
@@ -78,6 +100,7 @@ export function useAnalytics() {
         trackVerseCompleted,
         trackAssignmentOpened,
         trackAssignmentCompleted,
+        trackAssignmentCreated,
         trackThemeCreated,
         trackThemeDeleted,
         trackChangelogViewed,

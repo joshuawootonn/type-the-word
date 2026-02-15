@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useMemo, useState } from "react"
 
 import { AssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
 import { Button } from "~/components/ui/button"
@@ -55,27 +55,6 @@ export function StudentAssignmentCompletion({
             ? Math.min(100, Math.round((completedVerses / totalVerses) * 100))
             : 0
     const isComplete = totalVerses > 0 && completedVerses >= totalVerses
-    const wasComplete = useRef(isComplete)
-
-    useEffect(() => {
-        if (!wasComplete.current && isComplete) {
-            trackAssignmentCompleted({
-                assignmentId,
-                courseId,
-                totalVerses,
-                completedVerses,
-            })
-        }
-
-        wasComplete.current = isComplete
-    }, [
-        assignmentId,
-        completedVerses,
-        courseId,
-        isComplete,
-        totalVerses,
-        trackAssignmentCompleted,
-    ])
 
     // Calculate stats from assignment history
     const stats = useMemo(() => {
@@ -124,6 +103,12 @@ export function StudentAssignmentCompletion({
 
         try {
             await turnInAssignment(assignmentId)
+            trackAssignmentCompleted({
+                assignmentId,
+                courseId,
+                totalVerses,
+                completedVerses,
+            })
             setIsTurnedIn(true)
         } catch (error) {
             const message =

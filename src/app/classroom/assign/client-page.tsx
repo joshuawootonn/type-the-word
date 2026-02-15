@@ -14,6 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
+import { useAnalytics } from "~/lib/hooks/useAnalytics"
 import toProperCase from "~/lib/toProperCase"
 import { bookSchema } from "~/lib/types/book"
 import { Translation, translationsSchema } from "~/server/db/schema"
@@ -37,6 +38,7 @@ interface ClientPageProps {
 
 export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
     const router = useRouter()
+    const { trackAssignmentCreated } = useAnalytics()
     const [courses, setCourses] = useState<Course[]>([])
     const [isLoadingCourses, setIsLoadingCourses] = useState(true)
     const [isCreating, setIsCreating] = useState(false)
@@ -161,6 +163,21 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                 endVerse,
                 maxPoints,
                 dueDate: dueDate || undefined,
+            })
+
+            trackAssignmentCreated({
+                assignmentId: result.assignmentId,
+                courseId: selectedCourse,
+                courseWorkId: result.courseWorkId,
+                translation,
+                book,
+                startChapter,
+                startVerse,
+                endChapter,
+                endVerse,
+                maxPoints,
+                hasDescription: description.trim().length > 0,
+                hasDueDate: Boolean(dueDate),
             })
 
             setSuccess(true)
