@@ -32,6 +32,7 @@ import { fetchAddVerseToTypingSession } from "~/lib/api"
 import { usePassageRect, useVerseRect } from "~/lib/hooks/passageRectContext"
 import { useAnalytics } from "~/lib/hooks/useAnalytics"
 import { isAtomTyped, isVerseSameShape } from "~/lib/isEqual"
+import { isVerseTypedInHistory } from "~/lib/isVerseTypedInHistory"
 import { getPosition, isAtomComplete, isValidKeystroke } from "~/lib/keystroke"
 import { Block, Inline, ParsedPassage, Verse } from "~/lib/parseEsv"
 import { TypingSession } from "~/server/repositories/typingSession.repository"
@@ -244,7 +245,8 @@ export function CurrentVerse({
                                 ...prevChapterHistory,
                                 verses: {
                                     ...prevChapterHistory.verses,
-                                    [verse.verse]: verseStats,
+                                    [`${verse.chapter}:${verse.verse}`]:
+                                        verseStats,
                                 },
                             } as AssignmentHistory
                         }
@@ -503,7 +505,11 @@ export function CurrentVerse({
           )
         : position
 
-    const isTypedInHistory = history?.verses[verse.verse.verse]
+    const isTypedInHistory = isVerseTypedInHistory(
+        history,
+        verse.verse.chapter,
+        verse.verse.verse,
+    )
 
     return (
         <span

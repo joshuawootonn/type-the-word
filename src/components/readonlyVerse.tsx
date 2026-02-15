@@ -11,6 +11,7 @@ import {
     positionAtom,
 } from "~/components/passage"
 import { usePassageRect, useVerseRect } from "~/lib/hooks/passageRectContext"
+import { isVerseTypedInHistory } from "~/lib/isVerseTypedInHistory"
 import { Verse } from "~/lib/parseEsv"
 
 export function ReadonlyVerse({
@@ -30,7 +31,11 @@ export function ReadonlyVerse({
     const ref = useRef<HTMLSpanElement>(null)
     const rect = useVerseRect(ref, verse.verse.text + verse.metadata.offset)
 
-    const isTypedInHistory = history?.verses[verse.verse.verse]
+    const isTypedInHistory = isVerseTypedInHistory(
+        history,
+        verse.verse.chapter,
+        verse.verse.verse,
+    )
 
     const [currentVerse, setCurrentVerse] = useAtom(currentVerseAtom)
     const setPosition = useSetAtom(positionAtom)

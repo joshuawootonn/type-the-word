@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest"
 
+import { AssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
 import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
 
 import { getNextVerseToType } from "./getNextVerseToType"
@@ -279,6 +280,37 @@ describe("getNextVerseToType", () => {
         const result = getNextVerseToType(passage, chapterHistory)
 
         // Verse 5 is the last verse, so go back to first
+        expect(result).toBe("1")
+    })
+
+    test.concurrent("WHEN assignment history uses chapter:verse keys THEN resolves next verse in current chapter", () => {
+        const passage = createMockPassage([1, 2, 3, 4, 5])
+        const assignmentHistory: AssignmentHistory = {
+            verses: {
+                "1:1": { wpm: 55, accuracy: 98 },
+                "1:2": { wpm: 60, accuracy: 99 },
+                "2:1": { wpm: 52, accuracy: 95 },
+            },
+            chapterLogs: [],
+        }
+
+        const result = getNextVerseToType(passage, assignmentHistory)
+
+        expect(result).toBe("3")
+    })
+
+    test.concurrent("WHEN assignment history has no typed verses in current chapter THEN returns first verse", () => {
+        const passage = createMockPassage([1, 2, 3])
+        const assignmentHistory: AssignmentHistory = {
+            verses: {
+                "2:1": { wpm: 40, accuracy: 90 },
+                "2:2": { wpm: 42, accuracy: 91 },
+            },
+            chapterLogs: [],
+        }
+
+        const result = getNextVerseToType(passage, assignmentHistory)
+
         expect(result).toBe("1")
     })
 })

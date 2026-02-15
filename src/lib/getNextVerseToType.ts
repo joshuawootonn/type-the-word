@@ -38,8 +38,29 @@ export function getNextVerseToType(
 
     // Get the typed verse numbers
     const typedVerseNumbers = Object.keys(chapterHistory.verses)
-        .map(Number)
-        .filter(num => chapterHistory.verses[num])
+        .map(key => {
+            if (key.includes(":")) {
+                const [chapterSegment, verseSegment] = key.split(":")
+                const parsedChapter = Number.parseInt(chapterSegment ?? "", 10)
+                const parsedVerse = Number.parseInt(verseSegment ?? "", 10)
+                if (
+                    Number.isNaN(parsedChapter) ||
+                    Number.isNaN(parsedVerse) ||
+                    parsedChapter !== passage.firstVerse.chapter
+                ) {
+                    return null
+                }
+                return parsedVerse
+            }
+
+            const parsedVerse = Number.parseInt(key, 10)
+            if (Number.isNaN(parsedVerse)) {
+                return null
+            }
+            return parsedVerse
+        })
+        .filter((value): value is number => value != null)
+        .filter(verseNumber => allVerseNumbers.includes(verseNumber))
 
     // If no verses have been typed, focus the first verse
     if (typedVerseNumbers.length === 0) {
