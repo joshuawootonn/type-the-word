@@ -1,50 +1,59 @@
 import matter from "gray-matter"
 import { compileMDX } from "next-mdx-remote/rsc"
-import { readdir, readFile } from "node:fs/promises"
+import { readFile } from "node:fs/promises"
 import path from "path"
 import { cache } from "react"
 import rehypeSlug from "rehype-slug"
 import remarkGfm from "remark-gfm"
+import { fileURLToPath } from "url"
 
 import { docsMdxComponents } from "~/components/docs/mdx-components"
 
+import { docsNavigation } from "./navigation"
 import { extractToc } from "./toc"
-import { DocsPage, DocsPageMeta } from "./types"
+import { DocsNavItem, DocsPage, DocsPageMeta } from "./types"
 
-const DOCS_DIR = path.join(process.cwd(), "content", "docs")
+const CURRENT_DIR = path.dirname(fileURLToPath(import.meta.url))
+const DOCS_DIR = path.resolve(CURRENT_DIR, "../../../content/docs")
 
-async function walkMdxFiles(dir: string): Promise<string[]> {
-    const entries = await readdir(dir, { withFileTypes: true })
-    const mdxFiles = await Promise.all(
-        entries.map(async entry => {
-            const entryPath = path.join(dir, entry.name)
-            if (entry.isDirectory()) {
-                return walkMdxFiles(entryPath)
-            }
-
-            if (entry.isFile() && entry.name.endsWith(".mdx")) {
-                return [entryPath]
-            }
-
-            return []
-        }),
-    )
-
-    return mdxFiles.flat()
+function normalizeSlug(slug: string[]): string[] {
+    return slug.filter(Boolean)
 }
 
-function normalizeSlugs(filePath: string): string[] {
-    const relative = path
-        .relative(DOCS_DIR, filePath)
-        .replace(/\\/g, "/")
-        .replace(/\.mdx$/, "")
-
-    const parts = relative.split("/")
-    if (parts[parts.length - 1] === "index") {
-        return parts.slice(0, -1)
+function hrefToSlug(href: string): string[] {
+    if (href === "/docs") {
+        return []
     }
 
-    return parts
+    if (!href.startsWith("/docs/")) {
+        return []
+    }
+
+    return href.replace("/docs/", "").split("/").filter(Boolean)
+}
+
+function collectSlugs(items: DocsNavItem[]): string[][] {
+    const output: string[][] = []
+
+    for (const item of items) {
+        if (item.href != null) {
+            output.push(hrefToSlug(item.href))
+        }
+
+        if (item.items != null && item.items.length > 0) {
+            output.push(...collectSlugs(item.items))
+        }
+    }
+
+    return output
+}
+
+function getDocPathFromSlug(slug: string[]): string {
+    if (slug.length === 0) {
+        return path.join(DOCS_DIR, "index.mdx")
+    }
+
+    return path.join(DOCS_DIR, ...slug) + ".mdx"
 }
 
 function toHref(slug: string[]): string {
@@ -61,39 +70,25 @@ async function resolveDocPath(slug: string[]): Promise<string | null> {
         return null
     }
 
-    const normalized = slug.filter(Boolean)
-    if (normalized.length === 0) {
-        const indexPath = path.join(DOCS_DIR, "index.mdx")
-        try {
-            await readFile(indexPath, "utf8")
-            return indexPath
-        } catch {
-            return null
-        }
-    }
-
-    const directPath = path.join(DOCS_DIR, ...normalized) + ".mdx"
+    const normalized = normalizeSlug(slug)
+    const docPath = getDocPathFromSlug(normalized)
     try {
-        await readFile(directPath, "utf8")
-        return directPath
+        await readFile(docPath, "utf8")
+        return docPath
     } catch {
-        const nestedIndex = path.join(DOCS_DIR, ...normalized, "index.mdx")
-        try {
-            await readFile(nestedIndex, "utf8")
-            return nestedIndex
-        } catch {
-            return null
-        }
+        return null
     }
 }
 
-const listDocFiles = cache(
-    async (): Promise<string[]> => walkMdxFiles(DOCS_DIR),
-)
-
 export const getAllDocSlugs = cache(async (): Promise<string[][]> => {
-    const files = await listDocFiles()
-    return files.map(normalizeSlugs)
+    const allSlugs = collectSlugs(docsNavigation)
+    const deduped = new Map<string, string[]>()
+
+    for (const slug of allSlugs) {
+        deduped.set(slug.join("/"), slug)
+    }
+
+    return [...deduped.values()]
 })
 
 export const getDocMetaBySlug = cache(
@@ -105,7 +100,7 @@ export const getDocMetaBySlug = cache(
 
         const file = await readFile(docPath, "utf8")
         const parsed = matter(file)
-        const normalizedSlug = normalizeSlugs(docPath)
+        const normalizedSlug = normalizeSlug(slug)
 
         return {
             slug: normalizedSlug,
@@ -123,14 +118,14 @@ export const getDocMetaBySlug = cache(
 )
 
 export async function getDocBySlug(slug: string[]): Promise<DocsPage | null> {
-    const docPath = await resolveDocPath(slug)
+    const normalizedSlug = normalizeSlug(slug)
+    const docPath = await resolveDocPath(normalizedSlug)
     if (!docPath) {
         return null
     }
 
     const file = await readFile(docPath, "utf8")
     const parsed = matter(file)
-    const normalizedSlug = normalizeSlugs(docPath)
     const title =
         typeof parsed.data.title === "string"
             ? parsed.data.title
