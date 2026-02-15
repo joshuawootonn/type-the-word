@@ -94,47 +94,68 @@ export function StudentClientPage({
                     historyType="assignment"
                 />
 
-                {hasMultipleChapters && activeChapter && (
-                    <div className="not-prose border-primary bg-secondary flex items-center justify-between gap-3 border-2 p-4">
-                        <Button
-                            type="button"
-                            onClick={() =>
-                                navigateToChapter(activeChapterIndex - 1)
-                            }
-                            disabled={!canGoToPreviousChapter}
-                        >
-                            Previous Chapter
-                        </Button>
-                        <div className="text-primary text-center text-sm">
-                            <div className="font-semibold">
-                                Chapter {activeChapter.chapter} of{" "}
-                                {chapterSegments.length}
+                <div className="bg-secondary sticky right-0 bottom-0 left-0 -mx-16 flex flex-col gap-4 px-16 py-4 pt-0 pb-8">
+                    <hr className="border-primary my-0" />
+                    {hasMultipleChapters && activeChapter && (
+                        <div className="not-prose flex items-center justify-between gap-3">
+                            {canGoToPreviousChapter ? (
+                                <Button
+                                    type="button"
+                                    onClick={() =>
+                                        navigateToChapter(
+                                            activeChapterIndex - 1,
+                                        )
+                                    }
+                                >
+                                    Chapter{" "}
+                                    {
+                                        chapterSegments[activeChapterIndex - 1]
+                                            ?.chapter
+                                    }
+                                </Button>
+                            ) : (
+                                <div />
+                            )}
+                            <div className="text-primary absolute left-1/2 -translate-x-1/2 text-center text-sm">
+                                <div className="font-semibold">
+                                    Chapter {activeChapter.chapter} of{" "}
+                                    {chapterSegments.length}
+                                </div>
+                                <div className="opacity-75">
+                                    {activeChapter.referenceLabel}
+                                </div>
                             </div>
-                            <div className="opacity-75">
-                                {activeChapter.referenceLabel}
-                            </div>
+                            {canGoToNextChapter ? (
+                                <Button
+                                    type="button"
+                                    onClick={() =>
+                                        navigateToChapter(
+                                            activeChapterIndex + 1,
+                                        )
+                                    }
+                                >
+                                    Chapter{" "}
+                                    {
+                                        chapterSegments[activeChapterIndex + 1]
+                                            ?.chapter
+                                    }
+                                </Button>
+                            ) : (
+                                <div />
+                            )}
                         </div>
-                        <Button
-                            type="button"
-                            onClick={() =>
-                                navigateToChapter(activeChapterIndex + 1)
-                            }
-                            disabled={!canGoToNextChapter}
-                        >
-                            Next Chapter
-                        </Button>
-                    </div>
-                )}
+                    )}
 
-                <StudentAssignmentCompletion
-                    submission={submission}
-                    assignmentHistory={assignmentHistory}
-                    totalVerses={totalVerses}
-                    referenceLabel={referenceLabel}
-                    assignmentTitle={assignmentTitle}
-                    assignmentId={assignmentId}
-                    courseId={courseId}
-                />
+                    <StudentAssignmentCompletion
+                        submission={submission}
+                        assignmentHistory={assignmentHistory}
+                        totalVerses={totalVerses}
+                        referenceLabel={referenceLabel}
+                        assignmentTitle={assignmentTitle}
+                        assignmentId={assignmentId}
+                        courseId={courseId}
+                    />
+                </div>
                 <CopyrightCitation copyright={passage.copyright} />
             </div>
         </div>

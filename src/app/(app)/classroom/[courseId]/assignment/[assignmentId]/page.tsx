@@ -5,6 +5,7 @@ import { getOrCreateTypingSession } from "~/app/api/typing-session/getOrCreateTy
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Link } from "~/components/ui/link"
 import { fetchPassage } from "~/lib/api"
+import { ParsedPassage } from "~/lib/parseEsv"
 import { passageSegmentSchema } from "~/lib/passageSegment"
 import toProperCase from "~/lib/toProperCase"
 import { authOptions } from "~/server/auth"
@@ -74,6 +75,52 @@ function buildPassageSegment(data: {
         : `${data.startChapter}:${data.startVerse}-${data.endVerse}`
 
     return passageSegmentSchema.parse(`${data.book} ${verseSegment}`)
+}
+
+function trimPassageToVerseRange(
+    passage: ParsedPassage,
+    startVerse: number,
+    endVerse: number,
+): ParsedPassage {
+    const trimmedNodes: ParsedPassage["nodes"] = []
+    for (const node of passage.nodes) {
+        if (node.type !== "paragraph") {
+            trimmedNodes.push(node)
+            continue
+        }
+
+        const trimmedVerses = node.nodes.filter(verseNode => {
+            const verseNumber = verseNode.verse.verse
+            return verseNumber >= startVerse && verseNumber <= endVerse
+        })
+
+        if (trimmedVerses.length === 0) {
+            continue
+        }
+
+        trimmedNodes.push({
+            ...node,
+            nodes: trimmedVerses,
+            text: trimmedVerses.map(verseNode => verseNode.text).join(" "),
+        })
+    }
+
+    const allVerses = trimmedNodes.flatMap(node =>
+        node.type === "paragraph" ? node.nodes : [],
+    )
+    const firstVerse =
+        allVerses.find(verseNode => verseNode.metadata.hangingVerse !== true)
+            ?.verse ?? allVerses[0]?.verse
+
+    if (!firstVerse) {
+        return passage
+    }
+
+    return {
+        ...passage,
+        nodes: trimmedNodes,
+        firstVerse,
+    }
 }
 
 export default async function AssignmentDetailPage({
@@ -280,7 +327,7 @@ export default async function AssignmentDetailPage({
     const courses = await listStudentCourses(studentAccessToken)
     const course = courses.find(c => c.id === courseId)
 
-    const [passage, typingSession, assignmentHistory] = await Promise.all([
+    const [rawPassage, typingSession, assignmentHistory] = await Promise.all([
         fetchPassage(
             activeChapterSegment.passageSegment,
             assignment.translation,
@@ -288,6 +335,11 @@ export default async function AssignmentDetailPage({
         getOrCreateTypingSession(session.user.id, assignmentId),
         getAssignmentHistory(session.user.id, assignmentId),
     ])
+    const passage = trimPassageToVerseRange(
+        rawPassage,
+        activeChapterSegment.startVerse,
+        activeChapterSegment.endVerse,
+    )
 
     return (
         <StudentClientPage
