@@ -1,7 +1,12 @@
----
-title: Connect Your Student Account
-description: Link your student Google account so you can access and submit classroom assignments.
----
+import { DocsPage } from "~/components/docs/docs-page"
+
+export const metadata = {
+    title: "Connect Your Student Account",
+    description:
+        "Link your student Google account so you can access and submit classroom assignments.",
+}
+
+<DocsPage title={metadata.title} description={metadata.description} toc={toc}>
 
 ## Overview
 
@@ -92,3 +97,5 @@ After redirect back to [`/classroom`](/classroom), confirm:
 - `gc-student-connected-state.png`
 - `gc-student-dashboard-courses.png`
 - `gc-student-disconnect.png`
+
+</DocsPage>

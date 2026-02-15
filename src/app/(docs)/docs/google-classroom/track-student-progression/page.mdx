@@ -1,7 +1,12 @@
----
-title: Track Student Progression
-description: Monitor assignment completion, speed, and accuracy from teacher course and assignment views.
----
+import { DocsPage } from "~/components/docs/docs-page"
+
+export const metadata = {
+    title: "Track Student Progression",
+    description:
+        "Monitor assignment completion, speed, and accuracy from teacher course and assignment views.",
+}
+
+<DocsPage title={metadata.title} description={metadata.description} toc={toc}>
 
 ## Overview
 
@@ -97,3 +102,5 @@ If students cannot access an assignment, verify it is **Published** (not Draft).
 - `gc-track-assignment-student-metrics.png`
 - `gc-track-identify-at-risk-students.png`
 - `gc-track-publish-from-detail.png`
+
+</DocsPage>
