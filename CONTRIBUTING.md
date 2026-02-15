@@ -34,8 +34,41 @@ Reach out via email (josh@typetheword.site) or on [discord](https://discord.com/
 
 2. Install docker + container runtime + pnpm
 
+3. Install `just` (command runner used by this repo)
+
+```bash
+# macOS
+brew install just
+
+# Linux
+cargo install just
+
+# Windows
+winget install Casey.Just
+```
+
+Verify install:
+
+```bash
+just --version
+```
+
 Here is a how I startup the app
 
 ```bash
 kill $(lsof -t -i:1199) || true && colima start --cpu 10 --memory 8 --disk 10 && docker compose --project-directory ./docker up -d && pnpm dev -p 1199
+```
+
+## Git hooks
+
+After cloning, run the init command to install the repo's tracked `pre-push` hook:
+
+```bash
+just init
+```
+
+You can list all available project commands with:
+
+```bash
+just --list
 ```

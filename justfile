@@ -2,6 +2,10 @@
 default:
     @just --list
 
+# Initialize local git hooks and developer setup helpers
+init:
+    bash ./scripts/init.sh
+
 # Start the database containers
 db-up:
     docker compose --project-directory ./docker up -d
