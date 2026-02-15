@@ -21,20 +21,59 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     return <PHProvider client={posthog}>{children}</PHProvider>
 }
 
-export function PostHogIdentify() {
+function getClassroomRole({
+    hasClassroomTeacherAccess,
+    hasClassroomStudentAccess,
+}: {
+    hasClassroomTeacherAccess: boolean
+    hasClassroomStudentAccess: boolean
+}) {
+    if (hasClassroomTeacherAccess && hasClassroomStudentAccess) {
+        return "teacher_and_student"
+    }
+    if (hasClassroomTeacherAccess) {
+        return "teacher"
+    }
+    if (hasClassroomStudentAccess) {
+        return "student"
+    }
+
+    return "none"
+}
+
+export function PostHogIdentify({
+    hasClassroomTeacherAccess,
+    hasClassroomStudentAccess,
+}: {
+    hasClassroomTeacherAccess: boolean
+    hasClassroomStudentAccess: boolean
+}) {
     const { data: session, status } = useSession()
     const posthog = usePostHog()
 
     useEffect(() => {
         if (status === "authenticated" && session?.user) {
+            const classroomRole = getClassroomRole({
+                hasClassroomTeacherAccess,
+                hasClassroomStudentAccess,
+            })
             posthog.identify(session.user.id, {
                 email: session.user.email,
                 name: session.user.name,
+                has_classroom_teacher_access: hasClassroomTeacherAccess,
+                has_classroom_student_access: hasClassroomStudentAccess,
+                classroom_role: classroomRole,
             })
         } else if (status === "unauthenticated") {
             posthog.reset()
         }
-    }, [session, status, posthog])
+    }, [
+        hasClassroomStudentAccess,
+        hasClassroomTeacherAccess,
+        session,
+        status,
+        posthog,
+    ])
 
     return null
 }

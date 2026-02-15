@@ -8,6 +8,20 @@ type VerseCompletedProperties = {
     chapter: number
     verse: number
     translation: string
+    assignmentId?: string
+}
+
+type AssignmentOpenedProperties = {
+    assignmentId: string
+    courseId: string
+    totalVerses: number
+}
+
+type AssignmentCompletedProperties = {
+    assignmentId: string
+    courseId: string
+    totalVerses: number
+    completedVerses: number
 }
 
 type ThemeCreatedProperties = {
@@ -35,6 +49,20 @@ export function useAnalytics() {
         [posthog],
     )
 
+    const trackAssignmentOpened = useCallback(
+        (properties: AssignmentOpenedProperties) => {
+            posthog.capture("assignment_opened", properties)
+        },
+        [posthog],
+    )
+
+    const trackAssignmentCompleted = useCallback(
+        (properties: AssignmentCompletedProperties) => {
+            posthog.capture("assignment_completed", properties)
+        },
+        [posthog],
+    )
+
     const trackThemeDeleted = useCallback(
         (properties: ThemeDeletedProperties) => {
             posthog.capture("theme_deleted", properties)
@@ -48,6 +76,8 @@ export function useAnalytics() {
 
     return {
         trackVerseCompleted,
+        trackAssignmentOpened,
+        trackAssignmentCompleted,
         trackThemeCreated,
         trackThemeDeleted,
         trackChangelogViewed,

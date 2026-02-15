@@ -372,6 +372,7 @@ export function CurrentVerse({
                 chapter: verse.verse.chapter,
                 verse: verse.verse.verse,
                 translation: verse.verse.translation,
+                assignmentId: classroomAssignmentId,
             })
             if (typingSession?.id != null && sessionData?.user?.id != null) {
                 void addTypedVerseToSession.mutateAsync({
