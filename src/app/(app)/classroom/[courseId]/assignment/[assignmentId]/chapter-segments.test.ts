@@ -7,7 +7,12 @@ import {
 
 const mockMetadata = {
     genesis: {
-        chapters: [{ length: 31 }, { length: 25 }, { length: 24 }, { length: 26 }],
+        chapters: [
+            { length: 31 },
+            { length: 25 },
+            { length: 24 },
+            { length: 26 },
+        ],
     },
 }
 

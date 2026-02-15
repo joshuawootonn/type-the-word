@@ -84,6 +84,10 @@ lint:
 lint-check:
     pnpm lint-check
 
+# Run full local preflight checks
+pre-flight: format lint type-check test
+    @echo "✅ Pre-flight checks passed"
+
 # Full setup: start db and run migrations
 setup: db-up migrate
     @echo "✅ Database is up and migrations are complete"

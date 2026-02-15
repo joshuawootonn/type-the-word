@@ -51,7 +51,10 @@ export function buildAssignmentChapterSegments(data: {
 
     const chapterCount = bookMetadata.chapters.length
     const rangeStart = Math.max(1, Math.min(data.startChapter, chapterCount))
-    const rangeEnd = Math.max(rangeStart, Math.min(data.endChapter, chapterCount))
+    const rangeEnd = Math.max(
+        rangeStart,
+        Math.min(data.endChapter, chapterCount),
+    )
     const segments: AssignmentChapterSegment[] = []
 
     for (let chapter = rangeStart; chapter <= rangeEnd; chapter += 1) {
@@ -63,13 +66,18 @@ export function buildAssignmentChapterSegments(data: {
         const desiredStart = chapter === rangeStart ? data.startVerse : 1
         const desiredEnd = chapter === rangeEnd ? data.endVerse : chapterLength
         const startVerse = Math.max(1, Math.min(desiredStart, chapterLength))
-        const endVerse = Math.max(startVerse, Math.min(desiredEnd, chapterLength))
+        const endVerse = Math.max(
+            startVerse,
+            Math.min(desiredEnd, chapterLength),
+        )
 
         segments.push({
             chapter,
             startVerse,
             endVerse,
-            passageSegment: passageSegmentSchema.parse(`${data.book} ${chapter}`),
+            passageSegment: passageSegmentSchema.parse(
+                `${data.book} ${chapter}`,
+            ),
             referenceLabel: buildReferenceLabel({
                 book: data.book,
                 chapter,
@@ -108,7 +116,8 @@ export function getActiveChapterIndex(
 
     const parsedChapter = Number.parseInt(chapterParam ?? "", 10)
     const firstChapter = chapterSegments[0]?.chapter ?? 1
-    const lastChapter = chapterSegments[chapterSegments.length - 1]?.chapter ?? 1
+    const lastChapter =
+        chapterSegments[chapterSegments.length - 1]?.chapter ?? 1
     const clampedChapter = Number.isNaN(parsedChapter)
         ? firstChapter
         : Math.min(Math.max(parsedChapter, firstChapter), lastChapter)
