@@ -35,7 +35,7 @@ function isInTheFuture(date: Date) {
 
 export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
     return (
-        <div className="mb-24">
+        <div className="mb-24" data-testid="history-log-root">
             <Tooltip.Provider delayDuration={0}>
                 {monthLogs.map((monthLog, i) => {
                     const month = new Date(monthLog.year, monthLog.month)
@@ -66,7 +66,9 @@ export function HistoryLogV2({ monthLogs }: { monthLogs: MonthlyLogDTO[] }) {
                                           ? format(month, "MMMM")
                                           : format(month, "MMMM, yyyy")}
                                 </h3>
-                                <p>Verses: {monthLog.numberOfVersesTyped}</p>
+                                <p data-testid="history-month-total-verses">
+                                    Verses: {monthLog.numberOfVersesTyped}
+                                </p>
                             </div>
                             <div className="relative mb-2 flex w-full flex-col gap-2 md:w-auto">
                                 {daysGroupedByWeek.map((weekOfDays, j) => {

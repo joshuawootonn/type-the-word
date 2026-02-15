@@ -174,6 +174,7 @@ export default function SignUpPage() {
                                         name="firstName"
                                         type="text"
                                         id="firstName"
+                                        data-testid="signup-first-name"
                                         innerRef={firstNameRef}
                                         className="border-primary bg-secondary text-primary placeholder:text-primary/50 w-full rounded-none border-2 px-3 py-1.5 font-medium outline-hidden"
                                         placeholder="Enter your first name..."
@@ -200,6 +201,7 @@ export default function SignUpPage() {
                                         name="email"
                                         type="email"
                                         id="email"
+                                        data-testid="signup-email"
                                         innerRef={emailRef}
                                         className="border-primary bg-secondary text-primary placeholder:text-primary/50 w-full rounded-none border-2 px-3 py-1.5 font-medium outline-hidden"
                                         placeholder="Enter your email..."
@@ -226,6 +228,7 @@ export default function SignUpPage() {
                                         name="password"
                                         type="password"
                                         id="password"
+                                        data-testid="signup-password"
                                         innerRef={passwordRef}
                                         className="border-primary bg-secondary text-primary placeholder:text-primary/50 w-full rounded-none border-2 px-3 py-1.5 font-medium outline-hidden"
                                         placeholder="Create a password..."
@@ -252,6 +255,7 @@ export default function SignUpPage() {
                                         name="confirmPassword"
                                         type="password"
                                         id="confirmPassword"
+                                        data-testid="signup-confirm-password"
                                         innerRef={confirmPasswordRef}
                                         className="border-primary bg-secondary text-primary placeholder:text-primary/50 w-full rounded-none border-2 px-3 py-1.5 font-medium outline-hidden"
                                         placeholder="Confirm your password..."
@@ -269,6 +273,7 @@ export default function SignUpPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
+                                data-testid="signup-submit"
                                 className="svg-outline border-primary bg-primary text-secondary relative w-full cursor-pointer border-2 px-3 py-1 font-semibold disabled:cursor-not-allowed"
                             >
                                 {isLoading ? (

@@ -87,6 +87,8 @@ export function TypedVerseLines({
                 return (
                     <svg
                         key={index}
+                        data-testid="typed-verse-line"
+                        data-line-height={height}
                         className="pointer-events-none absolute right-full -left-3 z-0 w-4 rounded-none transition-[height] duration-200 ease-in-out md:-left-6"
                         style={{
                             height,

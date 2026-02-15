@@ -60,6 +60,14 @@ test:
 test-watch:
     export $(xargs <.env.test) && pnpm test-watch 
 
+# Run end-to-end tests
+test-e2e:
+    export $(xargs <.env.test) && pnpm run test:e2e
+
+# Run end-to-end tests with Playwright UI
+test-e2e-ui:
+    export $(xargs <.env.test) && pnpm run test:e2e:ui
+
 # Build the project
 build:
     pnpm build

@@ -20,11 +20,13 @@ function TabLink({
     href,
     isActive,
     onClick,
+    testId,
     children,
 }: {
     href: string
     isActive: boolean
     onClick: () => void
+    testId?: string
     children: React.ReactNode
 }) {
     return (
@@ -32,6 +34,7 @@ function TabLink({
             href={href}
             prefetch
             onClick={onClick}
+            data-testid={testId}
             className={clsx(
                 "flex cursor-pointer",
                 "svg-outline relative no-underline outline-hidden",
@@ -74,6 +77,7 @@ export function HistoryTabsNav({ showWpmChart }: { showWpmChart: boolean }) {
                 href={`/history/log${translationParam}`}
                 isActive={activeTab === "log"}
                 onClick={() => setActiveTab("log")}
+                testId="history-tab-log"
             >
                 Log
             </TabLink>
