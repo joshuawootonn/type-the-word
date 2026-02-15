@@ -1220,7 +1220,7 @@ function getPunctuationOnlyWords(paragraphs: Paragraph[]): string[] {
                         // standalone punctuation like semicolons/colons/commas/periods/question/exclamation
                         // These are needed for proper rendering of quoted/parenthetical text
                         const hasAllowedPunct =
-                            /[\u0022\u0027\u201C\u201D\u2018\u2019()[\];:,.?!]/.test(
+                            /[\u0022\u0027\u201C\u201D\u2018\u2019()[\];:,.?!\u2013\u2014]/.test(
                                 word,
                             )
                         if (!hasAllowedPunct) {
@@ -2998,5 +2998,59 @@ describe("Revelation 7:5-8 NASB - lim class paragraphs", () => {
 
             expect(words.length).toBeGreaterThan(5)
         }
+    })
+})
+
+// ============================================================================
+// CSB EM DASH REGRESSIONS
+// ============================================================================
+// Known issue: some CSB fixtures include "#" markers around em dashes.
+// We track this with test.fails so CI stays green until parser normalization lands.
+describe("CSB em dash formatting regressions", () => {
+    const csbJames1Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            "src/server/api-bible/responses/csb/james_1.html",
+        ),
+        "utf8",
+    )
+    const csbLeviticus16Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            "src/server/api-bible/responses/csb/leviticus_16.html",
+        ),
+        "utf8",
+    )
+
+    function getVerseText(
+        result: Awaited<ReturnType<typeof parseApiBibleChapter>>,
+        verseNumber: number,
+    ): string {
+        const paragraphs = result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+        return paragraphs
+            .flatMap(p => p.nodes.filter(v => v.verse.verse === verseNumber))
+            .map(v => v.text)
+            .join(" ")
+    }
+
+    test.concurrent("James 1:5 should preserve em dashes and remove hash placeholders", async () => {
+        const result = await cachedParseApiBibleChapter(csbJames1Html, "csb")
+        const verse5Text = getVerseText(result, 5)
+
+        expect(verse5Text).toContain("—")
+        expect(verse5Text).not.toContain("#")
+    })
+
+    test.concurrent("Leviticus 16:21 should preserve em dashes and remove hash placeholders", async () => {
+        const result = await cachedParseApiBibleChapter(
+            csbLeviticus16Html,
+            "csb",
+        )
+        const verse21Text = getVerseText(result, 21)
+
+        expect(verse21Text).toContain("—")
+        expect(verse21Text).not.toContain("#")
     })
 })
