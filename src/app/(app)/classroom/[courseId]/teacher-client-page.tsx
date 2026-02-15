@@ -4,13 +4,13 @@ import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query"
 import NextLink from "next/link"
 import { useCallback, useMemo, useState } from "react"
 
+import { type Assignment } from "~/app/api/classroom/schemas"
 import { AssignmentStatusBadge } from "~/components/assignment-status-badge"
 import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
 import { Link } from "~/components/ui/link"
 import toProperCase from "~/lib/toProperCase"
 
-import { type Assignment } from "../../api/classroom/schemas"
 import { fetchAssignments, publishAssignment } from "./actions"
 
 interface TeacherClientPageProps {

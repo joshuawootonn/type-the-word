@@ -10,6 +10,7 @@ import { useSession } from "next-auth/react"
 import React, { FormEvent, KeyboardEvent, useEffect, useRef } from "react"
 import { z } from "zod"
 
+import { calculateStatsForVerse } from "~/app/(app)/history/wpm"
 import {
     AssignmentHistory,
     VerseStats,
@@ -17,7 +18,6 @@ import {
 import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
 import { AddTypedVerseBody } from "~/app/api/typing-session/[id]/route"
 import { getOS } from "~/app/global-hotkeys"
-import { calculateStatsForVerse } from "~/app/history/wpm"
 import {
     passageIdAtom,
     autofocusAtom,

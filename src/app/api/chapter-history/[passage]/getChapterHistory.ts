@@ -1,4 +1,4 @@
-import { typingSessionToString } from "~/app/history/typingSessionToString"
+import { typingSessionToString } from "~/app/(app)/history/typingSessionToString"
 import { Translation } from "~/lib/parseEsv"
 import { PassageObject } from "~/lib/passageObject"
 import { getBibleMetadata } from "~/server/bibleMetadata"

@@ -4,9 +4,6 @@ import { Metadata } from "next"
 import { getServerSession } from "next-auth"
 import { cookies } from "next/headers"
 
-import { Footer } from "~/components/footer"
-import { Navigation } from "~/components/navigation/navigation"
-import { getLastTranslation } from "~/lib/last-translation"
 import { authOptions } from "~/server/auth"
 import { db } from "~/server/db"
 import { BuiltinThemeRepository } from "~/server/repositories/builtinTheme.repository"
@@ -14,8 +11,6 @@ import {
     CurrentTheme,
     CurrentThemeRepository,
 } from "~/server/repositories/currentTheme.repository"
-import { TypedVerseRepository } from "~/server/repositories/typedVerse.repository"
-import { TypedVerse } from "~/server/repositories/typingSession.repository"
 import {
     UserThemeRecord,
     UserThemeRepository,
@@ -40,21 +35,13 @@ export default async function RootLayout({
 }) {
     const session = await getServerSession(authOptions)
 
-    let lastTypedVerse: TypedVerse | null = null
     let currentTheme: CurrentTheme | null = null
     let userThemes: UserThemeRecord[] = []
 
     const builtinThemeRepository = new BuiltinThemeRepository(db)
     const builtinThemes = await builtinThemeRepository.getMany()
 
-    // Get last translation for server-side rendering
-    const lastTranslation = await getLastTranslation()
-
     if (session != null) {
-        const typedVerseRepository = new TypedVerseRepository(db)
-        lastTypedVerse = await typedVerseRepository.getOneOrNull({
-            userId: session.user.id,
-        })
         const userThemeRepository = new UserThemeRepository(db)
         userThemes = await userThemeRepository.getMany({
             userId: session.user.id,
@@ -87,29 +74,19 @@ export default async function RootLayout({
                 />
             </head>
             <body className={clsx("min-h-screen-1px flex w-full font-sans")}>
-                <div className="max-w-page container mx-auto flex flex-col px-4 lg:px-0">
-                    <Providers
-                        currentTheme={currentTheme}
-                        userThemes={userThemes}
-                        builtinThemes={builtinThemes}
-                        session={session}
-                        hasClassroomTeacherAccess={hasClassroomTeacherAccess}
-                        hasClassroomStudentAccess={hasClassroomStudentAccess}
-                    >
-                        <Navigation
-                            lastTypedVerse={lastTypedVerse}
-                            userThemes={userThemes}
-                            builtinThemes={builtinThemes}
-                            lastTranslation={lastTranslation}
-                            hasClassroomAccess={hasClassroomTeacherAccess}
-                        />
-                        {children}
-                        <Footer />
-                    </Providers>
-                    <Fathom />
-                    <Analytics />
-                    <GlobalHotkeys />
-                </div>
+                <Providers
+                    currentTheme={currentTheme}
+                    userThemes={userThemes}
+                    builtinThemes={builtinThemes}
+                    session={session}
+                    hasClassroomTeacherAccess={hasClassroomTeacherAccess}
+                    hasClassroomStudentAccess={hasClassroomStudentAccess}
+                >
+                    {children}
+                </Providers>
+                <Fathom />
+                <Analytics />
+                <GlobalHotkeys />
             </body>
         </html>
     )

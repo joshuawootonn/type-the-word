@@ -4,10 +4,10 @@ import NextLink from "next/link"
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 
+import { type Course } from "~/app/api/classroom/schemas"
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Loading } from "~/components/loading"
 
-import { type Course } from "../../api/classroom/schemas"
 import { fetchCourses } from "./actions"
 
 export function ClientPage() {
