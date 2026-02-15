@@ -1,9 +1,12 @@
 "use client"
 
+import { useEffect } from "react"
+
 import { AssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
 import { CopyrightCitation } from "~/components/copyright-citation"
 import { Passage } from "~/components/passage"
 import { Link } from "~/components/ui/link"
+import { useAnalytics } from "~/lib/hooks/useAnalytics"
 import { ParsedPassage, Translation } from "~/lib/parseEsv"
 import { TypingSession } from "~/server/repositories/typingSession.repository"
 
@@ -40,6 +43,16 @@ export function StudentClientPage({
     courseId,
     courseName,
 }: StudentClientPageProps) {
+    const { trackAssignmentOpened } = useAnalytics()
+
+    useEffect(() => {
+        trackAssignmentOpened({
+            assignmentId,
+            courseId,
+            totalVerses,
+        })
+    }, [assignmentId, courseId, totalVerses, trackAssignmentOpened])
+
     return (
         <div>
             {/* Breadcrumbs */}
@@ -73,6 +86,7 @@ export function StudentClientPage({
                     referenceLabel={referenceLabel}
                     assignmentTitle={assignmentTitle}
                     assignmentId={assignmentId}
+                    courseId={courseId}
                 />
                 <CopyrightCitation copyright={passage.copyright} />
             </div>

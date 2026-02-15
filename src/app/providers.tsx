@@ -23,12 +23,16 @@ export function Providers({
     builtinThemes,
     userThemes,
     currentTheme,
+    hasClassroomTeacherAccess,
+    hasClassroomStudentAccess,
 }: {
     children: ReactNode
     session: Session | null
     builtinThemes: BuiltinThemeRecord[]
     userThemes: UserThemeRecord[]
     currentTheme: CurrentTheme | null
+    hasClassroomTeacherAccess: boolean
+    hasClassroomStudentAccess: boolean
 }) {
     useTimezoneOffsetCookie()
     useSoliDeoGloria()
@@ -37,7 +41,10 @@ export function Providers({
         <PostHogProvider>
             <QueryClientProvider client={queryClient}>
                 <SessionProvider session={session}>
-                    <PostHogIdentify />
+                    <PostHogIdentify
+                        hasClassroomTeacherAccess={hasClassroomTeacherAccess}
+                        hasClassroomStudentAccess={hasClassroomStudentAccess}
+                    />
                     <ThemeProvider
                         session={session}
                         builtinThemes={builtinThemes}

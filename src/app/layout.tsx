@@ -69,7 +69,8 @@ export default async function RootLayout({
     // Check if user has teacher Classroom token (via cookies)
     // Only teachers should see the dashboard navigation link
     const cookieStore = await cookies()
-    const hasClassroomAccess = cookieStore.has("classroomTeacher")
+    const hasClassroomTeacherAccess = cookieStore.has("classroomTeacher")
+    const hasClassroomStudentAccess = cookieStore.has("classroomStudent")
 
     // added suppressHydrationWarning since `ThemeScript` adds classes to `html` onload
     return (
@@ -92,13 +93,15 @@ export default async function RootLayout({
                         userThemes={userThemes}
                         builtinThemes={builtinThemes}
                         session={session}
+                        hasClassroomTeacherAccess={hasClassroomTeacherAccess}
+                        hasClassroomStudentAccess={hasClassroomStudentAccess}
                     >
                         <Navigation
                             lastTypedVerse={lastTypedVerse}
                             userThemes={userThemes}
                             builtinThemes={builtinThemes}
                             lastTranslation={lastTranslation}
-                            hasClassroomAccess={hasClassroomAccess}
+                            hasClassroomAccess={hasClassroomTeacherAccess}
                         />
                         {children}
                         <Footer />
