@@ -36,9 +36,13 @@ type BibleMetadata = Record<string, BookMetadata>
 
 interface ClientPageProps {
     initialCourseId?: string
+    initialTranslation?: Translation
 }
 
-export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
+export function ClientPage({
+    initialCourseId,
+    initialTranslation,
+}: ClientPageProps = {}) {
     const router = useRouter()
     const { trackAssignmentCreated } = useAnalytics()
     const [courses, setCourses] = useState<Course[]>([])
@@ -51,7 +55,9 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
     const [selectedCourse, setSelectedCourse] = useState(initialCourseId || "")
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
-    const [translation, setTranslation] = useState<Translation>("esv")
+    const [translation, setTranslation] = useState<Translation>(
+        initialTranslation ?? "esv",
+    )
     const [book, setBook] = useState("genesis")
     const [startChapter, setStartChapter] = useState(1)
     const [startVerse, setStartVerse] = useState(1)
@@ -141,6 +147,14 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
 
         setTitle(`${bookName} ${reference}`)
     }, [book, startChapter, startVerse, endChapter, endVerse])
+
+    async function updateTranslationCookie(nextTranslation: Translation) {
+        await fetch("/api/set-translation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ translation: nextTranslation }),
+        })
+    }
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -292,9 +306,14 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                     </Label>
                                     <Select
                                         value={translation}
-                                        onValueChange={val =>
-                                            setTranslation(val as Translation)
-                                        }
+                                        onValueChange={val => {
+                                            const nextTranslation =
+                                                val as Translation
+                                            setTranslation(nextTranslation)
+                                            void updateTranslationCookie(
+                                                nextTranslation,
+                                            )
+                                        }}
                                     >
                                         <SelectTrigger className="w-full">
                                             <SelectValue />
