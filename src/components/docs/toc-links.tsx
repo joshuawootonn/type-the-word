@@ -89,7 +89,7 @@ export function TocLinks({ toc }: TocLinksProps) {
         }
     }, [toc])
 
-    if (toc.length === 0) {
+    if (toc.length < 2) {
         return null
     }
 
