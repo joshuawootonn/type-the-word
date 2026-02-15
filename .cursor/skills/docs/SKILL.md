@@ -50,21 +50,24 @@ Use this format:
 
 ```md
 ## Docs Impact Summary
+
 - Verdict: <none|low|medium|high>
 - Reason: <1-2 sentences>
 
 ## Suggested Documentation Updates
+
 1. `<path/to/doc-file>`
-   - Why: <reason tied to code change>
-   - Suggested update:
-     - <bullet or short patch snippet>
+    - Why: <reason tied to code change>
+    - Suggested update:
+        - <bullet or short patch snippet>
 
 2. `<path/to/doc-file>`
-   - Why: <reason>
-   - Suggested update:
-     - <bullet or short patch snippet>
+    - Why: <reason>
+    - Suggested update:
+        - <bullet or short patch snippet>
 
 ## Confidence / Gaps
+
 - <any assumptions, unknowns, or follow-up checks>
 ```
 
