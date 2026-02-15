@@ -109,9 +109,7 @@ export function TocLinks({ toc }: TocLinksProps) {
                         ) : null}
                         <a
                             href={`#${item.id}`}
-                            className={`svg-outline-sm relative block no-underline hover:underline ${
-                                activeId === item.id ? "font-semibold" : ""
-                            }`}
+                            className={`svg-outline-sm relative block no-underline hover:underline`}
                         >
                             {item.text}
                         </a>
