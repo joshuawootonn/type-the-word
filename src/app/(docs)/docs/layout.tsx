@@ -1,9 +1,9 @@
 import type { ReactElement, ReactNode } from "react"
 
+import { BackToMainLink } from "~/components/docs/back-to-main-link"
 import { DocsLogo } from "~/components/docs/docs-logo"
 import { DocsNavLinks } from "~/components/docs/docs-nav-links"
 import { MobileSidebarDialog } from "~/components/docs/mobile-sidebar-dialog"
-import { Link } from "~/components/ui/link"
 import { docsNavigation } from "~/lib/docs/navigation"
 
 export default function DocsRouteLayout({
@@ -21,8 +21,8 @@ export default function DocsRouteLayout({
                     <div className="min-h-0 flex-1 overflow-y-auto p-4">
                         <DocsNavLinks items={docsNavigation} />
                     </div>
-                    <div className="border-primary p-4">
-                        <Link href="/">Back to main site</Link>
+                    <div className="p-4">
+                        <BackToMainLink />
                     </div>
                 </aside>
 
