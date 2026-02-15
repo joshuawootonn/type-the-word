@@ -2,6 +2,10 @@ import type { MDXComponents } from "mdx/types"
 import type { ComponentPropsWithoutRef, ReactElement } from "react"
 
 import { LinkSimple } from "@phosphor-icons/react/dist/ssr"
+import { Backpack } from "@phosphor-icons/react/dist/ssr"
+
+import { DocsImage } from "~/components/docs/docs-image"
+import { DocsLinkCard, DocsLinkGrid } from "~/components/docs/docs-link-card"
 
 type HeadingTwoProps = ComponentPropsWithoutRef<"h2">
 type HeadingThreeProps = ComponentPropsWithoutRef<"h3">
@@ -78,4 +82,15 @@ export const docsMdxComponents: MDXComponents = {
     },
     h2: DocsHeadingTwo,
     h3: DocsHeadingThree,
+    DocsLinkCard,
+    DocsLinkGrid,
+    img: props => {
+        const src = props.src
+        if (typeof src !== "string") {
+            return null
+        }
+
+        return <DocsImage {...props} src={src} alt={props.alt ?? ""} />
+    },
+    Backpack,
 }

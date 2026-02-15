@@ -7,27 +7,27 @@ export const docsNavigation: DocsNavItem[] = [
     },
     {
         title: "Google Classroom",
-        href: "/docs/guides/google-classroom",
+        href: "/docs/google-classroom",
         icon: "backpack",
         items: [
             {
                 title: "Enable Google Workspace",
-                href: "/docs/guides/google-classroom/enable-google-workspace",
+                href: "/docs/google-classroom/enable-google-workspace",
             },
             {
                 title: "Teachers",
                 items: [
                     {
                         title: "Connect Teacher Account",
-                        href: "/docs/guides/google-classroom/connect-teacher-account",
+                        href: "/docs/google-classroom/connect-teacher-account",
                     },
                     {
                         title: "Create Assignment",
-                        href: "/docs/guides/google-classroom/create-assignment",
+                        href: "/docs/google-classroom/create-assignment",
                     },
                     {
                         title: "Track Student Progression",
-                        href: "/docs/guides/google-classroom/track-student-progression",
+                        href: "/docs/google-classroom/track-student-progression",
                     },
                 ],
             },
@@ -36,11 +36,11 @@ export const docsNavigation: DocsNavItem[] = [
                 items: [
                     {
                         title: "Connect Student Account",
-                        href: "/docs/guides/google-classroom/connect-student-account",
+                        href: "/docs/google-classroom/connect-student-account",
                     },
                     {
                         title: "Complete Assignments",
-                        href: "/docs/guides/google-classroom/complete-assignments",
+                        href: "/docs/google-classroom/complete-assignments",
                     },
                 ],
             },

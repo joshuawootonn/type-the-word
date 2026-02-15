@@ -1,0 +1,122 @@
+---
+title: Enable Google Classroom in Google Workspace
+description: Allow Type the Word in Google Workspace so teachers and students can sign in with Google and use Classroom features.
+---
+
+## Overview
+
+This guide walks through granting app access in the Google Admin Console for Type the Word.
+
+You will configure app access for:
+
+- Google sign-in scopes
+- Google Classroom scopes
+
+Type the Word currently appears as two web app entries in the app list, and you should configure both.
+
+## Why there are two Type the Word app entries
+
+When you search for Type the Word in Google Admin, you may see two entries:
+
+1. **Official Type the Word OAuth app**  
+   This is used for the main Type the Word sign-in flow and generally only needs basic identity data (such as email and first name). In some Workspace environments, enabling this entry is not strictly required, but we recommend explicitly enabling it for consistency.
+
+2. **Type the Word Google Classroom integration app**  
+   This is the app entry that allows Type the Word to access Google Classroom data for the user's Google account.
+
+For the smoothest setup, configure and enable both entries.
+
+## Prerequisites
+
+You need:
+
+- Google Workspace admin access
+- The ability to open **Security > Access and data control > API controls**
+
+## Step 1: Open the Google Admin Console
+
+1. Go to [admin.google.com](https://admin.google.com).
+2. Confirm you are signed in with an admin account.
+3. In the left nav, open **Security**.
+
+![Google Admin home with Security and API controls available](/assets/docs/google-classroom/enable-google-workspace/step-1-admin-home.png)
+
+The left nav path you want is visible in this area of the console.
+
+## Step 2: Open API controls
+
+1. In **Security**, open **Access and data control**.
+2. Click **API controls**.
+3. Click **MANAGE APP ACCESS**.
+
+![API controls page with Manage app access highlighted](/assets/docs/google-classroom/enable-google-workspace/step-2-api-controls.png)
+
+This takes you to the app access control center.
+
+## Step 3: Start configuring a new app
+
+1. On **App Access Control**, click **Configure new app**.
+2. Stay on the default **App** step in the wizard.
+
+![Manage app access page with Configure new app button](/assets/docs/google-classroom/enable-google-workspace/step-3-manage-app-access.png)
+
+## Step 4: Search and select Type the Word
+
+1. Search for `type the word`.
+2. Select one of the **Type The Word** web app entries.
+3. Click **Continue**.
+
+![Configure new app search results for Type the Word](/assets/docs/google-classroom/enable-google-workspace/step-4-search-app.png)
+
+If you see two Type the Word entries, configure one now and return later for the second.
+
+## Step 5: Choose scope target
+
+1. In the **Scope** step, choose **All in Type the Word (all users)** (or the equivalent all-users option for your org).
+2. Click **Continue**.
+
+![Scope step with all users selected](/assets/docs/google-classroom/enable-google-workspace/step-5-scope-all-users.png)
+
+## Step 6: Allow required Google data access
+
+1. On **Access to Google Data**, choose:
+    - **Specific Google data** with the listed Classroom + Sign in scopes, **or**
+    - **Trusted** (if your admin/security policy allows and you prefer broad trust)
+2. Click **Continue**.
+
+![Access to Google Data step with Specific Google data selected](/assets/docs/google-classroom/enable-google-workspace/step-6-access-to-google-data.png)
+
+This is the step that controls Classroom permission access behavior for your users.
+
+## Step 7: Review and finish
+
+1. Review app, scope, and data settings.
+2. Click **Finish**.
+
+![Review step before finishing app access configuration](/assets/docs/google-classroom/enable-google-workspace/step-7-review-and-finish.png)
+
+## Step 8: Repeat for the second Type the Word app entry
+
+1. Return to **Configure new app**.
+2. Search `type the word` again.
+3. Select the second Type the Word web entry.
+4. Repeat Steps 5-7.
+
+![Configure the second Type the Word app entry](/assets/docs/google-classroom/enable-google-workspace/step-8-repeat-for-second-app.png)
+
+## Verify in Type the Word
+
+After both app entries are configured:
+
+1. Go to [`/classroom`](/classroom) in Type the Word.
+2. Test **Connect as Teacher**.
+3. Test **Connect as Student**.
+
+Both flows should complete without access-denied errors.
+
+## Troubleshooting
+
+- **Only one app configured:** Make sure both Type the Word entries are configured.
+- **Access denied on connect:** Re-check Access to Google Data choice and scope settings.
+- **Teachers work but students fail (or vice versa):** One of the app entries likely has mismatched access settings.
+- **Policy blocks app access:** Check org-level security restrictions and required approval workflows.
