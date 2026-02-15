@@ -5,10 +5,13 @@ export class PassageBehavior {
 
     async openPsalm23() {
         await this.page.goto("/passage/psalm_23?translation=nlt")
-        await expect(this.page.getByTestId("passage-root").first()).toBeVisible()
+        await expect(
+            this.page.getByTestId("passage-root").first(),
+        ).toBeVisible()
         await expect
             .poll(async () => {
-                const response = await this.page.request.get("/api/auth/session")
+                const response =
+                    await this.page.request.get("/api/auth/session")
                 const data = (await response.json()) as {
                     user?: { email?: string }
                 }
@@ -18,7 +21,9 @@ export class PassageBehavior {
     }
 
     async typeVerse(verseNumber: number, text: string) {
-        const focusButton = this.page.getByTestId(`focus-verse-button-${verseNumber}`)
+        const focusButton = this.page.getByTestId(
+            `focus-verse-button-${verseNumber}`,
+        )
         if ((await focusButton.count()) > 0) {
             await focusButton.first().click()
         }

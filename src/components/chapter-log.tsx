@@ -34,7 +34,10 @@ export function ChapterLog({
             <h2>Log</h2>
             <ul className="list-[square]">
                 {chapterHistory.data.chapterLogs.map(log => (
-                    <li key={log.createdAt.toString()} data-testid="chapter-log-item">
+                    <li
+                        key={log.createdAt.toString()}
+                        data-testid="chapter-log-item"
+                    >
                         <div className="flex items-center justify-between">
                             <span>{log.location} </span>
                             <span>

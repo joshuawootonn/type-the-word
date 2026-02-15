@@ -9,7 +9,9 @@ export class HistoryBehavior {
     }
 
     async getCurrentMonthVerseTotal(): Promise<number> {
-        const currentMonth = this.page.getByTestId("history-month-total-verses").first()
+        const currentMonth = this.page
+            .getByTestId("history-month-total-verses")
+            .first()
         await expect(currentMonth).toBeVisible()
 
         const text = (await currentMonth.textContent()) ?? ""
