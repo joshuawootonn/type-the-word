@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm"
+import { and, eq, gte, lte, sql } from "drizzle-orm"
 
 import { db } from "~/server/db"
 import {
@@ -201,6 +201,60 @@ export async function getAssignmentByTeacher(
         where: eq(classroomAssignment.teacherUserId, teacherUserId),
         orderBy: (table, { desc }) => [desc(table.createdAt)],
     })
+}
+
+export type StudentPassageAssignmentMatch = {
+    id: string
+    courseId: string
+    title: string
+    translation: Translation
+    book: Book
+    startChapter: number
+    startVerse: number
+    endChapter: number
+    endVerse: number
+}
+
+export async function getStudentPassageAssignmentMatch(data: {
+    studentUserId: string
+    book: Book
+    chapter: number
+}): Promise<StudentPassageAssignmentMatch | undefined> {
+    const [assignment] = await db
+        .select({
+            id: classroomAssignment.id,
+            courseId: classroomAssignment.courseId,
+            title: classroomAssignment.title,
+            translation: classroomAssignment.translation,
+            book: classroomAssignment.book,
+            startChapter: classroomAssignment.startChapter,
+            startVerse: classroomAssignment.startVerse,
+            endChapter: classroomAssignment.endChapter,
+            endVerse: classroomAssignment.endVerse,
+        })
+        .from(classroomSubmission)
+        .innerJoin(
+            classroomAssignment,
+            eq(classroomSubmission.assignmentId, classroomAssignment.id),
+        )
+        .where(
+            and(
+                eq(classroomSubmission.studentUserId, data.studentUserId),
+                eq(classroomSubmission.isCompleted, 0),
+                eq(classroomSubmission.isTurnedIn, 0),
+                eq(classroomAssignment.state, "PUBLISHED"),
+                eq(classroomAssignment.book, data.book),
+                lte(classroomAssignment.startChapter, data.chapter),
+                gte(classroomAssignment.endChapter, data.chapter),
+            ),
+        )
+        .orderBy(
+            sql`${classroomAssignment.dueDate} NULLS LAST`,
+            classroomAssignment.createdAt,
+        )
+        .limit(1)
+
+    return assignment
 }
 
 /**

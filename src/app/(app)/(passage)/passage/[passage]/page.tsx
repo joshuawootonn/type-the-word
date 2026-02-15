@@ -5,6 +5,7 @@ import { redirect } from "next/navigation"
 
 import { getChapterHistory } from "~/app/api/chapter-history/[passage]/getChapterHistory"
 import { getOrCreateTypingSession } from "~/app/api/typing-session/getOrCreateTypingSession"
+import { AssignmentProgressWarningDialog } from "~/components/assignment-progress-warning-dialog"
 import { ChapterLog } from "~/components/chapter-log"
 import { CopyrightCitation } from "~/components/copyright-citation"
 import { Passage } from "~/components/passage"
@@ -15,6 +16,7 @@ import { passageReferenceSchema } from "~/lib/passageReference"
 import { PassageSegment, toPassageSegment } from "~/lib/passageSegment"
 import { authOptions } from "~/server/auth"
 import { db } from "~/server/db"
+import { getStudentPassageAssignmentMatch } from "~/server/repositories/classroom.repository"
 import { TypedVerseRepository } from "~/server/repositories/typedVerse.repository"
 
 import { DEFAULT_PASSAGE_SEGMENT } from "./default-passage"
@@ -92,21 +94,33 @@ export default async function PassagePage(props: {
     }
 
     const value: PassageSegment = params.passage
+    const passageObject = segmentToPassageObject(value)
 
-    const [passage, typingSession, chapterHistory] = await Promise.all([
+    const [passage, typingSession, chapterHistory, matchingAssignment] =
+        await Promise.all([
         fetchPassage(value, translation),
         session == null ? undefined : getOrCreateTypingSession(session.user.id),
         session == null
             ? undefined
             : getChapterHistory(
                   session.user.id,
-                  segmentToPassageObject(value),
+                  passageObject,
                   translation,
               ),
+        session == null
+            ? undefined
+            : getStudentPassageAssignmentMatch({
+                  studentUserId: session.user.id,
+                  book: passageObject.book,
+                  chapter: passageObject.chapter,
+              }),
     ])
 
     return (
         <>
+            {matchingAssignment && (
+                <AssignmentProgressWarningDialog assignment={matchingAssignment} />
+            )}
             <Passage
                 autofocus={true}
                 passage={passage}
