@@ -1,7 +1,7 @@
 "use client"
 
-import * as Dialog from "@radix-ui/react-dialog"
 import { XIcon } from "@phosphor-icons/react"
+import * as Dialog from "@radix-ui/react-dialog"
 import { useMemo, useState } from "react"
 
 import { Link } from "~/components/ui/link"
