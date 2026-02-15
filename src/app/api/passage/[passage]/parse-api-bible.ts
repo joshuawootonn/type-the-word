@@ -106,6 +106,10 @@ export async function parseApiBibleChapter(
             const result: Inline[] = []
             let textValue = node.value
 
+            // API.Bible can inject placeholder markers as " #"
+            // around punctuation (e.g. "God #— #who"), so strip that pattern.
+            textValue = textValue.replace(/\s+#/g, "")
+
             // Some NASB OT reference spans use thin/non-breaking spaces between
             // an initial capital and the rest of a lowercase word (e.g. "Y\u2009ou").
             // Normalize those to keep the word typeable as one token.
@@ -151,7 +155,7 @@ export async function parseApiBibleChapter(
                               // This preserves opening quotes like " and punctuation like ; ? !
                               // but filters out markers like *
                               const hasQuoteParenOrPunct =
-                                  /[\u0022\u0027\u201C\u201D\u2018\u2019()[\];:,.?!]/.test(
+                                  /[\u0022\u0027\u201C\u201D\u2018\u2019()[\];:,.?!\u2013\u2014]/.test(
                                       word,
                                   )
                               return hasQuoteParenOrPunct
