@@ -14,6 +14,7 @@ import {
     deleteTeacherToken,
     getAssignment,
     getAssignmentByTeacher,
+    getStudentCoursePassageAssignmentMatch,
     getOrCreateSubmission,
     getStudentPassageAssignmentMatch,
     getSubmissionByStudent,
@@ -615,6 +616,61 @@ describe("ClassroomRepository - Integration Tests", () => {
                 studentUserId: testStudentId,
                 book: "john",
                 chapter: 3,
+            })
+
+            expect(result).toBeUndefined()
+        })
+
+        it("returns matching assignment with no submission when course is enrolled", async () => {
+            const assignment = await createAssignment({
+                teacherUserId: testTeacherId,
+                courseId: "course-456",
+                courseWorkId: "coursework-5",
+                title: "Unstarted Assignment",
+                translation: "esv" as const,
+                book: "romans" as const,
+                startChapter: 8,
+                startVerse: 1,
+                endChapter: 8,
+                endVerse: 11,
+                totalVerses: 11,
+                maxPoints: 100,
+                state: "PUBLISHED",
+            })
+
+            const result = await getStudentCoursePassageAssignmentMatch({
+                studentUserId: testStudentId,
+                courseIds: ["course-456"],
+                book: "romans",
+                chapter: 8,
+            })
+
+            expect(result).toBeDefined()
+            expect(result?.id).toBe(assignment.id)
+        })
+
+        it("does not return course-filtered match when assignment course is not enrolled", async () => {
+            await createAssignment({
+                teacherUserId: testTeacherId,
+                courseId: "course-789",
+                courseWorkId: "coursework-6",
+                title: "Different Course Assignment",
+                translation: "esv" as const,
+                book: "romans" as const,
+                startChapter: 8,
+                startVerse: 1,
+                endChapter: 8,
+                endVerse: 11,
+                totalVerses: 11,
+                maxPoints: 100,
+                state: "PUBLISHED",
+            })
+
+            const result = await getStudentCoursePassageAssignmentMatch({
+                studentUserId: testStudentId,
+                courseIds: ["course-123"],
+                book: "romans",
+                chapter: 8,
             })
 
             expect(result).toBeUndefined()
