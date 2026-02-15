@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm"
 import { getServerSession } from "next-auth"
 import { NextRequest, NextResponse } from "next/server"
 
-import { calculateStatsForVerse } from "~/app/history/wpm"
+import { calculateStatsForVerse } from "~/app/(app)/history/wpm"
 import { authOptions } from "~/server/auth"
 import {
     refreshAccessToken,

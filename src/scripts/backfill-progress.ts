@@ -9,7 +9,7 @@
  *
  * Run with: dotenv pnpm dlx tsx ./src/scripts/backfill-progress.ts
  */
-import { aggregateBookData } from "~/app/history/overview"
+import { aggregateBookData } from "~/app/(app)/history/overview"
 import { Book, bookSchema } from "~/lib/types/book"
 import { getBibleMetadata } from "~/server/bibleMetadata"
 import { db } from "~/server/db"

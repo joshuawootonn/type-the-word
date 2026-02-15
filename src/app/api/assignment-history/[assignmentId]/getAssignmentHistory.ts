@@ -1,6 +1,6 @@
 import { and, eq, gte, isNotNull } from "drizzle-orm"
 
-import { calculateStatsForVerse } from "~/app/history/wpm"
+import { calculateStatsForVerse } from "~/app/(app)/history/wpm"
 import { db } from "~/server/db"
 import { typedVerses } from "~/server/db/schema"
 import { getAssignment } from "~/server/repositories/classroom.repository"

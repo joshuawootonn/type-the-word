@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm"
 import { getServerSession } from "next-auth"
 import { NextRequest, NextResponse } from "next/server"
 
-import { calculateStatsForVerse } from "~/app/history/wpm"
+import { calculateStatsForVerse } from "~/app/(app)/history/wpm"
 import { env } from "~/env.mjs"
 import { authOptions } from "~/server/auth"
 import { getValidStudentToken } from "~/server/classroom/student-token"

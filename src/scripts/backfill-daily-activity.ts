@@ -14,8 +14,8 @@
  */
 import { format, parseISO, startOfDay, endOfDay } from "date-fns"
 
-import { typingSessionToString } from "~/app/history/typingSessionToString"
-import { calculateStatsForVerse, VerseStats } from "~/app/history/wpm"
+import { typingSessionToString } from "~/app/(app)/history/typingSessionToString"
+import { calculateStatsForVerse, VerseStats } from "~/app/(app)/history/wpm"
 import { db } from "~/server/db"
 import { users } from "~/server/db/schema"
 import {

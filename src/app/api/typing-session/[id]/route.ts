@@ -5,7 +5,7 @@ import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 
-import { calculateStatsForVerse } from "~/app/history/wpm"
+import { calculateStatsForVerse } from "~/app/(app)/history/wpm"
 import { setTranslationCookie } from "~/lib/last-translation"
 import { authOptions } from "~/server/auth"
 import { db } from "~/server/db"

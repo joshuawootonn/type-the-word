@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 
+import { type AssignmentDetail } from "~/app/api/classroom/schemas"
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
@@ -9,7 +10,6 @@ import { Link } from "~/components/ui/link"
 import { Meter } from "~/components/ui/meter"
 import toProperCase from "~/lib/toProperCase"
 
-import { type AssignmentDetail } from "../../../../api/classroom/schemas"
 import { fetchAssignmentDetail, publishAssignment } from "./actions"
 
 interface TeacherClientPageProps {

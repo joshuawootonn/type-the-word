@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
+import { type Course } from "~/app/api/classroom/schemas"
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
@@ -19,7 +20,6 @@ import toProperCase from "~/lib/toProperCase"
 import { bookSchema } from "~/lib/types/book"
 import { Translation, translationsSchema } from "~/server/db/schema"
 
-import { type Course } from "../../api/classroom/schemas"
 import { createAssignment, fetchCourses } from "./actions"
 
 type ChapterMetadata = {
@@ -65,7 +65,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
         async function loadMetadata() {
             try {
                 const metadataModule = await import(
-                    "../../../server/bible-metadata/" + translation + ".json"
+                    "../../../../server/bible-metadata/" + translation + ".json"
                 )
                 if (isMounted) {
                     setMetadata(metadataModule.default)
