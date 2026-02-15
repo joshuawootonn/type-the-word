@@ -98,7 +98,9 @@ export function StudentClientPage({
                     <div className="not-prose border-primary bg-secondary flex items-center justify-between gap-3 border-2 p-4">
                         <Button
                             type="button"
-                            onClick={() => navigateToChapter(activeChapterIndex - 1)}
+                            onClick={() =>
+                                navigateToChapter(activeChapterIndex - 1)
+                            }
                             disabled={!canGoToPreviousChapter}
                         >
                             Previous Chapter
@@ -114,7 +116,9 @@ export function StudentClientPage({
                         </div>
                         <Button
                             type="button"
-                            onClick={() => navigateToChapter(activeChapterIndex + 1)}
+                            onClick={() =>
+                                navigateToChapter(activeChapterIndex + 1)
+                            }
                             disabled={!canGoToNextChapter}
                         >
                             Next Chapter

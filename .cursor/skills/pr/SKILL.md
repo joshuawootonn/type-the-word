@@ -7,14 +7,14 @@ description: Creates a repository-aligned pull request using gh CLI with templat
 
 ## Purpose
 
-Create a high-quality PR for this repo without extra prerelease/preflight assumptions.
+Create a high-quality PR for this repo with mandatory local preflight checks.
 
 ## Defaults
 
 - Default PR mode: Draft.
 - Default base branch: `main`.
 - Use repository PR template if present.
-- Do not run manual preflight/lint/test commands unless user asks (git hooks handle checks on commit/push).
+- Always run `just pre-flight` before opening the PR.
 
 ## Workflow
 
@@ -23,18 +23,19 @@ Create a high-quality PR for this repo without extra prerelease/preflight assump
     - `git status`
     - `git log --oneline main...HEAD`
     - `git diff main...HEAD`
-3. Ensure changes are committed before opening PR.
-4. Find PR template:
+3. Run preflight checks: `just pre-flight`.
+4. Ensure changes are committed before opening PR.
+5. Find PR template:
     - `.github/pull_request_template.md`
     - `.github/PULL_REQUEST_TEMPLATE.md`
     - `.github/PULL_REQUEST_TEMPLATE/*`
-5. Draft PR body by combining template structure with branch changes:
+6. Draft PR body by combining template structure with branch changes:
     - concise summary
     - why/context
     - test notes
     - linked issues when available
-6. Push branch if needed: `git push -u origin HEAD`.
-7. Create PR with `gh pr create` using:
+7. Push branch if needed: `git push -u origin HEAD`.
+8. Create PR with `gh pr create` using:
     - `--draft`
     - `--base main`
     - `--head <current-branch>`
@@ -45,5 +46,6 @@ Create a high-quality PR for this repo without extra prerelease/preflight assump
 
 - Never open a PR from `main` branch.
 - Preserve template headings/checklists where they exist.
+- If `just pre-flight` fails, stop and report the failing step and output.
 - Do not claim checks were run unless actually run.
 - If gh auth/permissions fail, report the exact blocker and command to fix.

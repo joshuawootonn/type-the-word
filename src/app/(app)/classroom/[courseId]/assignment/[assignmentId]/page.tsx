@@ -281,7 +281,10 @@ export default async function AssignmentDetailPage({
     const course = courses.find(c => c.id === courseId)
 
     const [passage, typingSession, assignmentHistory] = await Promise.all([
-        fetchPassage(activeChapterSegment.passageSegment, assignment.translation),
+        fetchPassage(
+            activeChapterSegment.passageSegment,
+            assignment.translation,
+        ),
         getOrCreateTypingSession(session.user.id, assignmentId),
         getAssignmentHistory(session.user.id, assignmentId),
     ])
