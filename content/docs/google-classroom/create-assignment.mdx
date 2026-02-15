@@ -5,17 +5,17 @@ description: Build and publish a Type the Word assignment for a Google Classroom
 
 ## Overview
 
-Teachers create assignments from `/classroom/assign`. The app creates Google Classroom coursework in **Draft** first, then you publish it.
+Teachers create assignments from [`/classroom/assign`](/classroom/assign). The app creates Google Classroom coursework in **Draft** first, then you publish it.
 
 ## Prerequisites
 
-- Teacher account connected on `/classroom`
+- Teacher account connected on [`/classroom`](/classroom)
 - At least one Google Classroom course
 - Passage details ready (translation, book, chapter, verse range)
 
 ## Step 1: Open the assignment form
 
-1. Go to `/classroom/assign`.
+1. Go to [`/classroom/assign`](/classroom/assign).
 2. Confirm the page title is **Create Assignment**.
 
 [Screenshot: Create Assignment page with full form visible]
@@ -57,7 +57,7 @@ Important: multi-chapter assignments are not supported in student completion. Ke
 ## Step 4: Submit and review draft
 
 1. Click **Create Assignment**.
-2. Wait for redirect to `/classroom/{courseId}/assignment/{assignmentId}`.
+2. Wait for redirect to [`/classroom/{courseId}/assignment/{assignmentId}`](/classroom/dashboard).
 3. Confirm assignment state shows **Draft**.
 
 [Screenshot: Newly created assignment detail page showing Draft state]
@@ -79,7 +79,7 @@ Important: multi-chapter assignments are not supported in student completion. Ke
 
 ## Troubleshooting
 
-- **Cannot open create form:** Reconnect teacher account on `/classroom`.
+- **Cannot open create form:** Reconnect teacher account on [`/classroom`](/classroom).
 - **Course dropdown is empty:** Verify you teach at least one course in Google Classroom.
 - **Assignment creation fails:** Check OAuth scopes for coursework students and rosters.
 - **Students cannot see assignment:** Ensure the assignment is published, not draft.
