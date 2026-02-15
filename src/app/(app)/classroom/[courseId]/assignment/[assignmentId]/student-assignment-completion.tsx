@@ -47,7 +47,7 @@ export function StudentAssignmentCompletion({
     const currentHistory = liveAssignmentHistory ?? assignmentHistory
 
     const completedVerses = useMemo(
-        () => Object.keys(currentHistory?.verses ?? {}).map(Number).length,
+        () => Object.keys(currentHistory?.verses ?? {}).length,
         [currentHistory?.verses],
     )
     const completionPercentage =

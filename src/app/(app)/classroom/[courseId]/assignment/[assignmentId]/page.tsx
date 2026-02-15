@@ -24,11 +24,16 @@ import {
     getOrCreateSubmission,
 } from "~/server/repositories/classroom.repository"
 
+import {
+    buildAssignmentChapterSegmentsFromMetadata,
+    getActiveChapterIndex,
+} from "./chapter-segments"
 import { StudentClientPage } from "./student-client-page"
 import { TeacherClientPage } from "./teacher-client-page"
 
 interface PageProps {
     params: Promise<{ courseId: string; assignmentId: string }>
+    searchParams: Promise<{ chapter?: string | string[] }>
 }
 
 function buildReferenceLabel(data: {
@@ -71,9 +76,13 @@ function buildPassageSegment(data: {
     return passageSegmentSchema.parse(`${data.book} ${verseSegment}`)
 }
 
-export default async function AssignmentDetailPage({ params }: PageProps) {
+export default async function AssignmentDetailPage({
+    params,
+    searchParams,
+}: PageProps) {
     const session = await getServerSession(authOptions)
     const { courseId, assignmentId } = await params
+    const resolvedSearchParams = await searchParams
 
     if (!session?.user) {
         return (
@@ -154,13 +163,51 @@ export default async function AssignmentDetailPage({ params }: PageProps) {
         endChapter: assignment.endChapter,
         endVerse: assignment.endVerse,
     })
+    const chapterSegments =
+        passageSegment != null
+            ? [
+                  {
+                      chapter: assignment.startChapter,
+                      startVerse: assignment.startVerse,
+                      endVerse: assignment.endVerse,
+                      passageSegment,
+                      referenceLabel,
+                  },
+              ]
+            : await buildAssignmentChapterSegmentsFromMetadata({
+                  book: assignment.book,
+                  startChapter: assignment.startChapter,
+                  startVerse: assignment.startVerse,
+                  endChapter: assignment.endChapter,
+                  endVerse: assignment.endVerse,
+                  translation: assignment.translation,
+              })
 
-    if (!passageSegment) {
+    if (chapterSegments.length === 0) {
         return (
             <ClassroomNotice
                 title={assignment.title}
                 variant="error"
-                message="This assignment spans multiple chapters, which is not supported yet."
+                message="This assignment has an invalid chapter range."
+            />
+        )
+    }
+
+    const chapterParam = Array.isArray(resolvedSearchParams.chapter)
+        ? resolvedSearchParams.chapter[0]
+        : resolvedSearchParams.chapter
+    const normalizedActiveChapterIndex = getActiveChapterIndex(
+        chapterSegments,
+        chapterParam,
+    )
+    const activeChapterSegment = chapterSegments[normalizedActiveChapterIndex]
+
+    if (!activeChapterSegment) {
+        return (
+            <ClassroomNotice
+                title={assignment.title}
+                variant="error"
+                message="Unable to load the selected chapter."
             />
         )
     }
@@ -234,7 +281,7 @@ export default async function AssignmentDetailPage({ params }: PageProps) {
     const course = courses.find(c => c.id === courseId)
 
     const [passage, typingSession, assignmentHistory] = await Promise.all([
-        fetchPassage(passageSegment, assignment.translation),
+        fetchPassage(activeChapterSegment.passageSegment, assignment.translation),
         getOrCreateTypingSession(session.user.id, assignmentId),
         getAssignmentHistory(session.user.id, assignmentId),
     ])
@@ -246,6 +293,8 @@ export default async function AssignmentDetailPage({ params }: PageProps) {
             referenceLabel={referenceLabel}
             translation={assignment.translation}
             passage={passage}
+            chapterSegments={chapterSegments}
+            activeChapterIndex={normalizedActiveChapterIndex}
             totalVerses={assignment.totalVerses}
             submission={{
                 id: submission.id,

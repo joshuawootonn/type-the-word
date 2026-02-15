@@ -5,13 +5,15 @@ import { db } from "~/server/db"
 import { typedVerses } from "~/server/db/schema"
 import { getAssignment } from "~/server/repositories/classroom.repository"
 
+import { getLatestVersesByLocation } from "./verse-location"
+
 export type VerseStats = {
     wpm: number | null
     accuracy: number | null
 }
 
 export type AssignmentHistory = {
-    verses: Record<number, VerseStats>
+    verses: Record<string, VerseStats>
     chapterLogs: []
 }
 
@@ -37,10 +39,12 @@ export async function getAssignmentHistory(
             ),
         )
 
-    const verses: Record<number, VerseStats> = {}
-    verseRows.forEach(row => {
+    const latestVersesByLocation = getLatestVersesByLocation(verseRows)
+
+    const verses: Record<string, VerseStats> = {}
+    latestVersesByLocation.forEach((row, key) => {
         const stats = calculateStatsForVerse(row)
-        verses[row.verse] = {
+        verses[key] = {
             wpm: stats?.wpm ?? null,
             accuracy: stats?.accuracy ?? null,
         }
