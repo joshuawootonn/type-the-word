@@ -9,7 +9,7 @@ import { getAssignmentHistory } from "./getAssignmentHistory"
 const uuidSchema = z.string().uuid()
 
 export async function GET(
-    _request: NextRequest,
+    request: NextRequest,
     { params }: { params: Promise<{ assignmentId: string }> },
 ) {
     const session = await getServerSession(authOptions)
@@ -27,8 +27,23 @@ export async function GET(
         )
     }
 
+    const chapterParam = request.nextUrl.searchParams.get("chapter")
+    let chapter: number | undefined = undefined
+    if (chapterParam != null) {
+        const parsedChapter = Number.parseInt(chapterParam, 10)
+        if (Number.isNaN(parsedChapter) || parsedChapter < 1) {
+            return Response.json(
+                { error: "Invalid chapter query param" },
+                { status: 400 },
+            )
+        }
+        chapter = parsedChapter
+    }
+
     try {
-        const data = await getAssignmentHistory(session.user.id, assignmentId)
+        const data = await getAssignmentHistory(session.user.id, assignmentId, {
+            chapter,
+        })
         return Response.json({ data }, { status: 200 })
     } catch (_) {
         return Response.json({ error: "Assignment not found" }, { status: 404 })

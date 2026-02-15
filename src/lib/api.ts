@@ -98,9 +98,15 @@ export async function fetchChapterHistory(
 
 export async function fetchAssignmentHistory(
     assignmentId: string,
+    chapter?: number,
 ): Promise<AssignmentHistory> {
+    const params = new URLSearchParams()
+    if (chapter != null) {
+        params.set("chapter", `${chapter}`)
+    }
+    const queryString = params.toString()
     const response = await fetch(
-        `${getBaseUrl()}/api/assignment-history/${assignmentId}`,
+        `${getBaseUrl()}/api/assignment-history/${assignmentId}${queryString ? `?${queryString}` : ""}`,
         { cache: "no-store" },
     )
 

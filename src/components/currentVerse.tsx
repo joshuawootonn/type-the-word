@@ -245,8 +245,7 @@ export function CurrentVerse({
                                 ...prevChapterHistory,
                                 verses: {
                                     ...prevChapterHistory.verses,
-                                    [`${verse.chapter}:${verse.verse}`]:
-                                        verseStats,
+                                    [verse.verse]: verseStats,
                                 },
                             } as AssignmentHistory
                         }
@@ -296,6 +295,11 @@ export function CurrentVerse({
             if (historyQueryKey) {
                 await queryClient.invalidateQueries({
                     queryKey: historyQueryKey,
+                })
+            }
+            if (classroomAssignmentId) {
+                await queryClient.invalidateQueries({
+                    queryKey: ["assignment-history", classroomAssignmentId],
                 })
             }
             await queryClient.invalidateQueries({

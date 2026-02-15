@@ -1,11 +1,11 @@
-import { and, eq, gte, isNotNull } from "drizzle-orm"
+import { and, eq, gte, isNotNull, SQL } from "drizzle-orm"
 
 import { calculateStatsForVerse } from "~/app/(app)/history/wpm"
 import { db } from "~/server/db"
 import { typedVerses } from "~/server/db/schema"
 import { getAssignment } from "~/server/repositories/classroom.repository"
 
-import { getLatestVersesByLocation } from "./verse-location"
+import { getLatestVerseByChapter } from "./verse-location"
 
 export type VerseStats = {
     wpm: number | null
@@ -20,6 +20,7 @@ export type AssignmentHistory = {
 export async function getAssignmentHistory(
     userId: string,
     assignmentId: string,
+    options?: { chapter?: number },
 ): Promise<AssignmentHistory> {
     const assignment = await getAssignment(assignmentId)
 
@@ -27,19 +28,24 @@ export async function getAssignmentHistory(
         throw new Error("Assignment not found")
     }
 
+    const conditions: SQL[] = [
+        eq(typedVerses.userId, userId),
+        eq(typedVerses.classroomAssignmentId, assignmentId),
+        isNotNull(typedVerses.classroomAssignmentId),
+        gte(typedVerses.createdAt, assignment.createdAt),
+    ]
+    if (options?.chapter != null) {
+        conditions.push(eq(typedVerses.chapter, options.chapter))
+    }
+
     const verseRows = await db
         .select()
         .from(typedVerses)
-        .where(
-            and(
-                eq(typedVerses.userId, userId),
-                eq(typedVerses.classroomAssignmentId, assignmentId),
-                isNotNull(typedVerses.classroomAssignmentId),
-                gte(typedVerses.createdAt, assignment.createdAt),
-            ),
-        )
+        .where(and(...conditions))
 
-    const latestVersesByLocation = getLatestVersesByLocation(verseRows)
+    const latestVersesByLocation = getLatestVerseByChapter(verseRows, {
+        chapterOnly: options?.chapter != null,
+    })
 
     const verses: Record<string, VerseStats> = {}
     latestVersesByLocation.forEach((row, key) => {

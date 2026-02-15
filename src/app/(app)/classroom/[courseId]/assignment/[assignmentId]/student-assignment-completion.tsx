@@ -35,7 +35,7 @@ export function StudentAssignmentCompletion({
     const [turnInError, setTurnInError] = useState<string | null>(null)
     const [isTurnedIn, setIsTurnedIn] = useState(submission.isTurnedIn)
 
-    // Use the same query key as the Passage component for automatic updates
+    // Assignment-wide history powers completion and turn-in gating
     const { data: liveAssignmentHistory } = useQuery({
         queryKey: ["assignment-history", assignmentId],
         queryFn: () => fetchAssignmentHistory(assignmentId),

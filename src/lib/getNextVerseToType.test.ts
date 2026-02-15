@@ -313,4 +313,34 @@ describe("getNextVerseToType", () => {
 
         expect(result).toBe("1")
     })
+
+    test.concurrent("WHEN assignment history has malformed keys THEN ignores them", () => {
+        const passage = createMockPassage([1, 2, 3, 4])
+        const assignmentHistory: AssignmentHistory = {
+            verses: {
+                abc: { wpm: 40, accuracy: 90 },
+                "1:not-a-number": { wpm: 41, accuracy: 91 },
+                "1:2": { wpm: 42, accuracy: 92 },
+            },
+            chapterLogs: [],
+        }
+
+        const result = getNextVerseToType(passage, assignmentHistory)
+
+        expect(result).toBe("3")
+    })
+
+    test.concurrent("WHEN assignment history includes legacy verse-only keys THEN handles them", () => {
+        const passage = createMockPassage([1, 2, 3, 4])
+        const assignmentHistory: AssignmentHistory = {
+            verses: {
+                "1": { wpm: 40, accuracy: 90 },
+            },
+            chapterLogs: [],
+        }
+
+        const result = getNextVerseToType(passage, assignmentHistory)
+
+        expect(result).toBe("2")
+    })
 })
