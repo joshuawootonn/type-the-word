@@ -1,9 +1,9 @@
 ---
-name: docs-impact
-description: Checks whether current branch changes require documentation updates and auto-suggests concrete doc edits. Use when the user asks for docs impact analysis, documentation follow-ups, or proposed doc updates from code changes.
+name: docs
+description: Checks whether current branch changes require documentation updates and auto-suggests concrete doc edits. Use when the user asks for /docs, docs impact analysis, documentation follow-ups, or proposed doc updates from code changes.
 ---
 
-# docs-impact
+# /docs
 
 ## Purpose
 
