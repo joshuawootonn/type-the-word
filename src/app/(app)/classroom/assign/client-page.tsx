@@ -1,5 +1,6 @@
 "use client"
 
+import { ArrowLineDown, CaretDoubleDown } from "@phosphor-icons/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -88,14 +89,10 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
     const chapterCount = Math.max(bookMetadata?.chapters.length ?? 1, 1)
     const startChapterMax = chapterCount
     const endChapterMax = chapterCount
-    const startChapterVerseMax = Math.max(
-        bookMetadata?.chapters[startChapter - 1]?.length ?? 1,
-        1,
-    )
-    const endChapterVerseMax = Math.max(
-        bookMetadata?.chapters[endChapter - 1]?.length ?? 1,
-        1,
-    )
+    const getVerseMaxForChapter = (chapter: number) =>
+        Math.max(bookMetadata?.chapters[chapter - 1]?.length ?? 1, 1)
+    const startChapterVerseMax = getVerseMaxForChapter(startChapter)
+    const endChapterVerseMax = getVerseMaxForChapter(endChapter)
 
     // Load courses on mount
     useEffect(() => {
@@ -401,19 +398,58 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                     >
                                         End Chapter
                                     </label>
-                                    <Input
-                                        type="number"
-                                        id="endChapter"
-                                        min="1"
-                                        max={endChapterMax}
-                                        value={endChapter}
-                                        onChange={e =>
-                                            setEndChapter(
-                                                parseInt(e.target.value) || 1,
-                                            )
-                                        }
-                                        required
-                                    />
+                                    <div className="flex items-center gap-2">
+                                        <div className="grow">
+                                            <Input
+                                                type="number"
+                                                id="endChapter"
+                                                min="1"
+                                                max={endChapterMax}
+                                                value={endChapter}
+                                                onChange={e => {
+                                                    const nextEndChapter =
+                                                        parseInt(
+                                                            e.target.value,
+                                                        ) || 1
+                                                    setEndChapter(nextEndChapter)
+                                                    setEndVerse(currentVerse =>
+                                                        Math.min(
+                                                            currentVerse,
+                                                            getVerseMaxForChapter(
+                                                                nextEndChapter,
+                                                            ),
+                                                        ),
+                                                    )
+                                                }}
+                                                required
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const lastChapter =
+                                                    endChapterMax
+                                                setEndChapter(lastChapter)
+                                                setEndVerse(currentVerse =>
+                                                    Math.min(
+                                                        currentVerse,
+                                                        getVerseMaxForChapter(
+                                                            lastChapter,
+                                                        ),
+                                                    ),
+                                                )
+                                            }}
+                                            className="svg-outline border-primary bg-secondary relative shrink-0 border-2 p-2"
+                                            aria-label="Set end chapter to the last chapter in this book"
+                                            title="Use last chapter"
+                                        >
+                                            <CaretDoubleDown
+                                                aria-hidden
+                                                size={16}
+                                                weight="bold"
+                                            />
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div>
@@ -423,19 +459,40 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                     >
                                         End Verse
                                     </label>
-                                    <Input
-                                        type="number"
-                                        id="endVerse"
-                                        min="1"
-                                        max={endChapterVerseMax}
-                                        value={endVerse}
-                                        onChange={e =>
-                                            setEndVerse(
-                                                parseInt(e.target.value) || 1,
-                                            )
-                                        }
-                                        required
-                                    />
+                                    <div className="flex items-center gap-2">
+                                        <div className="grow">
+                                            <Input
+                                                type="number"
+                                                id="endVerse"
+                                                min="1"
+                                                max={endChapterVerseMax}
+                                                value={endVerse}
+                                                onChange={e =>
+                                                    setEndVerse(
+                                                        parseInt(
+                                                            e.target.value,
+                                                        ) || 1,
+                                                    )
+                                                }
+                                                required
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setEndVerse(endChapterVerseMax)
+                                            }
+                                            className="svg-outline border-primary bg-secondary relative shrink-0 border-2 p-2"
+                                            aria-label="Set end verse to the last verse in this chapter"
+                                            title="Use last verse"
+                                        >
+                                            <ArrowLineDown
+                                                aria-hidden
+                                                size={16}
+                                                weight="bold"
+                                            />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
