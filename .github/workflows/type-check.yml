@@ -1,0 +1,36 @@
+name: Type Check
+
+on:
+    pull_request:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
+
+jobs:
+    type-check:
+        name: Type check
+        runs-on: ubuntu-latest
+        env:
+            SKIP_ENV_VALIDATION: "true"
+            NODE_ENV: test
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 8.7.5
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Run type check
+              run: pnpm type-check
