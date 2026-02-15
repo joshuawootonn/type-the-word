@@ -7,6 +7,7 @@ export const docsNavigation: DocsNavItem[] = [
     },
     {
         title: "Google Classroom",
+        href: "/docs/guides/google-classroom",
         icon: "backpack",
         items: [
             {
@@ -14,24 +15,34 @@ export const docsNavigation: DocsNavItem[] = [
                 href: "/docs/guides/google-classroom/enable-google-workspace",
             },
             {
-                title: "Connect Teacher Account",
-                href: "/docs/guides/google-classroom/connect-teacher-account",
+                title: "Teachers",
+                items: [
+                    {
+                        title: "Connect Teacher Account",
+                        href: "/docs/guides/google-classroom/connect-teacher-account",
+                    },
+                    {
+                        title: "Create Assignment",
+                        href: "/docs/guides/google-classroom/create-assignment",
+                    },
+                    {
+                        title: "Track Student Progression",
+                        href: "/docs/guides/google-classroom/track-student-progression",
+                    },
+                ],
             },
             {
-                title: "Create Assignment",
-                href: "/docs/guides/google-classroom/create-assignment",
-            },
-            {
-                title: "Track Student Progression",
-                href: "/docs/guides/google-classroom/track-student-progression",
-            },
-            {
-                title: "Connect Student Account",
-                href: "/docs/guides/google-classroom/connect-student-account",
-            },
-            {
-                title: "Complete Assignments",
-                href: "/docs/guides/google-classroom/complete-assignments",
+                title: "Students",
+                items: [
+                    {
+                        title: "Connect Student Account",
+                        href: "/docs/guides/google-classroom/connect-student-account",
+                    },
+                    {
+                        title: "Complete Assignments",
+                        href: "/docs/guides/google-classroom/complete-assignments",
+                    },
+                ],
             },
         ],
     },

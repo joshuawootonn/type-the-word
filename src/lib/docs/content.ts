@@ -48,12 +48,20 @@ function collectSlugs(items: DocsNavItem[]): string[][] {
     return output
 }
 
-function getDocPathFromSlug(slug: string[]): string {
+function getPrimaryDocPathFromSlug(slug: string[]): string {
     if (slug.length === 0) {
         return path.join(DOCS_DIR, "index.mdx")
     }
 
     return path.join(DOCS_DIR, ...slug) + ".mdx"
+}
+
+function getNestedIndexDocPathFromSlug(slug: string[]): string | null {
+    if (slug.length === 0) {
+        return null
+    }
+
+    return path.join(DOCS_DIR, ...slug, "index.mdx")
 }
 
 function toHref(slug: string[]): string {
@@ -71,13 +79,21 @@ async function resolveDocPath(slug: string[]): Promise<string | null> {
     }
 
     const normalized = normalizeSlug(slug)
-    const docPath = getDocPathFromSlug(normalized)
-    try {
-        await readFile(docPath, "utf8")
-        return docPath
-    } catch {
-        return null
+    const docPaths = [
+        getPrimaryDocPathFromSlug(normalized),
+        getNestedIndexDocPathFromSlug(normalized),
+    ].filter((docPath): docPath is string => docPath != null)
+
+    for (const docPath of docPaths) {
+        try {
+            await readFile(docPath, "utf8")
+            return docPath
+        } catch {
+            continue
+        }
     }
+
+    return null
 }
 
 export const getAllDocSlugs = cache(async (): Promise<string[][]> => {
