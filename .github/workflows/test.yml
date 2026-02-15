@@ -62,6 +62,10 @@ jobs:
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 
+            - name: Ensure required database schemas exist
+              run: |
+                  pnpm exec node -e "const postgres=require('postgres');(async()=>{const sql=postgres(process.env.POSTGRES_DATABASE_URL);await sql.unsafe('CREATE SCHEMA IF NOT EXISTS \"type-the-word\";');await sql.unsafe('CREATE SCHEMA IF NOT EXISTS drizzle;');await sql.end();})();"
+
             - name: Run test database migrations
               run: pnpm db:migrate
 
