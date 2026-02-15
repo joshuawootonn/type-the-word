@@ -147,7 +147,7 @@ export function CurrentVerse({
     const [passageId] = useAtom(passageIdAtom)
     const [autoFocus] = useAtom(autofocusAtom)
     const { data: sessionData } = useSession()
-    const { trackVerseCompleted } = useAnalytics()
+    const { trackVerseCompleted, trackAssignmentStarted } = useAnalytics()
 
     const passageRect = usePassageRect()
     const [isPassageActive, setIsPassageActive] = useAtom(isPassageActiveAtom)
@@ -366,6 +366,21 @@ export function CurrentVerse({
 
         if (isVerseComplete) {
             const verse = getVerse(currentVerse, passage.nodes)
+            const completedVerseCount = Object.keys(history?.verses ?? {}).length
+
+            if (
+                classroomAssignmentId != null &&
+                completedVerseCount === 0
+            ) {
+                trackAssignmentStarted({
+                    assignmentId: classroomAssignmentId,
+                    book: verse.verse.book,
+                    chapter: verse.verse.chapter,
+                    verse: verse.verse.verse,
+                    translation: verse.verse.translation,
+                })
+            }
+
             trackEvent("typed-verse")
             trackVerseCompleted({
                 book: verse.verse.book,

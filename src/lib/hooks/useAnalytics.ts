@@ -11,10 +11,12 @@ type VerseCompletedProperties = {
     assignmentId?: string
 }
 
-type AssignmentOpenedProperties = {
+type AssignmentStartedProperties = {
     assignmentId: string
-    courseId: string
-    totalVerses: number
+    book: string
+    chapter: number
+    verse: number
+    translation: string
 }
 
 type AssignmentCompletedProperties = {
@@ -64,9 +66,9 @@ export function useAnalytics() {
         [posthog],
     )
 
-    const trackAssignmentOpened = useCallback(
-        (properties: AssignmentOpenedProperties) => {
-            posthog.capture("assignment_opened", properties)
+    const trackAssignmentStarted = useCallback(
+        (properties: AssignmentStartedProperties) => {
+            posthog.capture("assignment_started", properties)
         },
         [posthog],
     )
@@ -98,7 +100,7 @@ export function useAnalytics() {
 
     return {
         trackVerseCompleted,
-        trackAssignmentOpened,
+        trackAssignmentStarted,
         trackAssignmentCompleted,
         trackAssignmentCreated,
         trackThemeCreated,
