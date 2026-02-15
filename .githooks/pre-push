@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+echo "🔍 Running pre-push checks..."
+echo "📱 Running checks in parallel..."
+
+FAILED=0
+
+(
+  echo "  🔧 Running Oxlint (type-aware linting)..."
+  if ! just lint-check > /tmp/lint.log 2>&1; then
+    echo "❌ Linting failed! Run 'just lint' to auto-fix issues."
+    cat /tmp/lint.log
+    exit 1
+  fi
+  echo "  ✅ Linting passed"
+) &
+LINT_PID=$!
+
+(
+  echo "  🔧 Running TypeScript type checking..."
+  if ! just type-check > /tmp/typecheck.log 2>&1; then
+    echo "❌ TypeScript type checking failed!"
+    cat /tmp/typecheck.log
+    exit 1
+  fi
+  echo "  ✅ Type checking passed"
+) &
+TYPECHECK_PID=$!
+
+(
+  echo "  🔧 Checking Oxfmt formatting..."
+  if ! just format-check > /tmp/format.log 2>&1; then
+    echo "❌ Formatting check failed! Run 'just format' to fix."
+    cat /tmp/format.log
+    exit 1
+  fi
+  echo "  ✅ Formatting check passed"
+) &
+FORMAT_PID=$!
+
+wait $LINT_PID || FAILED=1
+wait $TYPECHECK_PID || FAILED=1
+wait $FORMAT_PID || FAILED=1
+
+if [ "$FAILED" -eq 1 ]; then
+  exit 1
+fi
+
+echo "  🧪 Running tests..."
+if ! just test; then
+  echo "❌ Tests failed!"
+  exit 1
+fi
+echo "  ✅ Tests passed"
+
+echo ""
+echo "🎉 All pre-push checks passed!"
