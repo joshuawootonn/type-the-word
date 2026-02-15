@@ -13,7 +13,7 @@ import { DocsNavLinks } from "./docs-nav-links"
 
 function HamburgerIcon(): ReactElement {
     return (
-        <span className="inline-flex flex-col gap-1" aria-hidden>
+        <span className="flex flex-col gap-1" aria-hidden>
             <span className="bg-primary block h-0.5 w-5" />
             <span className="bg-primary block h-0.5 w-5" />
             <span className="bg-primary block h-0.5 w-5" />
@@ -33,7 +33,7 @@ export function MobileSidebarDialog({
             <Dialog.Trigger asChild>
                 <button
                     type="button"
-                    className="svg-outline border-primary bg-secondary relative border-2 px-2 py-2"
+                    className="svg-outline bg-secondary relative px-2 py-2"
                     aria-label="Open docs navigation"
                 >
                     <HamburgerIcon />
@@ -41,8 +41,8 @@ export function MobileSidebarDialog({
             </Dialog.Trigger>
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 z-40 bg-black/60" />
-                <Dialog.Content className="border-primary bg-secondary fixed top-0 right-0 z-50 flex h-dvh w-[85vw] max-w-sm translate-x-full flex-col border-l-2 p-4 transition-transform duration-200 data-[state=closed]:translate-x-full data-[state=open]:translate-x-0">
-                    <div className="border-primary mb-4 flex items-center justify-between border-b-2 pb-3">
+                <Dialog.Content className="border-primary bg-secondary fixed top-0 right-0 z-50 flex h-dvh w-[85vw] max-w-sm translate-x-full flex-col border-l-2 p-3 transition-transform duration-200 data-[state=closed]:translate-x-full data-[state=open]:translate-x-0">
+                    <div className="border-primary mb-4 flex items-center justify-between pb-3">
                         <DocsLogo />
                         <Dialog.Close asChild>
                             <button
@@ -61,7 +61,7 @@ export function MobileSidebarDialog({
                         />
                     </div>
 
-                    <div className="border-primary mt-4 border-t-2 pt-4">
+                    <div className="mt-4 pt-4">
                         <Link href="/" onClick={() => setOpen(false)}>
                             Back to main site
                         </Link>
