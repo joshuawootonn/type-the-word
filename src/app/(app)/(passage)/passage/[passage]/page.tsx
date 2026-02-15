@@ -15,8 +15,13 @@ import { segmentToPassageObject } from "~/lib/passageObject"
 import { passageReferenceSchema } from "~/lib/passageReference"
 import { PassageSegment, toPassageSegment } from "~/lib/passageSegment"
 import { authOptions } from "~/server/auth"
+import { getValidStudentToken } from "~/server/classroom/student-token"
+import { listStudentCourses } from "~/server/clients/classroom.client"
 import { db } from "~/server/db"
-import { getStudentPassageAssignmentMatch } from "~/server/repositories/classroom.repository"
+import {
+    getStudentCoursePassageAssignmentMatch,
+    getStudentPassageAssignmentMatch,
+} from "~/server/repositories/classroom.repository"
 import { TypedVerseRepository } from "~/server/repositories/typedVerse.repository"
 
 import { DEFAULT_PASSAGE_SEGMENT } from "./default-passage"
@@ -96,7 +101,7 @@ export default async function PassagePage(props: {
     const value: PassageSegment = params.passage
     const passageObject = segmentToPassageObject(value)
 
-    const [passage, typingSession, chapterHistory, matchingAssignment] =
+    const [passage, typingSession, chapterHistory, submissionMatchingAssignment] =
         await Promise.all([
             fetchPassage(value, translation),
             session == null
@@ -117,6 +122,23 @@ export default async function PassagePage(props: {
                       chapter: passageObject.chapter,
                   }),
         ])
+
+    let matchingAssignment = submissionMatchingAssignment
+
+    if (session != null && matchingAssignment == null) {
+        try {
+            const token = await getValidStudentToken(session.user.id)
+            const courses = await listStudentCourses(token.accessToken)
+            matchingAssignment = await getStudentCoursePassageAssignmentMatch({
+                studentUserId: session.user.id,
+                courseIds: courses.map(course => course.id),
+                book: passageObject.book,
+                chapter: passageObject.chapter,
+            })
+        } catch (_error) {
+            // Student token/courses lookup is optional for this warning.
+        }
+    }
 
     return (
         <>

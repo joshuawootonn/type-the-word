@@ -1,4 +1,4 @@
-import { and, eq, gte, lte, sql } from "drizzle-orm"
+import { and, eq, gte, inArray, isNull, lte, or, sql } from "drizzle-orm"
 
 import { db } from "~/server/db"
 import {
@@ -246,6 +246,61 @@ export async function getStudentPassageAssignmentMatch(data: {
                 eq(classroomAssignment.book, data.book),
                 lte(classroomAssignment.startChapter, data.chapter),
                 gte(classroomAssignment.endChapter, data.chapter),
+            ),
+        )
+        .orderBy(
+            sql`${classroomAssignment.dueDate} NULLS LAST`,
+            classroomAssignment.createdAt,
+        )
+        .limit(1)
+
+    return assignment
+}
+
+export async function getStudentCoursePassageAssignmentMatch(data: {
+    studentUserId: string
+    courseIds: string[]
+    book: Book
+    chapter: number
+}): Promise<StudentPassageAssignmentMatch | undefined> {
+    if (data.courseIds.length === 0) {
+        return undefined
+    }
+
+    const [assignment] = await db
+        .select({
+            id: classroomAssignment.id,
+            courseId: classroomAssignment.courseId,
+            title: classroomAssignment.title,
+            translation: classroomAssignment.translation,
+            book: classroomAssignment.book,
+            startChapter: classroomAssignment.startChapter,
+            startVerse: classroomAssignment.startVerse,
+            endChapter: classroomAssignment.endChapter,
+            endVerse: classroomAssignment.endVerse,
+        })
+        .from(classroomAssignment)
+        .leftJoin(
+            classroomSubmission,
+            and(
+                eq(classroomSubmission.assignmentId, classroomAssignment.id),
+                eq(classroomSubmission.studentUserId, data.studentUserId),
+            ),
+        )
+        .where(
+            and(
+                inArray(classroomAssignment.courseId, data.courseIds),
+                eq(classroomAssignment.state, "PUBLISHED"),
+                eq(classroomAssignment.book, data.book),
+                lte(classroomAssignment.startChapter, data.chapter),
+                gte(classroomAssignment.endChapter, data.chapter),
+                or(
+                    isNull(classroomSubmission.id),
+                    and(
+                        eq(classroomSubmission.isCompleted, 0),
+                        eq(classroomSubmission.isTurnedIn, 0),
+                    ),
+                ),
             ),
         )
         .orderBy(
