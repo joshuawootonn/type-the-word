@@ -7,9 +7,9 @@ import { isBefore, parseISO } from "date-fns"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
 
-import { changelogUpdatedAt } from "~/app/(marketing)/changelog/updated-at"
 import { EmailLink } from "~/components/emailLink"
 import { fetchUserChangelog } from "~/lib/api"
+import { changelogUpdatedAt } from "~/lib/changelogUpdatedAt"
 import { cn } from "~/lib/cn"
 
 export function Footer({ className }: { className?: string }) {

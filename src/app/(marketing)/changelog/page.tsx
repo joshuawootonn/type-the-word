@@ -6,10 +6,10 @@ import NextLink from "next/link"
 
 import { EmailLink } from "~/components/emailLink"
 import HotkeyLabel from "~/components/hotkey-label"
+import { changelogUpdatedAt } from "~/lib/changelogUpdatedAt"
 import { authOptions } from "~/server/auth"
 
 import { UpdateLastVisitedChangelog } from "./update-last-visited-changelog"
-import { changelogUpdatedAt } from "./updated-at"
 
 function Link({ href, children }: { href: string; children: React.ReactNode }) {
     return (
