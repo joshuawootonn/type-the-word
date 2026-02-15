@@ -101,27 +101,25 @@ export default async function PassagePage(props: {
     const value: PassageSegment = params.passage
     const passageObject = segmentToPassageObject(value)
 
-    const [passage, typingSession, chapterHistory, submissionMatchingAssignment] =
-        await Promise.all([
-            fetchPassage(value, translation),
-            session == null
-                ? undefined
-                : getOrCreateTypingSession(session.user.id),
-            session == null
-                ? undefined
-                : getChapterHistory(
-                      session.user.id,
-                      passageObject,
-                      translation,
-                  ),
-            session == null
-                ? undefined
-                : getStudentPassageAssignmentMatch({
-                      studentUserId: session.user.id,
-                      book: passageObject.book,
-                      chapter: passageObject.chapter,
-                  }),
-        ])
+    const [
+        passage,
+        typingSession,
+        chapterHistory,
+        submissionMatchingAssignment,
+    ] = await Promise.all([
+        fetchPassage(value, translation),
+        session == null ? undefined : getOrCreateTypingSession(session.user.id),
+        session == null
+            ? undefined
+            : getChapterHistory(session.user.id, passageObject, translation),
+        session == null
+            ? undefined
+            : getStudentPassageAssignmentMatch({
+                  studentUserId: session.user.id,
+                  book: passageObject.book,
+                  chapter: passageObject.chapter,
+              }),
+    ])
 
     let matchingAssignment = submissionMatchingAssignment
 
