@@ -366,12 +366,11 @@ export function CurrentVerse({
 
         if (isVerseComplete) {
             const verse = getVerse(currentVerse, passage.nodes)
-            const completedVerseCount = Object.keys(history?.verses ?? {}).length
+            const completedVerseCount = Object.keys(
+                history?.verses ?? {},
+            ).length
 
-            if (
-                classroomAssignmentId != null &&
-                completedVerseCount === 0
-            ) {
+            if (classroomAssignmentId != null && completedVerseCount === 0) {
                 trackAssignmentStarted({
                     assignmentId: classroomAssignmentId,
                     book: verse.verse.book,
