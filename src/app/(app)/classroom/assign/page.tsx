@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth"
 
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Link } from "~/components/ui/link"
+import { getLastTranslation } from "~/lib/last-translation"
 import { authOptions } from "~/server/auth"
 import { getTeacherToken } from "~/server/repositories/classroom.repository"
 
@@ -14,6 +15,7 @@ interface PageProps {
 export default async function AssignPage({ searchParams }: PageProps) {
     const session = await getServerSession(authOptions)
     const params = await searchParams
+    const lastTranslation = await getLastTranslation()
 
     // If not authenticated, redirect to login
     if (!session?.user) {
@@ -43,5 +45,10 @@ export default async function AssignPage({ searchParams }: PageProps) {
         )
     }
 
-    return <ClientPage initialCourseId={params.courseId} />
+    return (
+        <ClientPage
+            initialCourseId={params.courseId}
+            initialTranslation={lastTranslation}
+        />
+    )
 }

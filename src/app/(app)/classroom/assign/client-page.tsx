@@ -1,5 +1,6 @@
 "use client"
 
+import { ArrowLineDown, CaretDoubleDown } from "@phosphor-icons/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -34,9 +35,13 @@ type BibleMetadata = Record<string, BookMetadata>
 
 interface ClientPageProps {
     initialCourseId?: string
+    initialTranslation?: Translation
 }
 
-export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
+export function ClientPage({
+    initialCourseId,
+    initialTranslation,
+}: ClientPageProps = {}) {
     const router = useRouter()
     const { trackAssignmentCreated } = useAnalytics()
     const [courses, setCourses] = useState<Course[]>([])
@@ -49,7 +54,9 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
     const [selectedCourse, setSelectedCourse] = useState(initialCourseId || "")
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
-    const [translation, setTranslation] = useState<Translation>("esv")
+    const [translation, setTranslation] = useState<Translation>(
+        initialTranslation ?? "esv",
+    )
     const [book, setBook] = useState("genesis")
     const [startChapter, setStartChapter] = useState(1)
     const [startVerse, setStartVerse] = useState(1)
@@ -88,14 +95,10 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
     const chapterCount = Math.max(bookMetadata?.chapters.length ?? 1, 1)
     const startChapterMax = chapterCount
     const endChapterMax = chapterCount
-    const startChapterVerseMax = Math.max(
-        bookMetadata?.chapters[startChapter - 1]?.length ?? 1,
-        1,
-    )
-    const endChapterVerseMax = Math.max(
-        bookMetadata?.chapters[endChapter - 1]?.length ?? 1,
-        1,
-    )
+    const getVerseMaxForChapter = (chapter: number) =>
+        Math.max(bookMetadata?.chapters[chapter - 1]?.length ?? 1, 1)
+    const startChapterVerseMax = getVerseMaxForChapter(startChapter)
+    const endChapterVerseMax = getVerseMaxForChapter(endChapter)
 
     // Load courses on mount
     useEffect(() => {
@@ -143,6 +146,14 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
 
         setTitle(`${bookName} ${reference}`)
     }, [book, startChapter, startVerse, endChapter, endVerse])
+
+    async function updateTranslationCookie(nextTranslation: Translation) {
+        await fetch("/api/set-translation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ translation: nextTranslation }),
+        })
+    }
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -302,9 +313,14 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                     </label>
                                     <Select
                                         value={translation}
-                                        onValueChange={val =>
-                                            setTranslation(val as Translation)
-                                        }
+                                        onValueChange={val => {
+                                            const nextTranslation =
+                                                val as Translation
+                                            setTranslation(nextTranslation)
+                                            void updateTranslationCookie(
+                                                nextTranslation,
+                                            )
+                                        }}
                                     >
                                         <SelectTrigger className="w-full">
                                             <SelectValue />
@@ -357,19 +373,60 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                     >
                                         Start Chapter
                                     </label>
-                                    <Input
-                                        type="number"
-                                        id="startChapter"
-                                        min="1"
-                                        max={startChapterMax}
-                                        value={startChapter}
-                                        onChange={e =>
-                                            setStartChapter(
-                                                parseInt(e.target.value) || 1,
-                                            )
-                                        }
-                                        required
-                                    />
+                                    <div className="flex items-center gap-2">
+                                        <div className="grow">
+                                            <Input
+                                                type="number"
+                                                id="startChapter"
+                                                min="1"
+                                                max={startChapterMax}
+                                                value={startChapter}
+                                                onChange={e => {
+                                                    const nextStartChapter =
+                                                        parseInt(
+                                                            e.target.value,
+                                                        ) || 1
+                                                    setStartChapter(
+                                                        nextStartChapter,
+                                                    )
+                                                    setStartVerse(currentVerse =>
+                                                        Math.min(
+                                                            currentVerse,
+                                                            getVerseMaxForChapter(
+                                                                nextStartChapter,
+                                                            ),
+                                                        ),
+                                                    )
+                                                }}
+                                                required
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const lastChapter =
+                                                    startChapterMax
+                                                setStartChapter(lastChapter)
+                                                setStartVerse(currentVerse =>
+                                                    Math.min(
+                                                        currentVerse,
+                                                        getVerseMaxForChapter(
+                                                            lastChapter,
+                                                        ),
+                                                    ),
+                                                )
+                                            }}
+                                            className="svg-outline border-primary bg-secondary relative shrink-0 border-2 p-2"
+                                            aria-label="Set start chapter to the last chapter in this book"
+                                            title="Use last chapter"
+                                        >
+                                            <CaretDoubleDown
+                                                aria-hidden
+                                                size={16}
+                                                weight="bold"
+                                            />
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div>
@@ -379,19 +436,42 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                     >
                                         Start Verse
                                     </label>
-                                    <Input
-                                        type="number"
-                                        id="startVerse"
-                                        min="1"
-                                        max={startChapterVerseMax}
-                                        value={startVerse}
-                                        onChange={e =>
-                                            setStartVerse(
-                                                parseInt(e.target.value) || 1,
-                                            )
-                                        }
-                                        required
-                                    />
+                                    <div className="flex items-center gap-2">
+                                        <div className="grow">
+                                            <Input
+                                                type="number"
+                                                id="startVerse"
+                                                min="1"
+                                                max={startChapterVerseMax}
+                                                value={startVerse}
+                                                onChange={e =>
+                                                    setStartVerse(
+                                                        parseInt(
+                                                            e.target.value,
+                                                        ) || 1,
+                                                    )
+                                                }
+                                                required
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setStartVerse(
+                                                    startChapterVerseMax,
+                                                )
+                                            }
+                                            className="svg-outline border-primary bg-secondary relative shrink-0 border-2 p-2"
+                                            aria-label="Set start verse to the last verse in this chapter"
+                                            title="Use last verse"
+                                        >
+                                            <ArrowLineDown
+                                                aria-hidden
+                                                size={16}
+                                                weight="bold"
+                                            />
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div>
@@ -401,19 +481,58 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                     >
                                         End Chapter
                                     </label>
-                                    <Input
-                                        type="number"
-                                        id="endChapter"
-                                        min="1"
-                                        max={endChapterMax}
-                                        value={endChapter}
-                                        onChange={e =>
-                                            setEndChapter(
-                                                parseInt(e.target.value) || 1,
-                                            )
-                                        }
-                                        required
-                                    />
+                                    <div className="flex items-center gap-2">
+                                        <div className="grow">
+                                            <Input
+                                                type="number"
+                                                id="endChapter"
+                                                min="1"
+                                                max={endChapterMax}
+                                                value={endChapter}
+                                                onChange={e => {
+                                                    const nextEndChapter =
+                                                        parseInt(
+                                                            e.target.value,
+                                                        ) || 1
+                                                    setEndChapter(nextEndChapter)
+                                                    setEndVerse(currentVerse =>
+                                                        Math.min(
+                                                            currentVerse,
+                                                            getVerseMaxForChapter(
+                                                                nextEndChapter,
+                                                            ),
+                                                        ),
+                                                    )
+                                                }}
+                                                required
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const lastChapter =
+                                                    endChapterMax
+                                                setEndChapter(lastChapter)
+                                                setEndVerse(currentVerse =>
+                                                    Math.min(
+                                                        currentVerse,
+                                                        getVerseMaxForChapter(
+                                                            lastChapter,
+                                                        ),
+                                                    ),
+                                                )
+                                            }}
+                                            className="svg-outline border-primary bg-secondary relative shrink-0 border-2 p-2"
+                                            aria-label="Set end chapter to the last chapter in this book"
+                                            title="Use last chapter"
+                                        >
+                                            <CaretDoubleDown
+                                                aria-hidden
+                                                size={16}
+                                                weight="bold"
+                                            />
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div>
@@ -423,19 +542,40 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                     >
                                         End Verse
                                     </label>
-                                    <Input
-                                        type="number"
-                                        id="endVerse"
-                                        min="1"
-                                        max={endChapterVerseMax}
-                                        value={endVerse}
-                                        onChange={e =>
-                                            setEndVerse(
-                                                parseInt(e.target.value) || 1,
-                                            )
-                                        }
-                                        required
-                                    />
+                                    <div className="flex items-center gap-2">
+                                        <div className="grow">
+                                            <Input
+                                                type="number"
+                                                id="endVerse"
+                                                min="1"
+                                                max={endChapterVerseMax}
+                                                value={endVerse}
+                                                onChange={e =>
+                                                    setEndVerse(
+                                                        parseInt(
+                                                            e.target.value,
+                                                        ) || 1,
+                                                    )
+                                                }
+                                                required
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setEndVerse(endChapterVerseMax)
+                                            }
+                                            className="svg-outline border-primary bg-secondary relative shrink-0 border-2 p-2"
+                                            aria-label="Set end verse to the last verse in this chapter"
+                                            title="Use last verse"
+                                        >
+                                            <ArrowLineDown
+                                                aria-hidden
+                                                size={16}
+                                                weight="bold"
+                                            />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
