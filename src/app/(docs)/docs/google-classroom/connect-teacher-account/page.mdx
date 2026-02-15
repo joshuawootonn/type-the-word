@@ -1,7 +1,12 @@
----
-title: Connect Your Teacher Account
-description: Link your teacher Google Classroom account so you can create assignments and track student progress.
----
+import { DocsPage } from "~/components/docs/docs-page"
+
+export const metadata = {
+    title: "Connect Your Teacher Account",
+    description:
+        "Link your teacher Google Classroom account so you can create assignments and track student progress.",
+}
+
+<DocsPage title={metadata.title} description={metadata.description} toc={toc}>
 
 ## Overview
 
@@ -92,3 +97,5 @@ After redirect, you should return to [`/classroom`](/classroom) and see:
 - `gc-teacher-connected-state.png`
 - `gc-teacher-dashboard-courses.png`
 - `gc-teacher-disconnect-button.png`
+
+</DocsPage>

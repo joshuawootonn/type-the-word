@@ -1,7 +1,12 @@
----
-title: Introduction
-description: Welcome to Type the Word's docs site. Type the Word is a tool for typing through the Bible, and this doc site will help you find your way around.
----
+import { DocsPage } from "~/components/docs/docs-page"
+
+export const metadata = {
+    title: "Introduction",
+    description:
+        "Welcome to Type the Word's docs site. Type the Word is a tool for typing through the Bible, and this doc site will help you find your way around.",
+}
+
+<DocsPage title={metadata.title} description={metadata.description} toc={toc}>
 
 This docs site currently mainly covers how our Google Classroom integration works, but more content is coming soon.
 
@@ -16,3 +21,5 @@ This docs site currently mainly covers how our Google Classroom integration work
         <Backpack aria-hidden size={16} weight="regular" />
     </DocsLinkCard>
 </DocsLinkGrid>
+
+</DocsPage>

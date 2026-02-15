@@ -1,7 +1,12 @@
----
-title: Enable Google Classroom in Google Workspace
-description: Allow Type the Word in Google Workspace so teachers and students can sign in with Google and use Classroom features.
----
+import { DocsPage } from "~/components/docs/docs-page"
+
+export const metadata = {
+    title: "Enable Google Classroom in Google Workspace",
+    description:
+        "Allow Type the Word in Google Workspace so teachers and students can sign in with Google and use Classroom features.",
+}
+
+<DocsPage title={metadata.title} description={metadata.description} toc={toc}>
 
 ## Overview
 
@@ -120,3 +125,5 @@ Both flows should complete without access-denied errors.
 - **Access denied on connect:** Re-check Access to Google Data choice and scope settings.
 - **Teachers work but students fail (or vice versa):** One of the app entries likely has mismatched access settings.
 - **Policy blocks app access:** Check org-level security restrictions and required approval workflows.
+
+</DocsPage>

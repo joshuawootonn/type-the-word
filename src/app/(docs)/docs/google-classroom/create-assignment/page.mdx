@@ -1,7 +1,12 @@
----
-title: Create a Classroom Assignment
-description: Build and publish a Type the Word assignment for a Google Classroom course.
----
+import { DocsPage } from "~/components/docs/docs-page"
+
+export const metadata = {
+    title: "Create a Classroom Assignment",
+    description:
+        "Build and publish a Type the Word assignment for a Google Classroom course.",
+}
+
+<DocsPage title={metadata.title} description={metadata.description} toc={toc}>
 
 ## Overview
 
@@ -92,3 +97,5 @@ Important: multi-chapter assignments are not supported in student completion. Ke
 - `gc-create-assignment-details.png`
 - `gc-create-assignment-draft-state.png`
 - `gc-create-assignment-publish.png`
+
+</DocsPage>
