@@ -89,32 +89,30 @@ export function TocLinks({ toc }: TocLinksProps) {
         }
     }, [toc])
 
-    if (toc.length < 2) {
-        return null
-    }
-
     return (
         <aside className="border-primary sticky top-16 hidden h-[calc(100vh-8rem)] w-full max-w-[240px] pl-4 xl:block">
             <ul className="space-y-2 text-sm">
-                {toc.map(item => (
-                    <li
-                        key={item.id}
-                        className={`${item.level === 3 ? "ml-3" : ""} relative`}
-                    >
-                        {activeId === item.id ? (
-                            <span
-                                aria-hidden
-                                className="bg-primary absolute top-1 bottom-1 -left-3 w-0.5"
-                            />
-                        ) : null}
-                        <a
-                            href={`#${item.id}`}
-                            className={`svg-outline-sm relative block no-underline hover:underline`}
-                        >
-                            {item.text}
-                        </a>
-                    </li>
-                ))}
+                {toc.length < 2
+                    ? null
+                    : toc.map(item => (
+                          <li
+                              key={item.id}
+                              className={`${item.level === 3 ? "ml-3" : ""} relative`}
+                          >
+                              {activeId === item.id ? (
+                                  <span
+                                      aria-hidden
+                                      className="bg-primary absolute top-1 bottom-1 -left-3 w-0.5"
+                                  />
+                              ) : null}
+                              <a
+                                  href={`#${item.id}`}
+                                  className={`svg-outline-sm relative block no-underline hover:underline`}
+                              >
+                                  {item.text}
+                              </a>
+                          </li>
+                      ))}
             </ul>
         </aside>
     )
