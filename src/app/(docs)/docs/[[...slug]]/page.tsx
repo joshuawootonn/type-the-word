@@ -47,7 +47,7 @@ export default async function Page({
     }
 
     return (
-        <div className="flex gap-8 px-12 pt-12">
+        <div className="flex gap-8 px-4 pt-12 md:px-12">
             <article className="max-w-page typo:prose dark:typo:prose-invert typo:prose-headings:text-primary typo:prose-p:text-primary typo:prose-li:text-primary typo:prose-a:text-primary typo:prose-strong:text-primary typo:prose-code:text-primary container mx-auto w-full">
                 <h1>{page.title}</h1>
                 {page.description ? <p>{page.description}</p> : null}

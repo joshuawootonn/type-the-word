@@ -14,7 +14,7 @@ export default function DocsRouteLayout({
     return (
         <div data-docs-layout className="w-full">
             <div className="mx-auto grid w-full grid-cols-1 md:grid-cols-[18rem_minmax(0,1fr)]">
-                <aside className="bg-primary/3 sticky border-primary/5 border-r-2 top-0 hidden h-dvh md:flex md:flex-col">
+                <aside className="bg-primary/3 border-primary/5 sticky top-0 hidden h-dvh border-r-2 md:flex md:flex-col">
                     <div className="p-4">
                         <DocsLogo />
                     </div>
@@ -27,11 +27,13 @@ export default function DocsRouteLayout({
                 </aside>
 
                 <section className="min-w-0">
-                    <header className="border-primary bg-secondary sticky top-0 z-30 flex items-center justify-between border-b-2 p-3 md:hidden">
-                        <DocsLogo />
-                        <MobileSidebarDialog items={docsNavigation} />
+                    <header className="bg-secondary border-primary/5 sticky top-0 z-30 border-b-2 md:hidden">
+                        <div className="bg-primary/3 mx-auto flex w-full items-center justify-between p-4">
+                            <DocsLogo />
+                            <MobileSidebarDialog items={docsNavigation} />
+                        </div>
                     </header>
-                    <div className="mx-auto flex w-full flex-col px-4 lg:px-0">
+                    <div className="mx-auto flex w-full flex-col">
                         <main>{children}</main>
                     </div>
                 </section>
