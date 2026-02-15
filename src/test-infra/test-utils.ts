@@ -67,6 +67,10 @@ export async function createUser({
 
     // Insert each session
     const typingSessionRepository = new TypingSessionRepository(db)
+    const typingSessionIdMap = new Map<string, string>()
+    for (const session of sessions) {
+        typingSessionIdMap.set(session.id, crypto.randomUUID())
+    }
     const sema = new Sema(3)
     const chunkSize = 5000
     await Promise.all(
@@ -75,7 +79,7 @@ export async function createUser({
             try {
                 await typingSessionRepository.db.insert(typingSessions).values(
                     sessionChunk.map(session => ({
-                        id: session.id,
+                        id: typingSessionIdMap.get(session.id) ?? session.id,
                         createdAt: new Date(session.createdAt),
                         updatedAt: new Date(session.updatedAt),
                         userId: user.id,
@@ -109,6 +113,10 @@ export async function createUser({
             try {
                 const typedVersesData = verseChunk.map(verse => ({
                     ...verse,
+                    id: crypto.randomUUID(),
+                    typingSessionId:
+                        typingSessionIdMap.get(verse.typingSessionId) ??
+                        verse.typingSessionId,
                     createdAt: new Date(verse.createdAt),
                     userId: user.id,
                     typingData: verse.typingData as TypingData | null,
