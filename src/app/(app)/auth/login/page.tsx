@@ -108,11 +108,15 @@ export default function LogInPage() {
                                 >
                                     Email
                                 </label>
-                                <div className="svg-outline-within relative">
+                                <div
+                                    className="svg-outline-within relative"
+                                    data-testid="login-email-field"
+                                >
                                     <Field
                                         name="email"
                                         type="email"
                                         id="email"
+                                        data-testid="login-email"
                                         innerRef={emailRef}
                                         className="border-primary bg-secondary text-primary placeholder:text-primary/50 w-full rounded-none border-2 px-3 py-1.5 font-medium outline-hidden"
                                         placeholder="Enter your email..."
@@ -134,11 +138,15 @@ export default function LogInPage() {
                                 >
                                     Password
                                 </label>
-                                <div className="svg-outline-within relative">
+                                <div
+                                    className="svg-outline-within relative"
+                                    data-testid="login-password-field"
+                                >
                                     <Field
                                         name="password"
                                         type="password"
                                         id="password"
+                                        data-testid="login-password"
                                         innerRef={passwordRef}
                                         className="border-primary bg-secondary text-primary placeholder:text-primary/50 w-full rounded-none border-2 px-3 py-1.5 font-medium outline-hidden"
                                         placeholder="Enter your password..."
@@ -165,6 +173,7 @@ export default function LogInPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
+                                data-testid="login-submit"
                                 className={clsx(
                                     "svg-outline border-primary bg-primary text-secondary relative w-full cursor-pointer border-2 px-3 py-1 font-semibold",
                                     "disabled:bg-primary disabled:text-secondary disabled:cursor-not-allowed",
