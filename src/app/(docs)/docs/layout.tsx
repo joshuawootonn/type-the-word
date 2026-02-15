@@ -14,8 +14,10 @@ export default function DocsRouteLayout({
     return (
         <div data-docs-layout className="w-full">
             <div className="mx-auto grid w-full grid-cols-1 md:grid-cols-[18rem_minmax(0,1fr)]">
-                <aside className="border-primary bg-secondary/80 sticky top-0 hidden h-dvh border-r-2 md:flex md:flex-col">
-                    <DocsLogo className="p-4" />
+                <aside className="bg-primary/3 sticky border-primary/5 border-r-2 top-0 hidden h-dvh md:flex md:flex-col">
+                    <div className="p-4">
+                        <DocsLogo />
+                    </div>
                     <div className="min-h-0 flex-1 overflow-y-auto p-4">
                         <DocsNavLinks items={docsNavigation} />
                     </div>
