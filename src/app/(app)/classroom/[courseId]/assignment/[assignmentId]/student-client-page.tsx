@@ -99,55 +99,59 @@ export function StudentClientPage({
                 />
 
                 <div className="bg-secondary sticky right-0 bottom-0 left-0 -mx-16 flex flex-col gap-4 px-16 py-4 pt-0 pb-8">
-                    <hr className="border-primary my-0" />
                     {hasMultipleChapters && activeChapter && (
-                        <div className="not-prose flex items-center justify-between gap-3">
-                            {canGoToPreviousChapter ? (
-                                <Button
-                                    type="button"
-                                    onClick={() =>
-                                        navigateToChapter(
-                                            activeChapterIndex - 1,
-                                        )
-                                    }
-                                >
-                                    Chapter{" "}
-                                    {
-                                        chapterSegments[activeChapterIndex - 1]
-                                            ?.chapter
-                                    }
-                                </Button>
-                            ) : (
-                                <div />
-                            )}
-                            <div className="text-primary absolute left-1/2 -translate-x-1/2 text-center text-sm">
-                                <div className="font-semibold">
-                                    Chapter {activeChapter.chapter} of{" "}
-                                    {chapterSegments.length}
+                        <>
+                            <hr className="border-primary my-0" />
+                            <div className="not-prose flex items-center justify-between gap-3">
+                                {canGoToPreviousChapter ? (
+                                    <Button
+                                        type="button"
+                                        onClick={() =>
+                                            navigateToChapter(
+                                                activeChapterIndex - 1,
+                                            )
+                                        }
+                                    >
+                                        Chapter{" "}
+                                        {
+                                            chapterSegments[
+                                                activeChapterIndex - 1
+                                            ]?.chapter
+                                        }
+                                    </Button>
+                                ) : (
+                                    <div />
+                                )}
+                                <div className="text-primary absolute left-1/2 -translate-x-1/2 text-center text-sm">
+                                    <div className="font-semibold">
+                                        Chapter {activeChapter.chapter} of{" "}
+                                        {chapterSegments.length}
+                                    </div>
+                                    <div className="opacity-75">
+                                        {activeChapter.referenceLabel}
+                                    </div>
                                 </div>
-                                <div className="opacity-75">
-                                    {activeChapter.referenceLabel}
-                                </div>
+                                {canGoToNextChapter ? (
+                                    <Button
+                                        type="button"
+                                        onClick={() =>
+                                            navigateToChapter(
+                                                activeChapterIndex + 1,
+                                            )
+                                        }
+                                    >
+                                        Chapter{" "}
+                                        {
+                                            chapterSegments[
+                                                activeChapterIndex + 1
+                                            ]?.chapter
+                                        }
+                                    </Button>
+                                ) : (
+                                    <div />
+                                )}
                             </div>
-                            {canGoToNextChapter ? (
-                                <Button
-                                    type="button"
-                                    onClick={() =>
-                                        navigateToChapter(
-                                            activeChapterIndex + 1,
-                                        )
-                                    }
-                                >
-                                    Chapter{" "}
-                                    {
-                                        chapterSegments[activeChapterIndex + 1]
-                                            ?.chapter
-                                    }
-                                </Button>
-                            ) : (
-                                <div />
-                            )}
-                        </div>
+                        </>
                     )}
 
                     <StudentAssignmentCompletion
