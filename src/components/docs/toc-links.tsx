@@ -90,7 +90,7 @@ export function TocLinks({ toc }: TocLinksProps) {
     }, [toc])
 
     return (
-        <aside className="border-primary sticky top-16 hidden h-[calc(100vh-8rem)] w-full max-w-[240px] pl-4 xl:block">
+        <aside className="border-primary sticky top-16 hidden h-[calc(100vh-8rem)] w-full max-w-64 pl-4 xl:block">
             <ul className="space-y-2 text-sm">
                 {toc.length < 2
                     ? null

@@ -4,6 +4,8 @@ import type { TocItem } from "~/lib/docs/types"
 
 import { TocLinks } from "~/components/docs/toc-links"
 
+import { Footer } from "../footer"
+
 interface DocsPageProps {
     title: string
     description: string
@@ -68,14 +70,15 @@ export function DocsPage({
     const normalizedToc = toFlatToc(toc)
 
     return (
-        <div className="flex gap-8 px-4 pt-12 md:px-12">
+        <div className="flex gap-8 px-4 md:px-12">
             <article
                 data-doc-article
-                className="max-w-page typo:prose dark:typo:prose-invert typo:prose-headings:text-primary typo:prose-p:text-primary typo:prose-li:text-primary typo:prose-a:text-primary typo:prose-strong:text-primary typo:prose-code:text-primary container mx-auto w-full"
+                className="min-h-screen-1px pt-12 flex flex-col max-w-page typo:prose dark:typo:prose-invert typo:prose-headings:text-primary typo:prose-p:text-primary typo:prose-li:text-primary typo:prose-a:text-primary typo:prose-strong:text-primary typo:prose-code:text-primary container mx-auto w-full"
             >
                 <h1>{title}</h1>
                 <p>{description}</p>
-                {children}
+                <div className="grow">{children}</div>
+                <Footer variant="docs" />
             </article>
             <TocLinks toc={normalizedToc} />
         </div>

@@ -12,7 +12,14 @@ import { fetchUserChangelog } from "~/lib/api"
 import { changelogUpdatedAt } from "~/lib/changelogUpdatedAt"
 import { cn } from "~/lib/cn"
 
-export function Footer({ className }: { className?: string }) {
+type FooterVariant = "default" | "docs"
+
+interface FooterProps {
+    className?: string
+    variant?: FooterVariant
+}
+
+export function Footer({ className, variant = "default" }: FooterProps) {
     const { data: sessionData } = useSession()
     const { data } = useQuery({
         queryKey: ["user-changelog"],
@@ -26,13 +33,17 @@ export function Footer({ className }: { className?: string }) {
         isBefore(changelogUpdatedAt, parseISO(data.lastVisitedAt))
     const hasUnreadChangelog =
         !hasSeenChangelog || (hasSeenChangelog && !hasSeenEveryChangelog)
+    const primarySiteLink =
+        variant === "docs"
+            ? { href: "/", label: "main site" }
+            : { href: "/docs", label: "docs" }
 
     return (
         <>
             <footer
                 data-app-footer
                 className={cn(
-                    "text-primary mb-2 flex w-full flex-col items-center justify-between py-2 text-sm sm:flex-row",
+                    "not-prose text-primary mb-2 flex w-full flex-col items-center justify-between py-2 text-sm sm:flex-row",
                     className,
                 )}
             >
@@ -97,9 +108,9 @@ export function Footer({ className }: { className?: string }) {
                     <div>/</div>
                     <Link
                         className="svg-outline relative no-underline"
-                        href={"/docs"}
+                        href={primarySiteLink.href}
                     >
-                        docs
+                        {primarySiteLink.label}
                     </Link>
                 </div>
                 <div className="hidden grow md:block"> </div>
