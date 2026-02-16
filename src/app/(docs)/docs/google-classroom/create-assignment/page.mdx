@@ -18,18 +18,20 @@ Teachers create assignments from [`/classroom/assign`](/classroom/assign). The a
 - At least one Google Classroom course
 - Passage details ready (translation, book, chapter, verse range)
 
-## Step 1: Open the assignment form
+## Step 1: Open assignment creation from Classroom
 
-1. Go to [`/classroom/assign`](/classroom/assign).
-2. Confirm the page title is **Create Assignment**.
+You can start assignment creation from two places:
 
-[Screenshot: Create Assignment page with full form visible]
+1. From the teacher connection card on [`/classroom`](/classroom)
+2. From the specific course page (`/classroom/{courseId}`)
 
-- Suggested filename: `gc-create-assignment-form.png`
-- Alt text: `Create Assignment form with course, passage, and grading fields`
-- Caption: `All required assignment inputs are on one page.`
+![Teacher connection section with Create assignment button on classroom page](/assets/docs/google-classroom/create-assignment/gc-create-assignment-entrypoint-landing.png)
 
-## Step 2: Fill course and passage details
+![Course detail page with Create Assignment button](/assets/docs/google-classroom/create-assignment/gc-create-assignment-entrypoint-course.png)
+
+Use whichever entry point is most convenient for your workflow.
+
+## Step 2: Fill the create assignment form
 
 1. Choose a **Course**.
 2. In **Passage**, select:
@@ -38,49 +40,33 @@ Teachers create assignments from [`/classroom/assign`](/classroom/assign). The a
     - **Start Chapter** and **Start Verse**
     - **End Chapter** and **End Verse**
 
+3. Enter **Assignment Title**.
+4. Optionally add **Description (optional)**.
+5. Set **Max Points**.
+6. Optionally set **Due Date (optional)**.
+
+![Create Assignment form with course, passage, and grading fields](/assets/docs/google-classroom/create-assignment/gc-create-assignment-form.png)
+
 Important: multi-chapter assignments are not supported in student completion. Keep passage within one chapter.
 
-[Screenshot: Passage section with translation, book, and verse range filled]
-
-- Suggested filename: `gc-create-assignment-passage.png`
-- Alt text: `Passage fields completed for assignment`
-- Caption: `Use a single chapter range for best compatibility with assignment completion.`
-
-## Step 3: Fill assignment details
-
-1. Enter **Assignment Title**.
-2. Optionally add **Description (optional)**.
-3. Set **Max Points**.
-4. Optionally set **Due Date (optional)**.
-
-[Screenshot: Assignment title, description, points, and due date fields]
-
-- Suggested filename: `gc-create-assignment-details.png`
-- Alt text: `Assignment metadata fields completed on form`
-- Caption: `Title and points are required for assignment creation.`
-
-## Step 4: Submit and review draft
+## Step 3: Submit and review draft
 
 1. Click **Create Assignment**.
 2. Wait for redirect to [`/classroom/{courseId}/assignment/{assignmentId}`](/classroom/dashboard).
 3. Confirm assignment state shows **Draft**.
 
-[Screenshot: Newly created assignment detail page showing Draft state]
+![Assignment detail page with draft status badge and publish action](/assets/docs/google-classroom/create-assignment/gc-create-assignment-draft-state.png)
 
-- Suggested filename: `gc-create-assignment-draft-state.png`
-- Alt text: `Assignment detail page with draft status badge`
-- Caption: `New assignments are created as draft coursework in Google Classroom.`
+New assignments are created as draft coursework in Google Classroom.
 
-## Step 5: Publish the assignment
+## Step 4: Publish the assignment
 
 1. On the assignment detail page, click **Publish Assignment** (or **Publish** from course list).
 2. Confirm status changes from **Draft** to **Published**.
 
-[Screenshot: Publish Assignment button and published status]
+![Published assignment detail page after publishing](/assets/docs/google-classroom/create-assignment/gc-create-assignment-publish.png)
 
-- Suggested filename: `gc-create-assignment-publish.png`
-- Alt text: `Publishing action on assignment detail page`
-- Caption: `Students only receive assignments after publish.`
+Students only receive assignments after publish.
 
 ## Troubleshooting
 
@@ -89,13 +75,5 @@ Important: multi-chapter assignments are not supported in student completion. Ke
 - **Assignment creation fails:** Check OAuth scopes for coursework students and rosters.
 - **Students cannot see assignment:** Ensure the assignment is published, not draft.
 - **Verse range issues:** Use a same-chapter range to avoid unsupported multi-chapter behavior.
-
-## Screenshot Checklist
-
-- `gc-create-assignment-form.png`
-- `gc-create-assignment-passage.png`
-- `gc-create-assignment-details.png`
-- `gc-create-assignment-draft-state.png`
-- `gc-create-assignment-publish.png`
 
 </DocsPage>

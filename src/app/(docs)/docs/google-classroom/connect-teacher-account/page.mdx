@@ -10,11 +10,13 @@ export const metadata = {
 
 ## Overview
 
-Teachers connect their Google account from [`/classroom`](/classroom). A successful teacher connection enables:
+This guide shows teachers how to connect Google Classroom to Type the Word.
 
-- Course loading on [`/classroom/dashboard`](/classroom/dashboard)
-- Assignment creation on [`/classroom/assign`](/classroom/assign)
-- Progress tracking on course and assignment detail pages
+Once connected, you can:
+
+- See your classes on [`/classroom/dashboard`](/classroom/dashboard)
+- Create assignments from [`/classroom/assign`](/classroom/assign)
+- Track assignment progress for your students
 
 ## Prerequisites
 
@@ -22,54 +24,66 @@ Teachers connect their Google account from [`/classroom`](/classroom). A success
 - Your school admin completed Workspace setup
 - You are a teacher in at least one Google Classroom course
 
-## Step 1: Open the Classroom connection page
+## Step 1: Start from the Classroom page
 
 1. Sign in to Type the Word.
 2. Open [`/classroom`](/classroom).
-3. Find the **Teacher Connection** section.
+3. In **Teacher Connection**, click **Connect as Teacher**.
 
-[Screenshot: Classroom page focused on Teacher Connection panel]
+![Teacher connection section on the classroom page](/assets/docs/google-classroom/connect-teacher-account/step-1-open-classroom-page.png)
 
-- Suggested filename: `gc-teacher-open-connection-panel.png`
-- Alt text: `Teacher Connection section on the classroom page`
-- Caption: `Teachers connect from the Teacher Connection card on /classroom.`
+This button starts the Google sign-in and permission flow.
 
-## Step 2: Start OAuth with Google
+## Step 2: Choose your Google account
 
-1. Click **Connect as Teacher**.
-2. Choose the Google account that owns or teaches your classes.
-3. Review and approve requested permissions.
+1. On the Google sign-in page, choose the account you use to teach your classes.
+2. If needed, click **Use another account** and sign in with the correct one.
 
-[Screenshot: Google OAuth consent screen for teacher connection]
+![Google account chooser during teacher connection](/assets/docs/google-classroom/connect-teacher-account/step-2-choose-google-account.png)
 
-- Suggested filename: `gc-teacher-google-consent.png`
-- Alt text: `Google OAuth consent screen requesting classroom permissions for teacher`
-- Caption: `Approve access so Type the Word can create and monitor coursework.`
+Choose the same account that appears as a teacher in your Google Classroom courses.
 
-## Step 3: Confirm connected state
+## Step 3: Review and allow permissions
+
+1. Review the permissions screen.
+2. Click **Allow** to continue.
+
+![Google permissions screen for Type the Word Classroom access](/assets/docs/google-classroom/connect-teacher-account/step-3-allow-google-permissions.png)
+
+Google lists exactly what Type the Word can access. These permissions are used to support teacher workflows inside Type the Word.
+
+## What these permissions allow in Type the Word
+
+On the consent screen, Google shows four Classroom permissions. Here is what each one means in plain language:
+
+- **Manage coursework and grades for students in classes you teach/administer**  
+  Lets Type the Word create and update assignments in your classes.
+- **View coursework and grades for students in classes you teach/administer**  
+  Lets Type the Word show assignment details and progress when you review class work.
+- **View your Google Classroom class rosters**  
+  Lets Type the Word identify students in your classes for assignment tracking.
+- **View your Google Classroom classes**  
+  Lets Type the Word load your course list so you can pick a class when creating assignments.
+
+## Step 4: Confirm connected state in Type the Word
 
 After redirect, you should return to [`/classroom`](/classroom) and see:
 
 - **Connected as teacher**
-- Links to **Create assignment** and **View dashboard**
+- Buttons for **Create assignment** and **View dashboard**
+- A **Disconnect from Google Classroom** button
 
-[Screenshot: Teacher connected confirmation with Create assignment and View dashboard links]
+![Connected as teacher state on the classroom page](/assets/docs/google-classroom/connect-teacher-account/step-4-connected-as-teacher.png)
 
-- Suggested filename: `gc-teacher-connected-state.png`
-- Alt text: `Teacher connected status shown on classroom page`
-- Caption: `Connected state confirms your teacher token is active.`
+If this card appears, your teacher account is connected successfully.
 
-## Step 4: Verify your courses load
+## Step 5: Verify your classes load
 
 1. Click **View dashboard**.
 2. Confirm your classes appear on [`/classroom/dashboard`](/classroom/dashboard).
-3. Open one course to verify assignment list access.
+3. Open one class to verify you can view assignments and student progress.
 
-[Screenshot: Dashboard course list after successful teacher connection]
-
-- Suggested filename: `gc-teacher-dashboard-courses.png`
-- Alt text: `Dashboard page listing available classroom courses`
-- Caption: `If courses appear, your teacher connection and scopes are working.`
+If your classes appear, your connection is working.
 
 ## Disconnecting your teacher account
 
@@ -77,25 +91,11 @@ After redirect, you should return to [`/classroom`](/classroom) and see:
 2. In **Teacher Connection**, click **Disconnect from Google Classroom**.
 3. Refresh and confirm **Connect as Teacher** appears again.
 
-[Screenshot: Disconnect from Google Classroom button in Teacher Connection card]
-
-- Suggested filename: `gc-teacher-disconnect-button.png`
-- Alt text: `Disconnect from Google Classroom action in teacher card`
-- Caption: `Disconnect removes the saved teacher token for your user.`
-
 ## Troubleshooting
 
 - **No courses on dashboard:** Verify you selected the correct Google account and that it has teacher access.
 - **OAuth finishes but still not connected:** Clear browser cookies, reload [`/classroom`](/classroom), and reconnect.
 - **Classroom nav link not visible:** Teacher dashboard visibility depends on active teacher connection cookie.
 - **Permission denied errors:** Ask admin to verify the Classroom API and OAuth scopes.
-
-## Screenshot Checklist
-
-- `gc-teacher-open-connection-panel.png`
-- `gc-teacher-google-consent.png`
-- `gc-teacher-connected-state.png`
-- `gc-teacher-dashboard-courses.png`
-- `gc-teacher-disconnect-button.png`
 
 </DocsPage>
