@@ -621,12 +621,12 @@ describe("ClassroomRepository - Integration Tests", () => {
             expect(result).toBeUndefined()
         })
 
-        it("returns matching assignment with no submission when course is enrolled", async () => {
+        it("does not return deleted assignments in course-filtered matching", async () => {
             const assignment = await createAssignment({
                 teacherUserId: testTeacherId,
                 courseId: "course-456",
                 courseWorkId: "coursework-5",
-                title: "Unstarted Assignment",
+                title: "Deleted Assignment",
                 translation: "esv" as const,
                 book: "romans" as const,
                 startChapter: 8,
@@ -635,6 +635,92 @@ describe("ClassroomRepository - Integration Tests", () => {
                 endVerse: 11,
                 totalVerses: 11,
                 maxPoints: 100,
+                state: "DELETED",
+            })
+
+            const result = await getStudentCoursePassageAssignmentMatch({
+                studentUserId: testStudentId,
+                courseIds: ["course-456"],
+                book: "romans",
+                chapter: 8,
+            })
+
+            expect(result).toBeUndefined()
+            expect(assignment.id).toBeDefined()
+        })
+
+        it("does not return unpublished assignments in course-filtered matching", async () => {
+            const assignment = await createAssignment({
+                teacherUserId: testTeacherId,
+                courseId: "course-456",
+                courseWorkId: "coursework-5b",
+                title: "Draft Assignment",
+                translation: "esv" as const,
+                book: "romans" as const,
+                startChapter: 8,
+                startVerse: 1,
+                endChapter: 8,
+                endVerse: 11,
+                totalVerses: 11,
+                maxPoints: 100,
+                state: "DRAFT",
+            })
+
+            const result = await getStudentCoursePassageAssignmentMatch({
+                studentUserId: testStudentId,
+                courseIds: ["course-456"],
+                book: "romans",
+                chapter: 8,
+            })
+
+            expect(result).toBeUndefined()
+            expect(assignment.id).toBeDefined()
+        })
+
+        it("returns past-due published assignments in course-filtered matching", async () => {
+            const assignment = await createAssignment({
+                teacherUserId: testTeacherId,
+                courseId: "course-456",
+                courseWorkId: "coursework-5c",
+                title: "Past Due Assignment",
+                translation: "esv" as const,
+                book: "romans" as const,
+                startChapter: 8,
+                startVerse: 1,
+                endChapter: 8,
+                endVerse: 11,
+                totalVerses: 11,
+                maxPoints: 100,
+                dueDate: new Date("2000-01-01T12:00:00.000Z"),
+                state: "PUBLISHED",
+            })
+
+            const result = await getStudentCoursePassageAssignmentMatch({
+                studentUserId: testStudentId,
+                courseIds: ["course-456"],
+                book: "romans",
+                chapter: 8,
+            })
+
+            expect(result).toBeDefined()
+            expect(result?.id).toBe(assignment.id)
+        })
+
+        it("returns active published assignments in course-filtered matching", async () => {
+            const assignment = await createAssignment({
+                teacherUserId: testTeacherId,
+                courseId: "course-456",
+                courseWorkId: "coursework-5d",
+                title: "Active Assignment",
+                translation: "esv" as const,
+                book: "romans" as const,
+                startChapter: 8,
+                startVerse: 1,
+                endChapter: 8,
+                endVerse: 11,
+                totalVerses: 11,
+                maxPoints: 100,
+                dueDate: new Date("2099-01-01T12:00:00.000Z"),
                 state: "PUBLISHED",
             })
 
