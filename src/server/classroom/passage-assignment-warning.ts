@@ -1,5 +1,6 @@
 import { type Book } from "~/server/db/schema"
 import {
+    getTeacherToken,
     getStudentCoursePassageAssignmentMatch,
     getStudentPassageAssignmentMatch,
     getStudentToken,
@@ -14,9 +15,17 @@ export async function getPassageAssignmentWarningMatch(data: {
     book: Book
     chapter: number
 }): Promise<StudentPassageAssignmentMatch | undefined> {
-    const studentToken = await getStudentToken(data.userId).catch(() => null)
+    const [studentToken, teacherToken] = await Promise.all([
+        getStudentToken(data.userId).catch(() => null),
+        getTeacherToken(data.userId).catch(() => null),
+    ])
 
-    // Only students with a connected student token can have classroom assignment warnings.
+    // Users without any classroom token are not connected to Classroom.
+    if (!studentToken && !teacherToken) {
+        return undefined
+    }
+
+    // Assignment progress warnings only apply to student assignment work.
     if (!studentToken) {
         return undefined
     }

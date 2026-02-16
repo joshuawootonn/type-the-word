@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { getValidStudentToken } from "~/server/classroom/student-token"
 import { listStudentCourses } from "~/server/clients/classroom.client"
 import {
+    getTeacherToken,
     getStudentCoursePassageAssignmentMatch,
     getStudentPassageAssignmentMatch,
     getStudentToken,
@@ -11,6 +12,7 @@ import {
 import { getPassageAssignmentWarningMatch } from "./passage-assignment-warning"
 
 vi.mock("~/server/repositories/classroom.repository", () => ({
+    getTeacherToken: vi.fn(),
     getStudentToken: vi.fn(),
     getStudentPassageAssignmentMatch: vi.fn(),
     getStudentCoursePassageAssignmentMatch: vi.fn(),
@@ -29,7 +31,31 @@ describe("getPassageAssignmentWarningMatch", () => {
         vi.resetAllMocks()
     })
 
-    it("returns undefined when user is not a connected student", async () => {
+    it("returns undefined when user has no classroom tokens", async () => {
+        vi.mocked(getTeacherToken).mockResolvedValue(undefined)
+        vi.mocked(getStudentToken).mockResolvedValue(undefined)
+
+        const result = await getPassageAssignmentWarningMatch({
+            userId: "user-1",
+            book: "john",
+            chapter: 3,
+        })
+
+        expect(result).toBeUndefined()
+        expect(getStudentPassageAssignmentMatch).not.toHaveBeenCalled()
+        expect(getValidStudentToken).not.toHaveBeenCalled()
+    })
+
+    it("returns undefined when user only has a teacher token", async () => {
+        vi.mocked(getTeacherToken).mockResolvedValue({
+            userId: "user-1",
+            accessToken: "token",
+            refreshToken: "refresh",
+            expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+            scope: "scope",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        })
         vi.mocked(getStudentToken).mockResolvedValue(undefined)
 
         const result = await getPassageAssignmentWarningMatch({
@@ -66,6 +92,7 @@ describe("getPassageAssignmentWarningMatch", () => {
             createdAt: new Date(),
             updatedAt: new Date(),
         })
+        vi.mocked(getTeacherToken).mockResolvedValue(undefined)
         vi.mocked(getStudentPassageAssignmentMatch).mockResolvedValue(match)
 
         const result = await getPassageAssignmentWarningMatch({
@@ -102,6 +129,7 @@ describe("getPassageAssignmentWarningMatch", () => {
             createdAt: new Date(),
             updatedAt: new Date(),
         })
+        vi.mocked(getTeacherToken).mockResolvedValue(undefined)
         vi.mocked(getStudentPassageAssignmentMatch).mockResolvedValue(undefined)
         vi.mocked(getValidStudentToken).mockResolvedValue({
             accessToken: "fresh-token",
@@ -140,6 +168,7 @@ describe("getPassageAssignmentWarningMatch", () => {
             createdAt: new Date(),
             updatedAt: new Date(),
         })
+        vi.mocked(getTeacherToken).mockResolvedValue(undefined)
         vi.mocked(getStudentPassageAssignmentMatch).mockResolvedValue(undefined)
         vi.mocked(getValidStudentToken).mockResolvedValue({
             accessToken: "fresh-token",
