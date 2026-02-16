@@ -367,16 +367,9 @@ export function ClientPage({
                                 </div>
 
                                 <div>
-                                    <label
-                                        htmlFor="startChapter"
-                                        className="mb-2 block"
-                                    >
-                                        Start Chapter
-                                    </label>
                                     <NumberInput
                                         id="startChapter"
-                                        label="start chapter"
-                                        scrubLabel="Drag to change start chapter"
+                                        label="Start Chapter"
                                         min={1}
                                         max={startChapterMax}
                                         value={startChapter}
@@ -396,16 +389,9 @@ export function ClientPage({
                                 </div>
 
                                 <div>
-                                    <label
-                                        htmlFor="startVerse"
-                                        className="mb-2 block"
-                                    >
-                                        Start Verse
-                                    </label>
                                     <NumberInput
                                         id="startVerse"
-                                        label="start verse"
-                                        scrubLabel="Drag to change start verse"
+                                        label="Start Verse"
                                         min={1}
                                         max={startChapterVerseMax}
                                         value={startVerse}
@@ -415,16 +401,9 @@ export function ClientPage({
                                 </div>
 
                                 <div>
-                                    <label
-                                        htmlFor="endChapter"
-                                        className="mb-2 block"
-                                    >
-                                        End Chapter
-                                    </label>
                                     <NumberInput
                                         id="endChapter"
-                                        label="end chapter"
-                                        scrubLabel="Drag to change end chapter"
+                                        label="End Chapter"
                                         min={1}
                                         max={endChapterMax}
                                         value={endChapter}
@@ -444,16 +423,9 @@ export function ClientPage({
                                 </div>
 
                                 <div>
-                                    <label
-                                        htmlFor="endVerse"
-                                        className="mb-2 block"
-                                    >
-                                        End Verse
-                                    </label>
                                     <NumberInput
                                         id="endVerse"
-                                        label="end verse"
-                                        scrubLabel="Drag to change end verse"
+                                        label="End Verse"
                                         min={1}
                                         max={endChapterVerseMax}
                                         value={endVerse}
