@@ -1,6 +1,5 @@
 "use client"
 
-import { ArrowLineDown, CaretDoubleDown } from "@phosphor-icons/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -9,7 +8,7 @@ import { ClassroomNotice } from "~/components/classroom-notice"
 import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
 import { Input, Textarea } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
+import { NumberInput } from "~/components/ui/number-input"
 import {
     Select,
     SelectContent,
@@ -271,7 +270,12 @@ export function ClientPage({
                     >
                         {/* Course Selection */}
                         <div>
-                            <Label htmlFor="course">Course</Label>
+                            <label
+                                htmlFor="course"
+                                className="mb-2 block font-medium"
+                            >
+                                Course
+                            </label>
                             <Select
                                 value={selectedCourse}
                                 onValueChange={setSelectedCourse}
@@ -301,9 +305,12 @@ export function ClientPage({
 
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                    <Label htmlFor="translation">
+                                    <label
+                                        htmlFor="translation"
+                                        className="mb-2 block"
+                                    >
                                         Translation
-                                    </Label>
+                                    </label>
                                     <Select
                                         value={translation}
                                         onValueChange={val => {
@@ -334,7 +341,12 @@ export function ClientPage({
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="book">Book</Label>
+                                    <label
+                                        htmlFor="book"
+                                        className="mb-2 block"
+                                    >
+                                        Book
+                                    </label>
                                     <Select
                                         value={book}
                                         onValueChange={setBook}
@@ -355,210 +367,107 @@ export function ClientPage({
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="startChapter">
+                                    <label
+                                        htmlFor="startChapter"
+                                        className="mb-2 block"
+                                    >
                                         Start Chapter
-                                    </Label>
-                                    <div className="flex items-center gap-2">
-                                        <div className="grow">
-                                            <Input
-                                                type="number"
-                                                id="startChapter"
-                                                min="1"
-                                                max={startChapterMax}
-                                                value={startChapter}
-                                                onChange={e => {
-                                                    const nextStartChapter =
-                                                        parseInt(
-                                                            e.target.value,
-                                                        ) || 1
-                                                    setStartChapter(
+                                    </label>
+                                    <NumberInput
+                                        id="startChapter"
+                                        label="start chapter"
+                                        scrubLabel="Drag to change start chapter"
+                                        min={1}
+                                        max={startChapterMax}
+                                        value={startChapter}
+                                        onValueChange={nextStartChapter => {
+                                            setStartChapter(nextStartChapter)
+                                            setStartVerse(currentVerse =>
+                                                Math.min(
+                                                    currentVerse,
+                                                    getVerseMaxForChapter(
                                                         nextStartChapter,
-                                                    )
-                                                    setStartVerse(
-                                                        currentVerse =>
-                                                            Math.min(
-                                                                currentVerse,
-                                                                getVerseMaxForChapter(
-                                                                    nextStartChapter,
-                                                                ),
-                                                            ),
-                                                    )
-                                                }}
-                                                required
-                                            />
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                const lastChapter =
-                                                    startChapterMax
-                                                setStartChapter(lastChapter)
-                                                setStartVerse(currentVerse =>
-                                                    Math.min(
-                                                        currentVerse,
-                                                        getVerseMaxForChapter(
-                                                            lastChapter,
-                                                        ),
                                                     ),
-                                                )
-                                            }}
-                                            className="svg-outline border-primary bg-secondary relative shrink-0 border-2 p-2"
-                                            aria-label="Set start chapter to the last chapter in this book"
-                                            title="Use last chapter"
-                                        >
-                                            <CaretDoubleDown
-                                                aria-hidden
-                                                size={16}
-                                                weight="bold"
-                                            />
-                                        </button>
-                                    </div>
+                                                ),
+                                            )
+                                        }}
+                                        required
+                                    />
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="startVerse">
+                                    <label
+                                        htmlFor="startVerse"
+                                        className="mb-2 block"
+                                    >
                                         Start Verse
-                                    </Label>
-                                    <div className="flex items-center gap-2">
-                                        <div className="grow">
-                                            <Input
-                                                type="number"
-                                                id="startVerse"
-                                                min="1"
-                                                max={startChapterVerseMax}
-                                                value={startVerse}
-                                                onChange={e =>
-                                                    setStartVerse(
-                                                        parseInt(
-                                                            e.target.value,
-                                                        ) || 1,
-                                                    )
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setStartVerse(
-                                                    startChapterVerseMax,
-                                                )
-                                            }
-                                            className="svg-outline border-primary bg-secondary relative shrink-0 border-2 p-2"
-                                            aria-label="Set start verse to the last verse in this chapter"
-                                            title="Use last verse"
-                                        >
-                                            <ArrowLineDown
-                                                aria-hidden
-                                                size={16}
-                                                weight="bold"
-                                            />
-                                        </button>
-                                    </div>
+                                    </label>
+                                    <NumberInput
+                                        id="startVerse"
+                                        label="start verse"
+                                        scrubLabel="Drag to change start verse"
+                                        min={1}
+                                        max={startChapterVerseMax}
+                                        value={startVerse}
+                                        onValueChange={setStartVerse}
+                                        required
+                                    />
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="endChapter">
+                                    <label
+                                        htmlFor="endChapter"
+                                        className="mb-2 block"
+                                    >
                                         End Chapter
-                                    </Label>
-                                    <div className="flex items-center gap-2">
-                                        <div className="grow">
-                                            <Input
-                                                type="number"
-                                                id="endChapter"
-                                                min="1"
-                                                max={endChapterMax}
-                                                value={endChapter}
-                                                onChange={e => {
-                                                    const nextEndChapter =
-                                                        parseInt(
-                                                            e.target.value,
-                                                        ) || 1
-                                                    setEndChapter(
+                                    </label>
+                                    <NumberInput
+                                        id="endChapter"
+                                        label="end chapter"
+                                        scrubLabel="Drag to change end chapter"
+                                        min={1}
+                                        max={endChapterMax}
+                                        value={endChapter}
+                                        onValueChange={nextEndChapter => {
+                                            setEndChapter(nextEndChapter)
+                                            setEndVerse(currentVerse =>
+                                                Math.min(
+                                                    currentVerse,
+                                                    getVerseMaxForChapter(
                                                         nextEndChapter,
-                                                    )
-                                                    setEndVerse(currentVerse =>
-                                                        Math.min(
-                                                            currentVerse,
-                                                            getVerseMaxForChapter(
-                                                                nextEndChapter,
-                                                            ),
-                                                        ),
-                                                    )
-                                                }}
-                                                required
-                                            />
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                const lastChapter =
-                                                    endChapterMax
-                                                setEndChapter(lastChapter)
-                                                setEndVerse(currentVerse =>
-                                                    Math.min(
-                                                        currentVerse,
-                                                        getVerseMaxForChapter(
-                                                            lastChapter,
-                                                        ),
                                                     ),
-                                                )
-                                            }}
-                                            className="svg-outline border-primary bg-secondary relative shrink-0 border-2 p-2"
-                                            aria-label="Set end chapter to the last chapter in this book"
-                                            title="Use last chapter"
-                                        >
-                                            <CaretDoubleDown
-                                                aria-hidden
-                                                size={16}
-                                                weight="bold"
-                                            />
-                                        </button>
-                                    </div>
+                                                ),
+                                            )
+                                        }}
+                                        required
+                                    />
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="endVerse">End Verse</Label>
-                                    <div className="flex items-center gap-2">
-                                        <div className="grow">
-                                            <Input
-                                                type="number"
-                                                id="endVerse"
-                                                min="1"
-                                                max={endChapterVerseMax}
-                                                value={endVerse}
-                                                onChange={e =>
-                                                    setEndVerse(
-                                                        parseInt(
-                                                            e.target.value,
-                                                        ) || 1,
-                                                    )
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setEndVerse(endChapterVerseMax)
-                                            }
-                                            className="svg-outline border-primary bg-secondary relative shrink-0 border-2 p-2"
-                                            aria-label="Set end verse to the last verse in this chapter"
-                                            title="Use last verse"
-                                        >
-                                            <ArrowLineDown
-                                                aria-hidden
-                                                size={16}
-                                                weight="bold"
-                                            />
-                                        </button>
-                                    </div>
+                                    <label
+                                        htmlFor="endVerse"
+                                        className="mb-2 block"
+                                    >
+                                        End Verse
+                                    </label>
+                                    <NumberInput
+                                        id="endVerse"
+                                        label="end verse"
+                                        scrubLabel="Drag to change end verse"
+                                        min={1}
+                                        max={endChapterVerseMax}
+                                        value={endVerse}
+                                        onValueChange={setEndVerse}
+                                        required
+                                    />
                                 </div>
                             </div>
                         </div>
 
                         <div>
-                            <Label htmlFor="title">Assignment Title</Label>
+                            <label htmlFor="title" className="mb-2 block">
+                                Assignment Title
+                            </label>
                             <Input
                                 type="text"
                                 id="title"
@@ -569,9 +478,9 @@ export function ClientPage({
                         </div>
 
                         <div>
-                            <Label htmlFor="description">
+                            <label htmlFor="description" className="mb-2 block">
                                 Description (optional)
-                            </Label>
+                            </label>
                             <Textarea
                                 id="description"
                                 value={description}
@@ -582,7 +491,12 @@ export function ClientPage({
 
                         <div className="grid gap-4 sm:grid-cols-2">
                             <div>
-                                <Label htmlFor="maxPoints">Max Points</Label>
+                                <label
+                                    htmlFor="maxPoints"
+                                    className="mb-2 block"
+                                >
+                                    Max Points
+                                </label>
                                 <Input
                                     type="number"
                                     id="maxPoints"
@@ -598,9 +512,9 @@ export function ClientPage({
                             </div>
 
                             <div>
-                                <Label htmlFor="dueDate">
+                                <label htmlFor="dueDate" className="mb-2 block">
                                     Due Date (optional)
-                                </Label>
+                                </label>
                                 <Input
                                     type="date"
                                     id="dueDate"
