@@ -73,7 +73,7 @@ export function DocsPage({
         <div className="flex gap-8 px-4 md:px-12">
             <article
                 data-doc-article
-                className="min-h-screen-1px pt-12 flex flex-col max-w-page typo:prose dark:typo:prose-invert typo:prose-headings:text-primary typo:prose-p:text-primary typo:prose-li:text-primary typo:prose-a:text-primary typo:prose-strong:text-primary typo:prose-code:text-primary container mx-auto w-full"
+                className="min-h-screen-1px max-w-page typo:prose dark:typo:prose-invert typo:prose-headings:text-primary typo:prose-p:text-primary typo:prose-li:text-primary typo:prose-a:text-primary typo:prose-strong:text-primary typo:prose-code:text-primary container mx-auto flex w-full flex-col pt-12"
             >
                 <h1>{title}</h1>
                 <p>{description}</p>
