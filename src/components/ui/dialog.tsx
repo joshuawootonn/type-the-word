@@ -5,6 +5,17 @@ import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react"
 
 import { cn } from "~/lib/cn"
 
+function mergeClassName<State>(
+    defaultClassName: string,
+    className?: string | ((state: State) => string | undefined),
+): string | ((state: State) => string) {
+    if (typeof className === "function") {
+        return state => cn(defaultClassName, className(state))
+    }
+
+    return cn(defaultClassName, className)
+}
+
 const Dialog = DialogPrimitive.Root
 const DialogTrigger = DialogPrimitive.Trigger
 const DialogPortal = DialogPrimitive.Portal
@@ -15,7 +26,7 @@ const DialogBackdrop = forwardRef<
 >(({ className, ...props }, ref) => (
     <DialogPrimitive.Backdrop
         ref={ref}
-        className={cn("fixed inset-0 z-40 bg-black/60", className)}
+        className={mergeClassName("fixed inset-0 z-40 bg-black/60", className)}
         {...props}
     />
 ))
@@ -29,7 +40,7 @@ const DialogContent = forwardRef<
         <DialogBackdrop />
         <DialogPrimitive.Popup
             ref={ref}
-            className={cn(
+            className={mergeClassName(
                 "border-primary bg-secondary fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 border-2 p-5",
                 className,
             )}
@@ -45,7 +56,10 @@ const DialogTitle = forwardRef<
 >(({ className, ...props }, ref) => (
     <DialogPrimitive.Title
         ref={ref}
-        className={cn("text-primary text-xl font-semibold", className)}
+        className={mergeClassName(
+            "text-primary text-xl font-semibold",
+            className,
+        )}
         {...props}
     />
 ))
@@ -57,7 +71,7 @@ const DialogDescription = forwardRef<
 >(({ className, ...props }, ref) => (
     <DialogPrimitive.Description
         ref={ref}
-        className={cn("text-primary mt-3", className)}
+        className={mergeClassName("text-primary mt-3", className)}
         {...props}
     />
 ))
