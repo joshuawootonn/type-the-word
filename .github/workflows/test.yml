@@ -29,6 +29,7 @@ jobs:
             SKIP_ENV_VALIDATION: "true"
             NODE_ENV: test
             POSTGRES_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/type_the_word_test
+            NEXTAUTH_SECRET: e2e-local-ci-secret
             CROSSWAY_SECRET: ""
             STRIPE_SECRET_KEY: shh
             GOOGLE_CLIENT_ID: ""
