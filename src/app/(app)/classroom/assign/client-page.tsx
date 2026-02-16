@@ -8,6 +8,7 @@ import { ClassroomNotice } from "~/components/classroom-notice"
 import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
 import { Input, Textarea } from "~/components/ui/input"
+import { NumberInput } from "~/components/ui/number-input"
 import {
     Select,
     SelectContent,
@@ -34,9 +35,13 @@ type BibleMetadata = Record<string, BookMetadata>
 
 interface ClientPageProps {
     initialCourseId?: string
+    initialTranslation?: Translation
 }
 
-export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
+export function ClientPage({
+    initialCourseId,
+    initialTranslation,
+}: ClientPageProps = {}) {
     const router = useRouter()
     const { trackAssignmentCreated } = useAnalytics()
     const [courses, setCourses] = useState<Course[]>([])
@@ -49,7 +54,9 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
     const [selectedCourse, setSelectedCourse] = useState(initialCourseId || "")
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
-    const [translation, setTranslation] = useState<Translation>("esv")
+    const [translation, setTranslation] = useState<Translation>(
+        initialTranslation ?? "esv",
+    )
     const [book, setBook] = useState("genesis")
     const [startChapter, setStartChapter] = useState(1)
     const [startVerse, setStartVerse] = useState(1)
@@ -88,14 +95,10 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
     const chapterCount = Math.max(bookMetadata?.chapters.length ?? 1, 1)
     const startChapterMax = chapterCount
     const endChapterMax = chapterCount
-    const startChapterVerseMax = Math.max(
-        bookMetadata?.chapters[startChapter - 1]?.length ?? 1,
-        1,
-    )
-    const endChapterVerseMax = Math.max(
-        bookMetadata?.chapters[endChapter - 1]?.length ?? 1,
-        1,
-    )
+    const getVerseMaxForChapter = (chapter: number) =>
+        Math.max(bookMetadata?.chapters[chapter - 1]?.length ?? 1, 1)
+    const startChapterVerseMax = getVerseMaxForChapter(startChapter)
+    const endChapterVerseMax = getVerseMaxForChapter(endChapter)
 
     // Load courses on mount
     useEffect(() => {
@@ -143,6 +146,14 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
 
         setTitle(`${bookName} ${reference}`)
     }, [book, startChapter, startVerse, endChapter, endVerse])
+
+    async function updateTranslationCookie(nextTranslation: Translation) {
+        await fetch("/api/set-translation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ translation: nextTranslation }),
+        })
+    }
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -302,9 +313,14 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                     </label>
                                     <Select
                                         value={translation}
-                                        onValueChange={val =>
-                                            setTranslation(val as Translation)
-                                        }
+                                        onValueChange={val => {
+                                            const nextTranslation =
+                                                val as Translation
+                                            setTranslation(nextTranslation)
+                                            void updateTranslationCookie(
+                                                nextTranslation,
+                                            )
+                                        }}
                                     >
                                         <SelectTrigger className="w-full">
                                             <SelectValue />
@@ -351,89 +367,69 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                 </div>
 
                                 <div>
-                                    <label
-                                        htmlFor="startChapter"
-                                        className="mb-2 block"
-                                    >
-                                        Start Chapter
-                                    </label>
-                                    <Input
-                                        type="number"
+                                    <NumberInput
                                         id="startChapter"
-                                        min="1"
+                                        label="Start Chapter"
+                                        min={1}
                                         max={startChapterMax}
                                         value={startChapter}
-                                        onChange={e =>
-                                            setStartChapter(
-                                                parseInt(e.target.value) || 1,
+                                        onValueChange={nextStartChapter => {
+                                            setStartChapter(nextStartChapter)
+                                            setStartVerse(currentVerse =>
+                                                Math.min(
+                                                    currentVerse,
+                                                    getVerseMaxForChapter(
+                                                        nextStartChapter,
+                                                    ),
+                                                ),
                                             )
-                                        }
+                                        }}
                                         required
                                     />
                                 </div>
 
                                 <div>
-                                    <label
-                                        htmlFor="startVerse"
-                                        className="mb-2 block"
-                                    >
-                                        Start Verse
-                                    </label>
-                                    <Input
-                                        type="number"
+                                    <NumberInput
                                         id="startVerse"
-                                        min="1"
+                                        label="Start Verse"
+                                        min={1}
                                         max={startChapterVerseMax}
                                         value={startVerse}
-                                        onChange={e =>
-                                            setStartVerse(
-                                                parseInt(e.target.value) || 1,
-                                            )
-                                        }
+                                        onValueChange={setStartVerse}
                                         required
                                     />
                                 </div>
 
                                 <div>
-                                    <label
-                                        htmlFor="endChapter"
-                                        className="mb-2 block"
-                                    >
-                                        End Chapter
-                                    </label>
-                                    <Input
-                                        type="number"
+                                    <NumberInput
                                         id="endChapter"
-                                        min="1"
+                                        label="End Chapter"
+                                        min={1}
                                         max={endChapterMax}
                                         value={endChapter}
-                                        onChange={e =>
-                                            setEndChapter(
-                                                parseInt(e.target.value) || 1,
+                                        onValueChange={nextEndChapter => {
+                                            setEndChapter(nextEndChapter)
+                                            setEndVerse(currentVerse =>
+                                                Math.min(
+                                                    currentVerse,
+                                                    getVerseMaxForChapter(
+                                                        nextEndChapter,
+                                                    ),
+                                                ),
                                             )
-                                        }
+                                        }}
                                         required
                                     />
                                 </div>
 
                                 <div>
-                                    <label
-                                        htmlFor="endVerse"
-                                        className="mb-2 block"
-                                    >
-                                        End Verse
-                                    </label>
-                                    <Input
-                                        type="number"
+                                    <NumberInput
                                         id="endVerse"
-                                        min="1"
+                                        label="End Verse"
+                                        min={1}
                                         max={endChapterVerseMax}
                                         value={endVerse}
-                                        onChange={e =>
-                                            setEndVerse(
-                                                parseInt(e.target.value) || 1,
-                                            )
-                                        }
+                                        onValueChange={setEndVerse}
                                         required
                                     />
                                 </div>
