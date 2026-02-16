@@ -64,6 +64,10 @@ test-watch:
 build:
     pnpm build
 
+# Open/reuse an agent worktree shell by branch or agent name
+worktree-agent branch_or_agent:
+    bash ./scripts/worktree-agent.sh "{{branch_or_agent}}"
+
 # Format code
 format:
     pnpm format

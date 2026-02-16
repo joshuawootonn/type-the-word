@@ -4,7 +4,8 @@ set -euo pipefail
 
 usage() {
     cat <<'EOF'
-Usage: scripts/worktree-add.sh [--source <path>] [--force-env] [--skip-install] [--always-install] <path> <branch> [start-point]
+Usage: scripts/worktree-add.sh [--source <path>] [--force-env] [--skip-install] [--always-install] <branch> [start-point]
+       scripts/worktree-add.sh [--source <path>] [--force-env] [--skip-install] [--always-install] <path> <branch> [start-point]
 
 Creates a worktree and bootstraps it:
   1) git worktree add ...
@@ -12,8 +13,9 @@ Creates a worktree and bootstraps it:
   3) install dependencies when needed (unless --skip-install)
 
 Positional arguments:
-  path         Path where the new worktree will be created
-  branch       Branch name for the worktree
+  branch       Branch name for the worktree. When path is omitted, the target path
+               defaults to <repo>/worktrees/<branch>.
+  path         Optional path where the new worktree will be created
   start-point  Optional commit/branch to create new branch from (default: HEAD)
 
 Options:
@@ -29,6 +31,28 @@ SOURCE_WORKTREE=""
 FORCE_ENV=0
 SKIP_INSTALL=0
 ALWAYS_INSTALL=0
+
+resolve_path() {
+    local candidate="$1"
+
+    if command -v realpath >/dev/null 2>&1 && realpath -m / >/dev/null 2>&1; then
+        realpath -m "$candidate"
+        return
+    fi
+
+    if command -v python3 >/dev/null 2>&1; then
+        python3 - "$candidate" <<'PY'
+from pathlib import Path
+import sys
+
+print(str(Path(sys.argv[1]).expanduser().resolve(strict=False)))
+PY
+        return
+    fi
+
+    echo "Error: Could not resolve path. Install python3 or GNU coreutils realpath." >&2
+    exit 1
+}
 
 POSITIONAL=()
 while (($#)); do
@@ -75,14 +99,30 @@ done
 
 set -- "${POSITIONAL[@]}"
 
-if (($# < 2)); then
+if (($# < 1)); then
     usage
     exit 1
 fi
 
-TARGET_PATH="$1"
-BRANCH_NAME="$2"
-START_POINT="${3:-HEAD}"
+TARGET_PATH=""
+BRANCH_NAME=""
+START_POINT="HEAD"
+
+if (($# == 1)); then
+    BRANCH_NAME="$1"
+elif (($# == 2)); then
+    if [[ "$1" == */* || "$1" == . || "$1" == .. || "$1" == ~* ]]; then
+        TARGET_PATH="$1"
+        BRANCH_NAME="$2"
+    else
+        BRANCH_NAME="$1"
+        START_POINT="$2"
+    fi
+else
+    TARGET_PATH="$1"
+    BRANCH_NAME="$2"
+    START_POINT="$3"
+fi
 
 if ! REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"; then
     echo "Error: Run this command from inside a git repository." >&2
@@ -91,7 +131,11 @@ fi
 
 cd "$REPO_ROOT"
 
-TARGET_ABS_PATH="$(realpath -m "$TARGET_PATH")"
+if [[ -z "$TARGET_PATH" ]]; then
+    TARGET_PATH="$REPO_ROOT/worktrees/$BRANCH_NAME"
+fi
+
+TARGET_ABS_PATH="$(resolve_path "$TARGET_PATH")"
 
 if [[ -e "$TARGET_ABS_PATH" ]]; then
     echo "Error: Target path already exists: $TARGET_ABS_PATH" >&2

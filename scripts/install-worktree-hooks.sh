@@ -9,13 +9,35 @@ fi
 
 cd "$REPO_ROOT"
 
+resolve_path() {
+    local candidate="$1"
+
+    if command -v realpath >/dev/null 2>&1 && realpath -m / >/dev/null 2>&1; then
+        realpath -m "$candidate"
+        return
+    fi
+
+    if command -v python3 >/dev/null 2>&1; then
+        python3 - "$candidate" <<'PY'
+from pathlib import Path
+import sys
+
+print(str(Path(sys.argv[1]).expanduser().resolve(strict=False)))
+PY
+        return
+    fi
+
+    echo "Error: Could not resolve path. Install python3 or GNU coreutils realpath." >&2
+    exit 1
+}
+
 resolve_abs_path() {
     local candidate="$1"
 
     if [[ "$candidate" == /* ]]; then
-        realpath -m "$candidate"
+        resolve_path "$candidate"
     else
-        realpath -m "$REPO_ROOT/$candidate"
+        resolve_path "$REPO_ROOT/$candidate"
     fi
 }
 
