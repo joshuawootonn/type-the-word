@@ -61,12 +61,15 @@ export function AssignmentProgressWarningDialog({
                     <XIcon aria-hidden size={18} weight="bold" />
                 </DialogClose>
 
-                <DialogTitle>Assignment Progress Warning</DialogTitle>
+                <DialogTitle>
+                    Are you trying to complete an assignment?
+                </DialogTitle>
 
                 <DialogDescription>
-                    You have an assignment for {referenceLabel} (
-                    {assignment.translation.toUpperCase()}). Typing on this page
-                    will not count toward your assignment score or progress.
+                    Looks like you have a classroom assignment for{" "}
+                    {referenceLabel} ({assignment.translation.toUpperCase()}).
+                    To get credit for your work, type out these verses on the
+                    assignment page.
                 </DialogDescription>
 
                 <p className="text-primary mt-3 text-sm opacity-80">
@@ -74,13 +77,7 @@ export function AssignmentProgressWarningDialog({
                 </p>
 
                 <div className="mt-5 flex flex-wrap gap-3">
-                    <Link href={assignmentHref}>Go to assignment</Link>
-                    <DialogClose
-                        type="button"
-                        className="svg-outline border-primary bg-secondary text-primary relative border-2 px-3 py-1 font-medium"
-                    >
-                        Continue here
-                    </DialogClose>
+                    <Link href={assignmentHref}>Open assignment</Link>
                 </div>
             </DialogContent>
         </Dialog>
