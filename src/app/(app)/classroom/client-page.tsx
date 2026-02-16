@@ -144,7 +144,7 @@ export function ClientPage({
                     </p>
 
                     {isStudentConnected && studentSuccess && (
-                        <div className="border-success bg-secondary flex items-start gap-3 border-2 p-4">
+                        <div className="border-success bg-secondary flex items-start gap-3 border-2 p-4 mb-3">
                             <div className="text-success text-sm">
                                 Student account connected successfully.
                             </div>
@@ -224,7 +224,7 @@ export function ClientPage({
                     </p>
 
                     {isConnected && success && (
-                        <div className="border-success bg-secondary flex items-start gap-3 border-2 p-4">
+                        <div className="border-success bg-secondary flex items-start gap-3 border-2 p-4 mb-3">
                             <div className="text-success text-sm">
                                 Teacher account connected successfully.
                             </div>
