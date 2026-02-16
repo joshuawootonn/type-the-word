@@ -1,7 +1,7 @@
 "use client"
 
 import { NumberField } from "@base-ui/react/number-field"
-import { ArrowsHorizontal, Minus, Plus } from "@phosphor-icons/react"
+import { Minus, Plus } from "@phosphor-icons/react"
 
 import { cn } from "~/lib/cn"
 
@@ -10,7 +10,6 @@ interface NumberInputProps {
     value: number
     onValueChange: (value: number) => void
     label: string
-    scrubLabel?: string
     min?: number
     max?: number
     step?: number
@@ -36,7 +35,6 @@ export function NumberInput({
     value,
     onValueChange,
     label,
-    scrubLabel,
     min,
     max,
     step = 1,
@@ -45,31 +43,31 @@ export function NumberInput({
     className,
 }: NumberInputProps) {
     return (
-        <div className={cn("svg-outline group relative", className)}>
-            <div className="svg-outline-override absolute -z-10 hidden group-focus-within:block" />
-            <NumberField.Root
-                id={id}
-                value={value}
-                min={min}
-                max={max}
-                step={step}
-                required={required}
-                disabled={disabled}
-                onValueChange={nextValue => {
-                    if (nextValue == null) {
-                        onValueChange(clamp(value, min, max))
-                        return
-                    }
+        <NumberField.Root
+            id={id}
+            value={value}
+            min={min}
+            max={max}
+            step={step}
+            required={required}
+            disabled={disabled}
+            className={cn("w-full", className)}
+            onValueChange={nextValue => {
+                if (nextValue == null) {
+                    onValueChange(clamp(value, min, max))
+                    return
+                }
 
-                    onValueChange(clamp(Math.trunc(nextValue), min, max))
-                }}
-            >
-                <NumberField.ScrubArea className="border-primary bg-secondary text-primary/70 flex cursor-ew-resize items-center justify-center gap-1 border-x-2 border-t-2 px-2 py-1 text-[11px] leading-none select-none">
-                    <ArrowsHorizontal aria-hidden size={12} weight="bold" />
-                    <label htmlFor={id} className="cursor-ew-resize">
-                        {scrubLabel ?? `Drag to change ${label}`}
-                    </label>
-                </NumberField.ScrubArea>
+                onValueChange(clamp(Math.trunc(nextValue), min, max))
+            }}
+        >
+            <NumberField.ScrubArea className="mb-2 inline-flex cursor-ew-resize select-none">
+                <label htmlFor={id} className="block cursor-ew-resize">
+                    {label}
+                </label>
+            </NumberField.ScrubArea>
+            <div className="svg-outline group relative">
+                <div className="svg-outline-override absolute -z-10 hidden group-focus-within:block" />
                 <NumberField.Group className="border-primary bg-secondary text-primary flex items-stretch border-2">
                     <NumberField.Decrement
                         type="button"
@@ -89,7 +87,7 @@ export function NumberInput({
                         <Plus aria-hidden size={14} weight="bold" />
                     </NumberField.Increment>
                 </NumberField.Group>
-            </NumberField.Root>
-        </div>
+            </div>
+        </NumberField.Root>
     )
 }
