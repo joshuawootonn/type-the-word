@@ -1,9 +1,15 @@
 "use client"
 
 import { XIcon } from "@phosphor-icons/react"
-import * as Dialog from "@radix-ui/react-dialog"
 import { useMemo, useState } from "react"
 
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogTitle,
+} from "~/components/ui/dialog"
 import { Link } from "~/components/ui/link"
 import toProperCase from "~/lib/toProperCase"
 
@@ -45,48 +51,38 @@ export function AssignmentProgressWarningDialog({
     const assignmentHref = `/classroom/${encodeURIComponent(assignment.courseId)}/assignment/${encodeURIComponent(assignment.id)}`
 
     return (
-        <Dialog.Root open={open} onOpenChange={setOpen}>
-            <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 z-40 bg-black/60" />
-                <Dialog.Content className="border-primary bg-secondary fixed top-1/2 left-1/2 z-50 w-[min(95vw,36rem)] -translate-x-1/2 -translate-y-1/2 border-2 p-5">
-                    <Dialog.Close asChild>
-                        <button
-                            type="button"
-                            className="svg-outline border-primary bg-secondary text-primary absolute top-0 right-0 border-2 p-1"
-                            aria-label="Close assignment warning"
-                        >
-                            <XIcon aria-hidden size={18} weight="bold" />
-                        </button>
-                    </Dialog.Close>
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent className="w-[min(95vw,36rem)]">
+                <DialogClose
+                    type="button"
+                    className="svg-outline border-primary bg-secondary text-primary absolute top-0 right-0 border-2 p-1"
+                    aria-label="Close assignment warning"
+                >
+                    <XIcon aria-hidden size={18} weight="bold" />
+                </DialogClose>
 
-                    <Dialog.Title className="text-primary text-xl font-semibold">
-                        Assignment Progress Warning
-                    </Dialog.Title>
+                <DialogTitle>Assignment Progress Warning</DialogTitle>
 
-                    <Dialog.Description className="text-primary mt-3">
-                        You have an assignment for {referenceLabel} (
-                        {assignment.translation.toUpperCase()}). Typing on this
-                        page will not count toward your assignment score or
-                        progress.
-                    </Dialog.Description>
+                <DialogDescription>
+                    You have an assignment for {referenceLabel} (
+                    {assignment.translation.toUpperCase()}). Typing on this page
+                    will not count toward your assignment score or progress.
+                </DialogDescription>
 
-                    <p className="text-primary mt-3 text-sm opacity-80">
-                        Assignment: {assignment.title}
-                    </p>
+                <p className="text-primary mt-3 text-sm opacity-80">
+                    Assignment: {assignment.title}
+                </p>
 
-                    <div className="mt-5 flex flex-wrap gap-3">
-                        <Link href={assignmentHref}>Go to assignment</Link>
-                        <Dialog.Close asChild>
-                            <button
-                                type="button"
-                                className="svg-outline border-primary bg-secondary text-primary relative border-2 px-3 py-1 font-medium"
-                            >
-                                Continue here
-                            </button>
-                        </Dialog.Close>
-                    </div>
-                </Dialog.Content>
-            </Dialog.Portal>
-        </Dialog.Root>
+                <div className="mt-5 flex flex-wrap gap-3">
+                    <Link href={assignmentHref}>Go to assignment</Link>
+                    <DialogClose
+                        type="button"
+                        className="svg-outline border-primary bg-secondary text-primary relative border-2 px-3 py-1 font-medium"
+                    >
+                        Continue here
+                    </DialogClose>
+                </div>
+            </DialogContent>
+        </Dialog>
     )
 }
