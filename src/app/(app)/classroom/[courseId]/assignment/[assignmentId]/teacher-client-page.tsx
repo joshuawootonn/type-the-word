@@ -1,13 +1,31 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import {
+    type ColumnDef,
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getSortedRowModel,
+    type SortingState,
+    useReactTable,
+} from "@tanstack/react-table"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { type AssignmentDetail } from "~/app/api/classroom/schemas"
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
+import { Input } from "~/components/ui/input"
 import { Link } from "~/components/ui/link"
 import { Meter } from "~/components/ui/meter"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "~/components/ui/table"
 import toProperCase from "~/lib/toProperCase"
 
 import { fetchAssignmentDetail, publishAssignment } from "./actions"
@@ -28,6 +46,8 @@ export function TeacherClientPage({
     const [error, setError] = useState<string | null>(null)
     const [isPublishing, setIsPublishing] = useState(false)
     const [publishError, setPublishError] = useState<string | null>(null)
+    const [sorting, setSorting] = useState<SortingState>([])
+    const [globalFilter, setGlobalFilter] = useState("")
 
     const loadData = useCallback(async () => {
         try {
@@ -60,6 +80,109 @@ export function TeacherClientPage({
             setIsPublishing(false)
         }
     }
+
+    const columns = useMemo<ColumnDef<AssignmentDetail["students"][number]>[]>(
+        () => [
+            {
+                id: "student",
+                header: "Student",
+                accessorFn: row => row.studentName ?? row.studentEmail,
+                sortingFn: "alphanumeric",
+                cell: ({ row }) => (
+                    <div className="flex flex-col">
+                        <span className="font-semibold">
+                            {row.original.studentName ??
+                                row.original.studentEmail}
+                        </span>
+                        {row.original.studentName && (
+                            <span className="text-sm opacity-75">
+                                {row.original.studentEmail}
+                            </span>
+                        )}
+                    </div>
+                ),
+            },
+            {
+                id: "progress",
+                header: "Progress",
+                accessorKey: "completionPercentage",
+                cell: ({ row }) => (
+                    <div className="min-w-48">
+                        <Meter
+                            value={row.original.completionPercentage}
+                            label="Progress"
+                            className="w-full"
+                        />
+                    </div>
+                ),
+            },
+            {
+                id: "verses",
+                header: "Verses",
+                accessorFn: row => row.completedVerses / row.totalVerses,
+                cell: ({ row }) =>
+                    `${row.original.completedVerses} / ${row.original.totalVerses}`,
+            },
+            {
+                id: "wpm",
+                header: "WPM",
+                accessorFn: row => row.averageWpm ?? -1,
+                cell: ({ row }) => row.original.averageWpm ?? "-",
+            },
+            {
+                id: "accuracy",
+                header: "Accuracy",
+                accessorFn: row => row.averageAccuracy ?? -1,
+                cell: ({ row }) =>
+                    row.original.averageAccuracy !== null
+                        ? `${row.original.averageAccuracy}%`
+                        : "-",
+            },
+            {
+                id: "startedAt",
+                header: "Started",
+                accessorFn: row => row.startedAt ?? "",
+                cell: ({ row }) =>
+                    row.original.startedAt
+                        ? new Date(row.original.startedAt).toLocaleDateString()
+                        : "-",
+            },
+            {
+                id: "status",
+                header: "Status",
+                accessorFn: row => (row.isCompleted ? 1 : 0),
+                cell: ({ row }) =>
+                    row.original.isCompleted ? (
+                        <span className="text-success font-medium">
+                            Completed
+                        </span>
+                    ) : (
+                        <span className="opacity-75">In progress</span>
+                    ),
+            },
+        ],
+        [],
+    )
+    const table = useReactTable({
+        data: data?.students ?? [],
+        columns,
+        state: {
+            sorting,
+            globalFilter,
+        },
+        onSortingChange: setSorting,
+        onGlobalFilterChange: setGlobalFilter,
+        globalFilterFn: (row, _columnId, filterValue) => {
+            const value = String(filterValue).trim().toLowerCase()
+            if (!value) return true
+            const name = row.original.studentName ?? ""
+            const email = row.original.studentEmail
+            return `${name} ${email}`.toLowerCase().includes(value)
+        },
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+    })
 
     if (isLoading) {
         return <Loading />
@@ -165,78 +288,82 @@ export function TeacherClientPage({
                         No students enrolled in this course.
                     </p>
                 ) : (
-                    <div className="space-y-4">
-                        {students.map((student, idx) => (
-                            <div
-                                key={idx}
-                                className="border-primary bg-secondary border-2 p-4"
-                            >
-                                <div className="mb-3 flex items-start justify-between gap-4">
-                                    <div>
-                                        <div className="font-semibold">
-                                            {student.studentName ||
-                                                student.studentEmail}
-                                        </div>
-                                        {student.studentName && (
-                                            <div className="text-sm opacity-75">
-                                                {student.studentEmail}
-                                            </div>
-                                        )}
-                                    </div>
-                                    {student.isCompleted && (
-                                        <div className="text-success text-sm font-medium">
-                                            ✓ Completed
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Completion Meter */}
-                                <div className="mb-3">
-                                    <Meter
-                                        value={student.completionPercentage}
-                                        label="Progress"
-                                        className="w-full"
-                                    />
-                                </div>
-
-                                {/* Stats */}
-                                <div className="grid grid-cols-2 gap-3 text-sm">
-                                    <div>
-                                        <span className="opacity-75">
-                                            Verses:
-                                        </span>{" "}
-                                        {student.completedVerses} /{" "}
-                                        {student.totalVerses}
-                                    </div>
-                                    {student.averageWpm !== null && (
-                                        <div>
-                                            <span className="opacity-75">
-                                                WPM:
-                                            </span>{" "}
-                                            {student.averageWpm}
-                                        </div>
-                                    )}
-                                    {student.averageAccuracy !== null && (
-                                        <div>
-                                            <span className="opacity-75">
-                                                Accuracy:
-                                            </span>{" "}
-                                            {student.averageAccuracy}%
-                                        </div>
-                                    )}
-                                    {student.startedAt && (
-                                        <div>
-                                            <span className="opacity-75">
-                                                Started:
-                                            </span>{" "}
-                                            {new Date(
-                                                student.startedAt,
-                                            ).toLocaleDateString()}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
+                    <div className="space-y-3">
+                        <Input
+                            value={globalFilter}
+                            onChange={e => setGlobalFilter(e.target.value)}
+                            placeholder="Search by student name or email..."
+                            aria-label="Filter students"
+                        />
+                        <div className="border-primary bg-secondary overflow-x-auto border-2">
+                            <Table>
+                                <TableHeader>
+                                    {table
+                                        .getHeaderGroups()
+                                        .map(headerGroup => (
+                                            <TableRow key={headerGroup.id}>
+                                                {headerGroup.headers.map(
+                                                    header => (
+                                                        <TableHead
+                                                            key={header.id}
+                                                        >
+                                                            {header.isPlaceholder ? null : (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={header.column.getToggleSortingHandler()}
+                                                                    disabled={
+                                                                        !header.column.getCanSort()
+                                                                    }
+                                                                    className="inline-flex items-center gap-1 disabled:cursor-default"
+                                                                >
+                                                                    {flexRender(
+                                                                        header
+                                                                            .column
+                                                                            .columnDef
+                                                                            .header,
+                                                                        header.getContext(),
+                                                                    )}
+                                                                    {header.column.getCanSort() && (
+                                                                        <span className="text-xs opacity-75">
+                                                                            {header.column.getIsSorted() ===
+                                                                            "asc"
+                                                                                ? "▲"
+                                                                                : header.column.getIsSorted() ===
+                                                                                    "desc"
+                                                                                  ? "▼"
+                                                                                  : "↕"}
+                                                                        </span>
+                                                                    )}
+                                                                </button>
+                                                            )}
+                                                        </TableHead>
+                                                    ),
+                                                )}
+                                            </TableRow>
+                                        ))}
+                                </TableHeader>
+                                <TableBody>
+                                    {table.getRowModel().rows.map(row => (
+                                        <TableRow key={row.id}>
+                                            {row.getVisibleCells().map(cell => (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(
+                                                        cell.column.columnDef
+                                                            .cell,
+                                                        cell.getContext(),
+                                                    )}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                        {table.getRowModel().rows.length === 0 && (
+                            <p className="text-sm opacity-75">
+                                No students match this filter.
+                            </p>
+                        )}
                     </div>
                 )}
             </div>

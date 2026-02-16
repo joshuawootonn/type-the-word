@@ -1,14 +1,32 @@
 "use client"
 
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query"
-import NextLink from "next/link"
+import {
+    type ColumnDef,
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getSortedRowModel,
+    type SortingState,
+    useReactTable,
+} from "@tanstack/react-table"
+import { useRouter } from "next/navigation"
 import { useCallback, useMemo, useState } from "react"
 
 import { type Assignment } from "~/app/api/classroom/schemas"
 import { AssignmentStatusBadge } from "~/components/assignment-status-badge"
 import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
+import { Input } from "~/components/ui/input"
 import { Link } from "~/components/ui/link"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "~/components/ui/table"
 import toProperCase from "~/lib/toProperCase"
 
 import { fetchAssignments, publishAssignment } from "./actions"
@@ -22,7 +40,10 @@ export function TeacherClientPage({
     courseId,
     courseName,
 }: TeacherClientPageProps) {
+    const router = useRouter()
     const [publishingId, setPublishingId] = useState<string | null>(null)
+    const [sorting, setSorting] = useState<SortingState>([])
+    const [globalFilter, setGlobalFilter] = useState("")
     const queryClient = useQueryClient()
 
     // Single unified query with pagination
@@ -66,6 +87,127 @@ export function TeacherClientPage({
     const isInitialLoading = assignmentsQuery.isLoading
     const hasError = !!assignmentsQuery.error
     const totalAssignments = allAssignments.length
+    const globalFilterValue = globalFilter.trim().toLowerCase()
+    const columns = useMemo<ColumnDef<Assignment>[]>(
+        () => [
+            {
+                id: "title",
+                header: "Title",
+                accessorKey: "title",
+                cell: ({ row }) => (
+                    <span className="font-semibold">{row.original.title}</span>
+                ),
+                sortingFn: "alphanumeric",
+            },
+            {
+                id: "passage",
+                header: "Passage",
+                accessorFn: row => formatPassageRef(row),
+                cell: ({ row }) => (
+                    <span className="text-sm">
+                        {formatPassageRef(row.original)}
+                    </span>
+                ),
+                sortingFn: "alphanumeric",
+            },
+            {
+                id: "translation",
+                header: "Translation",
+                accessorFn: row => row.translation.toUpperCase(),
+                cell: ({ row }) => (
+                    <span className="text-sm font-medium">
+                        {row.original.translation.toUpperCase()}
+                    </span>
+                ),
+                sortingFn: "alphanumeric",
+            },
+            {
+                id: "status",
+                header: "Status",
+                accessorKey: "state",
+                cell: ({ row }) => (
+                    <AssignmentStatusBadge
+                        state={row.original.state}
+                        dueDate={row.original.dueDate}
+                    />
+                ),
+            },
+            {
+                id: "dueDate",
+                header: "Due Date",
+                accessorFn: row => row.dueDate ?? "",
+                cell: ({ row }) =>
+                    row.original.dueDate
+                        ? new Date(row.original.dueDate).toLocaleDateString()
+                        : "No due date",
+            },
+            {
+                id: "progress",
+                header: "Progress",
+                accessorFn: row =>
+                    row.submissionCount > 0 ? row.averageCompletion : -1,
+                cell: ({ row }) =>
+                    row.original.state === "PUBLISHED" &&
+                    row.original.submissionCount > 0 ? (
+                        <span>
+                            <span className="font-medium">
+                                {row.original.completedCount} /{" "}
+                                {row.original.submissionCount}
+                            </span>{" "}
+                            ({row.original.averageCompletion}% avg)
+                        </span>
+                    ) : (
+                        <span className="opacity-75">-</span>
+                    ),
+            },
+            {
+                id: "actions",
+                header: "Actions",
+                enableSorting: false,
+                cell: ({ row }) =>
+                    row.original.state === "DRAFT" ? (
+                        <Button
+                            onClick={e => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                void handlePublish(row.original.id)
+                            }}
+                            isLoading={publishingId === row.original.id}
+                            loadingLabel="Publishing"
+                            className="text-sm"
+                        >
+                            Publish
+                        </Button>
+                    ) : (
+                        <span className="opacity-75">-</span>
+                    ),
+            },
+        ],
+        [handlePublish, publishingId],
+    )
+    const table = useReactTable({
+        data: allAssignments,
+        columns,
+        state: {
+            sorting,
+            globalFilter,
+        },
+        onSortingChange: setSorting,
+        onGlobalFilterChange: setGlobalFilter,
+        globalFilterFn: row => {
+            if (!globalFilterValue) return true
+
+            const assignment = row.original
+            const searchable =
+                `${assignment.title} ${formatPassageRef(assignment)}`
+                    .toLowerCase()
+                    .trim()
+            return searchable.includes(globalFilterValue)
+        },
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+    })
 
     return (
         <div>
@@ -103,15 +245,81 @@ export function TeacherClientPage({
                 </div>
             ) : (
                 <div className="not-prose space-y-3">
-                    {allAssignments.map(assignment => (
-                        <AssignmentCard
-                            key={assignment.id}
-                            assignment={assignment}
-                            courseId={courseId}
-                            onPublish={handlePublish}
-                            isPublishing={publishingId === assignment.id}
-                        />
-                    ))}
+                    <Input
+                        value={globalFilter}
+                        onChange={e => setGlobalFilter(e.target.value)}
+                        placeholder="Search by title or passage..."
+                        aria-label="Filter assignments"
+                    />
+                    <div className="border-primary bg-secondary overflow-x-auto border-2">
+                        <Table>
+                            <TableHeader>
+                                {table.getHeaderGroups().map(headerGroup => (
+                                    <TableRow key={headerGroup.id}>
+                                        {headerGroup.headers.map(header => (
+                                            <TableHead key={header.id}>
+                                                {header.isPlaceholder ? null : (
+                                                    <button
+                                                        type="button"
+                                                        onClick={header.column.getToggleSortingHandler()}
+                                                        disabled={
+                                                            !header.column.getCanSort()
+                                                        }
+                                                        className="inline-flex items-center gap-1 disabled:cursor-default"
+                                                    >
+                                                        {flexRender(
+                                                            header.column
+                                                                .columnDef
+                                                                .header,
+                                                            header.getContext(),
+                                                        )}
+                                                        {header.column.getCanSort() && (
+                                                            <span className="text-xs opacity-75">
+                                                                {header.column.getIsSorted() ===
+                                                                "asc"
+                                                                    ? "▲"
+                                                                    : header.column.getIsSorted() ===
+                                                                        "desc"
+                                                                      ? "▼"
+                                                                      : "↕"}
+                                                            </span>
+                                                        )}
+                                                    </button>
+                                                )}
+                                            </TableHead>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableHeader>
+                            <TableBody>
+                                {table.getRowModel().rows.map(row => (
+                                    <TableRow
+                                        key={row.id}
+                                        onClick={() =>
+                                            router.push(
+                                                `/classroom/${courseId}/assignment/${row.original.id}`,
+                                            )
+                                        }
+                                        className="hover:bg-secondary/70 cursor-pointer"
+                                    >
+                                        {row.getVisibleCells().map(cell => (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext(),
+                                                )}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                    {table.getRowModel().rows.length === 0 && (
+                        <p className="text-sm opacity-75">
+                            No assignments match this filter.
+                        </p>
+                    )}
                     {assignmentsQuery.hasNextPage && (
                         <Button
                             onClick={() => assignmentsQuery.fetchNextPage()}
@@ -128,72 +336,6 @@ export function TeacherClientPage({
     )
 }
 
-function AssignmentCard({
-    assignment,
-    courseId,
-    onPublish,
-    isPublishing,
-}: {
-    assignment: Assignment
-    courseId: string
-    onPublish?: (id: string) => void
-    isPublishing?: boolean
-}) {
-    const passageRef = `${toProperCase(assignment.book.split("_").join(" "))} ${assignment.startChapter}:${assignment.startVerse}-${assignment.endChapter}:${assignment.endVerse}`
-
-    return (
-        <div className="border-primary bg-secondary relative border-2">
-            <NextLink
-                href={`/classroom/${courseId}/assignment/${assignment.id}`}
-                className="block p-4 no-underline"
-            >
-                <div className="flex flex-col items-start justify-between gap-2">
-                    <div className="flex w-full items-center justify-between gap-2">
-                        <div className="text-primary font-semibold">
-                            {assignment.title}
-                        </div>
-                        <AssignmentStatusBadge
-                            state={assignment.state}
-                            dueDate={assignment.dueDate}
-                        />
-                    </div>
-                    <div className="text-sm opacity-75">
-                        {passageRef} ({assignment.translation.toUpperCase()})
-                    </div>
-                    {assignment.dueDate && (
-                        <div className="text-sm opacity-75">
-                            Due:{" "}
-                            {new Date(assignment.dueDate).toLocaleDateString()}
-                        </div>
-                    )}
-                    {assignment.state === "PUBLISHED" &&
-                        assignment.submissionCount > 0 && (
-                            <div className="text-sm">
-                                <span className="font-medium">
-                                    {assignment.completedCount} /{" "}
-                                    {assignment.submissionCount}
-                                </span>{" "}
-                                completed ({assignment.averageCompletion}%
-                                average)
-                            </div>
-                        )}
-                </div>
-            </NextLink>
-
-            {assignment.state === "DRAFT" && onPublish && (
-                <Button
-                    onClick={e => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        onPublish(assignment.id)
-                    }}
-                    isLoading={!!isPublishing}
-                    loadingLabel="Publishing"
-                    className="absolute top-4 right-4 text-sm"
-                >
-                    Publish
-                </Button>
-            )}
-        </div>
-    )
+function formatPassageRef(assignment: Assignment): string {
+    return `${toProperCase(assignment.book.split("_").join(" "))} ${assignment.startChapter}:${assignment.startVerse}-${assignment.endChapter}:${assignment.endVerse}`
 }
