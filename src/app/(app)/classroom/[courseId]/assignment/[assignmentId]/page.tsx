@@ -5,9 +5,9 @@ import { getOrCreateTypingSession } from "~/app/api/typing-session/getOrCreateTy
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Link } from "~/components/ui/link"
 import { fetchPassage } from "~/lib/api"
+import { formatReferenceLabel } from "~/lib/formatReferenceLabel"
 import { ParsedPassage } from "~/lib/parseEsv"
 import { passageSegmentSchema } from "~/lib/passageSegment"
-import toProperCase from "~/lib/toProperCase"
 import { authOptions } from "~/server/auth"
 import { getValidStudentToken } from "~/server/classroom/student-token"
 import { getValidTeacherToken } from "~/server/classroom/teacher-token"
@@ -35,27 +35,6 @@ import { TeacherClientPage } from "./teacher-client-page"
 interface PageProps {
     params: Promise<{ courseId: string; assignmentId: string }>
     searchParams: Promise<{ chapter?: string | string[] }>
-}
-
-function buildReferenceLabel(data: {
-    book: string
-    startChapter: number
-    startVerse: number
-    endChapter: number
-    endVerse: number
-}): string {
-    const base = toProperCase(data.book)
-    const sameChapter = data.startChapter === data.endChapter
-    const sameVerse =
-        data.startChapter === data.endChapter &&
-        data.startVerse === data.endVerse
-    const chapterSegment = sameChapter
-        ? `${data.startChapter}:${data.startVerse}${
-              sameVerse ? "" : `-${data.endVerse}`
-          }`
-        : `${data.startChapter}:${data.startVerse}-${data.endChapter}:${data.endVerse}`
-
-    return `${base} ${chapterSegment}`
 }
 
 function buildPassageSegment(data: {
@@ -196,7 +175,7 @@ export default async function AssignmentDetailPage({
     }
 
     // Student view - complete the assignment
-    const referenceLabel = buildReferenceLabel({
+    const referenceLabel = formatReferenceLabel({
         book: assignment.book,
         startChapter: assignment.startChapter,
         startVerse: assignment.startVerse,

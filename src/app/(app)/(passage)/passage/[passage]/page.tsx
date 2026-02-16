@@ -5,7 +5,7 @@ import { redirect } from "next/navigation"
 
 import { getChapterHistory } from "~/app/api/chapter-history/[passage]/getChapterHistory"
 import { getOrCreateTypingSession } from "~/app/api/typing-session/getOrCreateTypingSession"
-import { AssignmentProgressWarningDialog } from "~/components/assignment-progress-warning-dialog"
+import { AssignmentInProgressWarningDialog } from "~/components/assignment-in-progress-warning-dialog"
 import { ChapterLog } from "~/components/chapter-log"
 import { CopyrightCitation } from "~/components/copyright-citation"
 import { Passage } from "~/components/passage"
@@ -121,7 +121,7 @@ export default async function PassagePage(props: {
     return (
         <>
             {matchingAssignment && (
-                <AssignmentProgressWarningDialog
+                <AssignmentInProgressWarningDialog
                     assignment={matchingAssignment}
                 />
             )}

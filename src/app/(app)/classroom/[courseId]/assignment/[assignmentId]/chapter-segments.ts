@@ -1,6 +1,6 @@
+import { formatReferenceLabel } from "~/lib/formatReferenceLabel"
 import { Translation } from "~/lib/parseEsv"
 import { passageSegmentSchema } from "~/lib/passageSegment"
-import toProperCase from "~/lib/toProperCase"
 import { getBibleMetadata } from "~/server/bibleMetadata"
 
 type ChapterMetadata = {
@@ -19,21 +19,6 @@ export type AssignmentChapterSegment = {
     endVerse: number
     passageSegment: ReturnType<typeof passageSegmentSchema.parse>
     referenceLabel: string
-}
-
-function buildReferenceLabel(data: {
-    book: string
-    chapter: number
-    startVerse: number
-    endVerse: number
-}): string {
-    const base = toProperCase(data.book)
-    const verseSegment =
-        data.startVerse === data.endVerse
-            ? `${data.chapter}:${data.startVerse}`
-            : `${data.chapter}:${data.startVerse}-${data.endVerse}`
-
-    return `${base} ${verseSegment}`
 }
 
 export function buildAssignmentChapterSegments(data: {
@@ -78,10 +63,11 @@ export function buildAssignmentChapterSegments(data: {
             passageSegment: passageSegmentSchema.parse(
                 `${data.book} ${chapter}`,
             ),
-            referenceLabel: buildReferenceLabel({
+            referenceLabel: formatReferenceLabel({
                 book: data.book,
-                chapter,
+                startChapter: chapter,
                 startVerse,
+                endChapter: chapter,
                 endVerse,
             }),
         })

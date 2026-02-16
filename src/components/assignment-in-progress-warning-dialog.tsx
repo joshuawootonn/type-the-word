@@ -11,9 +11,9 @@ import {
     DialogTitle,
 } from "~/components/ui/dialog"
 import { Link } from "~/components/ui/link"
-import toProperCase from "~/lib/toProperCase"
+import { formatReferenceLabel } from "~/lib/formatReferenceLabel"
 
-export interface AssignmentProgressWarning {
+export interface AssignmentInProgressWarning {
     id: string
     courseId: string
     title: string
@@ -25,27 +25,14 @@ export interface AssignmentProgressWarning {
     endVerse: number
 }
 
-function buildReferenceLabel(assignment: AssignmentProgressWarning): string {
-    const book = toProperCase(assignment.book.split("_").join(" "))
-    const sameChapter = assignment.startChapter === assignment.endChapter
-    const sameVerse =
-        sameChapter && assignment.startVerse === assignment.endVerse
-
-    const verseLabel = sameChapter
-        ? `${assignment.startChapter}:${assignment.startVerse}${sameVerse ? "" : `-${assignment.endVerse}`}`
-        : `${assignment.startChapter}:${assignment.startVerse}-${assignment.endChapter}:${assignment.endVerse}`
-
-    return `${book} ${verseLabel}`
-}
-
-export function AssignmentProgressWarningDialog({
+export function AssignmentInProgressWarningDialog({
     assignment,
 }: {
-    assignment: AssignmentProgressWarning
+    assignment: AssignmentInProgressWarning
 }) {
     const [open, setOpen] = useState(true)
     const referenceLabel = useMemo(
-        () => buildReferenceLabel(assignment),
+        () => formatReferenceLabel(assignment),
         [assignment],
     )
     const assignmentHref = `/classroom/${encodeURIComponent(assignment.courseId)}/assignment/${encodeURIComponent(assignment.id)}`
