@@ -20,7 +20,10 @@ export class AuthBehavior {
     }
 
     async loginViaUi(user: E2eUser) {
-        await this.page.goto("/auth/login")
+        const callbackUrl = encodeURIComponent(
+            "/passage/psalm_23?translation=nlt",
+        )
+        await this.page.goto(`/auth/login?callbackUrl=${callbackUrl}`)
         await this.page
             .getByTestId("login-email-field")
             .locator("input")
@@ -30,6 +33,8 @@ export class AuthBehavior {
             .locator("input")
             .fill(user.password)
         await this.page.getByTestId("login-submit").click()
-        await expect(this.page).toHaveURL(/\/(passage\/|$)/)
+        await expect(this.page).toHaveURL(
+            /\/passage\/psalm_23\?translation=nlt/,
+        )
     }
 }

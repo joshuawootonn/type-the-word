@@ -35,7 +35,10 @@ export class PassageBehavior {
             .first()
             .click()
 
-        await this.page.getByTestId(`current-verse-${verseNumber}`).click()
+        await this.page
+            .getByTestId(`current-verse-${verseNumber}`)
+            .first()
+            .click()
         await this.page.getByRole("textbox").first().pressSequentially(text)
     }
 
