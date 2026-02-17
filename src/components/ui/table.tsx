@@ -53,7 +53,10 @@ const TableHead = forwardRef<ElementRef<"th">, ComponentPropsWithoutRef<"th">>(
     ({ className, ...props }, ref) => (
         <th
             ref={ref}
-            className={clsx("px-3 py-2 text-left font-semibold", className)}
+            className={clsx(
+                "px-3 py-2 text-left text-sm font-normal",
+                className,
+            )}
             {...props}
         />
     ),
@@ -64,7 +67,7 @@ const TableCell = forwardRef<ElementRef<"td">, ComponentPropsWithoutRef<"td">>(
     ({ className, ...props }, ref) => (
         <td
             ref={ref}
-            className={clsx("px-3 py-2 align-top", className)}
+            className={clsx("px-3 py-2 text-sm", className)}
             {...props}
         />
     ),
