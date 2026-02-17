@@ -27,7 +27,11 @@ Run a safe commit-and-push flow for this repository.
         - Subject line (concise, action-oriented).
         - Body that explains why the change exists and user impact.
     - Commit with a multi-line message (HEREDOC preferred).
-5. Push:
+5. Rebase before push:
+    - Fetch latest remote refs: `git fetch origin`
+    - Rebase current branch onto its remote tracking branch (or `origin/<branch>` if unset).
+    - If conflicts occur, stop and report conflicted files plus suggested next resolution steps.
+6. Push:
     - If no upstream: `git push -u origin HEAD`
     - Else: `git push`
 
