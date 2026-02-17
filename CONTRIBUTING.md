@@ -75,7 +75,7 @@ export $(xargs < .env) && (kill $(lsof -t -i:${APP_PORT:-1199}) || true) && coli
 
 ## Git hooks
 
-After cloning, run the init command to install the repo's tracked `pre-push` hook:
+After cloning, run the init command to install the repo's tracked `pre-commit` hook (`just pre-flight`):
 
 ```bash
 just init

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if ! command -v just >/dev/null 2>&1; then
+  echo "Error: 'just' is required to run pre-commit checks." >&2
+  exit 1
+fi
+
+echo "Running just pre-flight..."
+just pre-flight

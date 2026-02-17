@@ -50,19 +50,25 @@ resolve_target_hooks_dir() {
     printf '%s\n' "$active_hooks_dir"
 }
 
-PRE_PUSH_SOURCE="$REPO_ROOT/.githooks/pre-push"
+PRE_COMMIT_SOURCE="$REPO_ROOT/.githooks/pre-commit"
 
-if [[ ! -f "$PRE_PUSH_SOURCE" ]]; then
-    echo "Error: Missing tracked hook at $PRE_PUSH_SOURCE" >&2
+if [[ ! -f "$PRE_COMMIT_SOURCE" ]]; then
+    echo "Error: Missing tracked hook at $PRE_COMMIT_SOURCE" >&2
     exit 1
 fi
 
 ACTIVE_HOOKS_DIR="$(resolve_active_hooks_dir)"
 TARGET_HOOKS_DIR="$(resolve_target_hooks_dir "$ACTIVE_HOOKS_DIR")"
+PRE_COMMIT_TARGET="$TARGET_HOOKS_DIR/pre-commit"
 PRE_PUSH_TARGET="$TARGET_HOOKS_DIR/pre-push"
 
 mkdir -p "$TARGET_HOOKS_DIR"
-cp "$PRE_PUSH_SOURCE" "$PRE_PUSH_TARGET"
-chmod +x "$PRE_PUSH_TARGET"
+cp "$PRE_COMMIT_SOURCE" "$PRE_COMMIT_TARGET"
+chmod +x "$PRE_COMMIT_TARGET"
 
-echo "Installed pre-push hook at $PRE_PUSH_TARGET"
+if [[ -f "$PRE_PUSH_TARGET" ]]; then
+    rm "$PRE_PUSH_TARGET"
+    echo "Removed pre-push hook at $PRE_PUSH_TARGET"
+fi
+
+echo "Installed pre-commit hook at $PRE_COMMIT_TARGET"

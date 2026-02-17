@@ -2,23 +2,15 @@
 
 This document outlines best practices for managing database migrations in this project using Drizzle ORM.
 
-## Agent Worktree Bootstrap
+## Git Hooks
 
-One-time install (run from main worktree):
-
-```bash
-pnpm worktree:install-hooks
-```
-
-This ensures Cursor-created worktrees trigger bootstrap automatically via `post-checkout`.
-
-Per-worker safety step (run in each new worker/worktree before tests/build/dev):
+After cloning, run:
 
 ```bash
-pnpm worktree:bootstrap
+just init
 ```
 
-This command copies `.env` from the primary worktree (if needed) and installs dependencies only when `node_modules` is missing or stale.
+This installs the tracked `pre-commit` hook, which runs `just pre-flight`.
 
 ## Core Principle
 
