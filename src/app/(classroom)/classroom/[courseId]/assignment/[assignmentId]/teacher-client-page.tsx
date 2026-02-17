@@ -1,5 +1,6 @@
 "use client"
 
+import { CheckCircle, Clock, XCircle } from "@phosphor-icons/react"
 import {
     type ColumnDef,
     flexRender,
@@ -105,13 +106,16 @@ export function TeacherClientPage({
             },
             {
                 id: "progress",
-                header: "Progress",
+                header: "Completion",
                 accessorKey: "completionPercentage",
                 cell: ({ row }) => (
-                    <div className="min-w-48">
+                    <div className="flex min-w-44 items-center">
                         <Meter
-                            value={row.original.completionPercentage}
+                            type="fractional"
+                            value={row.original.completedVerses}
+                            total={row.original.totalVerses}
                             label="Progress"
+                            variant="inline"
                             className="w-full"
                         />
                     </div>
@@ -154,11 +158,15 @@ export function TeacherClientPage({
                 accessorFn: row => (row.isCompleted ? 1 : 0),
                 cell: ({ row }) =>
                     row.original.isCompleted ? (
-                        <span className="text-success font-medium">
-                            Completed
+                        <span className="text-success inline-flex items-center gap-1.5 font-medium">
+                            <CheckCircle className="h-4 w-4 shrink-0" />
+                            <span>Completed</span>
                         </span>
                     ) : (
-                        <span className="opacity-75">In progress</span>
+                        <span className="inline-flex items-center gap-1.5 opacity-75">
+                            <Clock className="h-4 w-4 shrink-0" />
+                            <span>In Progress</span>
+                        </span>
                     ),
             },
         ],
@@ -239,24 +247,46 @@ export function TeacherClientPage({
             )}
 
             {/* Assignment Info */}
-            <div className="not-prose mb-6 space-y-2">
-                <div>
-                    <span className="font-semibold">Passage:</span> {passageRef}{" "}
-                    ({assignment.translation.toUpperCase()})
-                </div>
-                {assignment.dueDate && (
-                    <div>
-                        <span className="font-semibold">Due:</span>{" "}
-                        {new Date(assignment.dueDate).toLocaleDateString()}
+            <div className="not-prose bg-secondary mb-6 text-sm">
+                <div className="grid gap-x-6 gap-y-3 md:grid-cols-2 lg:grid-cols-4">
+                    <div className="min-w-0">
+                        <p className="text-xs tracking-wide opacity-70">
+                            Passage
+                        </p>
+                        <p className="truncate">
+                            {passageRef} ({assignment.translation.toUpperCase()}
+                            )
+                        </p>
                     </div>
-                )}
-                <div>
-                    <span className="font-semibold">Status:</span>{" "}
-                    {assignment.state}
-                </div>
-                <div>
-                    <span className="font-semibold">Max Points:</span>{" "}
-                    {assignment.maxPoints}
+                    {assignment.dueDate && (
+                        <div className="min-w-0">
+                            <p className="text-xs tracking-wide opacity-70">
+                                Due
+                            </p>
+                            <p className="truncate">
+                                {new Date(
+                                    assignment.dueDate,
+                                ).toLocaleDateString()}
+                            </p>
+                        </div>
+                    )}
+                    <div className="min-w-0">
+                        <p className="text-xs tracking-wide opacity-70">
+                            Status
+                        </p>
+                        <p className="inline-flex items-center gap-1.5 truncate">
+                            <AssignmentStatusIcon state={assignment.state} />
+                            <span>
+                                {formatAssignmentState(assignment.state)}
+                            </span>
+                        </p>
+                    </div>
+                    <div className="min-w-0">
+                        <p className="text-xs tracking-wide opacity-70">
+                            Max Points
+                        </p>
+                        <p className="truncate">{assignment.maxPoints}</p>
+                    </div>
                 </div>
             </div>
 
@@ -282,8 +312,6 @@ export function TeacherClientPage({
 
             {/* Student Progress */}
             <div className="not-prose">
-                <h2 className="mb-4 text-xl font-semibold">Student Progress</h2>
-
                 {students.length === 0 ? (
                     <p className="opacity-75">
                         No students enrolled in this course.
@@ -291,9 +319,7 @@ export function TeacherClientPage({
                 ) : (
                     <div className="space-y-3">
                         <div>
-                            <Label htmlFor="student-search">
-                                Search students
-                            </Label>
+                            <Label htmlFor="student-search">Filter</Label>
                             <Input
                                 id="student-search"
                                 inputSize="compact"
@@ -376,4 +402,26 @@ export function TeacherClientPage({
             </div>
         </div>
     )
+}
+
+function formatAssignmentState(state: AssignmentDetail["assignment"]["state"]) {
+    if (state === "DRAFT") return "Draft"
+    if (state === "PUBLISHED") return "Published"
+    return "Deleted"
+}
+
+function AssignmentStatusIcon({
+    state,
+}: {
+    state: AssignmentDetail["assignment"]["state"]
+}) {
+    if (state === "PUBLISHED") {
+        return <CheckCircle className="text-success h-4 w-4 shrink-0" />
+    }
+
+    if (state === "DRAFT") {
+        return <Clock className="h-4 w-4 shrink-0 opacity-75" />
+    }
+
+    return <XCircle className="text-error h-4 w-4 shrink-0" />
 }

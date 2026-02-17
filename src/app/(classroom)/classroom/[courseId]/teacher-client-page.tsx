@@ -1,5 +1,6 @@
 "use client"
 
+import { CheckCircle, Clock, XCircle } from "@phosphor-icons/react"
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query"
 import {
     type ColumnDef,
@@ -130,7 +131,7 @@ export function TeacherClientPage({
                 header: "Status",
                 accessorKey: "state",
                 cell: ({ row }) => (
-                    <TruncatedCellText text={formatState(row.original.state)} />
+                    <AssignmentStateCell state={row.original.state} />
                 ),
             },
             {
@@ -144,9 +145,7 @@ export function TeacherClientPage({
                                 row.original.dueDate,
                             ).toLocaleDateString()}
                         />
-                    ) : (
-                        <TruncatedCellText text="No due date" />
-                    ),
+                    ) : null,
             },
             {
                 id: "completion",
@@ -156,13 +155,15 @@ export function TeacherClientPage({
                         ? row.completedCount / row.submissionCount
                         : -1,
                 cell: ({ row }) =>
-                    row.original.state === "PUBLISHED" &&
-                    row.original.submissionCount > 0 ? (
+                    row.original.state === "PUBLISHED" ? (
                         <div className="flex h-full min-w-44 items-center justify-center">
                             <Meter
                                 type="fractional"
                                 value={row.original.completedCount}
-                                total={row.original.submissionCount}
+                                total={Math.max(
+                                    row.original.submissionCount,
+                                    1,
+                                )}
                                 label="Completion"
                                 variant="inline"
                                 className="w-full"
@@ -254,9 +255,7 @@ export function TeacherClientPage({
             ) : (
                 <div className="not-prose space-y-3">
                     <div>
-                        <Label htmlFor="assignment-search">
-                            Search assignments
-                        </Label>
+                        <Label htmlFor="assignment-search">Filter</Label>
                         <Input
                             id="assignment-search"
                             inputSize="compact"
@@ -372,6 +371,27 @@ function formatState(state: Assignment["state"]): string {
     return "Deleted"
 }
 
+function AssignmentStateCell({ state }: { state: Assignment["state"] }) {
+    return (
+        <span className="flex min-w-0 items-center gap-1.5 overflow-hidden">
+            <AssignmentStateIcon state={state} />
+            <span className="truncate">{formatState(state)}</span>
+        </span>
+    )
+}
+
+function AssignmentStateIcon({ state }: { state: Assignment["state"] }) {
+    if (state === "PUBLISHED") {
+        return <CheckCircle className="text-success h-4 w-4 shrink-0" />
+    }
+
+    if (state === "DRAFT") {
+        return <Clock className="h-4 w-4 shrink-0 opacity-75" />
+    }
+
+    return <XCircle className="text-error h-4 w-4 shrink-0" />
+}
+
 function getHeaderClassName(columnId: string): string {
     switch (columnId) {
         case "title":
@@ -381,9 +401,9 @@ function getHeaderClassName(columnId: string): string {
         case "translation":
             return "w-[10%] whitespace-nowrap overflow-hidden"
         case "status":
-            return "w-[10%] whitespace-nowrap overflow-hidden"
-        case "dueDate":
             return "w-[12%] whitespace-nowrap overflow-hidden"
+        case "dueDate":
+            return "w-[10%] whitespace-nowrap overflow-hidden"
         case "progress":
             return "w-[20%] whitespace-nowrap overflow-hidden"
         case "actions":
