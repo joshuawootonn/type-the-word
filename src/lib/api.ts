@@ -26,7 +26,7 @@ export function getBaseUrl() {
     if (process.env.VERCEL_PROJECT_PRODUCTION_URL)
         return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
 
-    return `http://localhost:${process.env.PORT ?? 1199}`
+    return `http://localhost:${process.env.PORT ?? process.env.APP_PORT ?? "1199"}`
 }
 
 export async function fetchPassage(

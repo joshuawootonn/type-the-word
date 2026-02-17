@@ -10,7 +10,11 @@
 1. Create a `.env` in the root with these values
 
 ```bash
-POSTGRES_DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:5435/type_the_word'
+APP_PORT="1199"
+POSTGRES_PORT="1200"
+POSTGRES_TEST_PORT="1201"
+COMPOSE_PROJECT_NAME="type_the_word"
+POSTGRES_DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:1200/type_the_word'
 NEXTAUTH_SECRET=""
 NEXTAUTH_URL="http://localhost:1199"
 GOOGLE_CLIENT_SECRET=""
@@ -30,11 +34,21 @@ NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
 
 This will allow you to load [Psalm 23](http://localhost:1199/passage/psalm_23) and [Gensis 1](http://localhost:1199/passage/genesis_1).
 
+If you run multiple local copies of this repo, give each one a unique `APP_PORT` / `POSTGRES_PORT` / `POSTGRES_TEST_PORT` triplet and keep the URLs + database URL aligned to that triplet. A useful pattern is to offset each extra instance by `+10` (for example: `1209/1210/1211`, then `1219/1220/1221`) to keep buffer space for other services.
+
+You can also set a unique `COMPOSE_PROJECT_NAME` per clone/worktree so Docker container, network, and volume names do not overlap.
+
+2. Create a local `.env.test` from `.env.test.example` and set the same port strategy for your test DB URL.
+
+```bash
+cp .env.test.example .env.test
+```
+
 Reach out via email (josh@typetheword.site) or on [discord](https://discord.com/invite/a9eYv4sgWp) and if we hit it off I can give you the env for further work.
 
-2. Install docker + container runtime + pnpm
+3. Install docker + container runtime + pnpm
 
-3. Install `just` (command runner used by this repo)
+4. Install `just` (command runner used by this repo)
 
 ```bash
 # macOS
@@ -56,7 +70,7 @@ just --version
 Here is a how I startup the app
 
 ```bash
-kill $(lsof -t -i:1199) || true && colima start --cpu 10 --memory 8 --disk 10 && docker compose --project-directory ./docker up -d && pnpm dev -p 1199
+export $(xargs < .env) && (kill $(lsof -t -i:${APP_PORT:-1199}) || true) && colima start --cpu 10 --memory 8 --disk 10 && docker compose --project-directory ./docker up -d && pnpm dev
 ```
 
 ## Git hooks

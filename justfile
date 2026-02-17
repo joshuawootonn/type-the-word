@@ -8,7 +8,7 @@ init:
 
 # Start the database containers
 db-up:
-    docker compose --project-directory ./docker up -d
+    export $(xargs < .env) && docker compose --project-directory ./docker up -d
 
 # Stop the database containers
 db-down:
@@ -50,7 +50,7 @@ check-migrations-prod:
 
 # Start development server
 dev:
-    kill $(lsof -t -i:1199) || true && orb start && docker compose --project-directory ./docker up -d && export $(xargs < .env) && pnpm dev -p 1199
+    export $(xargs < .env) && (kill $(lsof -t -i:${APP_PORT:-1199}) || true) && orb start && docker compose --project-directory ./docker up -d && pnpm dev
 
 # Run tests
 test:
