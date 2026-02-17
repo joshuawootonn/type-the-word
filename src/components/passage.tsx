@@ -162,6 +162,7 @@ export function Passage({
                 <div
                     ref={passageRef}
                     id={passageId}
+                    data-testid="passage-root"
                     className="passage typo:prose dark:typo:prose-invert relative z-0 w-full"
                 >
                     <PassageRectContext.Provider

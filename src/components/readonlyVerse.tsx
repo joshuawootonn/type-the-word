@@ -43,6 +43,8 @@ export function ReadonlyVerse({
 
     return (
         <span
+            data-testid={`readonly-verse-${verse.verse.verse}`}
+            data-typed-in-history={isTypedInHistory ? "true" : "false"}
             className={clsx(
                 "verse break-spaces group inline h-3 text-balance hover:cursor-pointer",
                 isCurrentVerse && "active-verse",
@@ -123,6 +125,7 @@ export function ReadonlyVerse({
 
             {rect && passageRect ? (
                 <button
+                    data-testid={`focus-verse-button-${verse.verse.verse}`}
                     className={clsx(
                         "svg-outline border-primary bg-secondary/80 text-primary absolute z-10 border-2 opacity-0 backdrop-blur-xs transition-opacity duration-100",
                         !isPassageActive && "hover:opacity-100",

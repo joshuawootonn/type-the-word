@@ -29,6 +29,7 @@ jobs:
             SKIP_ENV_VALIDATION: "true"
             NODE_ENV: test
             POSTGRES_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/type_the_word_test
+            NEXTAUTH_SECRET: e2e-local-ci-secret
             CROSSWAY_SECRET: ""
             STRIPE_SECRET_KEY: shh
             GOOGLE_CLIENT_ID: ""
@@ -71,3 +72,70 @@ jobs:
 
             - name: Run tests
               run: pnpm test
+
+    e2e:
+        name: E2E suite
+        runs-on: ubuntu-latest
+        services:
+            postgres-test:
+                image: postgres:17.5-alpine
+                env:
+                    POSTGRES_DB: type_the_word_test
+                    POSTGRES_PASSWORD: postgres
+                    POSTGRES_USER: postgres
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd "pg_isready -U postgres -d type_the_word_test"
+                    --health-interval 5s
+                    --health-timeout 5s
+                    --health-retries 20
+        env:
+            SKIP_ENV_VALIDATION: "true"
+            NODE_ENV: test
+            POSTGRES_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/type_the_word_test
+            CROSSWAY_SECRET: ""
+            STRIPE_SECRET_KEY: shh
+            GOOGLE_CLIENT_ID: ""
+            GOOGLE_CLIENT_SECRET: ""
+            GOOGLE_CLASSROOM_CLIENT_SECRET: ""
+            GOOGLE_CLASSROOM_CLIENT_ID: ""
+            SENTRY_AUTH_TOKEN: ""
+            CONVERTKIT_API_KEY: ""
+            CONVERTKIT_SUBSCRIBE_FORM_ID: ""
+            MAILPACE_API_TOKEN: ""
+            NEXT_PUBLIC_FATHOM_ID: ""
+            NEXT_PUBLIC_POSTHOG_KEY: ""
+            NEXT_PUBLIC_POSTHOG_HOST: http://localhost:1200
+            DEPLOYED_URL: http://localhost:1200
+            API_BIBLE_API_KEY: ""
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 8.7.5
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Install Playwright browser dependencies
+              run: pnpm exec playwright install --with-deps chromium
+
+            - name: Ensure required database schemas exist
+              run: |
+                  pnpm exec node -e "const postgres=require('postgres');(async()=>{const sql=postgres(process.env.POSTGRES_DATABASE_URL);await sql.unsafe('CREATE SCHEMA IF NOT EXISTS \"type-the-word\";');await sql.unsafe('CREATE SCHEMA IF NOT EXISTS drizzle;');await sql.end();})();"
+
+            - name: Run test database migrations
+              run: pnpm db:migrate
+
+            - name: Run e2e tests
+              run: pnpm test:e2e

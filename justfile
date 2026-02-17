@@ -60,6 +60,14 @@ test:
 test-watch:
     export $(xargs <.env.test) && pnpm test-watch 
 
+# Run end-to-end tests
+test-e2e:
+    export $(xargs <.env.test) && pnpm run test:e2e
+
+# Run end-to-end tests with Playwright UI
+test-e2e-ui:
+    export $(xargs <.env.test) && pnpm run test:e2e:ui
+
 # Build the project
 build:
     pnpm build
@@ -84,9 +92,13 @@ lint:
 lint-check:
     pnpm lint-check
 
-# Run full local preflight checks
-pre-flight: format lint type-check test
-    @echo "✅ Pre-flight checks passed"
+# Run all pre-flight checks (including e2e)
+pre-flight:
+    just lint-check
+    just type-check
+    just format-check
+    just test
+    just test-e2e
 
 # Full setup: start db and run migrations
 setup: db-up migrate
