@@ -3,22 +3,28 @@
 import clsx from "clsx"
 import { forwardRef, ComponentPropsWithoutRef, ElementRef } from "react"
 
-const Input = forwardRef<
-    ElementRef<"input">,
-    ComponentPropsWithoutRef<"input">
->(({ className, ...props }, ref) => (
-    <div className="svg-outline group relative">
-        <div className="svg-outline-override absolute -z-10 hidden group-focus-within:block" />
-        <input
-            ref={ref}
-            className={clsx(
-                "border-primary bg-secondary w-full border-2 px-3 py-2 outline-hidden",
-                className,
-            )}
-            {...props}
-        />
-    </div>
-))
+type InputProps = Omit<ComponentPropsWithoutRef<"input">, "size"> & {
+    inputSize?: "default" | "compact"
+}
+
+const Input = forwardRef<ElementRef<"input">, InputProps>(
+    ({ className, inputSize = "default", ...props }, ref) => (
+        <div className="svg-outline group relative">
+            <div className="svg-outline-override absolute -z-10 hidden group-focus-within:block" />
+            <input
+                ref={ref}
+                className={clsx(
+                    "border-primary bg-secondary w-full border-2 outline-hidden",
+                    inputSize === "compact"
+                        ? "px-2 py-1 text-sm"
+                        : "px-3 py-2 text-base",
+                    className,
+                )}
+                {...props}
+            />
+        </div>
+    ),
+)
 Input.displayName = "Input"
 
 const Textarea = forwardRef<

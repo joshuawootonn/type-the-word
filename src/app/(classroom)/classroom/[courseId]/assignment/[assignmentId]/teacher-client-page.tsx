@@ -16,6 +16,7 @@ import { ClassroomNotice } from "~/components/classroom-notice"
 import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
 import { Link } from "~/components/ui/link"
 import { Meter } from "~/components/ui/meter"
 import {
@@ -289,12 +290,18 @@ export function TeacherClientPage({
                     </p>
                 ) : (
                     <div className="space-y-3">
-                        <Input
-                            value={globalFilter}
-                            onChange={e => setGlobalFilter(e.target.value)}
-                            placeholder="Search by student name or email..."
-                            aria-label="Filter students"
-                        />
+                        <div>
+                            <Label htmlFor="student-search">
+                                Search students
+                            </Label>
+                            <Input
+                                id="student-search"
+                                inputSize="compact"
+                                value={globalFilter}
+                                onChange={e => setGlobalFilter(e.target.value)}
+                                aria-label="Filter students"
+                            />
+                        </div>
                         <div className="border-primary bg-secondary overflow-x-auto border-2">
                             <Table>
                                 <TableHeader>

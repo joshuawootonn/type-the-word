@@ -8,6 +8,7 @@ import { ClassroomNotice } from "~/components/classroom-notice"
 import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
 import { Input, Textarea } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
 import {
     Select,
     SelectContent,
@@ -259,12 +260,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                     >
                         {/* Course Selection */}
                         <div>
-                            <label
-                                htmlFor="course"
-                                className="mb-2 block font-medium"
-                            >
-                                Course
-                            </label>
+                            <Label htmlFor="course">Course</Label>
                             <Select
                                 value={selectedCourse}
                                 onValueChange={setSelectedCourse}
@@ -294,12 +290,9 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
 
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label
-                                        htmlFor="translation"
-                                        className="mb-2 block"
-                                    >
+                                    <Label htmlFor="translation">
                                         Translation
-                                    </label>
+                                    </Label>
                                     <Select
                                         value={translation}
                                         onValueChange={val =>
@@ -325,12 +318,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                 </div>
 
                                 <div>
-                                    <label
-                                        htmlFor="book"
-                                        className="mb-2 block"
-                                    >
-                                        Book
-                                    </label>
+                                    <Label htmlFor="book">Book</Label>
                                     <Select
                                         value={book}
                                         onValueChange={setBook}
@@ -351,12 +339,9 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                 </div>
 
                                 <div>
-                                    <label
-                                        htmlFor="startChapter"
-                                        className="mb-2 block"
-                                    >
+                                    <Label htmlFor="startChapter">
                                         Start Chapter
-                                    </label>
+                                    </Label>
                                     <Input
                                         type="number"
                                         id="startChapter"
@@ -373,12 +358,9 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                 </div>
 
                                 <div>
-                                    <label
-                                        htmlFor="startVerse"
-                                        className="mb-2 block"
-                                    >
+                                    <Label htmlFor="startVerse">
                                         Start Verse
-                                    </label>
+                                    </Label>
                                     <Input
                                         type="number"
                                         id="startVerse"
@@ -395,12 +377,9 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                 </div>
 
                                 <div>
-                                    <label
-                                        htmlFor="endChapter"
-                                        className="mb-2 block"
-                                    >
+                                    <Label htmlFor="endChapter">
                                         End Chapter
-                                    </label>
+                                    </Label>
                                     <Input
                                         type="number"
                                         id="endChapter"
@@ -417,12 +396,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                                 </div>
 
                                 <div>
-                                    <label
-                                        htmlFor="endVerse"
-                                        className="mb-2 block"
-                                    >
-                                        End Verse
-                                    </label>
+                                    <Label htmlFor="endVerse">End Verse</Label>
                                     <Input
                                         type="number"
                                         id="endVerse"
@@ -441,9 +415,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                         </div>
 
                         <div>
-                            <label htmlFor="title" className="mb-2 block">
-                                Assignment Title
-                            </label>
+                            <Label htmlFor="title">Assignment Title</Label>
                             <Input
                                 type="text"
                                 id="title"
@@ -454,9 +426,9 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                         </div>
 
                         <div>
-                            <label htmlFor="description" className="mb-2 block">
+                            <Label htmlFor="description">
                                 Description (optional)
-                            </label>
+                            </Label>
                             <Textarea
                                 id="description"
                                 value={description}
@@ -467,12 +439,7 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
 
                         <div className="grid gap-4 sm:grid-cols-2">
                             <div>
-                                <label
-                                    htmlFor="maxPoints"
-                                    className="mb-2 block"
-                                >
-                                    Max Points
-                                </label>
+                                <Label htmlFor="maxPoints">Max Points</Label>
                                 <Input
                                     type="number"
                                     id="maxPoints"
@@ -488,9 +455,9 @@ export function ClientPage({ initialCourseId }: ClientPageProps = {}) {
                             </div>
 
                             <div>
-                                <label htmlFor="dueDate" className="mb-2 block">
+                                <Label htmlFor="dueDate">
                                     Due Date (optional)
-                                </label>
+                                </Label>
                                 <Input
                                     type="date"
                                     id="dueDate"
