@@ -1,13 +1,12 @@
 import { getServerSession } from "next-auth"
 
+import { ClientPage } from "~/app/(classroom)/classroom/dashboard/client-page"
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { authOptions } from "~/server/auth"
 import {
     getTeacherToken,
     getStudentToken,
 } from "~/server/repositories/classroom.repository"
-
-import { ClientPage } from "./client-page"
 
 export default async function DashboardPage() {
     const session = await getServerSession(authOptions)
@@ -24,7 +23,6 @@ export default async function DashboardPage() {
         )
     }
 
-    // Check for either teacher or student token
     const teacherToken = await getTeacherToken(session.user.id).catch(
         () => null,
     )

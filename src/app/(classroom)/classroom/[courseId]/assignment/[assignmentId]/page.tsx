@@ -1,5 +1,11 @@
 import { getServerSession } from "next-auth"
 
+import {
+    buildAssignmentChapterSegmentsFromMetadata,
+    getActiveChapterIndex,
+} from "~/app/(classroom)/classroom/[courseId]/assignment/[assignmentId]/chapter-segments"
+import { StudentClientPage } from "~/app/(classroom)/classroom/[courseId]/assignment/[assignmentId]/student-client-page"
+import { TeacherClientPage } from "~/app/(classroom)/classroom/[courseId]/assignment/[assignmentId]/teacher-client-page"
 import { getAssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
 import { getOrCreateTypingSession } from "~/app/api/typing-session/getOrCreateTypingSession"
 import { ClassroomNotice } from "~/components/classroom-notice"
@@ -24,13 +30,6 @@ import {
     updateTeacherTokenAccess,
     getOrCreateSubmission,
 } from "~/server/repositories/classroom.repository"
-
-import {
-    buildAssignmentChapterSegmentsFromMetadata,
-    getActiveChapterIndex,
-} from "./chapter-segments"
-import { StudentClientPage } from "./student-client-page"
-import { TeacherClientPage } from "./teacher-client-page"
 
 interface PageProps {
     params: Promise<{ courseId: string; assignmentId: string }>
@@ -138,7 +137,6 @@ export default async function AssignmentDetailPage({
         )
     }
 
-    // Check if user is the teacher who owns this assignment
     const teacherToken = await getTeacherToken(session.user.id).catch(
         () => null,
     )
@@ -146,7 +144,6 @@ export default async function AssignmentDetailPage({
         teacherToken && assignment.teacherUserId === session.user.id
 
     if (isTeacher) {
-        // Teacher view - show class stats
         let accessToken = teacherToken.accessToken
         const now = new Date()
         if (teacherToken.expiresAt <= now) {
@@ -161,7 +158,6 @@ export default async function AssignmentDetailPage({
             )
         }
 
-        // Fetch course info
         const courses = await listCourses(accessToken)
         const course = courses.find(c => c.id === courseId)
 
@@ -174,7 +170,6 @@ export default async function AssignmentDetailPage({
         )
     }
 
-    // Student view - complete the assignment
     const referenceLabel = formatReferenceLabel({
         book: assignment.book,
         startChapter: assignment.startChapter,
@@ -238,7 +233,6 @@ export default async function AssignmentDetailPage({
         )
     }
 
-    // Get teacher's token to access Google Classroom API
     let teacherAccessToken: string
     try {
         const tokenRecord = await getValidTeacherToken(assignment.teacherUserId)
@@ -253,7 +247,6 @@ export default async function AssignmentDetailPage({
         )
     }
 
-    // Get student's token and verify enrollment
     let studentAccessToken: string
     let googleUserId: string
     try {
@@ -302,7 +295,6 @@ export default async function AssignmentDetailPage({
         submissionId: classroomSubmission?.id,
     })
 
-    // Fetch course info for breadcrumbs using student's token
     const courses = await listStudentCourses(studentAccessToken)
     const course = courses.find(c => c.id === courseId)
 

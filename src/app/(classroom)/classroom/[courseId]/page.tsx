@@ -1,5 +1,7 @@
 import { getServerSession } from "next-auth"
 
+import { StudentClientPage } from "~/app/(classroom)/classroom/[courseId]/student-client-page"
+import { TeacherClientPage } from "~/app/(classroom)/classroom/[courseId]/teacher-client-page"
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Link } from "~/components/ui/link"
 import { authOptions } from "~/server/auth"
@@ -13,9 +15,6 @@ import {
     getTeacherToken,
     getStudentToken,
 } from "~/server/repositories/classroom.repository"
-
-import { StudentClientPage } from "./student-client-page"
-import { TeacherClientPage } from "./teacher-client-page"
 
 interface PageProps {
     params: Promise<{ courseId: string }>
@@ -39,7 +38,6 @@ export default async function CoursePage({ params }: PageProps) {
         )
     }
 
-    // Check if user is a teacher
     const teacherToken = await getTeacherToken(session.user.id).catch(
         () => null,
     )
@@ -61,7 +59,6 @@ export default async function CoursePage({ params }: PageProps) {
         )
     }
 
-    // Determine which token to use and get valid version, then fetch courses
     let courses
     if (teacherToken) {
         const validToken = await getValidTeacherToken(session.user.id)
@@ -80,8 +77,8 @@ export default async function CoursePage({ params }: PageProps) {
             <div>
                 <h1>Course Not Found</h1>
                 <p>
-                    This course could not be found or you don't have access to
-                    it.
+                    This course could not be found or you don&apos;t have access
+                    to it.
                 </p>
                 <Link
                     href="/classroom/dashboard"
@@ -93,14 +90,11 @@ export default async function CoursePage({ params }: PageProps) {
         )
     }
 
-    // Render appropriate view based on role
     if (teacherToken) {
         return (
             <TeacherClientPage courseId={courseId} courseName={course.name} />
         )
-    } else {
-        return (
-            <StudentClientPage courseId={courseId} courseName={course.name} />
-        )
     }
+
+    return <StudentClientPage courseId={courseId} courseName={course.name} />
 }

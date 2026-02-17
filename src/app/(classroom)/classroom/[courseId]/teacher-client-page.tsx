@@ -14,11 +14,11 @@ import { useRouter } from "next/navigation"
 import { useCallback, useMemo, useState } from "react"
 
 import { type Assignment } from "~/app/api/classroom/schemas"
-import { AssignmentStatusBadge } from "~/components/assignment-status-badge"
 import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Link } from "~/components/ui/link"
+import { Meter } from "~/components/ui/meter"
 import {
     Table,
     TableBody,
@@ -95,7 +95,7 @@ export function TeacherClientPage({
                 header: "Title",
                 accessorKey: "title",
                 cell: ({ row }) => (
-                    <span className="font-semibold">{row.original.title}</span>
+                    <span className="block truncate">{row.original.title}</span>
                 ),
                 sortingFn: "alphanumeric",
             },
@@ -104,7 +104,7 @@ export function TeacherClientPage({
                 header: "Passage",
                 accessorFn: row => formatPassageRef(row),
                 cell: ({ row }) => (
-                    <span className="text-sm">
+                    <span className="block truncate">
                         {formatPassageRef(row.original)}
                     </span>
                 ),
@@ -115,7 +115,7 @@ export function TeacherClientPage({
                 header: "Translation",
                 accessorFn: row => row.translation.toUpperCase(),
                 cell: ({ row }) => (
-                    <span className="text-sm font-medium">
+                    <span className="block truncate">
                         {row.original.translation.toUpperCase()}
                     </span>
                 ),
@@ -126,10 +126,9 @@ export function TeacherClientPage({
                 header: "Status",
                 accessorKey: "state",
                 cell: ({ row }) => (
-                    <AssignmentStatusBadge
-                        state={row.original.state}
-                        dueDate={row.original.dueDate}
-                    />
+                    <span className="block truncate">
+                        {formatState(row.original.state)}
+                    </span>
                 ),
             },
             {
@@ -142,23 +141,26 @@ export function TeacherClientPage({
                         : "No due date",
             },
             {
-                id: "progress",
-                header: "Progress",
+                id: "completion",
+                header: "Completion",
                 accessorFn: row =>
-                    row.submissionCount > 0 ? row.averageCompletion : -1,
+                    row.submissionCount > 0
+                        ? row.completedCount / row.submissionCount
+                        : -1,
                 cell: ({ row }) =>
                     row.original.state === "PUBLISHED" &&
                     row.original.submissionCount > 0 ? (
-                        <span>
-                            <span className="font-medium">
-                                {row.original.completedCount} /{" "}
-                                {row.original.submissionCount}
-                            </span>{" "}
-                            ({row.original.averageCompletion}% avg)
-                        </span>
-                    ) : (
-                        <span className="opacity-75">-</span>
-                    ),
+                        <div className="flex h-full min-w-44 items-center justify-center">
+                            <Meter
+                                type="fractional"
+                                value={row.original.completedCount}
+                                total={row.original.submissionCount}
+                                label="Completion"
+                                variant="inline"
+                                className="w-full"
+                            />
+                        </div>
+                    ) : null,
             },
             {
                 id: "actions",
@@ -178,9 +180,7 @@ export function TeacherClientPage({
                         >
                             Publish
                         </Button>
-                    ) : (
-                        <span className="opacity-75">-</span>
-                    ),
+                    ) : null,
             },
         ],
         [handlePublish, publishingId],
@@ -199,7 +199,7 @@ export function TeacherClientPage({
 
             const assignment = row.original
             const searchable =
-                `${assignment.title} ${formatPassageRef(assignment)}`
+                `${assignment.title} ${formatPassageRef(assignment)} ${assignment.translation}`
                     .toLowerCase()
                     .trim()
             return searchable.includes(globalFilterValue)
@@ -252,12 +252,17 @@ export function TeacherClientPage({
                         aria-label="Filter assignments"
                     />
                     <div className="border-primary bg-secondary overflow-x-auto border-2">
-                        <Table>
+                        <Table className="table-fixed">
                             <TableHeader>
                                 {table.getHeaderGroups().map(headerGroup => (
                                     <TableRow key={headerGroup.id}>
                                         {headerGroup.headers.map(header => (
-                                            <TableHead key={header.id}>
+                                            <TableHead
+                                                key={header.id}
+                                                className={getHeaderClassName(
+                                                    header.column.id,
+                                                )}
+                                            >
                                                 {header.isPlaceholder ? null : (
                                                     <button
                                                         type="button"
@@ -265,14 +270,16 @@ export function TeacherClientPage({
                                                         disabled={
                                                             !header.column.getCanSort()
                                                         }
-                                                        className="inline-flex items-center gap-1 disabled:cursor-default"
+                                                        className="inline-flex w-full items-center gap-1 overflow-hidden text-left disabled:cursor-default"
                                                     >
-                                                        {flexRender(
-                                                            header.column
-                                                                .columnDef
-                                                                .header,
-                                                            header.getContext(),
-                                                        )}
+                                                        <span className="truncate">
+                                                            {flexRender(
+                                                                header.column
+                                                                    .columnDef
+                                                                    .header,
+                                                                header.getContext(),
+                                                            )}
+                                                        </span>
                                                         {header.column.getCanSort() && (
                                                             <span className="text-xs opacity-75">
                                                                 {header.column.getIsSorted() ===
@@ -303,7 +310,12 @@ export function TeacherClientPage({
                                         className="hover:bg-secondary/70 cursor-pointer"
                                     >
                                         {row.getVisibleCells().map(cell => (
-                                            <TableCell key={cell.id}>
+                                            <TableCell
+                                                key={cell.id}
+                                                className={getCellClassName(
+                                                    cell.column.id,
+                                                )}
+                                            >
                                                 {flexRender(
                                                     cell.column.columnDef.cell,
                                                     cell.getContext(),
@@ -338,4 +350,43 @@ export function TeacherClientPage({
 
 function formatPassageRef(assignment: Assignment): string {
     return `${toProperCase(assignment.book.split("_").join(" "))} ${assignment.startChapter}:${assignment.startVerse}-${assignment.endChapter}:${assignment.endVerse}`
+}
+
+function formatState(state: Assignment["state"]): string {
+    if (state === "DRAFT") return "Draft"
+    if (state === "PUBLISHED") return "Published"
+    return "Deleted"
+}
+
+function getHeaderClassName(columnId: string): string {
+    switch (columnId) {
+        case "title":
+            return "w-[18%] whitespace-nowrap overflow-hidden"
+        case "passage":
+            return "w-[20%] whitespace-nowrap overflow-hidden"
+        case "translation":
+            return "w-[10%] whitespace-nowrap overflow-hidden"
+        case "status":
+            return "w-[10%] whitespace-nowrap overflow-hidden"
+        case "dueDate":
+            return "w-[12%] whitespace-nowrap overflow-hidden"
+        case "progress":
+            return "w-[20%] whitespace-nowrap overflow-hidden"
+        case "actions":
+            return "w-[10%] whitespace-nowrap overflow-hidden"
+        default:
+            return "whitespace-nowrap overflow-hidden"
+    }
+}
+
+function getCellClassName(columnId: string): string {
+    if (columnId === "progress") {
+        return "whitespace-nowrap"
+    }
+
+    if (columnId === "actions") {
+        return "whitespace-nowrap"
+    }
+
+    return "whitespace-nowrap overflow-hidden text-ellipsis"
 }

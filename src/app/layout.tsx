@@ -3,6 +3,7 @@ import clsx from "clsx"
 import { Metadata } from "next"
 import { getServerSession } from "next-auth"
 import { cookies } from "next/headers"
+import { type CSSProperties } from "react"
 
 import { authOptions } from "~/server/auth"
 import { db } from "~/server/db"
@@ -58,6 +59,11 @@ export default async function RootLayout({
     const cookieStore = await cookies()
     const hasClassroomTeacherAccess = cookieStore.has("classroomTeacher")
     const hasClassroomStudentAccess = cookieStore.has("classroomStudent")
+    const bodyStyle = {
+        "--classroom-content-max-width": hasClassroomTeacherAccess
+            ? "1000px"
+            : "var(--container-page)",
+    } as CSSProperties
 
     // added suppressHydrationWarning since `ThemeScript` adds classes to `html` onload
     return (
@@ -73,7 +79,10 @@ export default async function RootLayout({
                     userThemes={userThemes}
                 />
             </head>
-            <body className={clsx("min-h-screen-1px flex w-full font-sans")}>
+            <body
+                className={clsx("min-h-screen-1px flex w-full font-sans")}
+                style={bodyStyle}
+            >
                 <Providers
                     currentTheme={currentTheme}
                     userThemes={userThemes}

@@ -1,12 +1,11 @@
 import { getServerSession } from "next-auth"
 
+import { ClientPage } from "~/app/(classroom)/classroom/client-page"
 import { authOptions } from "~/server/auth"
 import {
     getStudentToken,
     getTeacherToken,
 } from "~/server/repositories/classroom.repository"
-
-import { ClientPage } from "./client-page"
 
 interface PageProps {
     searchParams: Promise<{
@@ -24,13 +23,11 @@ export default async function ClassroomPage({ searchParams }: PageProps) {
     const isAuthed = session?.user != null
     const userId = session?.user.id
 
-    // Check if user has already connected their account
     const token = userId ? await getTeacherToken(userId) : null
     const isConnected = !!token
     const studentToken = userId ? await getStudentToken(userId) : null
     const isStudentConnected = !!studentToken
 
-    // Check for OAuth callback params
     const hasSuccess = params.success === "true"
     const errorMessage = params.error
         ? `Connection failed: ${params.error}`

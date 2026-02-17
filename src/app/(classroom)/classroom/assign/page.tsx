@@ -1,11 +1,10 @@
 import { getServerSession } from "next-auth"
 
+import { ClientPage } from "~/app/(classroom)/classroom/assign/client-page"
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Link } from "~/components/ui/link"
 import { authOptions } from "~/server/auth"
 import { getTeacherToken } from "~/server/repositories/classroom.repository"
-
-import { ClientPage } from "./client-page"
 
 interface PageProps {
     searchParams: Promise<{ courseId?: string }>
@@ -15,7 +14,6 @@ export default async function AssignPage({ searchParams }: PageProps) {
     const session = await getServerSession(authOptions)
     const params = await searchParams
 
-    // If not authenticated, redirect to login
     if (!session?.user) {
         return (
             <div>
@@ -28,7 +26,6 @@ export default async function AssignPage({ searchParams }: PageProps) {
         )
     }
 
-    // Check if user has connected Google Classroom
     const token = await getTeacherToken(session.user.id)
 
     if (!token) {
