@@ -26,6 +26,7 @@ Run a safe commit-and-push flow for this repository.
         - Subject line (concise, action-oriented).
         - Body that explains why the change exists and user impact.
     - Commit with a multi-line message (HEREDOC preferred).
+    - If commit is blocked by formatting checks, run `just format`, restage affected files, and retry the same commit once.
 5. Rebase before push:
     - Fetch latest remote refs: `git fetch origin`
     - Rebase current branch onto its remote tracking branch (or `origin/<branch>` if unset).
@@ -74,5 +75,6 @@ create 3 commits:
 
 - Never use `--no-verify`.
 - Never use force-push in this skill unless user explicitly asks.
-- If commit fails because the pre-commit hook blocks it, stop and report the failing step and output.
+- If commit fails because of formatting, automatically run `just format`, restage, and retry commit once.
+- If commit still fails after that retry (or fails for a non-formatting reason), stop and report the failing step and output.
 - If commit or push fails, report the exact failure and next step.
