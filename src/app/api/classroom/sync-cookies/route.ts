@@ -9,7 +9,7 @@ import { db } from "~/server/db"
  * Sync classroom cookies based on existing tokens
  * This function can be called directly or via POST request
  */
-export async function syncClassroomCookies() {
+async function syncClassroomCookies() {
     const session = await getServerSession(authOptions)
 
     if (!session?.user) {
