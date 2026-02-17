@@ -44,6 +44,8 @@ You can also set a unique `COMPOSE_PROJECT_NAME` per clone/worktree so Docker co
 cp .env.test.example .env.test
 ```
 
+By default, e2e uses `APP_PORT + 9` (for example, `1199 -> 1208`, `1209 -> 1218`). You can override with `E2E_APP_PORT` in `.env.test` if needed.
+
 Reach out via email (josh@typetheword.site) or on [discord](https://discord.com/invite/a9eYv4sgWp) and if we hit it off I can give you the env for further work.
 
 3. Install docker + container runtime + pnpm

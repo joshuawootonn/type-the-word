@@ -65,6 +65,38 @@ function getErrorMessage(error: unknown) {
     return String(error)
 }
 
+async function fetchMockPassageForE2E(
+    passageData: PassageObject,
+    translation: Translation,
+) {
+    const segment = toPassageSegment(passageData.book, passageData.chapter)
+    const preferredTranslation = translation === "esv" ? "nlt" : translation
+
+    const apiBibleFixturePath = path.join(
+        process.cwd(),
+        "/src/server/api-bible/responses",
+        preferredTranslation,
+        `${segment}.html`,
+    )
+
+    try {
+        const fixture = fs.readFileSync(apiBibleFixturePath, "utf8")
+        return {
+            data: await parseApiBibleChapter(fixture, preferredTranslation, ""),
+        }
+    } catch (_error) {
+        // Fall back to ESV fixture if API-Bible fixture is unavailable.
+    }
+
+    const esvFixturePath = path.join(
+        process.cwd(),
+        "/src/server",
+        `${segment}.html`,
+    )
+    const esvFixture = fs.readFileSync(esvFixturePath, "utf8")
+    return { data: await parseChapter(esvFixture) }
+}
+
 async function fetchESVPassage(
     passageData: PassageObject,
     reference: PassageSegment,
@@ -350,6 +382,14 @@ export async function GET(
     }
 
     try {
+        if (process.env.E2E_MOCK_PASSAGE === "1") {
+            const result = await fetchMockPassageForE2E(
+                passageData,
+                translation,
+            )
+            return Response.json(result, { status: 200 })
+        }
+
         if (translation === "esv") {
             const result = await fetchESVPassage(passageData, reference)
             return Response.json(result, { status: 200 })
