@@ -204,14 +204,8 @@ export async function GET(request: NextRequest) {
                 )
                 .groupBy(classroomAssignment.id)
                 .orderBy(
-                    // Group by state: DRAFT → PUBLISHED → DELETED
-                    sql`CASE 
-                        WHEN ${classroomAssignment.state} = 'DRAFT' THEN 1
-                        WHEN ${classroomAssignment.state} = 'PUBLISHED' THEN 2
-                        WHEN ${classroomAssignment.state} = 'DELETED' THEN 3
-                    END`,
-                    // Then by due date (nulls last)
-                    sql`${classroomAssignment.dueDate} NULLS LAST`,
+                    // Newest assignments first by creation timestamp.
+                    sql`${classroomAssignment.createdAt} DESC`,
                 )
                 .limit(limit)
                 .offset(page * limit)

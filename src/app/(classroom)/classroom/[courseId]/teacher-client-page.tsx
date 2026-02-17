@@ -11,7 +11,7 @@ import {
     useReactTable,
 } from "@tanstack/react-table"
 import { useRouter } from "next/navigation"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { type Assignment } from "~/app/api/classroom/schemas"
 import { Loading } from "~/components/loading"
@@ -28,6 +28,11 @@ import {
     TableHeader,
     TableRow,
 } from "~/components/ui/table"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "~/components/ui/tooltip"
 import toProperCase from "~/lib/toProperCase"
 
 import { fetchAssignments, publishAssignment } from "./actions"
@@ -96,7 +101,7 @@ export function TeacherClientPage({
                 header: "Title",
                 accessorKey: "title",
                 cell: ({ row }) => (
-                    <span className="block truncate">{row.original.title}</span>
+                    <TruncatedCellText text={row.original.title} />
                 ),
                 sortingFn: "alphanumeric",
             },
@@ -105,9 +110,7 @@ export function TeacherClientPage({
                 header: "Passage",
                 accessorFn: row => formatPassageRef(row),
                 cell: ({ row }) => (
-                    <span className="block truncate">
-                        {formatPassageRef(row.original)}
-                    </span>
+                    <TruncatedCellText text={formatPassageRef(row.original)} />
                 ),
                 sortingFn: "alphanumeric",
             },
@@ -116,9 +119,9 @@ export function TeacherClientPage({
                 header: "Translation",
                 accessorFn: row => row.translation.toUpperCase(),
                 cell: ({ row }) => (
-                    <span className="block truncate">
-                        {row.original.translation.toUpperCase()}
-                    </span>
+                    <TruncatedCellText
+                        text={row.original.translation.toUpperCase()}
+                    />
                 ),
                 sortingFn: "alphanumeric",
             },
@@ -127,9 +130,7 @@ export function TeacherClientPage({
                 header: "Status",
                 accessorKey: "state",
                 cell: ({ row }) => (
-                    <span className="block truncate">
-                        {formatState(row.original.state)}
-                    </span>
+                    <TruncatedCellText text={formatState(row.original.state)} />
                 ),
             },
             {
@@ -137,9 +138,15 @@ export function TeacherClientPage({
                 header: "Due Date",
                 accessorFn: row => row.dueDate ?? "",
                 cell: ({ row }) =>
-                    row.original.dueDate
-                        ? new Date(row.original.dueDate).toLocaleDateString()
-                        : "No due date",
+                    row.original.dueDate ? (
+                        <TruncatedCellText
+                            text={new Date(
+                                row.original.dueDate,
+                            ).toLocaleDateString()}
+                        />
+                    ) : (
+                        <TruncatedCellText text="No due date" />
+                    ),
             },
             {
                 id: "completion",
@@ -176,8 +183,8 @@ export function TeacherClientPage({
                                 void handlePublish(row.original.id)
                             }}
                             isLoading={publishingId === row.original.id}
-                            loadingLabel="Publishing"
-                            className="text-sm"
+                            loadingLabel=""
+                            className="inline-flex w-full min-w-0 items-center justify-center overflow-hidden text-sm whitespace-nowrap [&>div]:truncate"
                         >
                             Publish
                         </Button>
@@ -392,8 +399,49 @@ function getCellClassName(columnId: string): string {
     }
 
     if (columnId === "actions") {
-        return "whitespace-nowrap"
+        return "whitespace-nowrap overflow-hidden"
     }
 
     return "whitespace-nowrap overflow-hidden text-ellipsis"
+}
+
+function TruncatedCellText({ text }: { text: string }) {
+    const textRef = useRef<HTMLSpanElement>(null)
+    const [isTruncated, setIsTruncated] = useState(false)
+
+    useEffect(() => {
+        const el = textRef.current
+        if (!el) return
+
+        const updateTruncation = () => {
+            setIsTruncated(el.scrollWidth > el.clientWidth)
+        }
+
+        updateTruncation()
+        window.addEventListener("resize", updateTruncation)
+
+        return () => {
+            window.removeEventListener("resize", updateTruncation)
+        }
+    }, [text])
+
+    const content = (
+        <span ref={textRef} className="block truncate">
+            {text}
+        </span>
+    )
+
+    if (!isTruncated) return content
+
+    return (
+        <Tooltip>
+            <TooltipTrigger
+                render={<span className="block" />}
+                aria-label={text}
+            >
+                {content}
+            </TooltipTrigger>
+            <TooltipContent>{text}</TooltipContent>
+        </Tooltip>
+    )
 }
