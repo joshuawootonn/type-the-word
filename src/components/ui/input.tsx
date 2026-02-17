@@ -29,14 +29,19 @@ Input.displayName = "Input"
 
 const Textarea = forwardRef<
     ElementRef<"textarea">,
-    ComponentPropsWithoutRef<"textarea">
->(({ className, ...props }, ref) => (
+    ComponentPropsWithoutRef<"textarea"> & {
+        textareaSize?: "default" | "compact"
+    }
+>(({ className, textareaSize = "default", ...props }, ref) => (
     <div className="svg-outline group relative">
         <div className="svg-outline-override absolute -z-10 hidden group-focus-within:block" />
         <textarea
             ref={ref}
             className={clsx(
-                "border-primary bg-secondary w-full border-2 px-3 py-2 outline-hidden",
+                "border-primary bg-secondary w-full border-2 outline-hidden",
+                textareaSize === "compact"
+                    ? "px-2 py-1 text-sm"
+                    : "px-3 py-2 text-base",
                 className,
             )}
             {...props}

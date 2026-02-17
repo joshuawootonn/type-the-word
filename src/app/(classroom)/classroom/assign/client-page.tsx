@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 import { type Course } from "~/app/api/classroom/schemas"
 import { ClassroomNotice } from "~/components/classroom-notice"
@@ -33,6 +33,10 @@ type BookMetadata = {
 
 type BibleMetadata = Record<string, BookMetadata>
 
+function clamp(value: number, min: number, max: number): number {
+    return Math.min(Math.max(value, min), max)
+}
+
 interface ClientPageProps {
     initialCourseId?: string
     initialTranslation?: Translation
@@ -42,6 +46,7 @@ export function ClientPage({
     initialCourseId,
     initialTranslation,
 }: ClientPageProps = {}) {
+    const DEFAULT_MAX_POINTS = 100
     const router = useRouter()
     const { trackAssignmentCreated } = useAnalytics()
     const [courses, setCourses] = useState<Course[]>([])
@@ -62,7 +67,6 @@ export function ClientPage({
     const [startVerse, setStartVerse] = useState(1)
     const [endChapter, setEndChapter] = useState(1)
     const [endVerse, setEndVerse] = useState(1)
-    const [maxPoints, setMaxPoints] = useState(100)
     const [dueDate, setDueDate] = useState("")
     const [metadata, setMetadata] = useState<BibleMetadata | null>(null)
 
@@ -95,10 +99,58 @@ export function ClientPage({
     const chapterCount = Math.max(bookMetadata?.chapters.length ?? 1, 1)
     const startChapterMax = chapterCount
     const endChapterMax = chapterCount
-    const getVerseMaxForChapter = (chapter: number) =>
-        Math.max(bookMetadata?.chapters[chapter - 1]?.length ?? 1, 1)
+    const getVerseMaxForChapter = useCallback(
+        (chapter: number) =>
+            Math.max(bookMetadata?.chapters[chapter - 1]?.length ?? 1, 1),
+        [bookMetadata],
+    )
     const startChapterVerseMax = getVerseMaxForChapter(startChapter)
     const endChapterVerseMax = getVerseMaxForChapter(endChapter)
+
+    // Keep passage range valid when metadata/book/translation changes.
+    useEffect(() => {
+        const normalizedStartChapter = clamp(startChapter, 1, startChapterMax)
+        const normalizedStartVerse = clamp(
+            startVerse,
+            1,
+            getVerseMaxForChapter(normalizedStartChapter),
+        )
+        const normalizedEndChapter = clamp(
+            endChapter,
+            normalizedStartChapter,
+            endChapterMax,
+        )
+        const endVerseMin =
+            normalizedEndChapter === normalizedStartChapter
+                ? normalizedStartVerse
+                : 1
+        const normalizedEndVerse = clamp(
+            endVerse,
+            endVerseMin,
+            getVerseMaxForChapter(normalizedEndChapter),
+        )
+
+        if (normalizedStartChapter !== startChapter) {
+            setStartChapter(normalizedStartChapter)
+        }
+        if (normalizedStartVerse !== startVerse) {
+            setStartVerse(normalizedStartVerse)
+        }
+        if (normalizedEndChapter !== endChapter) {
+            setEndChapter(normalizedEndChapter)
+        }
+        if (normalizedEndVerse !== endVerse) {
+            setEndVerse(normalizedEndVerse)
+        }
+    }, [
+        startChapter,
+        startVerse,
+        endChapter,
+        endVerse,
+        startChapterMax,
+        endChapterMax,
+        getVerseMaxForChapter,
+    ])
 
     // Load courses on mount
     useEffect(() => {
@@ -172,7 +224,7 @@ export function ClientPage({
                 startVerse,
                 endChapter,
                 endVerse,
-                maxPoints,
+                maxPoints: DEFAULT_MAX_POINTS,
                 dueDate: dueDate || undefined,
             })
 
@@ -186,7 +238,7 @@ export function ClientPage({
                 startVerse,
                 endChapter,
                 endVerse,
-                maxPoints,
+                maxPoints: DEFAULT_MAX_POINTS,
                 hasDescription: description.trim().length > 0,
                 hasDueDate: Boolean(dueDate),
             })
@@ -266,13 +318,13 @@ export function ClientPage({
 
                     <form
                         onSubmit={handleSubmit}
-                        className="not-prose space-y-6"
+                        className="not-prose space-y-8 text-sm"
                     >
                         {/* Course Selection */}
-                        <div>
+                        <div className="space-y-2">
                             <label
                                 htmlFor="course"
-                                className="mb-2 block font-medium"
+                                className="mb-2 block text-lg"
                             >
                                 Course
                             </label>
@@ -280,7 +332,7 @@ export function ClientPage({
                                 value={selectedCourse}
                                 onValueChange={setSelectedCourse}
                             >
-                                <SelectTrigger className="w-full">
+                                <SelectTrigger className="w-full sm:w-1/2">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -300,8 +352,8 @@ export function ClientPage({
                         </div>
 
                         {/* Passage Selection */}
-                        <div>
-                            <h2 className="mb-4">Passage</h2>
+                        <div className="space-y-4">
+                            <h2 className="mb-4 text-lg">Passage</h2>
 
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div>
@@ -365,7 +417,9 @@ export function ClientPage({
                                         </SelectContent>
                                     </Select>
                                 </div>
+                            </div>
 
+                            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                                 <div>
                                     <NumberInput
                                         id="startChapter"
@@ -374,16 +428,46 @@ export function ClientPage({
                                         max={startChapterMax}
                                         value={startChapter}
                                         onValueChange={nextStartChapter => {
-                                            setStartChapter(nextStartChapter)
-                                            setStartVerse(currentVerse =>
-                                                Math.min(
-                                                    currentVerse,
-                                                    getVerseMaxForChapter(
-                                                        nextStartChapter,
-                                                    ),
+                                            const normalizedStartChapter =
+                                                clamp(
+                                                    nextStartChapter,
+                                                    1,
+                                                    startChapterMax,
+                                                )
+                                            const normalizedStartVerse = clamp(
+                                                startVerse,
+                                                1,
+                                                getVerseMaxForChapter(
+                                                    normalizedStartChapter,
                                                 ),
                                             )
+                                            const normalizedEndChapter = clamp(
+                                                endChapter,
+                                                normalizedStartChapter,
+                                                endChapterMax,
+                                            )
+                                            const endVerseMin =
+                                                normalizedEndChapter ===
+                                                normalizedStartChapter
+                                                    ? normalizedStartVerse
+                                                    : 1
+                                            const normalizedEndVerse = clamp(
+                                                endVerse,
+                                                endVerseMin,
+                                                getVerseMaxForChapter(
+                                                    normalizedEndChapter,
+                                                ),
+                                            )
+
+                                            setStartChapter(
+                                                normalizedStartChapter,
+                                            )
+                                            setStartVerse(normalizedStartVerse)
+                                            setEndChapter(normalizedEndChapter)
+                                            setEndVerse(normalizedEndVerse)
                                         }}
+                                        inputSize="compact"
+                                        preventEnterSubmit
                                         required
                                     />
                                 </div>
@@ -395,7 +479,29 @@ export function ClientPage({
                                         min={1}
                                         max={startChapterVerseMax}
                                         value={startVerse}
-                                        onValueChange={setStartVerse}
+                                        onValueChange={nextStartVerse => {
+                                            const normalizedStartVerse = clamp(
+                                                nextStartVerse,
+                                                1,
+                                                startChapterVerseMax,
+                                            )
+                                            const endVerseMin =
+                                                endChapter === startChapter
+                                                    ? normalizedStartVerse
+                                                    : 1
+                                            const normalizedEndVerse = clamp(
+                                                endVerse,
+                                                endVerseMin,
+                                                getVerseMaxForChapter(
+                                                    endChapter,
+                                                ),
+                                            )
+
+                                            setStartVerse(normalizedStartVerse)
+                                            setEndVerse(normalizedEndVerse)
+                                        }}
+                                        inputSize="compact"
+                                        preventEnterSubmit
                                         required
                                     />
                                 </div>
@@ -404,20 +510,33 @@ export function ClientPage({
                                     <NumberInput
                                         id="endChapter"
                                         label="End Chapter"
-                                        min={1}
+                                        min={startChapter}
                                         max={endChapterMax}
                                         value={endChapter}
                                         onValueChange={nextEndChapter => {
-                                            setEndChapter(nextEndChapter)
-                                            setEndVerse(currentVerse =>
-                                                Math.min(
-                                                    currentVerse,
-                                                    getVerseMaxForChapter(
-                                                        nextEndChapter,
-                                                    ),
+                                            const normalizedEndChapter = clamp(
+                                                nextEndChapter,
+                                                startChapter,
+                                                endChapterMax,
+                                            )
+                                            const endVerseMin =
+                                                normalizedEndChapter ===
+                                                startChapter
+                                                    ? startVerse
+                                                    : 1
+                                            const normalizedEndVerse = clamp(
+                                                endVerse,
+                                                endVerseMin,
+                                                getVerseMaxForChapter(
+                                                    normalizedEndChapter,
                                                 ),
                                             )
+
+                                            setEndChapter(normalizedEndChapter)
+                                            setEndVerse(normalizedEndVerse)
                                         }}
+                                        inputSize="compact"
+                                        preventEnterSubmit
                                         required
                                     />
                                 </div>
@@ -426,78 +545,90 @@ export function ClientPage({
                                     <NumberInput
                                         id="endVerse"
                                         label="End Verse"
-                                        min={1}
+                                        min={
+                                            endChapter === startChapter
+                                                ? startVerse
+                                                : 1
+                                        }
                                         max={endChapterVerseMax}
                                         value={endVerse}
-                                        onValueChange={setEndVerse}
+                                        onValueChange={nextEndVerse => {
+                                            const endVerseMin =
+                                                endChapter === startChapter
+                                                    ? startVerse
+                                                    : 1
+                                            setEndVerse(
+                                                clamp(
+                                                    nextEndVerse,
+                                                    endVerseMin,
+                                                    endChapterVerseMax,
+                                                ),
+                                            )
+                                        }}
+                                        inputSize="compact"
+                                        preventEnterSubmit
                                         required
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        <div>
-                            <label htmlFor="title" className="mb-2 block">
-                                Assignment Title
+                        <div className="space-y-4">
+                            <label
+                                htmlFor="course"
+                                className="mb-2 block text-lg"
+                            >
+                                Assignment
                             </label>
-                            <Input
-                                type="text"
-                                id="title"
-                                value={title}
-                                onChange={e => setTitle(e.target.value)}
-                                required
-                            />
-                        </div>
-
-                        <div>
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <div className="space-y-2">
+                                    <label
+                                        htmlFor="title"
+                                        className="mb-2 block"
+                                    >
+                                        Title
+                                    </label>
+                                    <Input
+                                        type="text"
+                                        id="title"
+                                        value={title}
+                                        onChange={e => setTitle(e.target.value)}
+                                        inputSize="compact"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label
+                                        htmlFor="dueDate"
+                                        className="mb-2 block"
+                                    >
+                                        Due Date
+                                    </label>
+                                    <Input
+                                        type="date"
+                                        id="dueDate"
+                                        value={dueDate}
+                                        onChange={e =>
+                                            setDueDate(e.target.value)
+                                        }
+                                        inputSize="compact"
+                                    />
+                                </div>
+                            </div>
                             <label htmlFor="description" className="mb-2 block">
-                                Description (optional)
+                                Description
                             </label>
                             <Textarea
                                 id="description"
                                 value={description}
                                 onChange={e => setDescription(e.target.value)}
+                                textareaSize="compact"
                                 rows={3}
                             />
                         </div>
 
-                        <div className="grid gap-4 sm:grid-cols-2">
-                            <div>
-                                <label
-                                    htmlFor="maxPoints"
-                                    className="mb-2 block"
-                                >
-                                    Max Points
-                                </label>
-                                <Input
-                                    type="number"
-                                    id="maxPoints"
-                                    min="1"
-                                    value={maxPoints}
-                                    onChange={e =>
-                                        setMaxPoints(
-                                            parseInt(e.target.value) || 100,
-                                        )
-                                    }
-                                    required
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="dueDate" className="mb-2 block">
-                                    Due Date (optional)
-                                </label>
-                                <Input
-                                    type="date"
-                                    id="dueDate"
-                                    value={dueDate}
-                                    onChange={e => setDueDate(e.target.value)}
-                                />
-                            </div>
-                        </div>
-
                         {/* Action Buttons */}
-                        <div className="border-primary flex justify-end gap-3 border-t-2 pt-6">
+                        <div className="flex justify-end">
                             <Button
                                 type="submit"
                                 isLoading={isCreating}
@@ -505,12 +636,6 @@ export function ClientPage({
                             >
                                 Create Assignment
                             </Button>
-                            <a
-                                href="/classroom"
-                                className="svg-outline border-primary bg-secondary relative border-2 px-3 py-1 font-semibold no-underline"
-                            >
-                                Cancel
-                            </a>
                         </div>
                     </form>
                 </>

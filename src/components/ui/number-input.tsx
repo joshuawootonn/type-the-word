@@ -16,6 +16,8 @@ interface NumberInputProps {
     required?: boolean
     disabled?: boolean
     className?: string
+    preventEnterSubmit?: boolean
+    inputSize?: "default" | "compact"
 }
 
 function clamp(value: number, min?: number, max?: number): number {
@@ -41,6 +43,8 @@ export function NumberInput({
     required,
     disabled,
     className,
+    preventEnterSubmit = false,
+    inputSize = "default",
 }: NumberInputProps) {
     return (
         <NumberField.Root
@@ -61,7 +65,12 @@ export function NumberInput({
                 onValueChange(clamp(Math.trunc(nextValue), min, max))
             }}
         >
-            <NumberField.ScrubArea className="mb-2 inline-flex cursor-ew-resize select-none">
+            <NumberField.ScrubArea
+                className={cn(
+                    "inline-flex cursor-ew-resize select-none",
+                    inputSize === "compact" ? "mb-1 text-sm" : "mb-2",
+                )}
+            >
                 <label htmlFor={id} className="block cursor-ew-resize">
                     {label}
                 </label>
@@ -73,18 +82,44 @@ export function NumberInput({
                         type="button"
                         aria-label={`Decrease ${label}`}
                         title={`Decrease ${label}`}
-                        className="border-primary hover:bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center border-r-2 outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
+                        className={cn(
+                            "border-primary bg-secondary flex shrink-0 cursor-pointer items-center justify-center border-r-2 outline-hidden disabled:cursor-not-allowed",
+                            inputSize === "compact" ? "h-8 w-8" : "h-10 w-10",
+                        )}
                     >
-                        <Minus aria-hidden size={14} weight="bold" />
+                        <Minus
+                            aria-hidden
+                            size={inputSize === "compact" ? 12 : 14}
+                            weight="bold"
+                        />
                     </NumberField.Decrement>
-                    <NumberField.Input className="bg-secondary text-primary h-10 w-full min-w-0 px-2 text-center font-medium outline-hidden" />
+                    <NumberField.Input
+                        className={cn(
+                            "bg-secondary text-primary w-full min-w-0 text-center font-medium outline-hidden",
+                            inputSize === "compact"
+                                ? "h-8 px-1 text-sm"
+                                : "h-10 px-2",
+                        )}
+                        onKeyDown={event => {
+                            if (preventEnterSubmit && event.key === "Enter") {
+                                event.preventDefault()
+                            }
+                        }}
+                    />
                     <NumberField.Increment
                         type="button"
                         aria-label={`Increase ${label}`}
                         title={`Increase ${label}`}
-                        className="border-primary hover:bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center border-l-2 outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
+                        className={cn(
+                            "border-primary bg-secondary flex shrink-0 cursor-pointer items-center justify-center border-l-2 outline-hidden disabled:cursor-not-allowed",
+                            inputSize === "compact" ? "h-8 w-8" : "h-10 w-10",
+                        )}
                     >
-                        <Plus aria-hidden size={14} weight="bold" />
+                        <Plus
+                            aria-hidden
+                            size={inputSize === "compact" ? 12 : 14}
+                            weight="bold"
+                        />
                     </NumberField.Increment>
                 </NumberField.Group>
             </div>
