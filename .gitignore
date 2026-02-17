@@ -15,6 +15,7 @@
 
 # next.js
 /.next/
+/.next-e2e/
 /.source/
 /out/
 next-env.d.ts

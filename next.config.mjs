@@ -8,12 +8,17 @@ import { env } from "./src/env.mjs"
 await import("./src/env.mjs")
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const isE2EMode =
+    process.env.E2E_MOCK_PASSAGE === "1" ||
+    process.env.E2E_MOCK_POSTHOG === "1" ||
+    process.env.E2E_MOCK_CONVERTKIT === "1"
 
 /** @type {import("next").NextConfig} */
 const config = {
     reactStrictMode: true,
     pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
     outputFileTracingRoot: __dirname,
+    distDir: isE2EMode ? ".next-e2e" : ".next",
     turbopack: {},
     // eslint-disable-next-line @typescript-eslint/require-await
     async rewrites() {

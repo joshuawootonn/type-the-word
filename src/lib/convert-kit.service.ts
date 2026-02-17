@@ -7,6 +7,10 @@ export async function createSubscription({
     email: string
     name: string
 }) {
+    if (process.env.E2E_MOCK_CONVERTKIT === "1") {
+        return
+    }
+
     const response = await fetch(
         `https://api.convertkit.com/v3/forms/${env.CONVERTKIT_SUBSCRIBE_FORM_ID}/subscribe`,
         {

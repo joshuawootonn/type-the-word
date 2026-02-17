@@ -62,7 +62,7 @@ test-watch:
 
 # Run end-to-end tests
 test-e2e:
-    export $(xargs <.env.test) && E2E_PORT=${E2E_APP_PORT:-$(( ${APP_PORT:-1199} + 9 ))} && LOCK_PIDS=$(lsof -t .next/dev/lock 2>/dev/null || true) && ([ -z "$LOCK_PIDS" ] || kill $LOCK_PIDS) && E2E_PIDS=$(lsof -t -i:${E2E_PORT} 2>/dev/null || true) && ([ -z "$E2E_PIDS" ] || kill $E2E_PIDS) && pnpm run test:e2e
+    export $(xargs <.env.test) && E2E_PORT=${E2E_APP_PORT:-$(( ${APP_PORT:-1199} + 9 ))} && E2E_PIDS=$(lsof -t -i:${E2E_PORT} 2>/dev/null || true) && ([ -z "$E2E_PIDS" ] || kill $E2E_PIDS) && pnpm run test:e2e
 
 # Run end-to-end tests with Playwright UI
 test-e2e-ui:
