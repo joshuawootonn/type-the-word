@@ -13,7 +13,7 @@ Run a safe commit-and-push flow for this repository.
 
 - Prefer semantic, focused commits over a single monolithic commit.
 - Stage per semantic unit (not always `git add -A` once).
-- Always run `just pre-flight` before committing.
+- Do not run extra pre-flight verification in this skill by default; rely on the repository's pre-commit hook.
 
 ## Workflow
 
@@ -22,7 +22,6 @@ Run a safe commit-and-push flow for this repository.
 3. Group files into semantic units.
 4. For each semantic unit:
     - Stage only relevant files/hunks.
-    - Run `just pre-flight` (or the smallest meaningful check if full pre-flight is too heavy per commit).
     - Write a commit message with:
         - Subject line (concise, action-oriented).
         - Body that explains why the change exists and user impact.
@@ -75,5 +74,5 @@ create 3 commits:
 
 - Never use `--no-verify`.
 - Never use force-push in this skill unless user explicitly asks.
-- If `just pre-flight` fails, stop and report the failing step and output.
+- If commit fails because the pre-commit hook blocks it, stop and report the failing step and output.
 - If commit or push fails, report the exact failure and next step.
