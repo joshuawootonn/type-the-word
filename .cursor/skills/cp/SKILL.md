@@ -14,24 +14,26 @@ Run a safe commit-and-push flow for this repository.
 - Prefer semantic, focused commits over a single monolithic commit.
 - Stage per semantic unit (not always `git add -A` once).
 - Do not run extra pre-flight verification in this skill by default; rely on the repository's pre-commit hook.
+- If schema or migration files changed, run `just migrate-test` before the first commit attempt so test DB schema matches the new code.
 
 ## Workflow
 
 1. Verify current branch with `git branch --show-current`.
 2. Review changes with `git status`, `git diff`, and recent commit style (`git log`).
-3. Group files into semantic units.
-4. For each semantic unit:
+3. If DB schema/migration files changed (for example `src/server/db/schema.ts` or `drizzle/**`), run `just migrate-test`.
+4. Group files into semantic units.
+5. For each semantic unit:
     - Stage only relevant files/hunks.
     - Write a commit message with:
         - Subject line (concise, action-oriented).
         - Body that explains why the change exists and user impact.
     - Commit with a multi-line message (HEREDOC preferred).
     - If commit is blocked by formatting checks, run `just format`, restage affected files, and retry the same commit once.
-5. Rebase before push:
+6. Rebase before push:
     - Fetch latest remote refs: `git fetch origin`
     - Rebase current branch onto its remote tracking branch (or `origin/<branch>` if unset).
     - If conflicts occur, stop and report conflicted files plus suggested next resolution steps.
-6. Push:
+7. Push:
     - If no upstream: `git push -u origin HEAD`
     - Else: `git push`
 
