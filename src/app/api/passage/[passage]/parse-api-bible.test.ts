@@ -1835,6 +1835,38 @@ describe("Luke 7:5-10 NASB - Spacing and quote rendering", () => {
 })
 
 // ============================================================================
+// ACTS 28:27 NASB - SMALL CAPS SPACING
+// ============================================================================
+describe("Acts 28:27 NASB - Small caps spacing", () => {
+    const nasbActs28Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            "src/server/api-bible/responses/nasb/acts_28.html",
+        ),
+        "utf8",
+    )
+
+    test.concurrent('keeps a space in "I would" (not "Iwould")', async () => {
+        const acts28Result = await cachedParseApiBibleChapter(
+            nasbActs28Html,
+            "nasb",
+        )
+        const paragraphs = acts28Result.nodes.filter(
+            (n): n is Paragraph => n.type === "paragraph",
+        )
+        const verse27Sections = paragraphs.flatMap(p =>
+            p.nodes.filter(v => v.verse.verse === 27),
+        )
+
+        expect(verse27Sections.length).toBeGreaterThan(0)
+
+        const verse27Text = verse27Sections.map(v => v.text).join("")
+        expect(verse27Text).toMatch(/\bI would\b/i)
+        expect(verse27Text).not.toMatch(/\bIwould\b/i)
+    })
+})
+
+// ============================================================================
 // PSALM 6 NASB - PILCROW (¶) DECORATION HANDLING
 // ============================================================================
 describe("Psalm 6 NASB - Pilcrow decoration handling", () => {

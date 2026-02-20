@@ -389,6 +389,8 @@ export async function parseApiBibleChapter(
                     "",
                 )
                 const currentTrimmed = current.letters.join("").trim()
+                const previousHasTrailingSpace =
+                    lastLetter === " " || lastLetter === "\n"
                 const shouldMergeOtReferenceSplit =
                     current.oldTestamentReference === true &&
                     /^[A-Z]$/.test(lastTrimmedWithoutOpeners) &&
@@ -397,9 +399,10 @@ export async function parseApiBibleChapter(
                     // OR when both are OT-ref but this looks like a split marker:
                     // - no trailing space on previous token (special whitespace split), or
                     // - very short suffix like "OU" in "Y OU".
-                    (lastResult.oldTestamentReference !== true ||
+                    ((lastResult.oldTestamentReference !== true &&
+                        !previousHasTrailingSpace) ||
                         (lastResult.oldTestamentReference === true &&
-                            ((lastLetter !== " " && lastLetter !== "\n") ||
+                            (!previousHasTrailingSpace ||
                                 currentTrimmed.length <= 2)))
 
                 if (shouldMergeOtReferenceSplit) {
