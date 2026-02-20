@@ -68,6 +68,11 @@ export default async function Changelog() {
             <hr className="border-primary mx-0 w-full border-t-2" />
             <ul>
                 <li>
+                    <DateComponent date={new Date("02/20/2026")} /> - Fixed NASB
+                    Acts 28:27 so &quot;I would&quot; displays with proper
+                    spacing.
+                </li>
+                <li>
                     <DateComponent date={new Date("02/14/2026")} /> - Fixed CSB
                     punctuation issues in some verses so dashes now display and
                     type correctly (including James 1:5 and Leviticus 16:21).
