@@ -44,6 +44,15 @@ export const env = createEnv({
                       .transform(str => (str ? `https://${str}` : str))
                       .pipe(z.string().url())
                 : z.string().url(),
+        DISCORD_ANALYTICS_WEBHOOK_URL:
+            process.env.NODE_ENV === "production"
+                ? z.string().url()
+                : z.string().url().optional(),
+        CRON_SECRET:
+            process.env.NODE_ENV === "production"
+                ? z.string().min(1)
+                : z.string().min(1).optional(),
+        ANALYTICS_TIMEZONE: z.string().default("America/Chicago"),
     },
 
     /**
@@ -85,6 +94,10 @@ export const env = createEnv({
         API_BIBLE_API_KEY: process.env.API_BIBLE_API_KEY,
         DEPLOYED_URL: process.env.DEPLOYED_URL ?? process.env.VERCEL_URL,
         STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+        DISCORD_ANALYTICS_WEBHOOK_URL:
+            process.env.DISCORD_ANALYTICS_WEBHOOK_URL,
+        CRON_SECRET: process.env.CRON_SECRET,
+        ANALYTICS_TIMEZONE: process.env.ANALYTICS_TIMEZONE,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
