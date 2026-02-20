@@ -52,6 +52,11 @@ export const users = pgTable("user", {
     id: varchar("id", { length: 255 }).notNull().primaryKey(),
     name: varchar("name", { length: 255 }),
     email: varchar("email", { length: 255 }).notNull(),
+    createdAt: timestamp("createdAt", {
+        mode: "date",
+    })
+        .notNull()
+        .$default(() => sql`CURRENT_TIMESTAMP(3)`),
     emailVerified: timestamp("emailVerified", {
         mode: "date",
     }).default(sql`CURRENT_TIMESTAMP(3)`),

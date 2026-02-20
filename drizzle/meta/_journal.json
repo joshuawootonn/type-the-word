@@ -155,6 +155,13 @@
             "when": 1769989774889,
             "tag": "0021_left_stephen_strange",
             "breakpoints": true
+        },
+        {
+            "idx": 22,
+            "version": "7",
+            "when": 1771603936653,
+            "tag": "0022_parallel_yellow_claw",
+            "breakpoints": true
         }
     ]
 }
