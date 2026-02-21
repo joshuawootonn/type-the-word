@@ -16,3 +16,6 @@ jobs:
 
     format:
         uses: ./.github/workflows/format.yml
+
+    type-check:
+        uses: ./.github/workflows/type-check.yml
