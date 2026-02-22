@@ -304,6 +304,7 @@ export function PassageSelector({
                     }}
                 >
                     <Combobox.Input
+                        ref={bookRef}
                         id={PASSAGE_BOOK_INPUT_ID}
                         onChange={event => setBookQuery(event.target.value)}
                         onFocus={event => {
