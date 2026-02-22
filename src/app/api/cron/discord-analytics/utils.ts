@@ -34,6 +34,8 @@ function getTimeZoneOffsetMs(date: Date, timeZone: string): number {
     const parts = new Intl.DateTimeFormat("en-US", {
         timeZone,
         hour12: false,
+        // Force 00-23 hours so midnight is never formatted as 24:00.
+        hourCycle: "h23",
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
