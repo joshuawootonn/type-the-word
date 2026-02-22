@@ -1,9 +1,10 @@
-import { eq, and, sql, or, gte, lt, isNull } from "drizzle-orm"
+import { eq, and, sql, or, gte, lt, isNull, inArray } from "drizzle-orm"
 import { getServerSession } from "next-auth"
 import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 import { ZodError } from "zod"
 
+import { calculateStatsForVerse } from "~/app/(app)/history/wpm"
 import { env } from "~/env.mjs"
 import {
     countVersesInRange,
@@ -21,12 +22,14 @@ import { db } from "~/server/db"
 import {
     classroomAssignment,
     classroomSubmission,
+    typedVerses,
     type Book,
 } from "~/server/db/schema"
 import {
     getTeacherToken,
     getStudentToken,
     createAssignment,
+    updateSubmissionProgress,
     updateTeacherTokenAccess,
 } from "~/server/repositories/classroom.repository"
 
@@ -316,7 +319,7 @@ export async function GET(request: NextRequest) {
                     dueDate: classroomAssignment.dueDate,
                     state: classroomAssignment.state,
                     // Student's submission data
-                    submissionId: classroomSubmission.id,
+                    submissionRowId: classroomSubmission.id,
                     completedVerses: classroomSubmission.completedVerses,
                     averageWpm: classroomSubmission.averageWpm,
                     averageAccuracy: classroomSubmission.averageAccuracy,
@@ -346,23 +349,176 @@ export async function GET(request: NextRequest) {
                 .limit(limit)
                 .offset(page * limit)
 
+            const assignmentIds = assignments.map(assignment => assignment.id)
+            const assignmentTypedVerses =
+                assignmentIds.length === 0
+                    ? []
+                    : await db
+                          .select()
+                          .from(typedVerses)
+                          .where(
+                              and(
+                                  eq(typedVerses.userId, session.user.id),
+                                  inArray(
+                                      typedVerses.classroomAssignmentId,
+                                      assignmentIds,
+                                  ),
+                              ),
+                          )
+
+            const latestVerseMapByAssignment = new Map<
+                string,
+                Map<string, (typeof assignmentTypedVerses)[number]>
+            >()
+
+            assignmentTypedVerses.forEach(typedVerse => {
+                if (typedVerse.classroomAssignmentId == null) {
+                    return
+                }
+
+                const assignmentId = typedVerse.classroomAssignmentId
+                const verseKey = `${typedVerse.chapter}:${typedVerse.verse}`
+                const assignmentVerseMap =
+                    latestVerseMapByAssignment.get(assignmentId) ?? new Map()
+                const existing = assignmentVerseMap.get(verseKey)
+
+                if (!existing || typedVerse.createdAt > existing.createdAt) {
+                    assignmentVerseMap.set(verseKey, typedVerse)
+                    latestVerseMapByAssignment.set(
+                        assignmentId,
+                        assignmentVerseMap,
+                    )
+                }
+            })
+
+            const progressByAssignment = new Map<
+                string,
+                {
+                    completedVerses: number
+                    averageWpm: number | null
+                    averageAccuracy: number | null
+                    isCompleted: boolean
+                }
+            >()
+
+            latestVerseMapByAssignment.forEach((verseMap, assignmentId) => {
+                const completedVerses = verseMap.size
+                const stats = Array.from(verseMap.values())
+                    .map(row => calculateStatsForVerse(row))
+                    .filter(
+                        (value): value is NonNullable<typeof value> =>
+                            value != null,
+                    )
+                const averageWpm =
+                    stats.length > 0
+                        ? Math.round(
+                              stats.reduce((sum, stat) => sum + stat.wpm, 0) /
+                                  stats.length,
+                          )
+                        : null
+                const averageAccuracy =
+                    stats.length > 0
+                        ? Math.round(
+                              stats.reduce(
+                                  (sum, stat) => sum + stat.accuracy,
+                                  0,
+                              ) / stats.length,
+                          )
+                        : null
+                const assignment = assignments.find(a => a.id === assignmentId)
+                const totalVerses = assignment?.totalVerses ?? 0
+
+                progressByAssignment.set(assignmentId, {
+                    completedVerses,
+                    averageWpm,
+                    averageAccuracy,
+                    isCompleted:
+                        totalVerses > 0 && completedVerses >= totalVerses,
+                })
+            })
+
+            await Promise.all(
+                assignments.map(async assignment => {
+                    if (assignment.submissionRowId == null) {
+                        return
+                    }
+
+                    const progress = progressByAssignment.get(assignment.id)
+                    if (!progress) {
+                        return
+                    }
+
+                    const hasProgressChanged =
+                        (assignment.completedVerses ?? 0) !==
+                            progress.completedVerses ||
+                        assignment.averageWpm !== progress.averageWpm ||
+                        assignment.averageAccuracy !==
+                            progress.averageAccuracy ||
+                        (assignment.isCompleted ?? 0) !==
+                            (progress.isCompleted ? 1 : 0)
+
+                    if (!hasProgressChanged) {
+                        return
+                    }
+
+                    await updateSubmissionProgress(assignment.submissionRowId, {
+                        completedVerses: progress.completedVerses,
+                        averageWpm: progress.averageWpm ?? undefined,
+                        averageAccuracy: progress.averageAccuracy ?? undefined,
+                        isCompleted: progress.isCompleted,
+                    })
+                }),
+            )
+
             const response: AssignmentsResponse = {
-                assignments: assignments.map(a => ({
-                    ...a,
-                    dueDate: a.dueDate ? a.dueDate.toISOString() : null,
-                    startedAt: a.startedAt ? a.startedAt.toISOString() : null,
-                    completedAt: a.completedAt
-                        ? a.completedAt.toISOString()
-                        : null,
-                    completionPercentage:
-                        a.totalVerses > 0
-                            ? Math.round(
-                                  ((a.completedVerses ?? 0) / a.totalVerses) *
-                                      100,
-                              )
-                            : 0,
-                    hasStarted: a.submissionId !== null,
-                })),
+                assignments: assignments.map(assignment => {
+                    const { submissionRowId, ...baseAssignment } = assignment
+                    const latestProgress = progressByAssignment.get(
+                        assignment.id,
+                    )
+                    const completedVerses =
+                        latestProgress?.completedVerses ??
+                        assignment.completedVerses ??
+                        0
+                    const isCompleted = latestProgress
+                        ? latestProgress.isCompleted
+                            ? 1
+                            : 0
+                        : assignment.isCompleted
+
+                    return {
+                        ...baseAssignment,
+                        submissionId: submissionRowId,
+                        dueDate: assignment.dueDate
+                            ? assignment.dueDate.toISOString()
+                            : null,
+                        startedAt: assignment.startedAt
+                            ? assignment.startedAt.toISOString()
+                            : null,
+                        completedAt: assignment.completedAt
+                            ? assignment.completedAt.toISOString()
+                            : null,
+                        completedVerses:
+                            latestProgress?.completedVerses ??
+                            assignment.completedVerses,
+                        averageWpm:
+                            latestProgress?.averageWpm ?? assignment.averageWpm,
+                        averageAccuracy:
+                            latestProgress?.averageAccuracy ??
+                            assignment.averageAccuracy,
+                        isCompleted,
+                        completionPercentage:
+                            assignment.totalVerses > 0
+                                ? Math.round(
+                                      (completedVerses /
+                                          assignment.totalVerses) *
+                                          100,
+                                  )
+                                : 0,
+                        hasStarted:
+                            submissionRowId !== null || completedVerses > 0,
+                    }
+                }),
                 pagination: {
                     page,
                     limit,

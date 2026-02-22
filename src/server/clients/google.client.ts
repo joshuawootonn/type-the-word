@@ -10,6 +10,10 @@ export function createGoogleOAuth2Client() {
 }
 
 export async function getGoogleUserId(accessToken: string): Promise<string> {
+    if (process.env.E2E_MOCK_CLASSROOM === "1") {
+        return "e2e-student-google-user"
+    }
+
     const oauth2Client = createGoogleOAuth2Client()
     oauth2Client.setCredentials({
         access_token: accessToken,
