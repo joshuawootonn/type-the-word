@@ -33,7 +33,12 @@ Run a safe commit-and-push flow for this repository.
     - Fetch latest remote refs: `git fetch origin`
     - Rebase current branch onto its remote tracking branch (or `origin/<branch>` if unset).
     - If conflicts occur, stop and report conflicted files plus suggested next resolution steps.
-7. Push:
+7. Sync dependencies and database after rebase:
+    - Run `pnpm install` to ensure lockfile and `node_modules` match the rebased branch.
+    - Run `just migrate` to apply pending development migrations.
+    - Run `just migrate-test` to apply pending test database migrations used by hooks/tests.
+    - If any of these fail, stop and report the exact failing command and output.
+8. Push:
     - If no upstream: `git push -u origin HEAD`
     - Else: `git push`
 
