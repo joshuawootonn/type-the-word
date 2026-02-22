@@ -34,8 +34,6 @@ function getTimeZoneOffsetMs(date: Date, timeZone: string): number {
     const parts = new Intl.DateTimeFormat("en-US", {
         timeZone,
         hour12: false,
-        // Force 00-23 hours so midnight is never formatted as 24:00.
-        hourCycle: "h23",
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
@@ -47,7 +45,9 @@ function getTimeZoneOffsetMs(date: Date, timeZone: string): number {
     const year = Number(parts.find(part => part.type === "year")?.value)
     const month = Number(parts.find(part => part.type === "month")?.value)
     const day = Number(parts.find(part => part.type === "day")?.value)
-    const hour = Number(parts.find(part => part.type === "hour")?.value)
+    const rawHour = Number(parts.find(part => part.type === "hour")?.value)
+    // Some ICU/runtime combinations represent midnight as 24:00.
+    const hour = rawHour === 24 ? 0 : rawHour
     const minute = Number(parts.find(part => part.type === "minute")?.value)
     const second = Number(parts.find(part => part.type === "second")?.value)
 
