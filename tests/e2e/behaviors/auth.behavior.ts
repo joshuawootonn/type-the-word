@@ -2,10 +2,22 @@ import { expect, Page } from "@playwright/test"
 
 import { E2eUser } from "../fixtures/user"
 
+function readAuthUrlPayload(payload: unknown): string {
+    if (typeof payload !== "object" || payload === null) {
+        throw new Error("Expected classroom auth response to be an object")
+    }
+
+    if (!("authUrl" in payload) || typeof payload.authUrl !== "string") {
+        throw new Error("Expected classroom auth response to include authUrl")
+    }
+
+    return payload.authUrl
+}
+
 export class AuthBehavior {
     constructor(private readonly page: Page) {}
 
-    async signupByApi(user: E2eUser) {
+    async signupByApi(user: E2eUser): Promise<void> {
         const response = await this.page.request.post("/api/auth/signup", {
             data: {
                 firstName: user.firstName,
@@ -16,7 +28,7 @@ export class AuthBehavior {
         expect(response.ok()).toBeTruthy()
     }
 
-    async loginViaApi(user: E2eUser) {
+    async loginViaApi(user: E2eUser): Promise<void> {
         const callbackUrl = "/passage/psalm_23?translation=nlt"
         const csrfResponse = await this.page.request.get("/api/auth/csrf")
         expect(csrfResponse.ok()).toBeTruthy()
@@ -48,5 +60,29 @@ export class AuthBehavior {
         await expect(this.page).toHaveURL(
             /\/passage\/psalm_23\?translation=nlt/,
         )
+    }
+
+    async connectTeacherClassroomViaApi(): Promise<void> {
+        const response = await this.page.request.get("/api/classroom/auth")
+        expect(response.ok()).toBeTruthy()
+
+        const authUrl = readAuthUrlPayload(await response.json())
+        expect(authUrl).toContain("/api/classroom/callback")
+
+        await this.page.goto(authUrl, { waitUntil: "domcontentloaded" })
+        await expect(this.page).toHaveURL(/\/classroom\?success=true/)
+    }
+
+    async connectStudentClassroomViaApi(): Promise<void> {
+        const response = await this.page.request.get(
+            "/api/classroom/student-auth",
+        )
+        expect(response.ok()).toBeTruthy()
+
+        const authUrl = readAuthUrlPayload(await response.json())
+        expect(authUrl).toContain("/api/classroom/student-callback")
+
+        await this.page.goto(authUrl, { waitUntil: "domcontentloaded" })
+        await expect(this.page).toHaveURL(/\/classroom\?student_success=true/)
     }
 }

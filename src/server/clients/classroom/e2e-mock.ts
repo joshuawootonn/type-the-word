@@ -42,6 +42,19 @@ type E2EClassroomMockStore = {
 const e2eClassroomMockStore: E2EClassroomMockStore = {
     courseWorks: new Map<string, E2EMockCourseWork>(),
 }
+const E2E_STUDENT_GOOGLE_USER_ID = "e2e-student-google-user"
+
+function createMockStudent(courseId: string, userId: string): Student {
+    return {
+        courseId,
+        userId,
+        profile: {
+            id: userId,
+            name: "E2E Student",
+            emailAddress: "student@e2e.local",
+        },
+    }
+}
 
 function getAuthUrl(state?: string): string {
     const callbackState = state ?? "e2e-teacher-user"
@@ -101,17 +114,21 @@ async function listStudentCourses(_accessToken: string): Promise<Course[]> {
 
 async function listStudents(
     _accessToken: string,
-    _courseId: string,
+    courseId: string,
 ): Promise<Student[]> {
-    return []
+    return [createMockStudent(courseId, E2E_STUDENT_GOOGLE_USER_ID)]
 }
 
 async function getStudent(
     _accessToken: string,
-    _courseId: string,
-    _userId: string,
+    courseId: string,
+    userId: string,
 ): Promise<Student | null> {
-    return null
+    if (userId !== E2E_STUDENT_GOOGLE_USER_ID) {
+        return null
+    }
+
+    return createMockStudent(courseId, userId)
 }
 
 async function createCourseWork(
@@ -137,11 +154,17 @@ async function createCourseWork(
 
 async function getStudentSubmission(
     _accessToken: string,
-    _courseId: string,
-    _courseWorkId: string,
-    _studentUserId: string,
+    courseId: string,
+    courseWorkId: string,
+    studentUserId: string,
 ): Promise<Submission | null> {
-    return null
+    return {
+        id: `e2e-submission-${courseWorkId}-${studentUserId}`,
+        courseId,
+        courseWorkId,
+        userId: studentUserId,
+        state: "CREATED",
+    }
 }
 
 async function updateDraftGrade(
