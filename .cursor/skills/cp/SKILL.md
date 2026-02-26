@@ -15,6 +15,7 @@ Run a safe commit-and-push flow for this repository.
 - Stage per semantic unit (not always `git add -A` once).
 - Do not run extra pre-flight verification in this skill by default; rely on the repository's pre-commit hook.
 - If schema or migration files changed, run `just migrate-test` before the first commit attempt so test DB schema matches the new code.
+- After rebase, re-check schema/migration changes introduced by the rebase and run `just migrate-test` again before push when needed.
 
 ## Workflow
 
@@ -32,6 +33,7 @@ Run a safe commit-and-push flow for this repository.
 6. Rebase before push:
     - Fetch latest remote refs: `git fetch origin`
     - Rebase current branch onto its remote tracking branch (or `origin/<branch>` if unset).
+    - If rebase introduces schema/migration changes (for example `src/server/db/schema.ts` or `drizzle/**`), run `just migrate-test` before push.
     - If conflicts occur, stop and report conflicted files plus suggested next resolution steps.
 7. Sync dependencies and database after rebase:
     - Run `pnpm install` to ensure lockfile and `node_modules` match the rebased branch.
