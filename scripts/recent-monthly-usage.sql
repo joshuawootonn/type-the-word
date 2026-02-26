@@ -62,13 +62,19 @@ order by month
 
 -- verses by user
 
-select count(*), u."id", "email", "name" from "typedVerse" tv
-                                                  join "user" u on tv."userId" = u."id"
-WHERE "createdAt" >= CURRENT_DATE - INTERVAL '20 month'
-  AND "createdAt" < CURRENT_DATE
+select
+    count(*) as typed_verse_count,
+    u."id",
+    u."email",
+    u."name",
+    max(tv."createdAt") as "lastTypedAt"
+from "typedVerse" tv
+         join "user" u on tv."userId" = u."id"
+where tv."createdAt" >= CURRENT_DATE - INTERVAL '20 month'
+  and tv."createdAt" < CURRENT_DATE
   and u."id" = 'a81fd49d-5e22-4a44-815f-7ccc1b0e8f1d'
-group by u.id
-order by count desc
+group by u."id", u."email", u."name"
+order by typed_verse_count desc
 
 
 
