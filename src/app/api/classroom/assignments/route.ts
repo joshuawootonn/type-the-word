@@ -345,7 +345,17 @@ export async function GET(request: NextRequest) {
                         eq(classroomAssignment.state, "PUBLISHED"),
                     ),
                 )
-                .orderBy(sql`${classroomAssignment.dueDate} NULLS LAST`)
+                .orderBy(
+                    sql`CASE
+                        WHEN COALESCE(${classroomSubmission.isCompleted}, 0) = 1 THEN 3
+                        WHEN ${classroomAssignment.dueDate} IS NULL THEN 2
+                        WHEN ${classroomAssignment.dueDate} < CURRENT_TIMESTAMP THEN 0
+                        ELSE 1
+                    END`,
+                    sql`${classroomAssignment.dueDate} ASC NULLS LAST`,
+                    sql`${classroomAssignment.createdAt} DESC`,
+                    sql`${classroomAssignment.id} ASC`,
+                )
                 .limit(limit)
                 .offset(page * limit)
 
