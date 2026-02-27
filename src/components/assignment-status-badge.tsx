@@ -1,5 +1,14 @@
 "use client"
 
+import {
+    CheckCircle,
+    Clock,
+    WarningCircle,
+    XCircle,
+} from "@phosphor-icons/react"
+
+import { getStudentAssignmentDisplayStatus } from "~/lib/classroom-assignment-status"
+
 type AssignmentState = "DRAFT" | "PUBLISHED" | "DELETED"
 
 interface AssignmentStatusBadgeProps {
@@ -15,50 +24,70 @@ export function AssignmentStatusBadge({
     isCompleted,
     isStudent = false,
 }: AssignmentStatusBadgeProps) {
-    // For students, compute status from PUBLISHED state
+    // For students, compute status from assignment completion and due date.
     if (isStudent && state === "PUBLISHED") {
-        const now = new Date()
-        const due = dueDate ? new Date(dueDate) : null
+        const status = getStudentAssignmentDisplayStatus({
+            dueDate,
+            isCompleted,
+        })
 
-        if (isCompleted === 1) {
+        if (status === "completed") {
             return (
-                <span className="border-success bg-secondary text-success inline-block border-2 px-2 py-1 text-xs font-semibold">
-                    Completed
-                </span>
-            )
-        } else if (due && due < now) {
-            return (
-                <span className="border-error bg-secondary text-error inline-block border-2 px-2 py-1 text-xs font-semibold">
-                    Past Due
-                </span>
-            )
-        } else {
-            return (
-                <span className="border-primary bg-secondary text-primary inline-block border-2 px-2 py-1 text-xs font-semibold">
-                    Current
+                <span className="text-success inline-flex items-center gap-1.5 text-sm font-medium">
+                    <CheckCircle className="h-4 w-4 shrink-0" />
+                    <span>Completed</span>
                 </span>
             )
         }
+
+        if (status === "pastDue") {
+            return (
+                <span className="text-error inline-flex items-center gap-1.5 text-sm font-medium">
+                    <WarningCircle className="h-4 w-4 shrink-0" />
+                    <span>Past Due</span>
+                </span>
+            )
+        }
+
+        if (status === "noDueDate") {
+            return (
+                <span className="inline-flex items-center gap-1.5 text-sm opacity-75">
+                    <Clock className="h-4 w-4 shrink-0" />
+                    <span>No Due Date</span>
+                </span>
+            )
+        }
+
+        return (
+            <span className="inline-flex items-center gap-1.5 text-sm opacity-75">
+                <Clock className="h-4 w-4 shrink-0" />
+                <span>Current</span>
+            </span>
+        )
     }
 
-    // For teachers, show state
-    if (state === "DRAFT") {
+    if (state === "PUBLISHED") {
         return (
-            <span className="border-primary bg-secondary inline-block border-2 px-2 py-1 text-xs font-semibold opacity-60">
-                Draft
-            </span>
-        )
-    } else if (state === "PUBLISHED") {
-        return (
-            <span className="border-primary bg-secondary text-primary inline-block border-2 px-2 py-1 text-xs font-semibold">
-                Published
-            </span>
-        )
-    } else {
-        return (
-            <span className="border-primary bg-secondary inline-block border-2 px-2 py-1 text-xs font-semibold opacity-40">
-                Deleted
+            <span className="text-success inline-flex items-center gap-1.5 text-sm font-medium">
+                <CheckCircle className="h-4 w-4 shrink-0" />
+                <span>Published</span>
             </span>
         )
     }
+
+    if (state === "DRAFT") {
+        return (
+            <span className="inline-flex items-center gap-1.5 text-sm opacity-75">
+                <Clock className="h-4 w-4 shrink-0" />
+                <span>Draft</span>
+            </span>
+        )
+    }
+
+    return (
+        <span className="text-error inline-flex items-center gap-1.5 text-sm">
+            <XCircle className="h-4 w-4 shrink-0" />
+            <span>Deleted</span>
+        </span>
+    )
 }
