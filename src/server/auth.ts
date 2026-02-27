@@ -1,5 +1,5 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter"
-import { eq } from "drizzle-orm"
+import { and, eq, isNull } from "drizzle-orm"
 import { type GetServerSidePropsContext } from "next"
 import { getServerSession, type NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
@@ -51,7 +51,12 @@ export const authOptions: NextAuthOptions = {
                 const existingUser = await db
                     .select()
                     .from(users)
-                    .where(eq(users.email, user.email ?? ""))
+                    .where(
+                        and(
+                            eq(users.email, user.email ?? ""),
+                            isNull(users.deactivatedAt),
+                        ),
+                    )
                     .limit(1)
 
                 if (
@@ -119,7 +124,12 @@ export const authOptions: NextAuthOptions = {
                 const user = await db
                     .select()
                     .from(users)
-                    .where(eq(users.email, credentials.email))
+                    .where(
+                        and(
+                            eq(users.email, credentials.email),
+                            isNull(users.deactivatedAt),
+                        ),
+                    )
                     .limit(1)
 
                 if (user.length === 0 || !user[0]) {

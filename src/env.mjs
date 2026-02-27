@@ -53,6 +53,7 @@ export const env = createEnv({
                 ? z.string().min(1)
                 : z.string().min(1).optional(),
         ANALYTICS_TIMEZONE: z.string().default("America/Chicago"),
+        ADMIN_EMAIL_WHITELIST: z.string().default(""),
     },
 
     /**
@@ -98,6 +99,7 @@ export const env = createEnv({
             process.env.DISCORD_ANALYTICS_WEBHOOK_URL,
         CRON_SECRET: process.env.CRON_SECRET,
         ANALYTICS_TIMEZONE: process.env.ANALYTICS_TIMEZONE,
+        ADMIN_EMAIL_WHITELIST: process.env.ADMIN_EMAIL_WHITELIST,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

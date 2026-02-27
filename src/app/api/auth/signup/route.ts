@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm"
+import { and, eq, isNull } from "drizzle-orm"
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
         const existingUser = await db
             .select()
             .from(users)
-            .where(eq(users.email, email))
+            .where(and(eq(users.email, email), isNull(users.deactivatedAt)))
             .limit(1)
 
         if (existingUser.length > 0) {
