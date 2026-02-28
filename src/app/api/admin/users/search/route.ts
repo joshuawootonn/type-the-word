@@ -1,4 +1,4 @@
-import { and, asc, isNull, or, sql } from "drizzle-orm"
+import { and, asc, eq, isNull, or, sql } from "drizzle-orm"
 import { getServerSession } from "next-auth"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -48,72 +48,107 @@ export async function GET(request: NextRequest): Promise<Response> {
     const normalizedQuery = query.toLowerCase()
     const likePattern = `%${normalizedQuery}%`
 
+    const typingSessionStats = db
+        .select({
+            userId: typingSessions.userId,
+            lastTypingSessionAt:
+                sql<Date | null>`MAX(${typingSessions.createdAt})`.as(
+                    "lastTypingSessionAt",
+                ),
+            typingSessionCount:
+                sql<number>`COUNT(${typingSessions.id})::int`.as(
+                    "typingSessionCount",
+                ),
+        })
+        .from(typingSessions)
+        .groupBy(typingSessions.userId)
+        .as("typingSessionStats")
+
+    const typedVerseStats = db
+        .select({
+            userId: typedVerses.userId,
+            lastTypedVerseAt:
+                sql<Date | null>`MAX(${typedVerses.createdAt})`.as(
+                    "lastTypedVerseAt",
+                ),
+            typedVerseCount: sql<number>`COUNT(${typedVerses.id})::int`.as(
+                "typedVerseCount",
+            ),
+        })
+        .from(typedVerses)
+        .groupBy(typedVerses.userId)
+        .as("typedVerseStats")
+
+    const dailyActivityStats = db
+        .select({
+            userId: userDailyActivity.userId,
+            activeDaysLast30:
+                sql<number>`COUNT(${userDailyActivity.date})::int`.as(
+                    "activeDaysLast30",
+                ),
+            versesTypedLast30:
+                sql<number>`COALESCE(SUM(${userDailyActivity.verseCount}), 0)::int`.as(
+                    "versesTypedLast30",
+                ),
+        })
+        .from(userDailyActivity)
+        .where(sql`${userDailyActivity.date} >= NOW() - INTERVAL '30 days'`)
+        .groupBy(userDailyActivity.userId)
+        .as("dailyActivityStats")
+
+    const classroomTeacherStats = db
+        .select({
+            userId: classroomAssignment.teacherUserId,
+            teacherAssignmentCount:
+                sql<number>`COUNT(${classroomAssignment.id})::int`.as(
+                    "teacherAssignmentCount",
+                ),
+        })
+        .from(classroomAssignment)
+        .groupBy(classroomAssignment.teacherUserId)
+        .as("classroomTeacherStats")
+
+    const classroomStudentStats = db
+        .select({
+            userId: classroomSubmission.studentUserId,
+            studentSubmissionCount:
+                sql<number>`COUNT(${classroomSubmission.id})::int`.as(
+                    "studentSubmissionCount",
+                ),
+        })
+        .from(classroomSubmission)
+        .groupBy(classroomSubmission.studentUserId)
+        .as("classroomStudentStats")
+
     const result = await db
         .select({
             id: users.id,
             email: users.email,
             name: users.name,
             accountCreatedAt: users.createdAt,
-            lastTypingSessionAt: sql<Date | null>`
-                (
-                    SELECT MAX(${typingSessions.createdAt})
-                    FROM ${typingSessions}
-                    WHERE ${typingSessions.userId} = ${users.id}
-                )
-            `,
-            lastTypedVerseAt: sql<Date | null>`
-                (
-                    SELECT MAX(${typedVerses.createdAt})
-                    FROM ${typedVerses}
-                    WHERE ${typedVerses.userId} = ${users.id}
-                )
-            `,
-            typingSessionCount: sql<number>`
-                (
-                    SELECT COUNT(*)::int
-                    FROM ${typingSessions}
-                    WHERE ${typingSessions.userId} = ${users.id}
-                )
-            `,
-            typedVerseCount: sql<number>`
-                (
-                    SELECT COUNT(*)::int
-                    FROM ${typedVerses}
-                    WHERE ${typedVerses.userId} = ${users.id}
-                )
-            `,
-            activeDaysLast30: sql<number>`
-                (
-                    SELECT COUNT(*)::int
-                    FROM ${userDailyActivity}
-                    WHERE ${userDailyActivity.userId} = ${users.id}
-                    AND ${userDailyActivity.date} >= NOW() - INTERVAL '30 days'
-                )
-            `,
-            versesTypedLast30: sql<number>`
-                (
-                    SELECT COALESCE(SUM(${userDailyActivity.verseCount}), 0)::int
-                    FROM ${userDailyActivity}
-                    WHERE ${userDailyActivity.userId} = ${users.id}
-                    AND ${userDailyActivity.date} >= NOW() - INTERVAL '30 days'
-                )
-            `,
+            lastTypingSessionAt: typingSessionStats.lastTypingSessionAt,
+            lastTypedVerseAt: typedVerseStats.lastTypedVerseAt,
+            typingSessionCount: sql<number>`COALESCE(${typingSessionStats.typingSessionCount}, 0)::int`,
+            typedVerseCount: sql<number>`COALESCE(${typedVerseStats.typedVerseCount}, 0)::int`,
+            activeDaysLast30: sql<number>`COALESCE(${dailyActivityStats.activeDaysLast30}, 0)::int`,
+            versesTypedLast30: sql<number>`COALESCE(${dailyActivityStats.versesTypedLast30}, 0)::int`,
             hasClassroomData: sql<boolean>`
-                (
-                    EXISTS (
-                        SELECT 1
-                        FROM ${classroomSubmission}
-                        WHERE ${classroomSubmission.studentUserId} = ${users.id}
-                    )
-                    OR EXISTS (
-                        SELECT 1
-                        FROM ${classroomAssignment}
-                        WHERE ${classroomAssignment.teacherUserId} = ${users.id}
-                    )
-                )
+                COALESCE(${classroomTeacherStats.teacherAssignmentCount}, 0) > 0
+                OR COALESCE(${classroomStudentStats.studentSubmissionCount}, 0) > 0
             `,
         })
         .from(users)
+        .leftJoin(typingSessionStats, eq(typingSessionStats.userId, users.id))
+        .leftJoin(typedVerseStats, eq(typedVerseStats.userId, users.id))
+        .leftJoin(dailyActivityStats, eq(dailyActivityStats.userId, users.id))
+        .leftJoin(
+            classroomTeacherStats,
+            eq(classroomTeacherStats.userId, users.id),
+        )
+        .leftJoin(
+            classroomStudentStats,
+            eq(classroomStudentStats.userId, users.id),
+        )
         .where(
             and(
                 isNull(users.deactivatedAt),
