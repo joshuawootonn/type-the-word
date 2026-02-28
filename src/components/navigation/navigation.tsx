@@ -30,6 +30,7 @@ export function Navigation({
     userThemes: serverRenderedUserThemes,
     lastTranslation: serverLastTranslation,
     hasClassroomAccess,
+    hasAdminAccess,
     className,
     ...props
 }: {
@@ -38,6 +39,7 @@ export function Navigation({
     lastTypedVerse: TypedVerse | null
     lastTranslation: Translation
     hasClassroomAccess: boolean
+    hasAdminAccess: boolean
     className?: string
 }) {
     const { data: sessionData } = useSession()
@@ -223,6 +225,16 @@ export function Navigation({
                                             href={"/classroom/dashboard"}
                                         >
                                             Classroom
+                                        </Link>
+                                    </DropdownMenu.Item>
+                                )}
+                                {hasAdminAccess && (
+                                    <DropdownMenu.Item asChild={true}>
+                                        <Link
+                                            className="text-medium group focus:bg-primary focus:text-secondary flex cursor-pointer items-center px-3 py-1 no-underline outline-hidden"
+                                            href={"/admin"}
+                                        >
+                                            Admin
                                         </Link>
                                     </DropdownMenu.Item>
                                 )}

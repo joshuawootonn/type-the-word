@@ -13,6 +13,7 @@ import { TypedVerse } from "~/server/repositories/typingSession.repository"
 import { UserThemeRecord } from "~/server/repositories/userTheme.repository"
 import { UserThemeRepository } from "~/server/repositories/userTheme.repository"
 
+import { isAdminEmail } from "./auth/admin"
 import { getLastTranslation } from "./last-translation"
 import { Translation } from "./parseEsv"
 
@@ -22,6 +23,7 @@ interface NavigationShellProps {
     builtinThemes: BuiltinThemeRecord[]
     lastTranslation: Translation
     hasClassroomAccess: boolean
+    hasAdminAccess: boolean
 }
 
 export const getNavigationShellProps = cache(
@@ -40,6 +42,7 @@ export const getNavigationShellProps = cache(
                 builtinThemes,
                 lastTranslation,
                 hasClassroomAccess,
+                hasAdminAccess: false,
             }
         }
 
@@ -58,6 +61,7 @@ export const getNavigationShellProps = cache(
             builtinThemes,
             lastTranslation,
             hasClassroomAccess,
+            hasAdminAccess: isAdminEmail(session.user.email),
         }
     },
 )
