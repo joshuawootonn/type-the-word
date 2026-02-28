@@ -14,14 +14,14 @@ Run a safe commit-and-push flow for this repository.
 - Prefer semantic, focused commits over a single monolithic commit.
 - Stage per semantic unit (not always `git add -A` once).
 - Do not run extra pre-flight verification in this skill by default; rely on the repository's pre-commit hook.
-- If schema or migration files changed, run `just migrate-test` before the first commit attempt so test DB schema matches the new code.
+- Always run `just migrate-test` before the first commit attempt so test DB schema is up to date for hooks/tests.
 - After rebase, re-check schema/migration changes introduced by the rebase and run `just migrate-test` again before push when needed.
 
 ## Workflow
 
 1. Verify current branch with `git branch --show-current`.
 2. Review changes with `git status`, `git diff`, and recent commit style (`git log`).
-3. If DB schema/migration files changed (for example `src/server/db/schema.ts` or `drizzle/**`), run `just migrate-test`.
+3. Run `just migrate-test`.
 4. Group files into semantic units.
 5. For each semantic unit:
     - Stage only relevant files/hunks.
@@ -85,5 +85,6 @@ create 3 commits:
 - Never use `--no-verify`.
 - Never use force-push in this skill unless user explicitly asks.
 - If commit fails because of formatting, automatically run `just format`, restage, and retry commit once.
+- If commit fails for missing DB columns/tables or migration drift, run `just migrate-test` once, then retry the same commit once.
 - If commit still fails after that retry (or fails for a non-formatting reason), stop and report the failing step and output.
 - If commit or push fails, report the exact failure and next step.
