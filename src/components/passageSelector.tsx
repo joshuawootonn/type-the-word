@@ -197,7 +197,7 @@ export function PassageSelector({
     const isFirstRender = useIsFirstRender()
 
     return (
-        <>
+        <div className={"flex flex-col sm:flex-row sm:items-center gap-2"}>
             <label htmlFor="passage" className={clsx(labelClassName)}>
                 {label ?? "Passage:"}
             </label>
@@ -469,6 +469,6 @@ export function PassageSelector({
                     </Combobox.Button>
                 </Combobox>
             </div>
-        </>
+        </div>
     )
 }
