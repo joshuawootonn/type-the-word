@@ -49,6 +49,21 @@ function getUserLabel(user: AdminUserSearchItem | null): string {
     return user.name ? `${user.name} (${user.email})` : user.email
 }
 
+function formatDateTime(date: Date | null): string {
+    if (date === null) {
+        return "Never"
+    }
+
+    return new Intl.DateTimeFormat(undefined, {
+        dateStyle: "medium",
+        timeStyle: "short",
+    }).format(date)
+}
+
+function formatCount(value: number): string {
+    return new Intl.NumberFormat().format(value)
+}
+
 export function ClientPage() {
     const [userQuery, setUserQuery] = useState("")
     const [userOptions, setUserOptions] = useState<AdminUserSearchItem[]>([])
@@ -119,6 +134,15 @@ export function ClientPage() {
             setState({
                 status: "error",
                 message: "Select a user from the search list first.",
+            })
+            return
+        }
+
+        if (selectedUser.hasClassroomData) {
+            setState({
+                status: "error",
+                message:
+                    "This user cannot be deactivated because they have classroom assignment data.",
             })
             return
         }
@@ -230,6 +254,22 @@ export function ClientPage() {
                                                     {item.name && (
                                                         <div>{item.email}</div>
                                                     )}
+                                                    <div className="text-xs">
+                                                        Last typed:{" "}
+                                                        {formatDateTime(
+                                                            item.lastTypedVerseAt,
+                                                        )}{" "}
+                                                        · 30d verses:{" "}
+                                                        {formatCount(
+                                                            item.versesTypedLast30,
+                                                        )}
+                                                    </div>
+                                                    {item.hasClassroomData && (
+                                                        <div className="text-error text-xs">
+                                                            Has classroom data
+                                                            (cannot deactivate)
+                                                        </div>
+                                                    )}
                                                 </ComboboxItem>
                                             )}
                                         </ComboboxList>
@@ -240,8 +280,83 @@ export function ClientPage() {
                     </div>
 
                     {selectedUser && (
-                        <div className="border-primary bg-secondary border-2 p-3 text-sm">
-                            Selected ID: <code>{selectedUser.id}</code>
+                        <div className="border-primary bg-secondary space-y-3 border-2 p-3 text-sm">
+                            <div>
+                                <div className="font-semibold">
+                                    {selectedUser.name ?? selectedUser.email}
+                                </div>
+                                {selectedUser.name && (
+                                    <div>{selectedUser.email}</div>
+                                )}
+                            </div>
+
+                            <div className="grid gap-2 md:grid-cols-2">
+                                <div>
+                                    <span className="font-semibold">
+                                        User ID:
+                                    </span>{" "}
+                                    <code>{selectedUser.id}</code>
+                                </div>
+                                <div>
+                                    <span className="font-semibold">
+                                        Account Created:
+                                    </span>{" "}
+                                    {formatDateTime(
+                                        selectedUser.accountCreatedAt,
+                                    )}
+                                </div>
+                                <div>
+                                    <span className="font-semibold">
+                                        Last Typed Verse:
+                                    </span>{" "}
+                                    {formatDateTime(
+                                        selectedUser.lastTypedVerseAt,
+                                    )}
+                                </div>
+                                <div>
+                                    <span className="font-semibold">
+                                        Last Typing Session:
+                                    </span>{" "}
+                                    {formatDateTime(
+                                        selectedUser.lastTypingSessionAt,
+                                    )}
+                                </div>
+                                <div>
+                                    <span className="font-semibold">
+                                        Total Typed Verses:
+                                    </span>{" "}
+                                    {formatCount(selectedUser.typedVerseCount)}
+                                </div>
+                                <div>
+                                    <span className="font-semibold">
+                                        Total Sessions:
+                                    </span>{" "}
+                                    {formatCount(
+                                        selectedUser.typingSessionCount,
+                                    )}
+                                </div>
+                                <div>
+                                    <span className="font-semibold">
+                                        Active Days (30d):
+                                    </span>{" "}
+                                    {formatCount(selectedUser.activeDaysLast30)}
+                                </div>
+                                <div>
+                                    <span className="font-semibold">
+                                        Verses Typed (30d):
+                                    </span>{" "}
+                                    {formatCount(
+                                        selectedUser.versesTypedLast30,
+                                    )}
+                                </div>
+                            </div>
+
+                            {selectedUser.hasClassroomData && (
+                                <div className="text-error font-semibold">
+                                    Cannot deactivate: user has classroom
+                                    assignment data.
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -281,7 +396,9 @@ export function ClientPage() {
                             type="submit"
                             isLoading={isSubmitting}
                             loadingLabel="Deactivating user"
-                            disabled={!selectedUser}
+                            disabled={
+                                !selectedUser || selectedUser.hasClassroomData
+                            }
                         >
                             Deactivate User
                         </Button>

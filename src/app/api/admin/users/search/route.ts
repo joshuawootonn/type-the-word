@@ -6,7 +6,14 @@ import { adminErrorResponseSchema } from "~/app/api/admin/users/deactivate/schem
 import { isAdminEmail } from "~/lib/auth/admin"
 import { authOptions } from "~/server/auth"
 import { db } from "~/server/db"
-import { users } from "~/server/db/schema"
+import {
+    classroomAssignment,
+    classroomSubmission,
+    typedVerses,
+    typingSessions,
+    userDailyActivity,
+    users,
+} from "~/server/db/schema"
 
 import {
     adminUserSearchResponseSchema,
@@ -46,6 +53,65 @@ export async function GET(request: NextRequest): Promise<Response> {
             id: users.id,
             email: users.email,
             name: users.name,
+            accountCreatedAt: users.createdAt,
+            lastTypingSessionAt: sql<Date | null>`
+                (
+                    SELECT MAX(${typingSessions.createdAt})
+                    FROM ${typingSessions}
+                    WHERE ${typingSessions.userId} = ${users.id}
+                )
+            `,
+            lastTypedVerseAt: sql<Date | null>`
+                (
+                    SELECT MAX(${typedVerses.createdAt})
+                    FROM ${typedVerses}
+                    WHERE ${typedVerses.userId} = ${users.id}
+                )
+            `,
+            typingSessionCount: sql<number>`
+                (
+                    SELECT COUNT(*)::int
+                    FROM ${typingSessions}
+                    WHERE ${typingSessions.userId} = ${users.id}
+                )
+            `,
+            typedVerseCount: sql<number>`
+                (
+                    SELECT COUNT(*)::int
+                    FROM ${typedVerses}
+                    WHERE ${typedVerses.userId} = ${users.id}
+                )
+            `,
+            activeDaysLast30: sql<number>`
+                (
+                    SELECT COUNT(*)::int
+                    FROM ${userDailyActivity}
+                    WHERE ${userDailyActivity.userId} = ${users.id}
+                    AND ${userDailyActivity.date} >= NOW() - INTERVAL '30 days'
+                )
+            `,
+            versesTypedLast30: sql<number>`
+                (
+                    SELECT COALESCE(SUM(${userDailyActivity.verseCount}), 0)::int
+                    FROM ${userDailyActivity}
+                    WHERE ${userDailyActivity.userId} = ${users.id}
+                    AND ${userDailyActivity.date} >= NOW() - INTERVAL '30 days'
+                )
+            `,
+            hasClassroomData: sql<boolean>`
+                (
+                    EXISTS (
+                        SELECT 1
+                        FROM ${classroomSubmission}
+                        WHERE ${classroomSubmission.studentUserId} = ${users.id}
+                    )
+                    OR EXISTS (
+                        SELECT 1
+                        FROM ${classroomAssignment}
+                        WHERE ${classroomAssignment.teacherUserId} = ${users.id}
+                    )
+                )
+            `,
         })
         .from(users)
         .where(
