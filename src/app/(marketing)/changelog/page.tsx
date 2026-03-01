@@ -30,8 +30,24 @@ function DateComponent({ date }: { date: Date }) {
             className={"text-primary font-bold"}
             dateTime={format(date, "yyyy-MM-dd")}
         >
-            {format(date, "LLLL do")}
+            {format(date, "LLLL do yyyy")}
         </time>
+    )
+}
+
+function YearHeading({
+    year,
+    isFirst = false,
+}: {
+    year: number
+    isFirst?: boolean
+}) {
+    return (
+        <li
+            className={`text-primary -ml-9 list-none text-7xl font-bold ${isFirst ? "" : "mt-8"}`}
+        >
+            {year}
+        </li>
     )
 }
 
@@ -67,6 +83,7 @@ export default async function Changelog() {
             )}
             <hr className="border-primary mx-0 w-full border-t-2" />
             <ul>
+                <YearHeading year={2026} isFirst />
                 <li>
                     <DateComponent date={new Date("02/20/2026")} /> - Fixed NASB
                     Acts 28:27 so &quot;I would&quot; displays with proper
@@ -266,6 +283,7 @@ export default async function Changelog() {
                     </NextLink>{" "}
                     for all new Bible translations.
                 </li>
+                <YearHeading year={2025} />
                 <li>
                     <DateComponent date={new Date("12/29/2025")} /> - Improved
                     parsing for new Bible translations:
@@ -634,8 +652,7 @@ export default async function Changelog() {
                     </ul>
                 </li>
                 <li>
-                    <DateComponent date={new Date("1/6/2024")} />
-
+                    <DateComponent date={new Date("1/6/2025")} />
                     <ul>
                         <li>
                             Fixed a bug where TTW was not downloading the last
@@ -698,6 +715,7 @@ export default async function Changelog() {
                         </li>
                     </ul>
                 </li>
+                <YearHeading year={2024} />
                 <li>
                     <DateComponent date={new Date("12/25/2024")} />
                     <ul>
@@ -1232,6 +1250,7 @@ export default async function Changelog() {
                     </Link>{" "}
                     about all the little details
                 </li>
+                <YearHeading year={2023} />
                 <li>
                     <DateComponent date={new Date("12/20/2023")} /> - Added Dark
                     Mode (Thanks to{" "}
