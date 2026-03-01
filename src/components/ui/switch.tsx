@@ -27,7 +27,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
             >
                 <span
                     className={cn(
-                        "border-1.5 border-primary bg-secondary ring-primary pointer-events-none block h-[22px] w-[22px] shadow-lg ring-0 transition-transform",
+                        "border-1.5 border-primary bg-secondary ring-primary pointer-events-none block h-[22px] w-[22px] ring-0 transition-transform",
                         checked ? "translate-x-[13px]" : "translate-x-[-2px]",
                     )}
                 />
