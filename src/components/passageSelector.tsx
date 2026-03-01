@@ -83,6 +83,8 @@ export function PassageSelector({
     const [translation, setTranslation] =
         useState<Translation>(initialTranslation)
 
+    const hasActivedSelector = useRef(false)
+
     const [bookQuery, setBookQuery] = useState("")
     const [chapterQuery, setChapterQuery] = useState("")
     const [translationQuery, setTranslationQuery] = useState("")
@@ -119,9 +121,14 @@ export function PassageSelector({
     }, [searchParams])
 
     useEffect(() => {
+        hasActivedSelector.current = true
+    }, [book, chapter, translation])
+
+    useEffect(() => {
         const values = getValues(value)
         setBook(values.book)
         setChapter(values.chapter)
+        hasActivedSelector.current = false
     }, [value])
 
     const filteredChapters =
@@ -183,7 +190,7 @@ export function PassageSelector({
     useEffect(() => {
         const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
         // I use `!includes` to prevent passage selector from clearing url specified verses
-        if (!pathname?.includes(nextValue) && pathname !== "/") {
+        if (hasActivedSelector.current && !pathname?.includes(nextValue)) {
             const t = setTimeout(() => {
                 onSubmit({ book, chapter, translation })
             }, 3000)
@@ -197,7 +204,7 @@ export function PassageSelector({
     const isFirstRender = useIsFirstRender()
 
     return (
-        <div className={"flex flex-col sm:flex-row sm:items-center gap-2"}>
+        <div className={"flex flex-col gap-2 sm:flex-row sm:items-center"}>
             <label htmlFor="passage" className={clsx(labelClassName)}>
                 {label ?? "Passage:"}
             </label>
