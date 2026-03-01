@@ -16,6 +16,7 @@ Run a safe commit-and-push flow for this repository.
 - Do not run extra pre-flight verification in this skill by default; rely on the repository's pre-commit hook.
 - Always run `just migrate-test` before the first commit attempt so test DB schema is up to date for hooks/tests.
 - After rebase, re-check schema/migration changes introduced by the rebase and run `just migrate-test` again before push when needed.
+- Auto-heal lint-check failures by trying `just lint`, then re-running `just lint-check` before retrying the blocked commit.
 
 ## Workflow
 
@@ -30,6 +31,9 @@ Run a safe commit-and-push flow for this repository.
         - Body that explains why the change exists and user impact.
     - Commit with a multi-line message (HEREDOC preferred).
     - If commit is blocked by formatting checks, run `just format`, restage affected files, and retry the same commit once.
+    - If commit is blocked by `lint-check` output, run `just lint` to attempt auto-fixes, then run `just lint-check`:
+        - If `just lint-check` passes, restage affected files and retry the same commit once.
+        - If `just lint-check` still fails, stop and report the remaining lint errors.
 6. Rebase before push:
     - Fetch latest remote refs: `git fetch origin`
     - Rebase current branch onto its remote tracking branch (or `origin/<branch>` if unset).
@@ -85,6 +89,7 @@ create 3 commits:
 - Never use `--no-verify`.
 - Never use force-push in this skill unless user explicitly asks.
 - If commit fails because of formatting, automatically run `just format`, restage, and retry commit once.
+- If commit fails due to `lint-check`, automatically run `just lint`, then `just lint-check`; if clean, restage and retry commit once.
 - If commit fails for missing DB columns/tables or migration drift, run `just migrate-test` once, then retry the same commit once.
 - If commit still fails after that retry (or fails for a non-formatting reason), stop and report the failing step and output.
 - If commit or push fails, report the exact failure and next step.
