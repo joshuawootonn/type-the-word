@@ -11,6 +11,10 @@ import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
 import { Link } from "~/components/ui/link"
 import { Meter } from "~/components/ui/meter"
+import {
+    type StudentAssignmentDisplayStatus,
+    getStudentAssignmentDisplayStatus,
+} from "~/lib/classroom-assignment-status"
 import toProperCase from "~/lib/toProperCase"
 
 import { fetchAssignments } from "./actions"
@@ -42,6 +46,10 @@ export function StudentClientPage({
             (assignmentsQuery.data?.pages.flatMap(page => page.assignments) ??
                 []) as StudentAssignment[],
         [assignmentsQuery.data],
+    )
+    const assignmentGroups = useMemo(
+        () => buildAssignmentGroups(allAssignments),
+        [allAssignments],
     )
 
     if (assignmentsQuery.isLoading) {
@@ -78,12 +86,21 @@ export function StudentClientPage({
                 <p className="opacity-75">No assignments yet.</p>
             ) : (
                 <div className="not-prose space-y-3">
-                    {allAssignments.map(assignment => (
-                        <AssignmentCard
-                            key={assignment.id}
-                            assignment={assignment}
-                            courseId={courseId}
-                        />
+                    {assignmentGroups.map(group => (
+                        <section key={group.id} className="space-y-2">
+                            <h2 className="text-base font-semibold">
+                                {group.title}
+                            </h2>
+                            <div className="space-y-3">
+                                {group.assignments.map(assignment => (
+                                    <AssignmentCard
+                                        key={assignment.id}
+                                        assignment={assignment}
+                                        courseId={courseId}
+                                    />
+                                ))}
+                            </div>
+                        </section>
                     ))}
                     {assignmentsQuery.hasNextPage && (
                         <Button
@@ -170,4 +187,43 @@ function AssignmentCard({
             )}
         </NextLink>
     )
+}
+
+function buildAssignmentGroups(assignments: StudentAssignment[]): Array<{
+    id: StudentAssignmentDisplayStatus
+    title: string
+    assignments: StudentAssignment[]
+}> {
+    const grouped: Record<StudentAssignmentDisplayStatus, StudentAssignment[]> =
+        {
+            pastDue: [],
+            current: [],
+            noDueDate: [],
+            completed: [],
+        }
+
+    assignments.forEach(assignment => {
+        const status = getStudentAssignmentDisplayStatus({
+            dueDate: assignment.dueDate,
+            isCompleted: assignment.isCompleted,
+        })
+        grouped[status].push(assignment)
+    })
+
+    const orderedGroups: Array<{
+        id: StudentAssignmentDisplayStatus
+        title: string
+        assignments: StudentAssignment[]
+    }> = [
+        { id: "pastDue", title: "Past Due", assignments: grouped.pastDue },
+        { id: "current", title: "Current", assignments: grouped.current },
+        {
+            id: "noDueDate",
+            title: "No Due Date",
+            assignments: grouped.noDueDate,
+        },
+        { id: "completed", title: "Completed", assignments: grouped.completed },
+    ]
+
+    return orderedGroups.filter(group => group.assignments.length > 0)
 }

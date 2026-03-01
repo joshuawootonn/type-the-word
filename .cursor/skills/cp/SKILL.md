@@ -14,13 +14,15 @@ Run a safe commit-and-push flow for this repository.
 - Prefer semantic, focused commits over a single monolithic commit.
 - Stage per semantic unit (not always `git add -A` once).
 - Do not run extra pre-flight verification in this skill by default; rely on the repository's pre-commit hook.
-- If schema or migration files changed, run `just migrate-test` before the first commit attempt so test DB schema matches the new code.
+- Always run `just migrate-test` before the first commit attempt so test DB schema is up to date for hooks/tests.
+- After rebase, re-check schema/migration changes introduced by the rebase and run `just migrate-test` again before push when needed.
+- Auto-heal lint-check failures by trying `just lint`, then re-running `just lint-check` before retrying the blocked commit.
 
 ## Workflow
 
 1. Verify current branch with `git branch --show-current`.
 2. Review changes with `git status`, `git diff`, and recent commit style (`git log`).
-3. If DB schema/migration files changed (for example `src/server/db/schema.ts` or `drizzle/**`), run `just migrate-test`.
+3. Run `just migrate-test`.
 4. Group files into semantic units.
 5. For each semantic unit:
     - Stage only relevant files/hunks.
@@ -29,9 +31,13 @@ Run a safe commit-and-push flow for this repository.
         - Body that explains why the change exists and user impact.
     - Commit with a multi-line message (HEREDOC preferred).
     - If commit is blocked by formatting checks, run `just format`, restage affected files, and retry the same commit once.
+    - If commit is blocked by `lint-check` output, run `just lint` to attempt auto-fixes, then run `just lint-check`:
+        - If `just lint-check` passes, restage affected files and retry the same commit once.
+        - If `just lint-check` still fails, stop and report the remaining lint errors.
 6. Rebase before push:
     - Fetch latest remote refs: `git fetch origin`
     - Rebase current branch onto its remote tracking branch (or `origin/<branch>` if unset).
+    - If rebase introduces schema/migration changes (for example `src/server/db/schema.ts` or `drizzle/**`), run `just migrate-test` before push.
     - If conflicts occur, stop and report conflicted files plus suggested next resolution steps.
 7. Sync dependencies and database after rebase:
     - Run `pnpm install` to ensure lockfile and `node_modules` match the rebased branch.
@@ -83,5 +89,7 @@ create 3 commits:
 - Never use `--no-verify`.
 - Never use force-push in this skill unless user explicitly asks.
 - If commit fails because of formatting, automatically run `just format`, restage, and retry commit once.
+- If commit fails due to `lint-check`, automatically run `just lint`, then `just lint-check`; if clean, restage and retry commit once.
+- If commit fails for missing DB columns/tables or migration drift, run `just migrate-test` once, then retry the same commit once.
 - If commit still fails after that retry (or fails for a non-formatting reason), stop and report the failing step and output.
 - If commit or push fails, report the exact failure and next step.

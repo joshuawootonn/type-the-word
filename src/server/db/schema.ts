@@ -56,12 +56,15 @@ export const users = pgTable("user", {
         mode: "date",
     })
         .notNull()
-        .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+        .default(sql`CURRENT_TIMESTAMP(3)`),
     emailVerified: timestamp("emailVerified", {
         mode: "date",
     }).default(sql`CURRENT_TIMESTAMP(3)`),
     image: varchar("image", { length: 255 }),
     hashedPassword: text("hashedPassword"),
+    deactivatedAt: timestamp("deactivatedAt", {
+        mode: "date",
+    }),
 })
 
 export const usersRelations = relations(users, ({ many, one }) => ({

@@ -162,6 +162,20 @@
             "when": 1771603936653,
             "tag": "0022_parallel_yellow_claw",
             "breakpoints": true
+        },
+        {
+            "idx": 23,
+            "version": "7",
+            "when": 1772032770524,
+            "tag": "0023_ensure_public_user_created_at",
+            "breakpoints": true
+        },
+        {
+            "idx": 24,
+            "version": "7",
+            "when": 1772223484732,
+            "tag": "0024_luxuriant_thunderball",
+            "breakpoints": true
         }
     ]
 }

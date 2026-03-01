@@ -59,16 +59,28 @@ WHERE "createdAt" >= CURRENT_DATE - INTERVAL '20 month'
 group by month
 order by month
 
+-- verses by quarter
+
+select count(*), date_trunc('quarter', "createdAt") AS quarter from "typedVerse" tv
+WHERE "createdAt" >= CURRENT_DATE - INTERVAL '36 month'
+group by quarter
+order by quarter
+
 
 -- verses by user
 
-select count(*), u."id", "email", "name" from "typedVerse" tv
-                                                  join "user" u on tv."userId" = u."id"
-WHERE "createdAt" >= CURRENT_DATE - INTERVAL '20 month'
-  AND "createdAt" < CURRENT_DATE
-  and u."id" = 'a81fd49d-5e22-4a44-815f-7ccc1b0e8f1d'
-group by u.id
-order by count desc
+select
+    count(*) as typed_verse_count,
+    u."id",
+    u."email",
+    u."name",
+    max(tv."createdAt") as "lastTypedAt"
+from "typedVerse" tv
+         join "user" u on tv."userId" = u."id"
+where tv."createdAt" >= CURRENT_DATE - INTERVAL '30 month'
+  and tv."createdAt" < CURRENT_DATE
+group by u."id", u."email", u."name"
+order by typed_verse_count desc
 
 
 
@@ -81,6 +93,16 @@ SELECT
 FROM "user" u
 group by month
 order by month;
+
+-- new users by quarter
+SELECT
+    count(*),
+    date_trunc('quarter', (SELECT MIN("createdAt")
+                           FROM "typingSession" tv
+                           WHERE tv."userId" = u.id)) AS quarter
+FROM "user" u
+GROUP BY quarter
+ORDER BY quarter;
 
 
 -- find users with their createdAt
@@ -112,6 +134,11 @@ select count(*) from "typedVerse";
 -- total users
 
 select count(*) from "user";
+
+-- users with connected student token
+
+select count(*) as users_with_student_token from "classroomStudentToken";
+
 
 -- Verse counts for the last ten days
 
