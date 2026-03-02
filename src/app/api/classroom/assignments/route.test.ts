@@ -13,6 +13,8 @@ vi.mock("next-auth", () => ({
 // Mock classroom client
 vi.mock("~/server/clients/classroom.client", () => ({
     createCourseWork: vi.fn(),
+    createTopic: vi.fn(),
+    listTopics: vi.fn(),
     refreshAccessToken: vi.fn(),
 }))
 
@@ -243,6 +245,11 @@ describe("POST /api/classroom/assignments", () => {
         vi.mocked(classroomRepository.getTeacherToken).mockResolvedValue(
             mockToken,
         )
+        vi.mocked(classroomClient.listTopics).mockResolvedValue([])
+        vi.mocked(classroomClient.createTopic).mockResolvedValue({
+            topicId: "topic-123",
+            name: "Bible Typing Practice",
+        })
         vi.mocked(classroomClient.createCourseWork).mockResolvedValue({
             id: "coursework-123",
             courseId: "course-123",
@@ -290,6 +297,22 @@ describe("POST /api/classroom/assignments", () => {
         expect(data.courseWorkLink).toBe(
             "https://classroom.google.com/c/abc/a/xyz",
         )
+        expect(classroomClient.listTopics).toHaveBeenCalledWith(
+            "valid-token",
+            "course-123",
+        )
+        expect(classroomClient.createTopic).toHaveBeenCalledWith(
+            "valid-token",
+            "course-123",
+            "Bible Typing Practice",
+        )
+        expect(classroomClient.createCourseWork).toHaveBeenCalledWith(
+            "valid-token",
+            "course-123",
+            expect.objectContaining({
+                topicId: "topic-123",
+            }),
+        )
     })
 
     test("WHEN token expired THEN refreshes and creates assignment", async () => {
@@ -301,6 +324,11 @@ describe("POST /api/classroom/assignments", () => {
         vi.mocked(classroomClient.refreshAccessToken).mockResolvedValue({
             accessToken: "new-token",
             expiresAt: new Date(Date.now() + 3600 * 1000),
+        })
+        vi.mocked(classroomClient.listTopics).mockResolvedValue([])
+        vi.mocked(classroomClient.createTopic).mockResolvedValue({
+            topicId: "topic-123",
+            name: "Bible Typing Practice",
         })
         vi.mocked(classroomClient.createCourseWork).mockResolvedValue({
             id: "coursework-123",
@@ -346,5 +374,9 @@ describe("POST /api/classroom/assignments", () => {
             "refresh-token",
         )
         expect(classroomRepository.updateTeacherTokenAccess).toHaveBeenCalled()
+        expect(classroomClient.listTopics).toHaveBeenCalledWith(
+            "new-token",
+            "course-123",
+        )
     })
 })

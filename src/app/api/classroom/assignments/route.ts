@@ -17,7 +17,9 @@ import { syncFutureAssignments } from "~/server/classroom/sync-assignments"
 import { getValidTeacherToken } from "~/server/classroom/teacher-token"
 import {
     createCourseWork,
+    createTopic,
     listStudents,
+    listTopics,
     refreshAccessToken,
 } from "~/server/clients/classroom.client"
 import { db } from "~/server/db"
@@ -40,6 +42,39 @@ import {
     createAssignmentRequestSchema,
     type CreateAssignmentResponse,
 } from "../schemas"
+
+const CLASSROOM_ASSIGNMENT_TOPIC_NAME = "Bible Typing Practice"
+
+async function getOrCreateAssignmentTopicId(
+    accessToken: string,
+    courseId: string,
+): Promise<string | undefined> {
+    try {
+        const topics = await listTopics(accessToken, courseId)
+        const existingTopic = topics.find(
+            topic => topic.name === CLASSROOM_ASSIGNMENT_TOPIC_NAME,
+        )
+
+        if (existingTopic) {
+            return existingTopic.topicId
+        }
+
+        const newTopic = await createTopic(
+            accessToken,
+            courseId,
+            CLASSROOM_ASSIGNMENT_TOPIC_NAME,
+        )
+        return newTopic.topicId
+    } catch (error) {
+        // Some existing tokens may not include classroom.topics yet.
+        // Continue assignment creation without topic so this flow remains usable.
+        console.warn(
+            "Unable to resolve Classroom topic for assignment creation:",
+            error,
+        )
+        return undefined
+    }
+}
 
 /**
  * Unified endpoint for getting assignments - works for both teachers and students
@@ -715,6 +750,10 @@ export async function POST(request: NextRequest) {
         }
 
         const assignmentId = crypto.randomUUID()
+        const topicId = await getOrCreateAssignmentTopicId(
+            accessToken,
+            data.courseId,
+        )
 
         // Create CourseWork in Google Classroom as DRAFT
         const courseWork = await createCourseWork(accessToken, data.courseId, {
@@ -733,6 +772,7 @@ export async function POST(request: NextRequest) {
                     },
                 },
             ],
+            ...(topicId ? { topicId } : {}),
         })
 
         // Create assignment record in our database as DRAFT
