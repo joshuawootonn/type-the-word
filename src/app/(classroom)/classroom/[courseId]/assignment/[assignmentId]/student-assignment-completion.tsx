@@ -164,7 +164,7 @@ export function StudentAssignmentCompletion({
                 {/* Show stats if we have valid data */}
                 {(stats.averageWpm !== null ||
                     stats.averageAccuracy !== null) && (
-                    <div className="border-primary grid grid-cols-2 gap-3 border-t-2 pt-3 text-sm">
+                    <div className="flex justify-between text-sm">
                         {stats.averageWpm !== null && (
                             <div>
                                 <span className="opacity-75">Average WPM:</span>{" "}
