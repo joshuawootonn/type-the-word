@@ -83,7 +83,7 @@ export function PassageSelector({
     const [translation, setTranslation] =
         useState<Translation>(initialTranslation)
 
-    const hasActivedSelector = useRef(false)
+    const hasActivatedSelector = useRef(false)
 
     const [bookQuery, setBookQuery] = useState("")
     const [chapterQuery, setChapterQuery] = useState("")
@@ -121,14 +121,14 @@ export function PassageSelector({
     }, [searchParams])
 
     useEffect(() => {
-        hasActivedSelector.current = true
+        hasActivatedSelector.current = true
     }, [book, chapter, translation])
 
     useEffect(() => {
         const values = getValues(value)
         setBook(values.book)
         setChapter(values.chapter)
-        hasActivedSelector.current = false
+        hasActivatedSelector.current = false
     }, [value])
 
     const filteredChapters =
@@ -190,7 +190,7 @@ export function PassageSelector({
     useEffect(() => {
         const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
         // I use `!includes` to prevent passage selector from clearing url specified verses
-        if (hasActivedSelector.current && !pathname?.includes(nextValue)) {
+        if (hasActivatedSelector.current && !pathname?.includes(nextValue)) {
             const t = setTimeout(() => {
                 onSubmit({ book, chapter, translation })
             }, 3000)
