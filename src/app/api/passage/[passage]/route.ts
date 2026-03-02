@@ -55,7 +55,18 @@ const apiBiblePassageSchema = z.object({
 })
 
 const translationSchema = z
-    .enum(["esv", "bsb", "nlt", "niv", "csb", "nkjv", "nasb", "ntv", "msg"])
+    .enum([
+        "esv",
+        "bsb",
+        "nlt",
+        "niv",
+        "csb",
+        "nkjv",
+        "nasb",
+        "ntv",
+        "rvr09",
+        "msg",
+    ])
     .default("esv")
 
 export const dynamic = "force-dynamic" // defaults to auto
@@ -341,7 +352,7 @@ export async function GET(
     } catch (_: unknown) {
         return Response.json(
             {
-                error: `Invalid translation. Must be one of: esv, bsb, nlt, niv, csb, nkjv, nasb, ntv, msg`,
+                error: `Invalid translation. Must be one of: esv, bsb, nlt, niv, csb, nkjv, nasb, ntv, rvr09, msg`,
             },
             {
                 status: 400,

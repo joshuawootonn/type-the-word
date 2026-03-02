@@ -1,0 +1,2 @@
+ALTER TYPE "public"."passageResponse_translation" ADD VALUE IF NOT EXISTS 'rvr09' BEFORE 'msg';--> statement-breakpoint
+ALTER TYPE "public"."typedVerse_translation" ADD VALUE IF NOT EXISTS 'rvr09' BEFORE 'msg';

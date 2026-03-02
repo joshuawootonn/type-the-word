@@ -29,6 +29,7 @@ export type Translation =
     | "nkjv"
     | "nasb"
     | "ntv"
+    | "rvr09"
     | "msg"
 
 export type VerseNumber = {

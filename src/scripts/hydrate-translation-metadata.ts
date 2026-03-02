@@ -170,6 +170,7 @@ async function main() {
         "nkjv",
         "nasb",
         "ntv",
+        "rvr09",
         "msg",
     ]
 

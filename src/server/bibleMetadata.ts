@@ -26,6 +26,7 @@ export type Translation =
     | "nkjv"
     | "nasb"
     | "ntv"
+    | "rvr09"
     | "msg"
 
 // Cache for loaded metadata to avoid repeated imports

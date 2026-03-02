@@ -26,7 +26,7 @@ export const passageResponseBook = pgEnum(
 )
 export const passageResponseTranslation = pgEnum(
     "passageResponse_translation",
-    ["esv", "bsb", "nlt", "niv", "csb", "nkjv", "nasb", "ntv", "msg"],
+    ["esv", "bsb", "nlt", "niv", "csb", "nkjv", "nasb", "ntv", "rvr09", "msg"],
 )
 export const typedVerseBook = pgEnum("typedVerse_book", bookSchema.options)
 export const typedVerseTranslation = pgEnum("typedVerse_translation", [
@@ -38,6 +38,7 @@ export const typedVerseTranslation = pgEnum("typedVerse_translation", [
     "nkjv",
     "nasb",
     "ntv",
+    "rvr09",
     "msg",
 ])
 

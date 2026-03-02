@@ -990,6 +990,7 @@ const TRANSLATIONS: Exclude<Translation, "esv">[] = [
     "nkjv",
     "nasb",
     "ntv",
+    "rvr09",
     "msg",
 ]
 

@@ -1,6 +1,6 @@
 {
   "genesis": {
-    "name": "Genesis",
+    "name": "Génesis",
     "testament": "OT",
     "chapters": [
       {
@@ -156,7 +156,7 @@
     ]
   },
   "exodus": {
-    "name": "Exodus",
+    "name": "Éxodo",
     "testament": "OT",
     "chapters": [
       {
@@ -282,7 +282,7 @@
     ]
   },
   "leviticus": {
-    "name": "Leviticus",
+    "name": "Levítico",
     "testament": "OT",
     "chapters": [
       {
@@ -369,7 +369,7 @@
     ]
   },
   "numbers": {
-    "name": "Numbers",
+    "name": "Números",
     "testament": "OT",
     "chapters": [
       {
@@ -406,10 +406,10 @@
         "length": 35
       },
       {
-        "length": 16
+        "length": 15
       },
       {
-        "length": 33
+        "length": 34
       },
       {
         "length": 45
@@ -457,10 +457,10 @@
         "length": 31
       },
       {
-        "length": 40
+        "length": 39
       },
       {
-        "length": 16
+        "length": 17
       },
       {
         "length": 54
@@ -483,7 +483,7 @@
     ]
   },
   "deuteronomy": {
-    "name": "Deuteronomy",
+    "name": "Deuteronomio",
     "testament": "OT",
     "chapters": [
       {
@@ -517,7 +517,7 @@
         "length": 22
       },
       {
-        "length": 33
+        "length": 32
       },
       {
         "length": 32
@@ -591,7 +591,7 @@
     ]
   },
   "joshua": {
-    "name": "Joshua",
+    "name": "Josué",
     "testament": "OT",
     "chapters": [
       {
@@ -669,7 +669,7 @@
     ]
   },
   "judges": {
-    "name": "Judges",
+    "name": "Jueces",
     "testament": "OT",
     "chapters": [
       {
@@ -712,7 +712,7 @@
         "length": 25
       },
       {
-        "length": 20
+        "length": 21
       },
       {
         "length": 20
@@ -738,7 +738,7 @@
     ]
   },
   "ruth": {
-    "name": "Ruth",
+    "name": "Rut",
     "testament": "OT",
     "chapters": [
       {
@@ -817,7 +817,7 @@
         "length": 24
       },
       {
-        "length": 42
+        "length": 43
       },
       {
         "length": 15
@@ -826,10 +826,10 @@
         "length": 23
       },
       {
-        "length": 29
+        "length": 28
       },
       {
-        "length": 22
+        "length": 23
       },
       {
         "length": 44
@@ -916,7 +916,7 @@
         "length": 43
       },
       {
-        "length": 26
+        "length": 25
       },
       {
         "length": 22
@@ -933,7 +933,7 @@
     ]
   },
   "1_kings": {
-    "name": "1 Kings",
+    "name": "1 Reyes",
     "testament": "OT",
     "chapters": [
       {
@@ -1000,12 +1000,12 @@
         "length": 29
       },
       {
-        "length": 53
+        "length": 54
       }
     ]
   },
   "2_kings": {
-    "name": "2 Kings",
+    "name": "2 Reyes",
     "testament": "OT",
     "chapters": [
       {
@@ -1086,7 +1086,7 @@
     ]
   },
   "1_chronicles": {
-    "name": "1 Chronicles",
+    "name": "1 Crónicas",
     "testament": "OT",
     "chapters": [
       {
@@ -1150,7 +1150,7 @@
         "length": 8
       },
       {
-        "length": 30
+        "length": 31
       },
       {
         "length": 19
@@ -1179,7 +1179,7 @@
     ]
   },
   "2_chronicles": {
-    "name": "2 Chronicles",
+    "name": "2 Crónicas",
     "testament": "OT",
     "chapters": [
       {
@@ -1228,7 +1228,7 @@
         "length": 19
       },
       {
-        "length": 14
+        "length": 15
       },
       {
         "length": 19
@@ -1279,7 +1279,7 @@
         "length": 33
       },
       {
-        "length": 25
+        "length": 24
       },
       {
         "length": 33
@@ -1293,7 +1293,7 @@
     ]
   },
   "ezra": {
-    "name": "Ezra",
+    "name": "Esdras",
     "testament": "OT",
     "chapters": [
       {
@@ -1329,7 +1329,7 @@
     ]
   },
   "nehemiah": {
-    "name": "Nehemiah",
+    "name": "Nehemías",
     "testament": "OT",
     "chapters": [
       {
@@ -1374,7 +1374,7 @@
     ]
   },
   "esther": {
-    "name": "Esther",
+    "name": "Ester",
     "testament": "OT",
     "chapters": [
       {
@@ -1516,7 +1516,7 @@
         "length": 37
       },
       {
-        "length": 16
+        "length": 15
       },
       {
         "length": 33
@@ -1525,13 +1525,13 @@
         "length": 24
       },
       {
-        "length": 41
+        "length": 38
       },
       {
-        "length": 30
+        "length": 38
       },
       {
-        "length": 24
+        "length": 19
       },
       {
         "length": 34
@@ -1542,7 +1542,7 @@
     ]
   },
   "psalm": {
-    "name": "Psalms",
+    "name": "Salmos",
     "testament": "OT",
     "chapters": [
       {
@@ -1998,7 +1998,7 @@
     ]
   },
   "proverbs": {
-    "name": "Proverbs",
+    "name": "Proverbios",
     "testament": "OT",
     "chapters": [
       {
@@ -2097,7 +2097,7 @@
     ]
   },
   "ecclesiastes": {
-    "name": "Ecclesiastes",
+    "name": "Eclesiastés",
     "testament": "OT",
     "chapters": [
       {
@@ -2139,7 +2139,7 @@
     ]
   },
   "song_of_solomon": {
-    "name": "Song of Songs",
+    "name": "Cantares",
     "testament": "OT",
     "chapters": [
       {
@@ -2169,7 +2169,7 @@
     ]
   },
   "isaiah": {
-    "name": "Isaiah",
+    "name": "Isaías",
     "testament": "OT",
     "chapters": [
       {
@@ -2373,7 +2373,7 @@
     ]
   },
   "jeremiah": {
-    "name": "Jeremiah",
+    "name": "Jeremías",
     "testament": "OT",
     "chapters": [
       {
@@ -2535,7 +2535,7 @@
     ]
   },
   "lamentations": {
-    "name": "Lamentations",
+    "name": "Lamentaciones",
     "testament": "OT",
     "chapters": [
       {
@@ -2556,7 +2556,7 @@
     ]
   },
   "ezekiel": {
-    "name": "Ezekiel",
+    "name": "Ezequiel",
     "testament": "OT",
     "chapters": [
       {
@@ -2748,7 +2748,7 @@
     ]
   },
   "hosea": {
-    "name": "Hosea",
+    "name": "Oseas",
     "testament": "OT",
     "chapters": [
       {
@@ -2782,10 +2782,10 @@
         "length": 15
       },
       {
-        "length": 12
+        "length": 11
       },
       {
-        "length": 14
+        "length": 15
       },
       {
         "length": 16
@@ -2811,7 +2811,7 @@
     ]
   },
   "amos": {
-    "name": "Amos",
+    "name": "Amós",
     "testament": "OT",
     "chapters": [
       {
@@ -2844,7 +2844,7 @@
     ]
   },
   "obadiah": {
-    "name": "Obadiah",
+    "name": "Abdías",
     "testament": "OT",
     "chapters": [
       {
@@ -2853,14 +2853,14 @@
     ]
   },
   "jonah": {
-    "name": "Jonah",
+    "name": "Jonás",
     "testament": "OT",
     "chapters": [
       {
-        "length": 17
+        "length": 16
       },
       {
-        "length": 10
+        "length": 11
       },
       {
         "length": 10
@@ -2871,7 +2871,7 @@
     ]
   },
   "micah": {
-    "name": "Micah",
+    "name": "Miqueas",
     "testament": "OT",
     "chapters": [
       {
@@ -2898,7 +2898,7 @@
     ]
   },
   "nahum": {
-    "name": "Nahum",
+    "name": "Nahúm",
     "testament": "OT",
     "chapters": [
       {
@@ -2913,7 +2913,7 @@
     ]
   },
   "habakkuk": {
-    "name": "Habakkuk",
+    "name": "Habacuc",
     "testament": "OT",
     "chapters": [
       {
@@ -2928,7 +2928,7 @@
     ]
   },
   "zephaniah": {
-    "name": "Zephaniah",
+    "name": "Sofonías",
     "testament": "OT",
     "chapters": [
       {
@@ -2943,7 +2943,7 @@
     ]
   },
   "haggai": {
-    "name": "Haggai",
+    "name": "Hageo",
     "testament": "OT",
     "chapters": [
       {
@@ -2955,7 +2955,7 @@
     ]
   },
   "zechariah": {
-    "name": "Zechariah",
+    "name": "Zacarías",
     "testament": "OT",
     "chapters": [
       {
@@ -2989,7 +2989,7 @@
         "length": 12
       },
       {
-        "length": 17
+        "length": 16
       },
       {
         "length": 14
@@ -3003,7 +3003,7 @@
     ]
   },
   "malachi": {
-    "name": "Malachi",
+    "name": "Malaquías",
     "testament": "OT",
     "chapters": [
       {
@@ -3021,7 +3021,7 @@
     ]
   },
   "matthew": {
-    "name": "Matthew",
+    "name": "San Mateo",
     "testament": "NT",
     "chapters": [
       {
@@ -3073,10 +3073,10 @@
         "length": 28
       },
       {
-        "length": 26
+        "length": 27
       },
       {
-        "length": 34
+        "length": 35
       },
       {
         "length": 30
@@ -3091,7 +3091,7 @@
         "length": 46
       },
       {
-        "length": 38
+        "length": 39
       },
       {
         "length": 51
@@ -3111,7 +3111,7 @@
     ]
   },
   "mark": {
-    "name": "Mark",
+    "name": "San Marcos",
     "testament": "NT",
     "chapters": [
       {
@@ -3133,19 +3133,19 @@
         "length": 56
       },
       {
-        "length": 36
+        "length": 37
       },
       {
         "length": 38
       },
       {
-        "length": 48
+        "length": 50
       },
       {
         "length": 52
       },
       {
-        "length": 32
+        "length": 33
       },
       {
         "length": 44
@@ -3157,7 +3157,7 @@
         "length": 72
       },
       {
-        "length": 46
+        "length": 47
       },
       {
         "length": 20
@@ -3165,7 +3165,7 @@
     ]
   },
   "luke": {
-    "name": "Luke",
+    "name": "San Lucas",
     "testament": "NT",
     "chapters": [
       {
@@ -3217,7 +3217,7 @@
         "length": 31
       },
       {
-        "length": 36
+        "length": 37
       },
       {
         "length": 43
@@ -3235,7 +3235,7 @@
         "length": 71
       },
       {
-        "length": 55
+        "length": 56
       },
       {
         "length": 53
@@ -3243,7 +3243,7 @@
     ]
   },
   "john": {
-    "name": "John",
+    "name": "San Juan",
     "testament": "NT",
     "chapters": [
       {
@@ -3259,7 +3259,7 @@
         "length": 54
       },
       {
-        "length": 46
+        "length": 47
       },
       {
         "length": 71
@@ -3312,7 +3312,7 @@
     ]
   },
   "acts": {
-    "name": "Acts",
+    "name": "Hechos",
     "testament": "NT",
     "chapters": [
       {
@@ -3337,7 +3337,7 @@
         "length": 60
       },
       {
-        "length": 39
+        "length": 40
       },
       {
         "length": 43
@@ -3358,7 +3358,7 @@
         "length": 28
       },
       {
-        "length": 40
+        "length": 41
       },
       {
         "length": 40
@@ -3370,7 +3370,7 @@
         "length": 28
       },
       {
-        "length": 41
+        "length": 40
       },
       {
         "length": 38
@@ -3385,7 +3385,7 @@
         "length": 35
       },
       {
-        "length": 26
+        "length": 27
       },
       {
         "length": 27
@@ -3397,12 +3397,12 @@
         "length": 44
       },
       {
-        "length": 30
+        "length": 31
       }
     ]
   },
   "romans": {
-    "name": "Romans",
+    "name": "Romanos",
     "testament": "NT",
     "chapters": [
       {
@@ -3451,12 +3451,12 @@
         "length": 33
       },
       {
-        "length": 26
+        "length": 27
       }
     ]
   },
   "1_corinthians": {
-    "name": "1 Corinthians",
+    "name": "1 Corintios",
     "testament": "NT",
     "chapters": [
       {
@@ -3510,7 +3510,7 @@
     ]
   },
   "2_corinthians": {
-    "name": "2 Corinthians",
+    "name": "2 Corintios",
     "testament": "NT",
     "chapters": [
       {
@@ -3555,7 +3555,7 @@
     ]
   },
   "galatians": {
-    "name": "Galatians",
+    "name": "Gálatas",
     "testament": "NT",
     "chapters": [
       {
@@ -3579,7 +3579,7 @@
     ]
   },
   "ephesians": {
-    "name": "Ephesians",
+    "name": "Efesios",
     "testament": "NT",
     "chapters": [
       {
@@ -3603,7 +3603,7 @@
     ]
   },
   "philippians": {
-    "name": "Philippians",
+    "name": "Filipenses",
     "testament": "NT",
     "chapters": [
       {
@@ -3621,7 +3621,7 @@
     ]
   },
   "colossians": {
-    "name": "Colossians",
+    "name": "Colosenses",
     "testament": "NT",
     "chapters": [
       {
@@ -3639,7 +3639,7 @@
     ]
   },
   "1_thessalonians": {
-    "name": "1 Thessalonians",
+    "name": "1 Tesalonicenses",
     "testament": "NT",
     "chapters": [
       {
@@ -3660,7 +3660,7 @@
     ]
   },
   "2_thessalonians": {
-    "name": "2 Thessalonians",
+    "name": "2 Tesalonicenses",
     "testament": "NT",
     "chapters": [
       {
@@ -3675,7 +3675,7 @@
     ]
   },
   "1_timothy": {
-    "name": "1 Timothy",
+    "name": "1 Timoteo",
     "testament": "NT",
     "chapters": [
       {
@@ -3699,7 +3699,7 @@
     ]
   },
   "2_timothy": {
-    "name": "2 Timothy",
+    "name": "2 Timoteo",
     "testament": "NT",
     "chapters": [
       {
@@ -3717,7 +3717,7 @@
     ]
   },
   "titus": {
-    "name": "Titus",
+    "name": "Tito",
     "testament": "NT",
     "chapters": [
       {
@@ -3732,7 +3732,7 @@
     ]
   },
   "philemon": {
-    "name": "Philemon",
+    "name": "Filemón",
     "testament": "NT",
     "chapters": [
       {
@@ -3741,7 +3741,7 @@
     ]
   },
   "hebrews": {
-    "name": "Hebrews",
+    "name": "Hebreos",
     "testament": "NT",
     "chapters": [
       {
@@ -3786,7 +3786,7 @@
     ]
   },
   "james": {
-    "name": "James",
+    "name": "Santiago",
     "testament": "NT",
     "chapters": [
       {
@@ -3807,7 +3807,7 @@
     ]
   },
   "1_peter": {
-    "name": "1 Peter",
+    "name": "1 Pedro",
     "testament": "NT",
     "chapters": [
       {
@@ -3828,7 +3828,7 @@
     ]
   },
   "2_peter": {
-    "name": "2 Peter",
+    "name": "2 Pedro",
     "testament": "NT",
     "chapters": [
       {
@@ -3843,7 +3843,7 @@
     ]
   },
   "1_john": {
-    "name": "1 John",
+    "name": "1 Juan",
     "testament": "NT",
     "chapters": [
       {
@@ -3864,7 +3864,7 @@
     ]
   },
   "2_john": {
-    "name": "2 John",
+    "name": "2 Juan",
     "testament": "NT",
     "chapters": [
       {
@@ -3873,7 +3873,7 @@
     ]
   },
   "3_john": {
-    "name": "3 John",
+    "name": "3 Juan",
     "testament": "NT",
     "chapters": [
       {
@@ -3882,7 +3882,7 @@
     ]
   },
   "jude": {
-    "name": "Jude",
+    "name": "Judas",
     "testament": "NT",
     "chapters": [
       {
@@ -3891,7 +3891,7 @@
     ]
   },
   "revelation": {
-    "name": "Revelation",
+    "name": "Apocalipsis",
     "testament": "NT",
     "chapters": [
       {
@@ -3928,7 +3928,7 @@
         "length": 19
       },
       {
-        "length": 18
+        "length": 17
       },
       {
         "length": 18

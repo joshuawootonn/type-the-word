@@ -16,6 +16,7 @@ export const allTranslations: TranslationOption[] = [
     { value: "nkjv", label: "NKJV" },
     { value: "nasb", label: "NASB" },
     { value: "ntv", label: "NTV" },
+    { value: "rvr09", label: "RVR09" },
     { value: "msg", label: "MSG" },
 ]
 
@@ -43,6 +44,7 @@ export const translationSchema = z.enum([
     "nkjv",
     "nasb",
     "ntv",
+    "rvr09",
     "msg",
 ])
 

@@ -30,6 +30,7 @@ const validTranslations: Translation[] = [
     "nkjv",
     "nasb",
     "ntv",
+    "rvr09",
     "msg",
 ]
 

@@ -19,5 +19,6 @@ export const API_BIBLE_IDS: Record<ApiBibleTranslation, string> = {
     nkjv: "63097d2a0a2f7db3-01", // New King James Version
     nasb: "a761ca71e0b3ddcf-01", // New American Standard Bible 2020
     ntv: "826f63861180e056-01", // Nueva Traducción Viviente
+    rvr09: "592420522e16049f-01", // Reina Valera 1909
     msg: "6f11a7de016f942e-01", // The Message
 }
