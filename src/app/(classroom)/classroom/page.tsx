@@ -6,7 +6,10 @@ import {
     getStudentToken,
     getTeacherToken,
 } from "~/server/repositories/classroom.repository"
-import { getApprovedOrganizationForUser } from "~/server/repositories/organization.repository"
+import {
+    getApprovedOrganizationForUser,
+    hasPendingTeacherMembershipForUser,
+} from "~/server/repositories/organization.repository"
 
 interface PageProps {
     searchParams: Promise<{
@@ -26,15 +29,20 @@ export default async function ClassroomPage({ searchParams }: PageProps) {
     const userId = session?.user.id
 
     const token = userId ? await getTeacherToken(userId) : null
-    const approvedOrganization = userId
-        ? await getApprovedOrganizationForUser(userId)
-        : null
+    const [approvedOrganization, hasPendingTeacherMembership] = userId
+        ? await Promise.all([
+              getApprovedOrganizationForUser(userId),
+              hasPendingTeacherMembershipForUser(userId),
+          ])
+        : [null, false]
     const isConnected = !!token && approvedOrganization != null
     const studentToken = userId ? await getStudentToken(userId) : null
     const isStudentConnected = !!studentToken
 
     const hasSuccess = params.success === "true"
-    const isTeacherPendingApproval = params.pending_teacher === "true"
+    const isTeacherPendingApproval =
+        params.pending_teacher === "true" ||
+        (!!token && !approvedOrganization && hasPendingTeacherMembership)
     const errorMessage = params.error
         ? `Connection failed: ${params.error}`
         : null

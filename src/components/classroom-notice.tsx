@@ -28,7 +28,7 @@ export function ClassroomNotice({
 
     return (
         <div>
-            {title && <h1 className={`mb-2 font-semibold`}>{title}</h1>}
+            {title && <h1 className={`mb-4 font-semibold`}>{title}</h1>}
             <div
                 className={
                     variant === "error"

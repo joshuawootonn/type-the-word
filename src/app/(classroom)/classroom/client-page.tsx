@@ -77,8 +77,10 @@ export function ClientPage({
             setIsConnected(false)
             setSuccess(false)
             setTeacherPendingApproval(false)
-        } catch (_) {
-            setError("Failed to disconnect")
+        } catch (error) {
+            setError(
+                error instanceof Error ? error.message : "Failed to disconnect",
+            )
         } finally {
             setIsLoading(false)
         }
@@ -121,6 +123,7 @@ export function ClientPage({
     }
 
     const error = teacherError || studentError
+    const showTeacherPendingOnly = teacherPendingApproval && !isConnected
 
     return (
         <>
@@ -142,7 +145,16 @@ export function ClientPage({
                 </div>
             )}
 
-            {!isConnected && (
+            {showTeacherPendingOnly && (
+                <div className="border-primary bg-secondary mb-3 flex items-start gap-3 border-2 p-4">
+                    <div className="text-primary text-sm">
+                        Your teacher account is connected and waiting for
+                        organization admin approval.
+                    </div>
+                </div>
+            )}
+
+            {!isConnected && !showTeacherPendingOnly && (
                 <>
                     <h2>Student Connection</h2>
                     <p>
@@ -222,7 +234,7 @@ export function ClientPage({
                 </>
             )}
 
-            {!isStudentConnected && (
+            {!isStudentConnected && !showTeacherPendingOnly && (
                 <>
                     <h2>Teacher Connection</h2>
                     <p>
@@ -234,15 +246,6 @@ export function ClientPage({
                         <div className="border-success bg-secondary mb-3 flex items-start gap-3 border-2 p-4">
                             <div className="text-success text-sm">
                                 Teacher account connected successfully.
-                            </div>
-                        </div>
-                    )}
-
-                    {teacherPendingApproval && !isConnected && (
-                        <div className="border-primary bg-secondary mb-3 flex items-start gap-3 border-2 p-4">
-                            <div className="text-primary text-sm">
-                                Your teacher account is connected and waiting
-                                for organization admin approval.
                             </div>
                         </div>
                     )}

@@ -36,6 +36,7 @@ export default async function DashboardPage() {
 
     const approvedTeacherToken =
         teacherToken && approvedOrganization ? teacherToken : null
+    const isTeacher = approvedTeacherToken != null
 
     if (!approvedTeacherToken && !studentToken) {
         return (
@@ -49,5 +50,5 @@ export default async function DashboardPage() {
         )
     }
 
-    return <ClientPage />
+    return <ClientPage isTeacher={isTeacher} />
 }
