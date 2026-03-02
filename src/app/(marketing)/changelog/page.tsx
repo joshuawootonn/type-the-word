@@ -85,6 +85,12 @@ export default async function Changelog() {
             <ul>
                 <YearHeading year={2026} isFirst />
                 <li>
+                    <DateComponent date={new Date("03/02/2026")} /> - Fixed
+                    missing NLT verses in Numbers 1:22-43, Numbers 2:12-15, and
+                    Numbers 2:20-23, and formatted Numbers 1:5-15 with a
+                    table-style layout.
+                </li>
+                <li>
                     <DateComponent date={new Date("02/20/2026")} /> - Fixed NASB
                     Acts 28:27 so &quot;I would&quot; displays with proper
                     spacing.
