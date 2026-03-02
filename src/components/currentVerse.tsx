@@ -123,6 +123,76 @@ function getNextVerse(currentVerse: string, blocks: Block[]): Verse | null {
     return verse ?? null
 }
 
+type VerseNode = Verse["nodes"][number]
+
+function Atom({
+    atom,
+    atomIndex,
+    verseNodes,
+    versePosition,
+    isIndented,
+}: {
+    atom: VerseNode
+    atomIndex: number
+    verseNodes: Verse["nodes"]
+    versePosition: Inline[]
+    isIndented: boolean
+}) {
+    const aIndex = verseNodes.slice(0, atomIndex).filter(isAtomTyped).length
+    const lastAtom = versePosition.at(aIndex - 1)
+    const typedAtom = versePosition.at(aIndex)
+    const nextAtom = versePosition.at(aIndex + 1)
+
+    if (atom.type === "newLine") {
+        return <br />
+    }
+
+    if (atom.type === "verseNumber") {
+        return (
+            <b className={clsx(isIndented && "absolute left-0")}>
+                {atom.text.split(":").at(-1)}
+            </b>
+        )
+    }
+    if (atom.type === "space") {
+        return (
+            <span
+                className={clsx(
+                    "space inline-flex h-[19px] w-[1ch] translate-y-[3px]",
+                    lastAtom != null && typedAtom == null && "active-space",
+                )}
+            >
+                &nbsp;
+            </span>
+        )
+    }
+    if (atom.type === "decoration" || atom.type === "tableColumnBreak") {
+        return null
+    }
+    if (
+        atom.type === "word" &&
+        (typedAtom == null || typedAtom.type === "word")
+    ) {
+        return (
+            <Word
+                word={atom}
+                active={Boolean(
+                    (aIndex === 0 || isAtomComplete(lastAtom)) &&
+                    !isAtomComplete(typedAtom) &&
+                    nextAtom == null,
+                )}
+                typedWord={typedAtom}
+                isPrevTyped={
+                    (versePosition.length === 0 && aIndex === 0) || !!lastAtom
+                }
+                isWordTyped={isAtomComplete(typedAtom)}
+            />
+        )
+    }
+
+    return null
+}
+
 export function CurrentVerse({
     verse,
     isCurrentVerse,
@@ -508,6 +578,31 @@ export function CurrentVerse({
               verse.metadata.offset + verse.metadata.length,
           )
         : position
+    const hasTableColumns = verse.nodes.some(
+        atom => atom.type === "tableColumnBreak",
+    )
+    const columnSegments: Array<
+        Array<{ atom: (typeof verse.nodes)[number]; i: number }>
+    > = []
+    if (hasTableColumns) {
+        let currentSegment: Array<{
+            atom: (typeof verse.nodes)[number]
+            i: number
+        }> = []
+        verse.nodes.forEach((atom, i) => {
+            if (atom.type === "tableColumnBreak") {
+                if (currentSegment.length > 0) {
+                    columnSegments.push(currentSegment)
+                }
+                currentSegment = []
+            } else {
+                currentSegment.push({ atom, i })
+            }
+        })
+        if (currentSegment.length > 0) {
+            columnSegments.push(currentSegment)
+        }
+    }
 
     const isTypedInHistory = isVerseTypedInHistory(
         history,
@@ -520,7 +615,8 @@ export function CurrentVerse({
             data-testid={`current-verse-${verse.verse.verse}`}
             data-typed-in-history={isTypedInHistory ? "true" : "false"}
             className={clsx(
-                "verse break-spaces group inline h-3 text-balance hover:cursor-pointer",
+                "verse break-spaces group hover:cursor-pointer",
+                hasTableColumns ? "block w-full" : "inline h-3 text-balance",
                 isCurrentVerse && "active-verse",
                 isTypedInHistory ? "text-primary/50" : "text-primary",
             )}
@@ -535,72 +631,40 @@ export function CurrentVerse({
                     "inline-block -translate-y-[300px] lg:-translate-y-[340px]"
                 }
             />
-            {verse.nodes.map((atom, aIndexPrime) => {
-                const aIndex = verse.nodes
-                    .slice(0, aIndexPrime)
-                    .filter(isAtomTyped).length
-
-                const lastAtom = versePosition.at(aIndex - 1)
-                const typedAtom = versePosition.at(aIndex)
-                const nextAtom = versePosition.at(aIndex + 1)
-
-                if (atom.type === "newLine") {
-                    return <br key={aIndexPrime} />
-                }
-
-                if (atom.type === "verseNumber") {
-                    return (
-                        <b
-                            className={clsx(isIndented && "absolute left-0")}
-                            key={aIndexPrime}
-                        >
-                            {atom.text.split(":").at(-1)}
-                        </b>
-                    )
-                }
-                if (atom.type === "space") {
-                    return (
-                        <span
-                            key={aIndexPrime}
-                            className={clsx(
-                                "space inline-flex h-[19px] w-[1ch] translate-y-[3px]",
-                                lastAtom != null &&
-                                    typedAtom == null &&
-                                    "active-space",
-                            )}
-                        >
-                            &nbsp;
+            {hasTableColumns ? (
+                <span
+                    className="inline-grid w-full gap-x-6"
+                    style={{
+                        gridTemplateColumns: `repeat(${columnSegments.length || 1}, minmax(0, 1fr))`,
+                    }}
+                >
+                    {columnSegments.map((segment, segmentIndex) => (
+                        <span key={segmentIndex} className="min-w-0">
+                            {segment.map(({ atom, i }) => (
+                                <Atom
+                                    key={i}
+                                    atom={atom}
+                                    atomIndex={i}
+                                    verseNodes={verse.nodes}
+                                    versePosition={versePosition}
+                                    isIndented={isIndented}
+                                />
+                            ))}
                         </span>
-                    )
-                }
-                if (atom.type === "decoration") {
-                    return null
-                }
-                if (
-                    atom.type === "word" &&
-                    (typedAtom == null || typedAtom.type === "word")
-                ) {
-                    return (
-                        <Word
-                            key={aIndexPrime}
-                            word={atom}
-                            active={Boolean(
-                                (aIndex === 0 || isAtomComplete(lastAtom)) &&
-                                !isAtomComplete(typedAtom) &&
-                                nextAtom == null,
-                            )}
-                            typedWord={typedAtom}
-                            isPrevTyped={
-                                (versePosition.length === 0 && aIndex === 0) ||
-                                !!lastAtom
-                            }
-                            isWordTyped={isAtomComplete(typedAtom)}
-                        />
-                    )
-                }
-
-                return null
-            })}
+                    ))}
+                </span>
+            ) : (
+                verse.nodes.map((atom, aIndexPrime) => (
+                    <Atom
+                        key={aIndexPrime}
+                        atom={atom}
+                        atomIndex={aIndexPrime}
+                        verseNodes={verse.nodes}
+                        versePosition={versePosition}
+                        isIndented={isIndented}
+                    />
+                ))
+            )}
 
             {rect && passageRect && !isPassageFocused ? (
                 <button

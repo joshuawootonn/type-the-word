@@ -31,6 +31,7 @@ export function isAtomTyped(atom: Inline | Paragraph): boolean {
         case "verseNumber":
         case "paragraph":
         case "space":
+        case "tableColumnBreak":
         case "newLine":
         case "decoration":
             return false
