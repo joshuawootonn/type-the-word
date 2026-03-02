@@ -133,8 +133,8 @@ describe("OrganizationRepository - Unit Tests", () => {
         const result = await upsertOrganizationMembership({
             organizationId: "org-1",
             userId: "user-1",
-            role: "teacher",
-            status: "pending",
+            role: "TEACHER",
+            status: "PENDING",
         })
 
         expect(result.id).toBe("membership-1")
@@ -160,8 +160,8 @@ describe("OrganizationRepository - Unit Tests", () => {
                 id: "membership-1",
                 organizationId: "org-1",
                 userId: "user-1",
-                role: "org_admin",
-                status: "approved",
+                role: "ORG_ADMIN",
+                status: "APPROVED",
                 approvedByUserId: "user-1",
                 approvedAt: new Date(),
                 createdAt: new Date(),
@@ -190,7 +190,7 @@ describe("OrganizationRepository - Unit Tests", () => {
 
         expect(result.isFirstTeacher).toBe(true)
         expect(result.needsApproval).toBe(false)
-        expect(result.membership.role).toBe("org_admin")
+        expect(result.membership.role).toBe("ORG_ADMIN")
     })
 
     it("returns pending for non-first teacher", async () => {
@@ -203,8 +203,8 @@ describe("OrganizationRepository - Unit Tests", () => {
                 id: "membership-2",
                 organizationId: "org-1",
                 userId: "user-2",
-                role: "teacher",
-                status: "pending",
+                role: "TEACHER",
+                status: "PENDING",
                 approvedByUserId: null,
                 approvedAt: null,
                 createdAt: new Date(),
@@ -232,13 +232,13 @@ describe("OrganizationRepository - Unit Tests", () => {
         })
 
         expect(result.needsApproval).toBe(true)
-        expect(result.membership.status).toBe("pending")
+        expect(result.membership.status).toBe("PENDING")
     })
 
     it("checks if user is organization admin", async () => {
         mockDb.query.organizationUser.findFirst.mockResolvedValue({
-            role: "org_admin",
-            status: "approved",
+            role: "ORG_ADMIN",
+            status: "APPROVED",
         })
 
         const result = await isUserOrganizationAdmin({
@@ -252,18 +252,18 @@ describe("OrganizationRepository - Unit Tests", () => {
     it("approves teacher membership when approver is admin", async () => {
         mockDb.query.organizationUser.findFirst
             .mockResolvedValueOnce({
-                role: "org_admin",
-                status: "approved",
+                role: "ORG_ADMIN",
+                status: "APPROVED",
             })
             .mockResolvedValueOnce({
-                role: "teacher",
-                status: "pending",
+                role: "TEACHER",
+                status: "PENDING",
             })
 
         const returning = vi.fn().mockResolvedValue([
             {
-                role: "teacher",
-                status: "approved",
+                role: "TEACHER",
+                status: "APPROVED",
             },
         ])
         const onConflictDoUpdate = vi.fn(() => ({ returning }))
@@ -276,13 +276,13 @@ describe("OrganizationRepository - Unit Tests", () => {
             approvedByUserId: "admin-1",
         })
 
-        expect(result?.status).toBe("approved")
+        expect(result?.status).toBe("APPROVED")
     })
 
     it("throws when non-admin approves teacher", async () => {
         mockDb.query.organizationUser.findFirst.mockResolvedValue({
-            role: "teacher",
-            status: "approved",
+            role: "TEACHER",
+            status: "APPROVED",
         })
 
         await expect(
@@ -296,8 +296,8 @@ describe("OrganizationRepository - Unit Tests", () => {
 
     it("returns approved membership helper", async () => {
         mockDb.query.organizationUser.findFirst.mockResolvedValue({
-            role: "teacher",
-            status: "approved",
+            role: "TEACHER",
+            status: "APPROVED",
         })
 
         const result = await getApprovedOrganizationMembership({
@@ -305,7 +305,7 @@ describe("OrganizationRepository - Unit Tests", () => {
             userId: "user-1",
         })
 
-        expect(result?.status).toBe("approved")
+        expect(result?.status).toBe("APPROVED")
     })
 
     it("returns approved organization for user", async () => {
@@ -421,8 +421,8 @@ describe("OrganizationRepository - Unit Tests", () => {
                 userId: "user-1",
                 email: "user-1@example.com",
                 name: "User 1",
-                role: "teacher",
-                status: "approved",
+                role: "TEACHER",
+                status: "APPROVED",
                 approvedAt: new Date("2025-01-01T00:00:00.000Z"),
                 teacherTokenUserId: "user-1",
                 studentTokenUserId: null,

@@ -8,18 +8,17 @@ import {
     organization,
     organizationUser,
     organizationRole,
-    organizationMembershipStatus,
+    organizationUserState,
     users,
 } from "~/server/db/schema"
 
 type Organization = typeof organization.$inferSelect
 type OrganizationMembership = typeof organizationUser.$inferSelect
 type OrganizationRole = (typeof organizationRole.enumValues)[number]
-type OrganizationMembershipStatus =
-    (typeof organizationMembershipStatus.enumValues)[number]
+type OrganizationUserState = (typeof organizationUserState.enumValues)[number]
 type User = typeof users.$inferSelect
 
-const teacherRoles: OrganizationRole[] = ["org_admin", "teacher"]
+const teacherRoles: OrganizationRole[] = ["ORG_ADMIN", "TEACHER"]
 
 function normalizeDomain(domain: string): string {
     return domain.trim().toLowerCase()
@@ -94,7 +93,7 @@ export async function upsertOrganizationMembership(data: {
     organizationId: string
     userId: string
     role: OrganizationRole
-    status: OrganizationMembershipStatus
+    status: OrganizationUserState
     approvedByUserId?: string | null
     approvedAt?: Date | null
 }): Promise<OrganizationMembership> {
@@ -135,7 +134,7 @@ export async function countApprovedTeacherMemberships(
         .where(
             and(
                 eq(organizationUser.organizationId, organizationId),
-                eq(organizationUser.status, "approved"),
+                eq(organizationUser.status, "APPROVED"),
                 inArray(organizationUser.role, teacherRoles),
             ),
         )
@@ -166,7 +165,7 @@ export async function ensureTeacherMembershipOnConnect(data: {
 
     if (
         existingMembership &&
-        existingMembership.status === "approved" &&
+        existingMembership.status === "APPROVED" &&
         teacherRoles.includes(existingMembership.role)
     ) {
         return {
@@ -181,8 +180,8 @@ export async function ensureTeacherMembershipOnConnect(data: {
         const adminMembership = await upsertOrganizationMembership({
             organizationId: org.id,
             userId: data.userId,
-            role: "org_admin",
-            status: "approved",
+            role: "ORG_ADMIN",
+            status: "APPROVED",
             approvedByUserId: data.userId,
             approvedAt: new Date(),
         })
@@ -198,8 +197,8 @@ export async function ensureTeacherMembershipOnConnect(data: {
     const pendingMembership = await upsertOrganizationMembership({
         organizationId: org.id,
         userId: data.userId,
-        role: "teacher",
-        status: "pending",
+        role: "TEACHER",
+        status: "PENDING",
         approvedByUserId: null,
         approvedAt: null,
     })
@@ -217,7 +216,7 @@ export async function isUserOrganizationAdmin(data: {
     userId: string
 }): Promise<boolean> {
     const membership = await getOrganizationMembership(data)
-    return membership?.status === "approved" && membership.role === "org_admin"
+    return membership?.status === "APPROVED" && membership.role === "ORG_ADMIN"
 }
 
 export async function approveTeacherMembership(data: {
@@ -244,8 +243,8 @@ export async function approveTeacherMembership(data: {
     return await upsertOrganizationMembership({
         organizationId: data.organizationId,
         userId: data.teacherUserId,
-        role: existingMembership.role === "org_admin" ? "org_admin" : "teacher",
-        status: "approved",
+        role: existingMembership.role === "ORG_ADMIN" ? "ORG_ADMIN" : "TEACHER",
+        status: "APPROVED",
         approvedByUserId: data.approvedByUserId,
         approvedAt: new Date(),
     })
@@ -256,7 +255,7 @@ export async function getApprovedOrganizationMembership(data: {
     userId: string
 }): Promise<OrganizationMembership | undefined> {
     const membership = await getOrganizationMembership(data)
-    if (!membership || membership.status !== "approved") {
+    if (!membership || membership.status !== "APPROVED") {
         return undefined
     }
 
@@ -278,7 +277,7 @@ export async function getApprovedOrganizationForUser(
         .where(
             and(
                 eq(organizationUser.userId, userId),
-                eq(organizationUser.status, "approved"),
+                eq(organizationUser.status, "APPROVED"),
             ),
         )
         .limit(1)
@@ -368,7 +367,7 @@ export async function listApprovedTeacherUserIdsForCourse(data: {
             and(
                 eq(courseTeacher.organizationId, data.organizationId),
                 eq(courseTeacher.courseId, data.courseId),
-                eq(organizationUser.status, "approved"),
+                eq(organizationUser.status, "APPROVED"),
                 inArray(organizationUser.role, teacherRoles),
             ),
         )
@@ -399,7 +398,7 @@ export async function isUserApprovedTeacherForCourse(data: {
                 eq(courseTeacher.organizationId, data.organizationId),
                 eq(courseTeacher.courseId, data.courseId),
                 eq(courseTeacher.teacherUserId, data.userId),
-                eq(organizationUser.status, "approved"),
+                eq(organizationUser.status, "APPROVED"),
                 inArray(organizationUser.role, teacherRoles),
             ),
         )
@@ -431,8 +430,8 @@ export async function listPendingTeacherMemberships(
         .where(
             and(
                 eq(organizationUser.organizationId, organizationId),
-                eq(organizationUser.status, "pending"),
-                eq(organizationUser.role, "teacher"),
+                eq(organizationUser.status, "PENDING"),
+                eq(organizationUser.role, "TEACHER"),
             ),
         )
 
@@ -447,7 +446,7 @@ export type OrganizationDirectoryUser = {
     email: string
     name: string | null
     role: OrganizationRole
-    status: OrganizationMembershipStatus
+    status: OrganizationUserState
     approvedAt: string | null
     hasTeacherConnection: boolean
     hasStudentConnection: boolean

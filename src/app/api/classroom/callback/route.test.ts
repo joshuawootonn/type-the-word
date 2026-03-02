@@ -71,7 +71,7 @@ describe("GET /api/classroom/callback", () => {
             organizationRepository.ensureTeacherMembershipOnConnect,
         ).mockResolvedValue({
             organization: { id: "org-1", domain: "example.com" },
-            membership: { status: "pending" },
+            membership: { status: "PENDING" },
             needsApproval: true,
             isFirstTeacher: false,
         } as never)
@@ -100,7 +100,7 @@ describe("GET /api/classroom/callback", () => {
             organizationRepository.ensureTeacherMembershipOnConnect,
         ).mockResolvedValue({
             organization: { id: "org-1", domain: "example.com" },
-            membership: { status: "approved" },
+            membership: { status: "APPROVED" },
             needsApproval: false,
             isFirstTeacher: true,
         } as never)

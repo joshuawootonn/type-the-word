@@ -49,15 +49,16 @@ export const courseWorkState = pgEnum("courseWork_state", [
 ])
 
 export const organizationRole = pgEnum("organization_role", [
-    "org_admin",
-    "teacher",
-    "student",
+    "ORG_ADMIN",
+    "TEACHER",
+    "STUDENT",
 ])
 
-export const organizationMembershipStatus = pgEnum(
-    "organization_membership_status",
-    ["pending", "approved", "rejected"],
-)
+export const organizationUserState = pgEnum("organization_membership_status", [
+    "PENDING",
+    "APPROVED",
+    "REJECTED",
+])
 
 export const users = pgTable("user", {
     id: varchar("id", { length: 255 }).notNull().primaryKey(),
@@ -541,9 +542,7 @@ export const organizationUser = pgTable(
         organizationId: varchar("organizationId", { length: 255 }).notNull(),
         userId: varchar("userId", { length: 255 }).notNull(),
         role: organizationRole("role").notNull(),
-        status: organizationMembershipStatus("status")
-            .notNull()
-            .default("pending"),
+        status: organizationUserState("status").notNull().default("PENDING"),
         approvedByUserId: varchar("approvedByUserId", { length: 255 }),
         approvedAt: timestamp("approvedAt", { mode: "date" }),
         createdAt: timestamp("createdAt", { mode: "date" })

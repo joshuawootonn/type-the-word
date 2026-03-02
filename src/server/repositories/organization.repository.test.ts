@@ -111,14 +111,14 @@ describe("OrganizationRepository - Integration Tests", () => {
         const pending = await upsertOrganizationMembership({
             organizationId: org.id,
             userId,
-            role: "teacher",
-            status: "pending",
+            role: "TEACHER",
+            status: "PENDING",
         })
         const approved = await upsertOrganizationMembership({
             organizationId: org.id,
             userId,
-            role: "teacher",
-            status: "approved",
+            role: "TEACHER",
+            status: "APPROVED",
             approvedByUserId: userId,
             approvedAt: new Date(),
         })
@@ -133,9 +133,9 @@ describe("OrganizationRepository - Integration Tests", () => {
         })
         const approvedOrg = await getApprovedOrganizationForUser(userId)
 
-        expect(pending.status).toBe("pending")
-        expect(approved.status).toBe("approved")
-        expect(membership?.status).toBe("approved")
+        expect(pending.status).toBe("PENDING")
+        expect(approved.status).toBe("APPROVED")
+        expect(membership?.status).toBe("APPROVED")
         expect(approvedMembership?.userId).toBe(userId)
         expect(approvedOrg?.id).toBe(org.id)
     })
@@ -164,13 +164,13 @@ describe("OrganizationRepository - Integration Tests", () => {
 
         expect(first.isFirstTeacher).toBe(true)
         expect(first.needsApproval).toBe(false)
-        expect(first.membership.role).toBe("org_admin")
-        expect(first.membership.status).toBe("approved")
+        expect(first.membership.role).toBe("ORG_ADMIN")
+        expect(first.membership.status).toBe("APPROVED")
 
         expect(second.isFirstTeacher).toBe(false)
         expect(second.needsApproval).toBe(true)
-        expect(second.membership.role).toBe("teacher")
-        expect(second.membership.status).toBe("pending")
+        expect(second.membership.role).toBe("TEACHER")
+        expect(second.membership.status).toBe("PENDING")
     })
 
     it("approves pending teacher memberships by org admin", async () => {
@@ -195,7 +195,7 @@ describe("OrganizationRepository - Integration Tests", () => {
             approvedByUserId: adminUserId,
         })
 
-        expect(approved.status).toBe("approved")
+        expect(approved.status).toBe("APPROVED")
         expect(approved.approvedByUserId).toBe(adminUserId)
 
         const pending = await listPendingTeacherMemberships(
@@ -271,8 +271,8 @@ describe("OrganizationRepository - Integration Tests", () => {
         await upsertOrganizationMembership({
             organizationId: adminMembership.organization.id,
             userId: studentUserId,
-            role: "student",
-            status: "approved",
+            role: "STUDENT",
+            status: "APPROVED",
             approvedByUserId: adminUserId,
             approvedAt: new Date(),
         })
@@ -302,9 +302,9 @@ describe("OrganizationRepository - Integration Tests", () => {
         )
 
         expect(adminEntry?.hasTeacherConnection).toBe(true)
-        expect(adminEntry?.role).toBe("org_admin")
+        expect(adminEntry?.role).toBe("ORG_ADMIN")
         expect(studentEntry?.hasStudentConnection).toBe(true)
-        expect(studentEntry?.role).toBe("student")
+        expect(studentEntry?.role).toBe("STUDENT")
     })
 
     it("throws when non-admin tries to approve teacher", async () => {
@@ -325,8 +325,8 @@ describe("OrganizationRepository - Integration Tests", () => {
         await upsertOrganizationMembership({
             organizationId: adminMembership.organization.id,
             userId: nonAdminUserId,
-            role: "student",
-            status: "approved",
+            role: "STUDENT",
+            status: "APPROVED",
             approvedByUserId: adminUserId,
             approvedAt: new Date(),
         })
@@ -360,6 +360,6 @@ describe("OrganizationRepository - Integration Tests", () => {
         )
         expect(pending).toHaveLength(1)
         expect(pending[0]?.user.id).toBe(teacherUserId)
-        expect(pending[0]?.status).toBe("pending")
+        expect(pending[0]?.status).toBe("PENDING")
     })
 })
