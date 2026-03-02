@@ -17,6 +17,7 @@ import { syncFutureAssignments } from "~/server/classroom/sync-assignments"
 import { getValidTeacherToken } from "~/server/classroom/teacher-token"
 import {
     createCourseWork,
+    listStudents,
     refreshAccessToken,
 } from "~/server/clients/classroom.client"
 import { db } from "~/server/db"
@@ -101,6 +102,7 @@ export async function GET(request: NextRequest) {
 
         if (isTeacher) {
             // TEACHER FLOW
+            let enrolledStudentCount: number | null = null
             const teacherAssignmentsFilter = and(
                 eq(classroomAssignment.courseId, courseId),
                 or(
@@ -170,8 +172,15 @@ export async function GET(request: NextRequest) {
                         ),
                     )
                 }
+
+                // Use roster size as denominator for course completion meters.
+                const students = await listStudents(token.accessToken, courseId)
+                enrolledStudentCount = students.length
             } catch (error) {
-                console.error("Error syncing with Google Classroom:", error)
+                console.error(
+                    "Error syncing with Google Classroom or loading roster:",
+                    error,
+                )
                 // Continue with request even if sync fails
             }
 
@@ -232,10 +241,20 @@ export async function GET(request: NextRequest) {
                 .offset(page * limit)
 
             const response: AssignmentsResponse = {
-                assignments: assignments.map(a => ({
-                    ...a,
-                    dueDate: a.dueDate ? a.dueDate.toISOString() : null,
-                })),
+                assignments: assignments.map(a => {
+                    const totalStudents =
+                        enrolledStudentCount ?? a.submissionCount
+
+                    return {
+                        ...a,
+                        submissionCount: totalStudents,
+                        completedCount: Math.min(
+                            a.completedCount,
+                            totalStudents,
+                        ),
+                        dueDate: a.dueDate ? a.dueDate.toISOString() : null,
+                    }
+                }),
                 pagination: {
                     page,
                     limit,

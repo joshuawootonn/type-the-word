@@ -18,7 +18,7 @@ test("teacher connects, creates assignment, and publishes it", async ({
 
     await expect(page).toHaveURL(/\/classroom\?success=true/)
     await expect(
-        page.getByText("Teacher account connected successfully."),
+        page.getByText("Teacher account connected successfully.").first(),
     ).toBeVisible()
 
     await page.getByRole("link", { name: "Create assignment" }).click()
