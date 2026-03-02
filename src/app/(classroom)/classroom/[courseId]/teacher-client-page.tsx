@@ -12,7 +12,7 @@ import {
     useReactTable,
 } from "@tanstack/react-table"
 import { useRouter } from "next/navigation"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 
 import { type Assignment } from "~/app/api/classroom/schemas"
 import { Loading } from "~/components/loading"
@@ -29,11 +29,6 @@ import {
     TableHeader,
     TableRow,
 } from "~/components/ui/table"
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from "~/components/ui/tooltip"
 import toProperCase from "~/lib/toProperCase"
 
 import { fetchAssignments, publishAssignment } from "./actions"
@@ -265,7 +260,7 @@ export function TeacherClientPage({
                         />
                     </div>
                     <div className="border-primary bg-secondary overflow-x-auto border-2">
-                        <Table className="table-fixed">
+                        <Table className="w-max min-w-full">
                             <TableHeader>
                                 {table.getHeaderGroups().map(headerGroup => (
                                     <TableRow key={headerGroup.id}>
@@ -395,73 +390,32 @@ function AssignmentStateIcon({ state }: { state: Assignment["state"] }) {
 function getHeaderClassName(columnId: string): string {
     switch (columnId) {
         case "title":
-            return "w-[18%] whitespace-nowrap overflow-hidden"
+            return "min-w-56 whitespace-nowrap"
         case "passage":
-            return "w-[20%] whitespace-nowrap overflow-hidden"
+            return "min-w-36 whitespace-nowrap"
         case "translation":
-            return "w-[10%] whitespace-nowrap overflow-hidden"
+            return "min-w-32 whitespace-nowrap"
         case "status":
-            return "w-[12%] whitespace-nowrap overflow-hidden"
+            return "min-w-32 whitespace-nowrap"
         case "dueDate":
-            return "w-[10%] whitespace-nowrap overflow-hidden"
-        case "progress":
-            return "w-[20%] whitespace-nowrap overflow-hidden"
+            return "min-w-32 whitespace-nowrap"
+        case "completion":
+            return "min-w-56 whitespace-nowrap"
         case "actions":
-            return "w-[10%] whitespace-nowrap overflow-hidden"
+            return "min-w-36 whitespace-nowrap"
         default:
-            return "whitespace-nowrap overflow-hidden"
+            return "whitespace-nowrap"
     }
 }
 
 function getCellClassName(columnId: string): string {
-    if (columnId === "progress") {
+    if (columnId === "completion") {
         return "whitespace-nowrap"
     }
 
-    if (columnId === "actions") {
-        return "whitespace-nowrap overflow-hidden"
-    }
-
-    return "whitespace-nowrap overflow-hidden text-ellipsis"
+    return "whitespace-nowrap"
 }
 
 function TruncatedCellText({ text }: { text: string }) {
-    const textRef = useRef<HTMLSpanElement>(null)
-    const [isTruncated, setIsTruncated] = useState(false)
-
-    useEffect(() => {
-        const el = textRef.current
-        if (!el) return
-
-        const updateTruncation = () => {
-            setIsTruncated(el.scrollWidth > el.clientWidth)
-        }
-
-        updateTruncation()
-        window.addEventListener("resize", updateTruncation)
-
-        return () => {
-            window.removeEventListener("resize", updateTruncation)
-        }
-    }, [text])
-
-    const content = (
-        <span ref={textRef} className="block truncate">
-            {text}
-        </span>
-    )
-
-    if (!isTruncated) return content
-
-    return (
-        <Tooltip>
-            <TooltipTrigger
-                render={<span className="block" />}
-                aria-label={text}
-            >
-                {content}
-            </TooltipTrigger>
-            <TooltipContent>{text}</TooltipContent>
-        </Tooltip>
-    )
+    return <span className="block whitespace-nowrap">{text}</span>
 }
