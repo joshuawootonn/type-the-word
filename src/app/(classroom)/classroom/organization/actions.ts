@@ -30,3 +30,17 @@ export async function approveOrganizationTeacher(userId: string) {
         throw new Error(error.error)
     }
 }
+
+export async function promoteOrganizationTeacherToAdmin(userId: string) {
+    const response = await fetch(
+        `/api/classroom/organization/users/${encodeURIComponent(userId)}/promote`,
+        {
+            method: "POST",
+        },
+    )
+    if (!response.ok) {
+        const errorData = await response.json()
+        const error = errorResponseSchema.parse(errorData)
+        throw new Error(error.error)
+    }
+}

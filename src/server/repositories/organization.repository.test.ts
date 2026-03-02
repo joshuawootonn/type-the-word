@@ -14,6 +14,7 @@ import {
 import {
     approveTeacherMembership,
     ensureTeacherMembershipOnConnect,
+    hasAnotherApprovedOrganizationAdmin,
     getApprovedOrganizationForUser,
     getApprovedOrganizationMembership,
     getDomainFromEmail,
@@ -25,6 +26,7 @@ import {
     listApprovedTeacherUserIdsForCourse,
     listOrganizationDirectoryUsers,
     listPendingTeacherMemberships,
+    promoteTeacherToAdmin,
     syncTeacherCourseMappings,
     upsertOrganizationMembership,
 } from "./organization.repository"
@@ -361,5 +363,73 @@ describe("OrganizationRepository - Integration Tests", () => {
         expect(pending).toHaveLength(1)
         expect(pending[0]?.user.id).toBe(teacherUserId)
         expect(pending[0]?.status).toBe("PENDING")
+    })
+
+    it("promotes an approved teacher to admin", async () => {
+        const domain = uniqueDomain("promote")
+        const adminUserId = await createUser(`admin@${domain}`, "Admin")
+        const teacherUserId = await createUser(`teacher@${domain}`, "Teacher")
+
+        const adminMembership = await ensureTeacherMembershipOnConnect({
+            userId: adminUserId,
+            domain,
+        })
+        organizationIds.push(adminMembership.organization.id)
+        await ensureTeacherMembershipOnConnect({
+            userId: teacherUserId,
+            domain,
+        })
+        await approveTeacherMembership({
+            organizationId: adminMembership.organization.id,
+            teacherUserId,
+            approvedByUserId: adminUserId,
+        })
+
+        const promoted = await promoteTeacherToAdmin({
+            organizationId: adminMembership.organization.id,
+            teacherUserId,
+            promotedByUserId: adminUserId,
+        })
+
+        expect(promoted.role).toBe("ORG_ADMIN")
+        expect(promoted.status).toBe("APPROVED")
+    })
+
+    it("reports whether another admin exists", async () => {
+        const domain = uniqueDomain("admins")
+        const admin1UserId = await createUser(`admin1@${domain}`, "Admin 1")
+        const admin2UserId = await createUser(`admin2@${domain}`, "Admin 2")
+
+        const first = await ensureTeacherMembershipOnConnect({
+            userId: admin1UserId,
+            domain,
+        })
+        organizationIds.push(first.organization.id)
+        await ensureTeacherMembershipOnConnect({
+            userId: admin2UserId,
+            domain,
+        })
+        await approveTeacherMembership({
+            organizationId: first.organization.id,
+            teacherUserId: admin2UserId,
+            approvedByUserId: admin1UserId,
+        })
+        await promoteTeacherToAdmin({
+            organizationId: first.organization.id,
+            teacherUserId: admin2UserId,
+            promotedByUserId: admin1UserId,
+        })
+
+        const hasAnotherForAdmin1 = await hasAnotherApprovedOrganizationAdmin({
+            organizationId: first.organization.id,
+            excludingUserId: admin1UserId,
+        })
+        const hasAnotherForAdmin2 = await hasAnotherApprovedOrganizationAdmin({
+            organizationId: first.organization.id,
+            excludingUserId: admin2UserId,
+        })
+
+        expect(hasAnotherForAdmin1).toBe(true)
+        expect(hasAnotherForAdmin2).toBe(true)
     })
 })

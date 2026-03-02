@@ -1,4 +1,4 @@
-import { and, eq, inArray, notInArray, sql } from "drizzle-orm"
+import { and, eq, inArray, ne, notInArray, sql } from "drizzle-orm"
 
 import { db } from "~/server/db"
 import {
@@ -250,6 +250,65 @@ export async function approveTeacherMembership(data: {
     })
 }
 
+export async function promoteTeacherToAdmin(data: {
+    organizationId: string
+    teacherUserId: string
+    promotedByUserId: string
+}): Promise<OrganizationMembership> {
+    const isPromoterAdmin = await isUserOrganizationAdmin({
+        organizationId: data.organizationId,
+        userId: data.promotedByUserId,
+    })
+    if (!isPromoterAdmin) {
+        throw new Error("Only organization admins can promote teachers")
+    }
+
+    const existingMembership = await getOrganizationMembership({
+        organizationId: data.organizationId,
+        userId: data.teacherUserId,
+    })
+    if (!existingMembership) {
+        throw new Error("Membership not found")
+    }
+
+    if (existingMembership.role === "STUDENT") {
+        throw new Error("Only teachers can be promoted to admin")
+    }
+
+    if (existingMembership.status !== "APPROVED") {
+        throw new Error("Teacher must be approved before admin promotion")
+    }
+
+    return await upsertOrganizationMembership({
+        organizationId: data.organizationId,
+        userId: data.teacherUserId,
+        role: "ORG_ADMIN",
+        status: "APPROVED",
+        approvedByUserId: data.promotedByUserId,
+        approvedAt: existingMembership.approvedAt ?? new Date(),
+    })
+}
+
+export async function hasAnotherApprovedOrganizationAdmin(data: {
+    organizationId: string
+    excludingUserId: string
+}): Promise<boolean> {
+    const [row] = await db
+        .select({ userId: organizationUser.userId })
+        .from(organizationUser)
+        .where(
+            and(
+                eq(organizationUser.organizationId, data.organizationId),
+                eq(organizationUser.role, "ORG_ADMIN"),
+                eq(organizationUser.status, "APPROVED"),
+                ne(organizationUser.userId, data.excludingUserId),
+            ),
+        )
+        .limit(1)
+
+    return row != null
+}
+
 export async function getApprovedOrganizationMembership(data: {
     organizationId: string
     userId: string
@@ -283,6 +342,24 @@ export async function getApprovedOrganizationForUser(
         .limit(1)
 
     return row?.org
+}
+
+export async function hasPendingTeacherMembershipForUser(
+    userId: string,
+): Promise<boolean> {
+    const [row] = await db
+        .select({ membershipId: organizationUser.id })
+        .from(organizationUser)
+        .where(
+            and(
+                eq(organizationUser.userId, userId),
+                eq(organizationUser.status, "PENDING"),
+                inArray(organizationUser.role, teacherRoles),
+            ),
+        )
+        .limit(1)
+
+    return row != null
 }
 
 export async function syncTeacherCourseMappings(data: {

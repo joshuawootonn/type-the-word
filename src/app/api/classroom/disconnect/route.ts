@@ -4,6 +4,11 @@ import { NextResponse } from "next/server"
 
 import { authOptions } from "~/server/auth"
 import { deleteTeacherToken } from "~/server/repositories/classroom.repository"
+import {
+    getApprovedOrganizationForUser,
+    hasAnotherApprovedOrganizationAdmin,
+    isUserOrganizationAdmin,
+} from "~/server/repositories/organization.repository"
 
 import { type DisconnectResponse } from "../schemas"
 
@@ -19,6 +24,33 @@ export async function POST() {
     }
 
     try {
+        const approvedOrganization = await getApprovedOrganizationForUser(
+            session.user.id,
+        )
+        if (approvedOrganization) {
+            const isOrgAdmin = await isUserOrganizationAdmin({
+                organizationId: approvedOrganization.id,
+                userId: session.user.id,
+            })
+
+            if (isOrgAdmin) {
+                const hasAnotherAdmin =
+                    await hasAnotherApprovedOrganizationAdmin({
+                        organizationId: approvedOrganization.id,
+                        excludingUserId: session.user.id,
+                    })
+
+                if (!hasAnotherAdmin) {
+                    return NextResponse.json(
+                        {
+                            error: "You are the only organization admin. Promote another teacher to admin before disconnecting.",
+                        },
+                        { status: 403 },
+                    )
+                }
+            }
+        }
+
         await deleteTeacherToken(session.user.id)
 
         // Delete teacher cookie

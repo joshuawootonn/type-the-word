@@ -23,6 +23,7 @@ vi.mock("~/server/db", () => ({
 let approveTeacherMembership: typeof import("./organization.repository").approveTeacherMembership
 let countApprovedTeacherMemberships: typeof import("./organization.repository").countApprovedTeacherMemberships
 let ensureTeacherMembershipOnConnect: typeof import("./organization.repository").ensureTeacherMembershipOnConnect
+let hasAnotherApprovedOrganizationAdmin: typeof import("./organization.repository").hasAnotherApprovedOrganizationAdmin
 let getApprovedOrganizationForUser: typeof import("./organization.repository").getApprovedOrganizationForUser
 let getApprovedOrganizationMembership: typeof import("./organization.repository").getApprovedOrganizationMembership
 let getDomainFromEmail: typeof import("./organization.repository").getDomainFromEmail
@@ -35,6 +36,7 @@ let isUserOrganizationAdmin: typeof import("./organization.repository").isUserOr
 let listApprovedTeacherUserIdsForCourse: typeof import("./organization.repository").listApprovedTeacherUserIdsForCourse
 let listOrganizationDirectoryUsers: typeof import("./organization.repository").listOrganizationDirectoryUsers
 let listPendingTeacherMemberships: typeof import("./organization.repository").listPendingTeacherMemberships
+let promoteTeacherToAdmin: typeof import("./organization.repository").promoteTeacherToAdmin
 let syncTeacherCourseMappings: typeof import("./organization.repository").syncTeacherCourseMappings
 let upsertOrganizationMembership: typeof import("./organization.repository").upsertOrganizationMembership
 
@@ -47,6 +49,8 @@ describe("OrganizationRepository - Unit Tests", () => {
         approveTeacherMembership = repo.approveTeacherMembership
         countApprovedTeacherMemberships = repo.countApprovedTeacherMemberships
         ensureTeacherMembershipOnConnect = repo.ensureTeacherMembershipOnConnect
+        hasAnotherApprovedOrganizationAdmin =
+            repo.hasAnotherApprovedOrganizationAdmin
         getApprovedOrganizationForUser = repo.getApprovedOrganizationForUser
         getApprovedOrganizationMembership =
             repo.getApprovedOrganizationMembership
@@ -61,6 +65,7 @@ describe("OrganizationRepository - Unit Tests", () => {
             repo.listApprovedTeacherUserIdsForCourse
         listOrganizationDirectoryUsers = repo.listOrganizationDirectoryUsers
         listPendingTeacherMemberships = repo.listPendingTeacherMemberships
+        promoteTeacherToAdmin = repo.promoteTeacherToAdmin
         syncTeacherCourseMappings = repo.syncTeacherCourseMappings
         upsertOrganizationMembership = repo.upsertOrganizationMembership
     })
@@ -292,6 +297,71 @@ describe("OrganizationRepository - Unit Tests", () => {
                 approvedByUserId: "teacher-2",
             }),
         ).rejects.toThrow("Only organization admins can approve teachers")
+    })
+
+    it("promotes approved teacher to org admin", async () => {
+        mockDb.query.organizationUser.findFirst
+            .mockResolvedValueOnce({
+                role: "ORG_ADMIN",
+                status: "APPROVED",
+            })
+            .mockResolvedValueOnce({
+                role: "TEACHER",
+                status: "APPROVED",
+                approvedAt: new Date("2025-01-01T00:00:00.000Z"),
+            })
+
+        const returning = vi.fn().mockResolvedValue([
+            {
+                role: "ORG_ADMIN",
+                status: "APPROVED",
+            },
+        ])
+        const onConflictDoUpdate = vi.fn(() => ({ returning }))
+        const values = vi.fn(() => ({ onConflictDoUpdate }))
+        mockDb.insert.mockReturnValue({ values })
+
+        const result = await promoteTeacherToAdmin({
+            organizationId: "org-1",
+            teacherUserId: "teacher-1",
+            promotedByUserId: "admin-1",
+        })
+
+        expect(result.role).toBe("ORG_ADMIN")
+    })
+
+    it("throws when promoting a non-teacher role", async () => {
+        mockDb.query.organizationUser.findFirst
+            .mockResolvedValueOnce({
+                role: "ORG_ADMIN",
+                status: "APPROVED",
+            })
+            .mockResolvedValueOnce({
+                role: "STUDENT",
+                status: "APPROVED",
+            })
+
+        await expect(
+            promoteTeacherToAdmin({
+                organizationId: "org-1",
+                teacherUserId: "student-1",
+                promotedByUserId: "admin-1",
+            }),
+        ).rejects.toThrow("Only teachers can be promoted to admin")
+    })
+
+    it("detects when another approved org admin exists", async () => {
+        const limit = vi.fn().mockResolvedValue([{ userId: "admin-2" }])
+        const where = vi.fn(() => ({ limit }))
+        const from = vi.fn(() => ({ where }))
+        mockDb.select.mockReturnValue({ from })
+
+        const result = await hasAnotherApprovedOrganizationAdmin({
+            organizationId: "org-1",
+            excludingUserId: "admin-1",
+        })
+
+        expect(result).toBe(true)
     })
 
     it("returns approved membership helper", async () => {

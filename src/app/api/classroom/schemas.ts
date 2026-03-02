@@ -223,6 +223,7 @@ export const pendingTeacherSchema = z.object({
 export const organizationUsersResponseSchema = z.object({
     organizationId: z.string(),
     organizationDomain: z.string(),
+    isOrgAdmin: z.boolean(),
     users: z.array(organizationUserSchema),
     pendingTeachers: z.array(pendingTeacherSchema),
 })

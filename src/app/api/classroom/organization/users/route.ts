@@ -7,8 +7,8 @@ import {
 } from "~/app/api/classroom/schemas"
 import { authOptions } from "~/server/auth"
 import {
+    getApprovedOrganizationMembership,
     getApprovedOrganizationForUser,
-    isUserOrganizationAdmin,
     listOrganizationDirectoryUsers,
     listPendingTeacherMemberships,
 } from "~/server/repositories/organization.repository"
@@ -27,11 +27,13 @@ export async function GET() {
         )
     }
 
-    const isOrgAdmin = await isUserOrganizationAdmin({
+    const membership = await getApprovedOrganizationMembership({
         organizationId: organization.id,
         userId: session.user.id,
     })
-    if (!isOrgAdmin) {
+    const isOrgAdmin = membership?.role === "ORG_ADMIN"
+    const isTeacher = membership?.role === "TEACHER"
+    if (!isOrgAdmin && !isTeacher) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
@@ -43,6 +45,7 @@ export async function GET() {
     const response: OrganizationUsersResponse = {
         organizationId: organization.id,
         organizationDomain: organization.domain,
+        isOrgAdmin,
         users,
         pendingTeachers: pendingMemberships.map(membership => ({
             userId: membership.user.id,

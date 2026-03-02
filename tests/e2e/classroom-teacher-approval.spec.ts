@@ -68,10 +68,14 @@ test("second teacher is approved and can collaborate on assignments", async ({
     await expect(page.getByText(teacherPending.email).first()).toBeVisible()
     await page.getByRole("button", { name: "Approve" }).first().click()
     await expect(
-        page.getByRole("heading", { name: "Pending Teachers" }),
+        page
+            .getByRole("row")
+            .filter({ hasText: teacherPending.email })
+            .getByText("Pending"),
     ).toHaveCount(0)
 
     await auth.loginViaApi(teacherPending)
+    await page.request.get("/api/classroom/courses")
     await page.goto("/classroom/e2e-course-1", {
         waitUntil: "domcontentloaded",
     })
