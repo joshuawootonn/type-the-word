@@ -9,9 +9,13 @@ import {
     listStudentCourses,
 } from "~/server/clients/classroom.client"
 import {
-    getTeacherToken,
+    getTeacherToken as getTeacherClassroomToken,
     getStudentToken,
 } from "~/server/repositories/classroom.repository"
+import {
+    getApprovedOrganizationForUser,
+    syncTeacherCourseMappings,
+} from "~/server/repositories/organization.repository"
 
 import { type CoursesResponse } from "../schemas"
 
@@ -28,16 +32,26 @@ export async function GET() {
 
     try {
         // Check if user is a teacher first
-        const teacherToken = await getTeacherToken(session.user.id).catch(
-            () => null,
-        )
+        const teacherToken = await getTeacherClassroomToken(
+            session.user.id,
+        ).catch(() => null)
 
         if (teacherToken) {
-            // Teacher flow
-            const validToken = await getValidTeacherToken(session.user.id)
-            const courses = await listCourses(validToken.accessToken)
-            const response: CoursesResponse = { courses }
-            return NextResponse.json(response)
+            const approvedOrganization = await getApprovedOrganizationForUser(
+                session.user.id,
+            )
+
+            if (approvedOrganization) {
+                const validToken = await getValidTeacherToken(session.user.id)
+                const courses = await listCourses(validToken.accessToken)
+                await syncTeacherCourseMappings({
+                    organizationId: approvedOrganization.id,
+                    teacherUserId: session.user.id,
+                    courseIds: courses.map(course => course.id),
+                })
+                const response: CoursesResponse = { courses }
+                return NextResponse.json(response)
+            }
         }
 
         // Check if user is a student

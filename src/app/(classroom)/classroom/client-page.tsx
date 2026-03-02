@@ -15,6 +15,7 @@ import {
 interface ClientPageProps {
     initialIsConnected: boolean
     initialSuccess: boolean
+    initialTeacherPendingApproval: boolean
     initialError: string | null
     initialStudentConnected: boolean
     initialStudentSuccess: boolean
@@ -25,6 +26,7 @@ interface ClientPageProps {
 export function ClientPage({
     initialIsConnected,
     initialSuccess,
+    initialTeacherPendingApproval,
     initialError,
     initialStudentConnected,
     initialStudentSuccess,
@@ -35,6 +37,9 @@ export function ClientPage({
     const [isLoading, setIsLoading] = useState(false)
     const [teacherError, setError] = useState<string | null>(initialError)
     const [success, setSuccess] = useState(initialSuccess)
+    const [teacherPendingApproval, setTeacherPendingApproval] = useState(
+        initialTeacherPendingApproval,
+    )
     const [isStudentConnected, setIsStudentConnected] = useState(
         initialStudentConnected,
     )
@@ -47,6 +52,7 @@ export function ClientPage({
     async function handleConnect() {
         setIsLoading(true)
         setError(null)
+        setTeacherPendingApproval(false)
 
         try {
             const authUrl = await initiateOAuthConnection()
@@ -70,6 +76,7 @@ export function ClientPage({
             await disconnectClassroom()
             setIsConnected(false)
             setSuccess(false)
+            setTeacherPendingApproval(false)
         } catch (_) {
             setError("Failed to disconnect")
         } finally {
@@ -231,6 +238,15 @@ export function ClientPage({
                         </div>
                     )}
 
+                    {teacherPendingApproval && !isConnected && (
+                        <div className="border-primary bg-secondary mb-3 flex items-start gap-3 border-2 p-4">
+                            <div className="text-primary text-sm">
+                                Your teacher account is connected and waiting
+                                for organization admin approval.
+                            </div>
+                        </div>
+                    )}
+
                     {isConnected ? (
                         <>
                             <div className="border-primary bg-secondary mb-3 flex items-center gap-4 border-2 p-4">
@@ -263,6 +279,9 @@ export function ClientPage({
                                 </Link>
                                 <Link href="/classroom/dashboard">
                                     View dashboard
+                                </Link>
+                                <Link href="/classroom/organization">
+                                    Organization
                                 </Link>
                                 <Button
                                     onClick={() => {

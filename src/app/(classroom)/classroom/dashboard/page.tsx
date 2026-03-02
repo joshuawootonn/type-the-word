@@ -7,6 +7,7 @@ import {
     getTeacherToken,
     getStudentToken,
 } from "~/server/repositories/classroom.repository"
+import { getApprovedOrganizationForUser } from "~/server/repositories/organization.repository"
 
 export default async function DashboardPage() {
     const session = await getServerSession(authOptions)
@@ -26,11 +27,17 @@ export default async function DashboardPage() {
     const teacherToken = await getTeacherToken(session.user.id).catch(
         () => null,
     )
+    const approvedOrganization = await getApprovedOrganizationForUser(
+        session.user.id,
+    ).catch(() => null)
     const studentToken = await getStudentToken(session.user.id).catch(
         () => null,
     )
 
-    if (!teacherToken && !studentToken) {
+    const approvedTeacherToken =
+        teacherToken && approvedOrganization ? teacherToken : null
+
+    if (!approvedTeacherToken && !studentToken) {
         return (
             <ClassroomNotice
                 title="Dashboard"

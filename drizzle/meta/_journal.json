@@ -176,6 +176,20 @@
             "when": 1772223484732,
             "tag": "0024_luxuriant_thunderball",
             "breakpoints": true
+        },
+        {
+            "idx": 25,
+            "version": "7",
+            "when": 1772469989698,
+            "tag": "0025_cool_snowbird",
+            "breakpoints": true
+        },
+        {
+            "idx": 26,
+            "version": "7",
+            "when": 1772480559415,
+            "tag": "0026_rename_org_tables",
+            "breakpoints": true
         }
     ]
 }

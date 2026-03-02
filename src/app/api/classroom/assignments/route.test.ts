@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server"
 import { beforeEach, describe, expect, test, vi } from "vitest"
 
+import * as organizationAccess from "~/server/classroom/organization-access"
 import * as classroomClient from "~/server/clients/classroom.client"
 import * as classroomRepository from "~/server/repositories/classroom.repository"
 
@@ -20,6 +21,10 @@ vi.mock("~/server/repositories/classroom.repository", () => ({
     getTeacherToken: vi.fn(),
     updateTeacherTokenAccess: vi.fn(),
     createAssignment: vi.fn(),
+}))
+
+vi.mock("~/server/classroom/organization-access", () => ({
+    canTeacherAccessCourse: vi.fn(),
 }))
 
 import { getServerSession } from "next-auth"
@@ -55,6 +60,10 @@ describe("POST /api/classroom/assignments", () => {
 
     beforeEach(() => {
         vi.clearAllMocks()
+        vi.mocked(organizationAccess.canTeacherAccessCourse).mockResolvedValue({
+            allowed: true,
+            organizationId: "org-1",
+        })
     })
 
     test("WHEN not authenticated THEN returns 401", async () => {
@@ -94,6 +103,31 @@ describe("POST /api/classroom/assignments", () => {
 
         expect(response.status).toBe(403)
         expect(data.error).toBe("Google Classroom not connected")
+    })
+
+    test("WHEN teacher lacks course access THEN returns 403", async () => {
+        vi.mocked(getServerSession).mockResolvedValue(mockSession)
+        vi.mocked(classroomRepository.getTeacherToken).mockResolvedValue(
+            mockToken,
+        )
+        vi.mocked(organizationAccess.canTeacherAccessCourse).mockResolvedValue({
+            allowed: false,
+            organizationId: "org-1",
+        })
+
+        const request = new NextRequest(
+            "http://localhost/api/classroom/assignments",
+            {
+                method: "POST",
+                body: JSON.stringify(validRequest),
+            },
+        )
+
+        const response = await POST(request)
+        const data = await response.json()
+
+        expect(response.status).toBe(403)
+        expect(data.error).toContain("pending approval")
     })
 
     test("WHEN end verse before start verse THEN returns 400", async () => {
@@ -218,6 +252,7 @@ describe("POST /api/classroom/assignments", () => {
         })
         vi.mocked(classroomRepository.createAssignment).mockResolvedValue({
             id: "assignment-123",
+            organizationId: "org-1",
             teacherUserId: "user-123",
             courseId: "course-123",
             courseWorkId: "coursework-123",
@@ -275,6 +310,7 @@ describe("POST /api/classroom/assignments", () => {
         })
         vi.mocked(classroomRepository.createAssignment).mockResolvedValue({
             id: "assignment-123",
+            organizationId: "org-1",
             teacherUserId: "user-123",
             courseId: "course-123",
             courseWorkId: "coursework-123",

@@ -5,8 +5,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { calculateStatsForVerse } from "~/app/(app)/history/wpm"
 import { env } from "~/env.mjs"
 import { authOptions } from "~/server/auth"
+import { getTeacherTokenForAssignment } from "~/server/classroom/organization-access"
 import { getValidStudentToken } from "~/server/classroom/student-token"
-import { getValidTeacherToken } from "~/server/classroom/teacher-token"
 import {
     addSubmissionLinkAttachment,
     getStudent,
@@ -49,9 +49,11 @@ export async function POST(
             )
         }
 
-        const teacherToken = await getValidTeacherToken(
-            assignment.teacherUserId,
-        )
+        const teacherToken = await getTeacherTokenForAssignment({
+            organizationId: assignment.organizationId,
+            courseId: assignment.courseId,
+            teacherUserId: assignment.teacherUserId,
+        })
         const teacherAccessToken = teacherToken.accessToken
         const { accessToken: studentAccessToken, googleUserId } =
             await getValidStudentToken(session.user.id)

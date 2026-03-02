@@ -134,6 +134,7 @@ export async function deleteStudentToken(userId: string) {
 
 export async function createAssignment(data: {
     id?: string
+    organizationId?: string
     teacherUserId: string
     courseId: string
     courseWorkId: string

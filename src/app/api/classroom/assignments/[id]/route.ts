@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 
 import { calculateStatsForVerse } from "~/app/(app)/history/wpm"
 import { authOptions } from "~/server/auth"
+import { canTeacherAccessAssignment } from "~/server/classroom/organization-access"
 import {
     refreshAccessToken,
     listStudents,
@@ -47,8 +48,15 @@ export async function GET(
             )
         }
 
-        // Verify teacher owns this assignment
-        if (assignment.teacherUserId !== session.user.id) {
+        const canAccess = await canTeacherAccessAssignment({
+            userId: session.user.id,
+            assignment: {
+                organizationId: assignment.organizationId,
+                courseId: assignment.courseId,
+                teacherUserId: assignment.teacherUserId,
+            },
+        })
+        if (!canAccess) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 })
         }
 

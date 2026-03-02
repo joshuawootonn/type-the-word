@@ -15,8 +15,11 @@ import { formatReferenceLabel } from "~/lib/formatReferenceLabel"
 import { ParsedPassage } from "~/lib/parseEsv"
 import { passageSegmentSchema } from "~/lib/passageSegment"
 import { authOptions } from "~/server/auth"
+import {
+    canTeacherAccessAssignment,
+    getTeacherTokenForAssignment,
+} from "~/server/classroom/organization-access"
 import { getValidStudentToken } from "~/server/classroom/student-token"
-import { getValidTeacherToken } from "~/server/classroom/teacher-token"
 import {
     listCourses,
     listStudentCourses,
@@ -140,8 +143,15 @@ export default async function AssignmentDetailPage({
     const teacherToken = await getTeacherToken(session.user.id).catch(
         () => null,
     )
-    const isTeacher =
-        teacherToken && assignment.teacherUserId === session.user.id
+    const teacherCanAccess = await canTeacherAccessAssignment({
+        userId: session.user.id,
+        assignment: {
+            organizationId: assignment.organizationId,
+            courseId: assignment.courseId,
+            teacherUserId: assignment.teacherUserId,
+        },
+    })
+    const isTeacher = teacherToken && teacherCanAccess
 
     if (isTeacher) {
         let accessToken = teacherToken.accessToken
@@ -235,7 +245,11 @@ export default async function AssignmentDetailPage({
 
     let teacherAccessToken: string
     try {
-        const tokenRecord = await getValidTeacherToken(assignment.teacherUserId)
+        const tokenRecord = await getTeacherTokenForAssignment({
+            organizationId: assignment.organizationId,
+            courseId: assignment.courseId,
+            teacherUserId: assignment.teacherUserId,
+        })
         teacherAccessToken = tokenRecord.accessToken
     } catch (_error) {
         return (

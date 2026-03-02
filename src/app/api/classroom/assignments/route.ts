@@ -11,6 +11,7 @@ import {
     validatePassageRange,
 } from "~/lib/validate-passage-range"
 import { authOptions } from "~/server/auth"
+import { canTeacherAccessCourse } from "~/server/classroom/organization-access"
 import { getValidStudentToken } from "~/server/classroom/student-token"
 import { syncFutureAssignments } from "~/server/classroom/sync-assignments"
 import { getValidTeacherToken } from "~/server/classroom/teacher-token"
@@ -78,10 +79,41 @@ export async function GET(request: NextRequest) {
             )
         }
 
-        const isTeacher = !!teacherToken
+        let isTeacher = false
+        let teacherOrganizationId: string | null = null
+        if (teacherToken) {
+            const teacherAccess = await canTeacherAccessCourse({
+                userId: session.user.id,
+                courseId,
+            })
+            isTeacher = teacherAccess.allowed
+            teacherOrganizationId = teacherAccess.organizationId
+        }
+
+        if (teacherToken && !isTeacher && !studentToken) {
+            return NextResponse.json(
+                {
+                    error: "Teacher access is pending approval or you are not a teacher for this course",
+                },
+                { status: 403 },
+            )
+        }
 
         if (isTeacher) {
             // TEACHER FLOW
+            const teacherAssignmentsFilter = and(
+                eq(classroomAssignment.courseId, courseId),
+                or(
+                    eq(
+                        classroomAssignment.organizationId,
+                        teacherOrganizationId!,
+                    ),
+                    and(
+                        isNull(classroomAssignment.organizationId),
+                        eq(classroomAssignment.teacherUserId, session.user.id),
+                    ),
+                ),
+            )
 
             // Sync assignments that haven't been synced in the last hour
             try {
@@ -105,11 +137,7 @@ export async function GET(request: NextRequest) {
                     .from(classroomAssignment)
                     .where(
                         and(
-                            eq(
-                                classroomAssignment.teacherUserId,
-                                session.user.id,
-                            ),
-                            eq(classroomAssignment.courseId, courseId),
+                            teacherAssignmentsFilter,
                             or(
                                 eq(classroomAssignment.state, "DRAFT"),
                                 gte(classroomAssignment.dueDate, now),
@@ -151,12 +179,7 @@ export async function GET(request: NextRequest) {
             const countResult = await db
                 .select({ count: sql<number>`CAST(COUNT(*) AS INTEGER)` })
                 .from(classroomAssignment)
-                .where(
-                    and(
-                        eq(classroomAssignment.teacherUserId, session.user.id),
-                        eq(classroomAssignment.courseId, courseId),
-                    ),
-                )
+                .where(teacherAssignmentsFilter)
             const totalCount = countResult[0]?.count ?? 0
 
             // Fetch paginated assignments with submission stats
@@ -199,12 +222,7 @@ export async function GET(request: NextRequest) {
                         classroomAssignment.id,
                     ),
                 )
-                .where(
-                    and(
-                        eq(classroomAssignment.teacherUserId, session.user.id),
-                        eq(classroomAssignment.courseId, courseId),
-                    ),
-                )
+                .where(teacherAssignmentsFilter)
                 .groupBy(classroomAssignment.id)
                 .orderBy(
                     // Newest assignments first by creation timestamp.
@@ -607,6 +625,19 @@ export async function POST(request: NextRequest) {
             )
         }
 
+        const teacherAccess = await canTeacherAccessCourse({
+            userId: session.user.id,
+            courseId: data.courseId,
+        })
+        if (!teacherAccess.allowed || !teacherAccess.organizationId) {
+            return NextResponse.json(
+                {
+                    error: "Teacher access is pending approval or you are not a teacher for this course",
+                },
+                { status: 403 },
+            )
+        }
+
         let accessToken = tokenRecord.accessToken
 
         // Check if token is expired and refresh if needed
@@ -688,6 +719,7 @@ export async function POST(request: NextRequest) {
         // Create assignment record in our database as DRAFT
         const assignment = await createAssignment({
             id: assignmentId,
+            organizationId: teacherAccess.organizationId,
             teacherUserId: session.user.id,
             courseId: data.courseId,
             courseWorkId: courseWork.id,

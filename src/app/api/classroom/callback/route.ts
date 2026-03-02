@@ -1,9 +1,20 @@
+import { eq } from "drizzle-orm"
 import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 
 import { env } from "~/env.mjs"
-import { exchangeCodeForTokens } from "~/server/clients/classroom.client"
+import {
+    exchangeCodeForTokens,
+    listCourses,
+} from "~/server/clients/classroom.client"
+import { db } from "~/server/db"
+import { users } from "~/server/db/schema"
 import { saveTeacherToken } from "~/server/repositories/classroom.repository"
+import {
+    ensureTeacherMembershipOnConnect,
+    getDomainFromEmail,
+    syncTeacherCourseMappings,
+} from "~/server/repositories/organization.repository"
 
 /**
  * Handles the OAuth callback from Google
@@ -36,6 +47,43 @@ export async function GET(request: NextRequest) {
         const redirectUri = `${env.DEPLOYED_URL}/api/classroom/callback`
         console.log("Token exchange redirect URI:", redirectUri)
         const tokens = await exchangeCodeForTokens(code, redirectUri)
+        const [user] = await db
+            .select({
+                id: users.id,
+                email: users.email,
+                name: users.name,
+            })
+            .from(users)
+            .where(eq(users.id, state))
+            .limit(1)
+
+        if (!user) {
+            return NextResponse.redirect(
+                new URL("/classroom?error=user_not_found", request.url),
+            )
+        }
+
+        const domain = getDomainFromEmail(user.email)
+        if (!domain) {
+            return NextResponse.redirect(
+                new URL("/classroom?error=invalid_email_domain", request.url),
+            )
+        }
+
+        const [courses, membership] = await Promise.all([
+            listCourses(tokens.accessToken),
+            ensureTeacherMembershipOnConnect({
+                userId: state,
+                domain,
+                organizationName: domain,
+            }),
+        ])
+
+        await syncTeacherCourseMappings({
+            organizationId: membership.organization.id,
+            teacherUserId: state,
+            courseIds: courses.map(course => course.id),
+        })
 
         // Save tokens to database
         await saveTeacherToken({
@@ -43,8 +91,15 @@ export async function GET(request: NextRequest) {
             ...tokens,
         })
 
-        // Set cookie to indicate teacher is connected
         const cookieStore = await cookies()
+        if (membership.needsApproval) {
+            cookieStore.delete("classroomTeacher")
+            return NextResponse.redirect(
+                new URL("/classroom?pending_teacher=true", request.url),
+            )
+        }
+
+        // Set cookie to indicate teacher is connected
         cookieStore.set("classroomTeacher", "true", {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
