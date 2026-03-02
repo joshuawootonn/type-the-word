@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { AssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
 import { Button } from "~/components/ui/button"
@@ -34,6 +34,7 @@ export function StudentAssignmentCompletion({
     const [isTurningIn, setIsTurningIn] = useState(false)
     const [turnInError, setTurnInError] = useState<string | null>(null)
     const [isTurnedIn, setIsTurnedIn] = useState(submission.isTurnedIn)
+    const hasAutoTurnInTriggered = useRef(false)
 
     // Assignment-wide history powers completion and turn-in gating
     const { data: liveAssignmentHistory } = useQuery({
@@ -97,7 +98,7 @@ export function StudentAssignmentCompletion({
         }
     }, [currentHistory?.verses])
 
-    async function handleTurnIn(): Promise<void> {
+    const handleTurnIn = useCallback(async (): Promise<void> => {
         setIsTurningIn(true)
         setTurnInError(null)
 
@@ -119,7 +120,27 @@ export function StudentAssignmentCompletion({
         } finally {
             setIsTurningIn(false)
         }
-    }
+    }, [
+        assignmentId,
+        completedVerses,
+        courseId,
+        totalVerses,
+        trackAssignmentCompleted,
+    ])
+
+    useEffect(() => {
+        if (
+            !isComplete ||
+            isTurnedIn ||
+            isTurningIn ||
+            hasAutoTurnInTriggered.current
+        ) {
+            return
+        }
+
+        hasAutoTurnInTriggered.current = true
+        void handleTurnIn()
+    }, [handleTurnIn, isComplete, isTurnedIn, isTurningIn])
 
     return (
         <>
@@ -186,23 +207,33 @@ export function StudentAssignmentCompletion({
                                 <div className="text-success text-sm">
                                     This assignment is turned in.
                                 </div>
+                            ) : isTurningIn ? (
+                                <div className="text-success text-sm">
+                                    Turning in assignment...
+                                </div>
                             ) : (
-                                <Button
-                                    type="button"
-                                    onClick={handleTurnIn}
-                                    isLoading={isTurningIn}
-                                    loadingLabel="Turning in"
-                                    className="text-sm"
-                                >
-                                    Turn in assignment
-                                </Button>
+                                <div className="text-success text-sm">
+                                    Final verse complete. Turning in assignment
+                                    automatically.
+                                </div>
                             )}
                         </div>
                     </div>
                     <div className="mb-32!">
                         {turnInError && (
-                            <div className="not-prose text-error text-sm">
-                                {turnInError}
+                            <div className="not-prose flex items-center justify-between gap-3 text-sm">
+                                <div className="text-error">{turnInError}</div>
+                                <Button
+                                    type="button"
+                                    onClick={() => {
+                                        void handleTurnIn()
+                                    }}
+                                    isLoading={isTurningIn}
+                                    loadingLabel="Retrying"
+                                    className="text-sm"
+                                >
+                                    Turn in assignment
+                                </Button>
                             </div>
                         )}
                     </div>
