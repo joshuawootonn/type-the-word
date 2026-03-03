@@ -121,14 +121,9 @@ export function PassageSelector({
     }, [searchParams])
 
     useEffect(() => {
-        hasActivatedSelector.current = true
-    }, [book, chapter, translation])
-
-    useEffect(() => {
         const values = getValues(value)
         setBook(values.book)
         setChapter(values.chapter)
-        hasActivatedSelector.current = false
     }, [value])
 
     const filteredChapters =
@@ -218,12 +213,15 @@ export function PassageSelector({
                     className="relative"
                     value={translation}
                     onChange={next => {
-                        if (next !== null) setTranslation(next)
+                        if (next !== null) {
+                            setTranslation(next)
+                            hasActivatedSelector.current = true
+                        }
                     }}
                 >
                     <Combobox.Input
                         as={ForwardedRefInput}
-                        onChange={event =>
+                        onChange={event => 
                             setTranslationQuery(event.target.value)
                         }
                         onFocus={event => event.currentTarget.select()}
@@ -307,13 +305,18 @@ export function PassageSelector({
                     as="div"
                     value={book}
                     onChange={next => {
-                        if (next !== null) setBook(next)
+                        if (next !== null) {
+                            setBook(next)
+                            hasActivatedSelector.current = true
+                        }
                     }}
                 >
                     <Combobox.Input
                         ref={bookRef}
                         id={PASSAGE_BOOK_INPUT_ID}
-                        onChange={event => setBookQuery(event.target.value)}
+                        onChange={event =>
+                            setBookQuery(event.target.value)
+                        }
                         onFocus={event => {
                             event.currentTarget.select()
                         }}
