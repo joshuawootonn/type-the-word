@@ -221,7 +221,7 @@ export function PassageSelector({
                 >
                     <Combobox.Input
                         as={ForwardedRefInput}
-                        onChange={event => 
+                        onChange={event =>
                             setTranslationQuery(event.target.value)
                         }
                         onFocus={event => event.currentTarget.select()}
@@ -314,9 +314,7 @@ export function PassageSelector({
                     <Combobox.Input
                         ref={bookRef}
                         id={PASSAGE_BOOK_INPUT_ID}
-                        onChange={event =>
-                            setBookQuery(event.target.value)
-                        }
+                        onChange={event => setBookQuery(event.target.value)}
                         onFocus={event => {
                             event.currentTarget.select()
                         }}
