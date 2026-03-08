@@ -83,11 +83,11 @@ export function PassageSelector({
     const [translation, setTranslation] =
         useState<Translation>(initialTranslation)
 
-    const hasActivatedSelector = useRef(false)
-
     const [bookQuery, setBookQuery] = useState("")
     const [chapterQuery, setChapterQuery] = useState("")
     const [translationQuery, setTranslationQuery] = useState("")
+
+    const timerRef = useRef<NodeJS.Timeout | null>(null)
 
     const router = useRouter()
     const pathname = usePathname()
@@ -185,13 +185,13 @@ export function PassageSelector({
     useEffect(() => {
         const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
         // I use `!includes` to prevent passage selector from clearing url specified verses
-        if (hasActivatedSelector.current && !pathname?.includes(nextValue)) {
-            const t = setTimeout(() => {
+        if (!pathname?.includes(nextValue) && pathname !== "/") {
+            timerRef.current = setTimeout(() => {
                 onSubmit({ book, chapter, translation })
             }, 3000)
 
             return () => {
-                clearTimeout(t)
+                clearTimeout(timerRef.current!)
             }
         }
     }, [book, chapter, translation, onSubmit, pathname])
@@ -213,10 +213,7 @@ export function PassageSelector({
                     className="relative"
                     value={translation}
                     onChange={next => {
-                        if (next !== null) {
-                            setTranslation(next)
-                            hasActivatedSelector.current = true
-                        }
+                        if (next !== null) setTranslation(next)
                     }}
                 >
                     <Combobox.Input
@@ -305,10 +302,7 @@ export function PassageSelector({
                     as="div"
                     value={book}
                     onChange={next => {
-                        if (next !== null) {
-                            setBook(next)
-                            hasActivatedSelector.current = true
-                        }
+                        if (next !== null) setBook(next)
                     }}
                 >
                     <Combobox.Input
