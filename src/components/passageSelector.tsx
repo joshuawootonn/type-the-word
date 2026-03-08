@@ -87,6 +87,8 @@ export function PassageSelector({
     const [chapterQuery, setChapterQuery] = useState("")
     const [translationQuery, setTranslationQuery] = useState("")
 
+    const timerRef = useRef<NodeJS.Timeout | null>(null)
+
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -184,12 +186,12 @@ export function PassageSelector({
         const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
         // I use `!includes` to prevent passage selector from clearing url specified verses
         if (!pathname?.includes(nextValue) && pathname !== "/") {
-            const t = setTimeout(() => {
+            timerRef.current = setTimeout(() => {
                 onSubmit({ book, chapter, translation })
             }, 3000)
 
             return () => {
-                clearTimeout(t)
+                clearTimeout(timerRef.current!)
             }
         }
     }, [book, chapter, translation, onSubmit, pathname])
@@ -197,7 +199,7 @@ export function PassageSelector({
     const isFirstRender = useIsFirstRender()
 
     return (
-        <>
+        <div className={"flex flex-col gap-2 sm:flex-row sm:items-center"}>
             <label htmlFor="passage" className={clsx(labelClassName)}>
                 {label ?? "Passage:"}
             </label>
@@ -304,6 +306,7 @@ export function PassageSelector({
                     }}
                 >
                     <Combobox.Input
+                        ref={bookRef}
                         id={PASSAGE_BOOK_INPUT_ID}
                         onChange={event => setBookQuery(event.target.value)}
                         onFocus={event => {
@@ -468,6 +471,6 @@ export function PassageSelector({
                     </Combobox.Button>
                 </Combobox>
             </div>
-        </>
+        </div>
     )
 }
