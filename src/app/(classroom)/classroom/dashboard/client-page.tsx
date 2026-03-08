@@ -7,10 +7,15 @@ import { useCallback, useEffect, useState } from "react"
 import { type Course } from "~/app/api/classroom/schemas"
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Loading } from "~/components/loading"
+import { Link } from "~/components/ui/link"
 
 import { fetchCourses } from "./actions"
 
-export function ClientPage() {
+type ClientPageProps = {
+    isTeacher: boolean
+}
+
+export function ClientPage({ isTeacher }: ClientPageProps) {
     const router = useRouter()
     const [courses, setCourses] = useState<Course[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -21,8 +26,12 @@ export function ClientPage() {
             const result = await fetchCourses()
             setCourses(result.courses)
 
-            // Auto-redirect if only one course
-            if (result.courses.length === 1 && result.courses[0]) {
+            // Auto-redirect only for students with one course.
+            if (
+                !isTeacher &&
+                result.courses.length === 1 &&
+                result.courses[0]
+            ) {
                 router.push(`/classroom/${result.courses[0].id}`)
                 return
             }
@@ -31,7 +40,7 @@ export function ClientPage() {
         } finally {
             setIsLoading(false)
         }
-    }, [router])
+    }, [isTeacher, router])
 
     useEffect(() => {
         void loadCourses()
@@ -40,6 +49,11 @@ export function ClientPage() {
     return (
         <div>
             <h1>Dashboard</h1>
+            {isTeacher && (
+                <div className="not-prose mb-4">
+                    <Link href="/classroom/organization">Organization</Link>
+                </div>
+            )}
 
             {isLoading ? (
                 <Loading />

@@ -15,6 +15,7 @@ import {
 interface ClientPageProps {
     initialIsConnected: boolean
     initialSuccess: boolean
+    initialTeacherPendingApproval: boolean
     initialError: string | null
     initialStudentConnected: boolean
     initialStudentSuccess: boolean
@@ -25,6 +26,7 @@ interface ClientPageProps {
 export function ClientPage({
     initialIsConnected,
     initialSuccess,
+    initialTeacherPendingApproval,
     initialError,
     initialStudentConnected,
     initialStudentSuccess,
@@ -35,6 +37,9 @@ export function ClientPage({
     const [isLoading, setIsLoading] = useState(false)
     const [teacherError, setError] = useState<string | null>(initialError)
     const [success, setSuccess] = useState(initialSuccess)
+    const [teacherPendingApproval, setTeacherPendingApproval] = useState(
+        initialTeacherPendingApproval,
+    )
     const [isStudentConnected, setIsStudentConnected] = useState(
         initialStudentConnected,
     )
@@ -47,6 +52,7 @@ export function ClientPage({
     async function handleConnect() {
         setIsLoading(true)
         setError(null)
+        setTeacherPendingApproval(false)
 
         try {
             const authUrl = await initiateOAuthConnection()
@@ -70,8 +76,11 @@ export function ClientPage({
             await disconnectClassroom()
             setIsConnected(false)
             setSuccess(false)
-        } catch (_) {
-            setError("Failed to disconnect")
+            setTeacherPendingApproval(false)
+        } catch (error) {
+            setError(
+                error instanceof Error ? error.message : "Failed to disconnect",
+            )
         } finally {
             setIsLoading(false)
         }
@@ -114,6 +123,7 @@ export function ClientPage({
     }
 
     const error = teacherError || studentError
+    const showTeacherPendingOnly = teacherPendingApproval && !isConnected
 
     return (
         <>
@@ -135,7 +145,16 @@ export function ClientPage({
                 </div>
             )}
 
-            {!isConnected && (
+            {showTeacherPendingOnly && (
+                <div className="border-primary bg-secondary mb-3 flex items-start gap-3 border-2 p-4">
+                    <div className="text-primary text-sm">
+                        Your teacher account is connected and waiting for
+                        organization admin approval.
+                    </div>
+                </div>
+            )}
+
+            {!isConnected && !showTeacherPendingOnly && (
                 <>
                     <h2>Student Connection</h2>
                     <p>
@@ -215,7 +234,7 @@ export function ClientPage({
                 </>
             )}
 
-            {!isStudentConnected && (
+            {!isStudentConnected && !showTeacherPendingOnly && (
                 <>
                     <h2>Teacher Connection</h2>
                     <p>
@@ -263,6 +282,9 @@ export function ClientPage({
                                 </Link>
                                 <Link href="/classroom/dashboard">
                                     View dashboard
+                                </Link>
+                                <Link href="/classroom/organization">
+                                    Organization
                                 </Link>
                                 <Button
                                     onClick={() => {

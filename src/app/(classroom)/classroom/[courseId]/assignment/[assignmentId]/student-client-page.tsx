@@ -101,7 +101,7 @@ export function StudentClientPage({
                 <div className="bg-secondary sticky right-0 bottom-0 left-0 -mx-16 flex flex-col gap-4 px-16 py-4 pt-0 pb-8">
                     {hasMultipleChapters && activeChapter && (
                         <>
-                            <hr className="border-primary my-0" />
+                            <hr className="border-primary my-0 border-1" />
                             <div className="not-prose flex items-center justify-between gap-3">
                                 {canGoToPreviousChapter ? (
                                     <Button

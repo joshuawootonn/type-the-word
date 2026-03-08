@@ -15,6 +15,7 @@ export type {
     DraftGradeResponse,
     ModifyAttachmentsResponse,
     RefreshTokenResponse,
+    Topic,
     Student,
     Submission,
     TokenResponse,
@@ -48,6 +49,18 @@ export async function listCourses(accessToken: string) {
 
 export async function listStudentCourses(accessToken: string) {
     return getClassroomClient().listStudentCourses(accessToken)
+}
+
+export async function listTopics(accessToken: string, courseId: string) {
+    return getClassroomClient().listTopics(accessToken, courseId)
+}
+
+export async function createTopic(
+    accessToken: string,
+    courseId: string,
+    name: string,
+) {
+    return getClassroomClient().createTopic(accessToken, courseId, name)
 }
 
 export async function listStudents(accessToken: string, courseId: string) {

@@ -11,11 +11,15 @@ import {
     validatePassageRange,
 } from "~/lib/validate-passage-range"
 import { authOptions } from "~/server/auth"
+import { canTeacherAccessCourse } from "~/server/classroom/organization-access"
 import { getValidStudentToken } from "~/server/classroom/student-token"
 import { syncFutureAssignments } from "~/server/classroom/sync-assignments"
 import { getValidTeacherToken } from "~/server/classroom/teacher-token"
 import {
     createCourseWork,
+    createTopic,
+    listStudents,
+    listTopics,
     refreshAccessToken,
 } from "~/server/clients/classroom.client"
 import { db } from "~/server/db"
@@ -38,6 +42,39 @@ import {
     createAssignmentRequestSchema,
     type CreateAssignmentResponse,
 } from "../schemas"
+
+const CLASSROOM_ASSIGNMENT_TOPIC_NAME = "Bible Typing Practice"
+
+async function getOrCreateAssignmentTopicId(
+    accessToken: string,
+    courseId: string,
+): Promise<string | undefined> {
+    try {
+        const topics = await listTopics(accessToken, courseId)
+        const existingTopic = topics.find(
+            topic => topic.name === CLASSROOM_ASSIGNMENT_TOPIC_NAME,
+        )
+
+        if (existingTopic) {
+            return existingTopic.topicId
+        }
+
+        const newTopic = await createTopic(
+            accessToken,
+            courseId,
+            CLASSROOM_ASSIGNMENT_TOPIC_NAME,
+        )
+        return newTopic.topicId
+    } catch (error) {
+        // Some existing tokens may not include classroom.topics yet.
+        // Continue assignment creation without topic so this flow remains usable.
+        console.warn(
+            "Unable to resolve Classroom topic for assignment creation:",
+            error,
+        )
+        return undefined
+    }
+}
 
 /**
  * Unified endpoint for getting assignments - works for both teachers and students
@@ -78,10 +115,42 @@ export async function GET(request: NextRequest) {
             )
         }
 
-        const isTeacher = !!teacherToken
+        let isTeacher = false
+        let teacherOrganizationId: string | null = null
+        if (teacherToken) {
+            const teacherAccess = await canTeacherAccessCourse({
+                userId: session.user.id,
+                courseId,
+            })
+            isTeacher = teacherAccess.allowed
+            teacherOrganizationId = teacherAccess.organizationId
+        }
+
+        if (teacherToken && !isTeacher && !studentToken) {
+            return NextResponse.json(
+                {
+                    error: "Teacher access is pending approval or you are not a teacher for this course",
+                },
+                { status: 403 },
+            )
+        }
 
         if (isTeacher) {
             // TEACHER FLOW
+            let enrolledStudentCount: number | null = null
+            const teacherAssignmentsFilter = and(
+                eq(classroomAssignment.courseId, courseId),
+                or(
+                    eq(
+                        classroomAssignment.organizationId,
+                        teacherOrganizationId!,
+                    ),
+                    and(
+                        isNull(classroomAssignment.organizationId),
+                        eq(classroomAssignment.teacherUserId, session.user.id),
+                    ),
+                ),
+            )
 
             // Sync assignments that haven't been synced in the last hour
             try {
@@ -105,11 +174,7 @@ export async function GET(request: NextRequest) {
                     .from(classroomAssignment)
                     .where(
                         and(
-                            eq(
-                                classroomAssignment.teacherUserId,
-                                session.user.id,
-                            ),
-                            eq(classroomAssignment.courseId, courseId),
+                            teacherAssignmentsFilter,
                             or(
                                 eq(classroomAssignment.state, "DRAFT"),
                                 gte(classroomAssignment.dueDate, now),
@@ -142,8 +207,15 @@ export async function GET(request: NextRequest) {
                         ),
                     )
                 }
+
+                // Use roster size as denominator for course completion meters.
+                const students = await listStudents(token.accessToken, courseId)
+                enrolledStudentCount = students.length
             } catch (error) {
-                console.error("Error syncing with Google Classroom:", error)
+                console.error(
+                    "Error syncing with Google Classroom or loading roster:",
+                    error,
+                )
                 // Continue with request even if sync fails
             }
 
@@ -151,12 +223,7 @@ export async function GET(request: NextRequest) {
             const countResult = await db
                 .select({ count: sql<number>`CAST(COUNT(*) AS INTEGER)` })
                 .from(classroomAssignment)
-                .where(
-                    and(
-                        eq(classroomAssignment.teacherUserId, session.user.id),
-                        eq(classroomAssignment.courseId, courseId),
-                    ),
-                )
+                .where(teacherAssignmentsFilter)
             const totalCount = countResult[0]?.count ?? 0
 
             // Fetch paginated assignments with submission stats
@@ -199,12 +266,7 @@ export async function GET(request: NextRequest) {
                         classroomAssignment.id,
                     ),
                 )
-                .where(
-                    and(
-                        eq(classroomAssignment.teacherUserId, session.user.id),
-                        eq(classroomAssignment.courseId, courseId),
-                    ),
-                )
+                .where(teacherAssignmentsFilter)
                 .groupBy(classroomAssignment.id)
                 .orderBy(
                     // Newest assignments first by creation timestamp.
@@ -214,10 +276,20 @@ export async function GET(request: NextRequest) {
                 .offset(page * limit)
 
             const response: AssignmentsResponse = {
-                assignments: assignments.map(a => ({
-                    ...a,
-                    dueDate: a.dueDate ? a.dueDate.toISOString() : null,
-                })),
+                assignments: assignments.map(a => {
+                    const totalStudents =
+                        enrolledStudentCount ?? a.submissionCount
+
+                    return {
+                        ...a,
+                        submissionCount: totalStudents,
+                        completedCount: Math.min(
+                            a.completedCount,
+                            totalStudents,
+                        ),
+                        dueDate: a.dueDate ? a.dueDate.toISOString() : null,
+                    }
+                }),
                 pagination: {
                     page,
                     limit,
@@ -607,6 +679,19 @@ export async function POST(request: NextRequest) {
             )
         }
 
+        const teacherAccess = await canTeacherAccessCourse({
+            userId: session.user.id,
+            courseId: data.courseId,
+        })
+        if (!teacherAccess.allowed || !teacherAccess.organizationId) {
+            return NextResponse.json(
+                {
+                    error: "Teacher access is pending approval or you are not a teacher for this course",
+                },
+                { status: 403 },
+            )
+        }
+
         let accessToken = tokenRecord.accessToken
 
         // Check if token is expired and refresh if needed
@@ -665,6 +750,10 @@ export async function POST(request: NextRequest) {
         }
 
         const assignmentId = crypto.randomUUID()
+        const topicId = await getOrCreateAssignmentTopicId(
+            accessToken,
+            data.courseId,
+        )
 
         // Create CourseWork in Google Classroom as DRAFT
         const courseWork = await createCourseWork(accessToken, data.courseId, {
@@ -683,11 +772,13 @@ export async function POST(request: NextRequest) {
                     },
                 },
             ],
+            ...(topicId ? { topicId } : {}),
         })
 
         // Create assignment record in our database as DRAFT
         const assignment = await createAssignment({
             id: assignmentId,
+            organizationId: teacherAccess.organizationId,
             teacherUserId: session.user.id,
             courseId: data.courseId,
             courseWorkId: courseWork.id,

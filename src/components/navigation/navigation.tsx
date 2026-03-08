@@ -79,22 +79,11 @@ export function Navigation({
         placeholderData: props.lastTypedVerse ?? undefined,
     })
 
-    // Get current translation from URL, fallback to cookie, then server value
+    // Get current translation from URL, fallback to server value.
+    // The server already reads the last translation cookie, so this stays
+    // deterministic between SSR and hydration.
     const urlTranslation = tryParseTranslation(searchParams?.get("translation"))
-
-    let cookieTranslation: Translation | null = null
-    if (typeof document !== "undefined") {
-        const cookies = document.cookie.split("; ")
-        const translationCookie = cookies.find(row =>
-            row.startsWith("lastTranslation="),
-        )
-        cookieTranslation = tryParseTranslation(
-            translationCookie?.split("=")[1],
-        )
-    }
-
-    const currentTranslation =
-        urlTranslation ?? cookieTranslation ?? serverLastTranslation
+    const currentTranslation = urlTranslation ?? serverLastTranslation
 
     const rootPathname = lastTypedVerse
         ? `/passage/${toPassageSegment(
@@ -192,6 +181,7 @@ export function Navigation({
                             <Popover.PopoverAnchor asChild>
                                 <DropdownMenu.Trigger asChild>
                                     <button
+                                        id="navigation-user-menu-trigger"
                                         ref={dropDownTriggerRef}
                                         className="svg-outline border-primary text-primary relative border-2 px-3 py-1 font-medium"
                                     >
@@ -201,6 +191,7 @@ export function Navigation({
                             </Popover.PopoverAnchor>
 
                             <DropdownMenu.Content
+                                id="navigation-user-menu-content"
                                 className="border-primary bg-secondary text-primary z-50 border-2"
                                 sideOffset={-2}
                                 align="end"

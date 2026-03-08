@@ -575,7 +575,209 @@ export async function parseApiBibleChapter(
         | { type: "stanzaBreak" }
         | { type: "poetryLine"; paragraph: Block & { type: "paragraph" } }
 
+    function buildParagraphFromInlineNodes(options: {
+        nodes: Inline[]
+        isPoetryBlock: boolean
+        dataVid?: string
+        allowLeadingContinuation?: boolean
+    }): ParsedBlock | null {
+        const {
+            nodes,
+            isPoetryBlock,
+            dataVid,
+            allowLeadingContinuation = true,
+        } = options
+
+        if (inlineToString(nodes).trim() === "") {
+            return null
+        }
+
+        const verseNumberNodes: number[] = []
+        for (const [i, node] of nodes.entries()) {
+            if (node.type === "verseNumber") {
+                verseNumberNodes.push(i)
+            }
+        }
+
+        const verseSections: Inline[][] = []
+
+        // Check if this is a continuation paragraph (has data-vid but no verse number)
+        if (dataVid && verseNumberNodes.length === 0) {
+            const parsedVid = parseDataVid(dataVid)
+            if (parsedVid && context.lastVerse) {
+                // This is a continuation of a verse
+                const verses: Verse[] = [
+                    {
+                        type: "verse",
+                        nodes,
+                        verse: context.lastVerse.verse,
+                        text: inlineToString(nodes),
+                        metadata: {
+                            hangingVerse: true,
+                            offset:
+                                context.lastVerse.metadata.offset +
+                                context.lastVerse.metadata.length,
+                            length: nodes.filter(isAtomTyped).length,
+                        },
+                    },
+                ]
+
+                context.lastVerse = verses.at(-1)
+
+                const paragraph = {
+                    type: "paragraph" as const,
+                    text: inlineToString(nodes),
+                    nodes: verses,
+                    metadata: {
+                        type: isPoetryBlock
+                            ? ("quote" as const)
+                            : ("default" as const),
+                        blockIndent: isPoetryBlock,
+                    },
+                }
+
+                // Return as poetry line to enable merging
+                if (isPoetryBlock) {
+                    return { type: "poetryLine", paragraph }
+                }
+                return paragraph
+            }
+        }
+
+        if (verseNumberNodes.length === 0) {
+            verseSections.push(nodes)
+        } else {
+            const firstSection = nodes.slice(0, verseNumberNodes.at(0))
+            if (firstSection.length > 0) {
+                verseSections.push(firstSection)
+            }
+            for (const [i, index] of verseNumberNodes.entries()) {
+                verseSections.push(
+                    nodes.slice(index, verseNumberNodes.at(i + 1)),
+                )
+            }
+        }
+
+        const verses: Verse[] = []
+        for (const [i, verseSection] of verseSections.entries()) {
+            const firstWordIndex = verseSection.findIndex(
+                a => a.type === "word",
+            )
+            const verseIndex = verseSection.findIndex(
+                a => a.type === "verseNumber",
+            )
+            const continuingVerse =
+                allowLeadingContinuation &&
+                i === 0 &&
+                (verseIndex === -1 || verseIndex > firstWordIndex)
+
+            if (verseSection.every(inline => inline.type === "space")) {
+                // noop
+            } else if (continuingVerse && context?.lastVerse == undefined) {
+                // Skip if we don't have a last verse to continue from
+                continue
+            } else if (continuingVerse && context?.lastVerse) {
+                verses.push({
+                    type: "verse",
+                    nodes: verseSection,
+                    verse: context.lastVerse.verse,
+                    text: inlineToString(verseSection),
+                    metadata: {
+                        hangingVerse: true,
+                        offset:
+                            context.lastVerse.metadata.offset +
+                            context.lastVerse.metadata.length,
+                        length: verseSection.filter(isAtomTyped).length,
+                    },
+                })
+            } else if (verseIndex !== -1) {
+                verses.push({
+                    type: "verse",
+                    nodes: verseSection,
+                    verse: verseSection.at(verseIndex) as VerseNumber,
+                    text: inlineToString(verseSection),
+                    metadata: {
+                        hangingVerse: false,
+                        offset: 0,
+                        length: verseSection.filter(isAtomTyped).length,
+                    },
+                })
+            }
+
+            if (context.firstVerseOfPassage == undefined && verseIndex !== -1) {
+                context.firstVerseOfPassage = verseSection.at(
+                    verseIndex,
+                ) as VerseNumber
+            }
+            context.lastVerse = verses.at(-1)
+        }
+
+        if (verses.length === 0) {
+            return null
+        }
+
+        const paragraph = {
+            type: "paragraph" as const,
+            text: inlineToString(nodes),
+            nodes: verses,
+            metadata: {
+                type: isPoetryBlock ? ("quote" as const) : ("default" as const),
+                blockIndent: isPoetryBlock,
+            },
+        }
+
+        // Return as poetry line to enable merging
+        if (isPoetryBlock) {
+            return { type: "poetryLine", paragraph }
+        }
+        return paragraph
+    }
+
     function parseBlock(node: ChildNode): ParsedBlock | null {
+        // NLT (and sometimes others) can render tabular census/camp data as
+        // <row><cell>... blocks (parse5 lifts <row> to top-level). Parse these.
+        if (node.nodeName === "row" && "childNodes" in node) {
+            const cells = node.childNodes.filter(
+                (child: ChildNode) => child.nodeName === "cell",
+            )
+            const rowNodes =
+                cells.length > 0
+                    ? cells.flatMap((cell, index): Inline[] => {
+                          const parsedCell = parseInline(cell)
+                          if (index === cells.length - 1) {
+                              return parsedCell
+                          }
+                          return [
+                              ...parsedCell,
+                              { type: "tableColumnBreak" as const },
+                          ]
+                      })
+                    : node.childNodes.flatMap((child: ChildNode) =>
+                          parseInline(child),
+                      )
+            const parsedNodes: Inline[] = mergeAdjacentWords(rowNodes)
+
+            const firstVerseNodeIndex = parsedNodes.findIndex(
+                n => n.type === "verseNumber",
+            )
+            if (firstVerseNodeIndex === -1) {
+                // Some table rows (headers/first data row) omit explicit verse
+                // markers and continue the previous verse.
+                return buildParagraphFromInlineNodes({
+                    nodes: parsedNodes,
+                    isPoetryBlock: false,
+                })
+            }
+
+            // Drop row labels before the first verse marker.
+            const tableVerseNodes = parsedNodes.slice(firstVerseNodeIndex)
+            return buildParagraphFromInlineNodes({
+                nodes: tableVerseNodes,
+                isPoetryBlock: false,
+                allowLeadingContinuation: false,
+            })
+        }
+
         if (node.nodeName !== "p") return null
         if (!("attrs" in node)) return null
 
@@ -702,164 +904,11 @@ export async function parseApiBibleChapter(
             } else {
                 nodes = parsedNodes
             }
-
-            if (inlineToString(nodes).trim() === "") {
-                return null
-            }
-
-            const verseNumberNodes: number[] = []
-            for (const [i, node] of nodes.entries()) {
-                if (node.type === "verseNumber") {
-                    verseNumberNodes.push(i)
-                }
-            }
-
-            const verseSections: Inline[][] = []
-
-            // Check if this is a continuation paragraph (has data-vid but no verse number)
-            if (dataVid && verseNumberNodes.length === 0) {
-                const parsedVid = parseDataVid(dataVid)
-                if (parsedVid && context.lastVerse) {
-                    // Note: leading spaces already added to `nodes` above for poetry lines
-
-                    // This is a continuation of a verse
-                    const verses: Verse[] = [
-                        {
-                            type: "verse",
-                            nodes,
-                            verse: context.lastVerse.verse,
-                            text: inlineToString(nodes),
-                            metadata: {
-                                hangingVerse: true,
-                                offset:
-                                    context.lastVerse.metadata.offset +
-                                    context.lastVerse.metadata.length,
-                                length: nodes.filter(isAtomTyped).length,
-                            },
-                        },
-                    ]
-
-                    context.lastVerse = verses.at(-1)
-
-                    const paragraph = {
-                        type: "paragraph" as const,
-                        text: inlineToString(nodes),
-                        nodes: verses,
-                        metadata: {
-                            type: isPoetryLine
-                                ? ("quote" as const)
-                                : ("default" as const),
-                            blockIndent: isPoetryLine,
-                        },
-                    }
-
-                    // Return as poetry line to enable merging
-                    if (isPoetryLine) {
-                        return { type: "poetryLine", paragraph }
-                    }
-                    return paragraph
-                }
-            }
-
-            if (verseNumberNodes.length === 0) {
-                verseSections.push(nodes)
-            } else {
-                const firstSection = nodes.slice(0, verseNumberNodes.at(0))
-                if (firstSection.length > 0) {
-                    verseSections.push(firstSection)
-                }
-                for (const [i, index] of verseNumberNodes.entries()) {
-                    verseSections.push(
-                        nodes.slice(index, verseNumberNodes.at(i + 1)),
-                    )
-                }
-            }
-
-            const verses: Verse[] = []
-            for (const [i, verseSection] of verseSections.entries()) {
-                const firstWordIndex = verseSection.findIndex(
-                    a => a.type === "word",
-                )
-                const verseIndex = verseSection.findIndex(
-                    a => a.type === "verseNumber",
-                )
-                const continuingVerse =
-                    i === 0 &&
-                    (verseIndex === -1 || verseIndex > firstWordIndex)
-
-                if (verseSection.every(inline => inline.type === "space")) {
-                    // noop
-                } else if (continuingVerse && context?.lastVerse == undefined) {
-                    // Skip if we don't have a last verse to continue from
-                    continue
-                } else if (continuingVerse && context?.lastVerse) {
-                    verses.push({
-                        type: "verse",
-                        nodes: verseSection,
-                        verse: context.lastVerse.verse,
-                        text: inlineToString(verseSection),
-                        metadata: {
-                            hangingVerse: true,
-                            offset:
-                                context.lastVerse.metadata.offset +
-                                context.lastVerse.metadata.length,
-                            length: verseSection.filter(isAtomTyped).length,
-                        },
-                    })
-                } else {
-                    verses.push({
-                        type: "verse",
-                        nodes: verseSection,
-                        verse: verseSection.at(verseIndex) as VerseNumber,
-                        text: inlineToString(verseSection),
-                        metadata: {
-                            hangingVerse: false,
-                            offset: 0,
-                            length: verseSection.filter(isAtomTyped).length,
-                        },
-                    })
-                }
-
-                if (
-                    context.firstVerseOfPassage == undefined &&
-                    verseIndex !== -1
-                ) {
-                    context.firstVerseOfPassage = verseSection.at(
-                        verseIndex,
-                    ) as VerseNumber
-                }
-                context.lastVerse = verses.at(-1)
-            }
-
-            if (verses.length === 0) {
-                return null
-            }
-
-            const isPoetryBlock =
-                hasClass(node, "q") ||
-                hasClass(node, "q1") ||
-                hasClass(node, "q2") ||
-                hasClass(node, "qc") ||
-                hasClass(node, "qm1") ||
-                hasClass(node, "qm2")
-
-            const paragraph = {
-                type: "paragraph" as const,
-                text: inlineToString(nodes),
-                nodes: verses,
-                metadata: {
-                    type: isPoetryBlock
-                        ? ("quote" as const)
-                        : ("default" as const),
-                    blockIndent: isPoetryBlock,
-                },
-            }
-
-            // Return as poetry line to enable merging
-            if (isPoetryBlock) {
-                return { type: "poetryLine", paragraph }
-            }
-            return paragraph
+            return buildParagraphFromInlineNodes({
+                nodes,
+                isPoetryBlock: isPoetryLine,
+                dataVid: dataVid ?? undefined,
+            })
         }
 
         return null

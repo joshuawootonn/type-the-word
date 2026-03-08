@@ -10,6 +10,7 @@ import {
     ModifyAttachmentsResponse,
     RefreshTokenResponse,
     SCOPES,
+    Topic,
     Student,
     Submission,
     TokenResponse,
@@ -20,6 +21,7 @@ import {
     modifyAttachmentsResponseSchema,
     refreshTokenResponseSchema,
     tokenResponseSchema,
+    topicSchema,
     turnInResponseSchema,
 } from "./types"
 
@@ -35,12 +37,19 @@ type E2EMockCourseWork = {
     dueTime?: { hours: number; minutes: number }
 }
 
+type E2EMockTopic = {
+    topicId: string
+    name: string
+}
+
 type E2EClassroomMockStore = {
     courseWorks: Map<string, E2EMockCourseWork>
+    topicsByCourseId: Map<string, E2EMockTopic[]>
 }
 
 const e2eClassroomMockStore: E2EClassroomMockStore = {
     courseWorks: new Map<string, E2EMockCourseWork>(),
+    topicsByCourseId: new Map<string, E2EMockTopic[]>(),
 }
 const E2E_STUDENT_GOOGLE_USER_ID = "e2e-student-google-user"
 
@@ -110,6 +119,40 @@ async function listStudentCourses(_accessToken: string): Promise<Course[]> {
             courseState: "ACTIVE",
         }),
     ]
+}
+
+async function listTopics(
+    _accessToken: string,
+    courseId: string,
+): Promise<Topic[]> {
+    const topics = e2eClassroomMockStore.topicsByCourseId.get(courseId) ?? []
+    return topics.map(topic => topicSchema.parse(topic))
+}
+
+async function createTopic(
+    _accessToken: string,
+    courseId: string,
+    name: string,
+): Promise<Topic> {
+    const existingTopics =
+        e2eClassroomMockStore.topicsByCourseId.get(courseId) ?? []
+    const existingTopic = existingTopics.find(topic => topic.name === name)
+
+    if (existingTopic) {
+        return topicSchema.parse(existingTopic)
+    }
+
+    const topic: E2EMockTopic = {
+        topicId: crypto.randomUUID(),
+        name,
+    }
+
+    e2eClassroomMockStore.topicsByCourseId.set(courseId, [
+        ...existingTopics,
+        topic,
+    ])
+
+    return topicSchema.parse(topic)
 }
 
 async function listStudents(
@@ -239,6 +282,8 @@ export function createE2EMockClassroomClient(): ClassroomClient {
         refreshAccessToken,
         listCourses,
         listStudentCourses,
+        listTopics,
+        createTopic,
         listStudents,
         getStudent,
         createCourseWork,

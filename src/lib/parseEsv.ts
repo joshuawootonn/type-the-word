@@ -55,6 +55,7 @@ export type Inline =
     | Word
     | Decoration
     | { type: "space" }
+    | { type: "tableColumnBreak" }
     | { type: "newLine" }
 
 type VerseMetadata = {

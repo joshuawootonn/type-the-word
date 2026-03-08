@@ -4,6 +4,7 @@ import { NextResponse } from "next/server"
 
 import { authOptions } from "~/server/auth"
 import { db } from "~/server/db"
+import { getApprovedOrganizationForUser } from "~/server/repositories/organization.repository"
 
 /**
  * Sync classroom cookies based on existing tokens
@@ -46,8 +47,12 @@ async function syncClassroomCookies() {
                       .catch(() => null),
         ])
 
-        // Set cookies if tokens exist but cookies don't
-        if (teacherToken && !hasTeacherCookie) {
+        const approvedOrganization = teacherToken
+            ? await getApprovedOrganizationForUser(session.user.id)
+            : null
+
+        // Set cookies if tokens exist, membership is approved, and cookies don't.
+        if (teacherToken && approvedOrganization && !hasTeacherCookie) {
             cookieStore.set("classroomTeacher", "true", {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",

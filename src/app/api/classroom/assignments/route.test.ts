@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server"
 import { beforeEach, describe, expect, test, vi } from "vitest"
 
+import * as organizationAccess from "~/server/classroom/organization-access"
 import * as classroomClient from "~/server/clients/classroom.client"
 import * as classroomRepository from "~/server/repositories/classroom.repository"
 
@@ -12,6 +13,8 @@ vi.mock("next-auth", () => ({
 // Mock classroom client
 vi.mock("~/server/clients/classroom.client", () => ({
     createCourseWork: vi.fn(),
+    createTopic: vi.fn(),
+    listTopics: vi.fn(),
     refreshAccessToken: vi.fn(),
 }))
 
@@ -20,6 +23,10 @@ vi.mock("~/server/repositories/classroom.repository", () => ({
     getTeacherToken: vi.fn(),
     updateTeacherTokenAccess: vi.fn(),
     createAssignment: vi.fn(),
+}))
+
+vi.mock("~/server/classroom/organization-access", () => ({
+    canTeacherAccessCourse: vi.fn(),
 }))
 
 import { getServerSession } from "next-auth"
@@ -55,6 +62,10 @@ describe("POST /api/classroom/assignments", () => {
 
     beforeEach(() => {
         vi.clearAllMocks()
+        vi.mocked(organizationAccess.canTeacherAccessCourse).mockResolvedValue({
+            allowed: true,
+            organizationId: "org-1",
+        })
     })
 
     test("WHEN not authenticated THEN returns 401", async () => {
@@ -94,6 +105,31 @@ describe("POST /api/classroom/assignments", () => {
 
         expect(response.status).toBe(403)
         expect(data.error).toBe("Google Classroom not connected")
+    })
+
+    test("WHEN teacher lacks course access THEN returns 403", async () => {
+        vi.mocked(getServerSession).mockResolvedValue(mockSession)
+        vi.mocked(classroomRepository.getTeacherToken).mockResolvedValue(
+            mockToken,
+        )
+        vi.mocked(organizationAccess.canTeacherAccessCourse).mockResolvedValue({
+            allowed: false,
+            organizationId: "org-1",
+        })
+
+        const request = new NextRequest(
+            "http://localhost/api/classroom/assignments",
+            {
+                method: "POST",
+                body: JSON.stringify(validRequest),
+            },
+        )
+
+        const response = await POST(request)
+        const data = await response.json()
+
+        expect(response.status).toBe(403)
+        expect(data.error).toContain("pending approval")
     })
 
     test("WHEN end verse before start verse THEN returns 400", async () => {
@@ -209,6 +245,11 @@ describe("POST /api/classroom/assignments", () => {
         vi.mocked(classroomRepository.getTeacherToken).mockResolvedValue(
             mockToken,
         )
+        vi.mocked(classroomClient.listTopics).mockResolvedValue([])
+        vi.mocked(classroomClient.createTopic).mockResolvedValue({
+            topicId: "topic-123",
+            name: "Bible Typing Practice",
+        })
         vi.mocked(classroomClient.createCourseWork).mockResolvedValue({
             id: "coursework-123",
             courseId: "course-123",
@@ -218,6 +259,7 @@ describe("POST /api/classroom/assignments", () => {
         })
         vi.mocked(classroomRepository.createAssignment).mockResolvedValue({
             id: "assignment-123",
+            organizationId: "org-1",
             teacherUserId: "user-123",
             courseId: "course-123",
             courseWorkId: "coursework-123",
@@ -255,6 +297,22 @@ describe("POST /api/classroom/assignments", () => {
         expect(data.courseWorkLink).toBe(
             "https://classroom.google.com/c/abc/a/xyz",
         )
+        expect(classroomClient.listTopics).toHaveBeenCalledWith(
+            "valid-token",
+            "course-123",
+        )
+        expect(classroomClient.createTopic).toHaveBeenCalledWith(
+            "valid-token",
+            "course-123",
+            "Bible Typing Practice",
+        )
+        expect(classroomClient.createCourseWork).toHaveBeenCalledWith(
+            "valid-token",
+            "course-123",
+            expect.objectContaining({
+                topicId: "topic-123",
+            }),
+        )
     })
 
     test("WHEN token expired THEN refreshes and creates assignment", async () => {
@@ -267,6 +325,11 @@ describe("POST /api/classroom/assignments", () => {
             accessToken: "new-token",
             expiresAt: new Date(Date.now() + 3600 * 1000),
         })
+        vi.mocked(classroomClient.listTopics).mockResolvedValue([])
+        vi.mocked(classroomClient.createTopic).mockResolvedValue({
+            topicId: "topic-123",
+            name: "Bible Typing Practice",
+        })
         vi.mocked(classroomClient.createCourseWork).mockResolvedValue({
             id: "coursework-123",
             courseId: "course-123",
@@ -275,6 +338,7 @@ describe("POST /api/classroom/assignments", () => {
         })
         vi.mocked(classroomRepository.createAssignment).mockResolvedValue({
             id: "assignment-123",
+            organizationId: "org-1",
             teacherUserId: "user-123",
             courseId: "course-123",
             courseWorkId: "coursework-123",
@@ -310,5 +374,9 @@ describe("POST /api/classroom/assignments", () => {
             "refresh-token",
         )
         expect(classroomRepository.updateTeacherTokenAccess).toHaveBeenCalled()
+        expect(classroomClient.listTopics).toHaveBeenCalledWith(
+            "new-token",
+            "course-123",
+        )
     })
 })

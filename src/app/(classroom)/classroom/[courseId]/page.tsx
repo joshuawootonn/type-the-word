@@ -5,6 +5,7 @@ import { TeacherClientPage } from "~/app/(classroom)/classroom/[courseId]/teache
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Link } from "~/components/ui/link"
 import { authOptions } from "~/server/auth"
+import { canTeacherAccessCourse } from "~/server/classroom/organization-access"
 import { getValidStudentToken } from "~/server/classroom/student-token"
 import { getValidTeacherToken } from "~/server/classroom/teacher-token"
 import {
@@ -59,13 +60,31 @@ export default async function CoursePage({ params }: PageProps) {
         )
     }
 
+    const teacherCourseAccess = teacherToken
+        ? await canTeacherAccessCourse({
+              userId: session.user.id,
+              courseId,
+          })
+        : null
+    const hasTeacherCourseAccess = !!teacherCourseAccess?.allowed
+
     let courses
-    if (teacherToken) {
+    if (teacherToken && hasTeacherCourseAccess) {
         const validToken = await getValidTeacherToken(session.user.id)
         courses = await listCourses(validToken.accessToken)
     } else if (studentToken) {
         const validToken = await getValidStudentToken(session.user.id)
         courses = await listStudentCourses(validToken.accessToken)
+    } else if (teacherToken) {
+        return (
+            <ClassroomNotice
+                title="Course Access Pending"
+                variant="notice"
+                message="Your teacher access is pending approval or you are not a co-teacher for this course."
+                linkHref="/classroom"
+                linkLabel="Back to Classroom"
+            />
+        )
     } else {
         throw new Error("No valid token found")
     }
@@ -90,7 +109,7 @@ export default async function CoursePage({ params }: PageProps) {
         )
     }
 
-    if (teacherToken) {
+    if (teacherToken && hasTeacherCourseAccess) {
         return (
             <TeacherClientPage courseId={courseId} courseName={course.name} />
         )

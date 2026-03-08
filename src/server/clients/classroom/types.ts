@@ -3,6 +3,7 @@ import { z } from "zod"
 export const SCOPES = [
     "https://www.googleapis.com/auth/classroom.courses.readonly",
     "https://www.googleapis.com/auth/classroom.coursework.students",
+    "https://www.googleapis.com/auth/classroom.topics",
     "https://www.googleapis.com/auth/classroom.rosters.readonly",
     "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
 ]
@@ -34,6 +35,11 @@ export const courseSchema = z.object({
     descriptionHeading: z.string().optional(),
     room: z.string().optional(),
     courseState: z.string().optional(),
+})
+
+export const topicSchema = z.object({
+    topicId: z.string(),
+    name: z.string(),
 })
 
 export const studentProfileSchema = z.object({
@@ -89,6 +95,7 @@ export const modifyAttachmentsResponseSchema = z.object({
 export type TokenResponse = z.infer<typeof tokenResponseSchema>
 export type RefreshTokenResponse = z.infer<typeof refreshTokenResponseSchema>
 export type Course = z.infer<typeof courseSchema>
+export type Topic = z.infer<typeof topicSchema>
 export type Student = z.infer<typeof studentSchema>
 export type CourseWork = z.infer<typeof courseWorkSchema>
 export type Submission = z.infer<typeof submissionSchema>
@@ -111,6 +118,7 @@ export type CreateCourseWorkInput = {
     materials?: Array<{
         link: { url: string; title?: string }
     }>
+    topicId?: string
 }
 
 export type ClassroomClient = {
@@ -123,6 +131,12 @@ export type ClassroomClient = {
     refreshAccessToken: (refreshToken: string) => Promise<RefreshTokenResponse>
     listCourses: (accessToken: string) => Promise<Course[]>
     listStudentCourses: (accessToken: string) => Promise<Course[]>
+    listTopics: (accessToken: string, courseId: string) => Promise<Topic[]>
+    createTopic: (
+        accessToken: string,
+        courseId: string,
+        name: string,
+    ) => Promise<Topic>
     listStudents: (accessToken: string, courseId: string) => Promise<Student[]>
     getStudent: (
         accessToken: string,

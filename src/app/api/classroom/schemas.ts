@@ -201,3 +201,34 @@ export const assignmentsResponseSchema = z.object({
 })
 
 export type AssignmentsResponse = z.infer<typeof assignmentsResponseSchema>
+
+// GET /api/classroom/organization/users
+export const organizationUserSchema = z.object({
+    userId: z.string(),
+    email: z.string().email(),
+    name: z.string().nullable(),
+    role: z.enum(["ORG_ADMIN", "TEACHER", "STUDENT"]),
+    status: z.enum(["PENDING", "APPROVED", "REJECTED"]),
+    approvedAt: z.string().nullable(),
+    hasTeacherConnection: z.boolean(),
+    hasStudentConnection: z.boolean(),
+})
+
+export const pendingTeacherSchema = z.object({
+    userId: z.string(),
+    email: z.string().email(),
+    name: z.string().nullable(),
+})
+
+export const organizationUsersResponseSchema = z.object({
+    organizationId: z.string(),
+    organizationDomain: z.string(),
+    isOrgAdmin: z.boolean(),
+    users: z.array(organizationUserSchema),
+    pendingTeachers: z.array(pendingTeacherSchema),
+})
+
+export type OrganizationUser = z.infer<typeof organizationUserSchema>
+export type OrganizationUsersResponse = z.infer<
+    typeof organizationUsersResponseSchema
+>

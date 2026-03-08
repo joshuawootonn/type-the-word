@@ -14,6 +14,7 @@ import {
     DraftGradeResponse,
     ModifyAttachmentsResponse,
     RefreshTokenResponse,
+    Topic,
     Student,
     Submission,
     TokenResponse,
@@ -26,6 +27,7 @@ import {
     studentSchema,
     submissionSchema,
     tokenResponseSchema,
+    topicSchema,
     turnInResponseSchema,
 } from "./types"
 
@@ -128,6 +130,53 @@ async function listStudentCourses(accessToken: string): Promise<Course[]> {
         })) ?? []
 
     return z.array(courseSchema).parse(courses)
+}
+
+async function listTopics(
+    accessToken: string,
+    courseId: string,
+): Promise<Topic[]> {
+    const classroom = createClassroomClient(accessToken)
+    const topics: Topic[] = []
+    let nextPageToken: string | undefined
+
+    do {
+        const response = await classroom.courses.topics.list({
+            courseId,
+            pageSize: 100,
+            pageToken: nextPageToken,
+        })
+
+        const currentPageTopics =
+            response.data.topic?.map((topic: classroom_v1.Schema$Topic) =>
+                topicSchema.parse({
+                    topicId: topic.topicId!,
+                    name: topic.name!,
+                }),
+            ) ?? []
+
+        topics.push(...currentPageTopics)
+        nextPageToken = response.data.nextPageToken ?? undefined
+    } while (nextPageToken)
+
+    return topics
+}
+
+async function createTopic(
+    accessToken: string,
+    courseId: string,
+    name: string,
+): Promise<Topic> {
+    const classroom = createClassroomClient(accessToken)
+    const response = await classroom.courses.topics.create({
+        courseId,
+        requestBody: { name },
+    })
+
+    return topicSchema.parse({
+        topicId: response.data.topicId!,
+        name: response.data.name!,
+    })
 }
 
 async function listStudents(
@@ -396,6 +445,8 @@ export function createGoogleClassroomClient(): ClassroomClient {
         refreshAccessToken,
         listCourses,
         listStudentCourses,
+        listTopics,
+        createTopic,
         listStudents,
         getStudent,
         createCourseWork,

@@ -62,7 +62,9 @@ export class AuthBehavior {
         )
     }
 
-    async connectTeacherClassroomViaApi(): Promise<void> {
+    async connectTeacherClassroomViaApi(options?: {
+        expectedQuery?: "success=true" | "pending_teacher=true"
+    }): Promise<void> {
         const response = await this.page.request.get("/api/classroom/auth")
         expect(response.ok()).toBeTruthy()
 
@@ -70,7 +72,12 @@ export class AuthBehavior {
         expect(authUrl).toContain("/api/classroom/callback")
 
         await this.page.goto(authUrl, { waitUntil: "domcontentloaded" })
-        await expect(this.page).toHaveURL(/\/classroom\?success=true/)
+        const expectedQuery = options?.expectedQuery ?? "success=true"
+        const expectedPattern =
+            expectedQuery === "success=true"
+                ? /\/classroom\?success=true/
+                : /\/classroom\?pending_teacher=true/
+        await expect(this.page).toHaveURL(expectedPattern)
     }
 
     async connectStudentClassroomViaApi(): Promise<void> {

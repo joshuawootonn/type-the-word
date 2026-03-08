@@ -69,7 +69,9 @@ test("student sees assignment progress on assignment and course pages", async ({
     )
 
     await expect(page.getByTestId("passage-root").first()).toBeVisible()
-    await expect(page.getByText("0 of 2 verses completed")).toBeVisible()
+    await expect(
+        page.getByText("0 of 2 verses completed").first(),
+    ).toBeVisible()
 
     await passage.typeVerse(
         1,
@@ -78,9 +80,11 @@ test("student sees assignment progress on assignment and course pages", async ({
     await passage.expectVerseTyped(1)
 
     await expect(page.getByText("Completion")).toBeVisible()
-    await expect(page.getByText("1 of 2 verses completed")).toBeVisible({
-        timeout: 15_000,
-    })
+    await expect(page.getByText("1 of 2 verses completed").first()).toBeVisible(
+        {
+            timeout: 15_000,
+        },
+    )
 
     await page.goto("/classroom/e2e-course-1", {
         waitUntil: "domcontentloaded",

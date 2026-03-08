@@ -48,6 +48,18 @@ export const courseWorkState = pgEnum("courseWork_state", [
     "DELETED",
 ])
 
+export const organizationRole = pgEnum("organization_role", [
+    "ORG_ADMIN",
+    "TEACHER",
+    "STUDENT",
+])
+
+export const organizationUserState = pgEnum("organization_membership_status", [
+    "PENDING",
+    "APPROVED",
+    "REJECTED",
+])
+
 export const users = pgTable("user", {
     id: varchar("id", { length: 255 }).notNull().primaryKey(),
     name: varchar("name", { length: 255 }),
@@ -80,6 +92,11 @@ export const usersRelations = relations(users, ({ many, one }) => ({
     classroomStudentToken: one(classroomStudentToken),
     classroomAssignments: many(classroomAssignment),
     classroomSubmissions: many(classroomSubmission),
+    organizationUsers: many(organizationUser),
+    approvedOrganizationUsers: many(organizationUser, {
+        relationName: "organizationUserApprovedBy",
+    }),
+    courseTeachers: many(courseTeacher),
 }))
 
 export const userChangelog = pgTable("userChangelog", {
@@ -488,6 +505,122 @@ export const passageResponse = pgTable("passageResponse", {
 
 // Google Classroom Integration
 
+export const organization = pgTable(
+    "organization",
+    {
+        id: varchar("id", { length: 255 })
+            .notNull()
+            .$default(() => crypto.randomUUID())
+            .primaryKey(),
+        domain: varchar("domain", { length: 255 }).notNull(),
+        name: varchar("name", { length: 255 }).notNull(),
+        createdAt: timestamp("createdAt", { mode: "date" })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+        updatedAt: timestamp("updatedAt", { mode: "date" })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+    },
+    table => ({
+        domainUnique: unique().on(table.domain),
+    }),
+)
+
+export const organizationRelations = relations(organization, ({ many }) => ({
+    organizationUsers: many(organizationUser),
+    classroomAssignments: many(classroomAssignment),
+    courseTeachers: many(courseTeacher),
+}))
+
+export const organizationUser = pgTable(
+    "organizationUser",
+    {
+        id: varchar("id", { length: 255 })
+            .notNull()
+            .$default(() => crypto.randomUUID())
+            .primaryKey(),
+        organizationId: varchar("organizationId", { length: 255 }).notNull(),
+        userId: varchar("userId", { length: 255 }).notNull(),
+        role: organizationRole("role").notNull(),
+        status: organizationUserState("status").notNull().default("PENDING"),
+        approvedByUserId: varchar("approvedByUserId", { length: 255 }),
+        approvedAt: timestamp("approvedAt", { mode: "date" }),
+        createdAt: timestamp("createdAt", { mode: "date" })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+        updatedAt: timestamp("updatedAt", { mode: "date" })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+    },
+    table => ({
+        organizationIdIdx: index("organizationUser_organizationId_idx").on(
+            table.organizationId,
+        ),
+        userIdIdx: index("organizationUser_userId_idx").on(table.userId),
+        statusIdx: index("organizationUser_status_idx").on(table.status),
+        organizationUserUnique: unique().on(table.organizationId, table.userId),
+    }),
+)
+
+export const organizationUserRelations = relations(
+    organizationUser,
+    ({ one }) => ({
+        organization: one(organization, {
+            fields: [organizationUser.organizationId],
+            references: [organization.id],
+        }),
+        user: one(users, {
+            fields: [organizationUser.userId],
+            references: [users.id],
+        }),
+        approvedByUser: one(users, {
+            relationName: "organizationUserApprovedBy",
+            fields: [organizationUser.approvedByUserId],
+            references: [users.id],
+        }),
+    }),
+)
+
+export const courseTeacher = pgTable(
+    "courseTeacher",
+    {
+        organizationId: varchar("organizationId", { length: 255 }).notNull(),
+        courseId: varchar("courseId", { length: 255 }).notNull(),
+        teacherUserId: varchar("teacherUserId", { length: 255 }).notNull(),
+        createdAt: timestamp("createdAt", { mode: "date" })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+        updatedAt: timestamp("updatedAt", { mode: "date" })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+    },
+    table => ({
+        compoundKey: primaryKey(
+            table.organizationId,
+            table.courseId,
+            table.teacherUserId,
+        ),
+        organizationIdIdx: index("courseTeacher_organizationId_idx").on(
+            table.organizationId,
+        ),
+        courseIdIdx: index("courseTeacher_courseId_idx").on(table.courseId),
+        teacherUserIdIdx: index("courseTeacher_teacherUserId_idx").on(
+            table.teacherUserId,
+        ),
+    }),
+)
+
+export const courseTeacherRelations = relations(courseTeacher, ({ one }) => ({
+    organization: one(organization, {
+        fields: [courseTeacher.organizationId],
+        references: [organization.id],
+    }),
+    teacher: one(users, {
+        fields: [courseTeacher.teacherUserId],
+        references: [users.id],
+    }),
+}))
+
 // Stores OAuth tokens for teachers who connect their Google Classroom account
 export const classroomTeacherToken = pgTable(
     "classroomTeacherToken",
@@ -559,6 +692,7 @@ export const classroomAssignment = pgTable(
             .notNull()
             .$default(() => crypto.randomUUID())
             .primaryKey(),
+        organizationId: varchar("organizationId", { length: 255 }),
         teacherUserId: varchar("teacherUserId", { length: 255 }).notNull(),
         // Google Classroom IDs
         courseId: varchar("courseId", { length: 255 }).notNull(),
@@ -589,6 +723,9 @@ export const classroomAssignment = pgTable(
         teacherUserIdIdx: index("classroomAssignment_teacherUserId_idx").on(
             table.teacherUserId,
         ),
+        organizationIdIdx: index("classroomAssignment_organizationId_idx").on(
+            table.organizationId,
+        ),
         courseIdIdx: index("classroomAssignment_courseId_idx").on(
             table.courseId,
         ),
@@ -601,6 +738,10 @@ export const classroomAssignment = pgTable(
 export const classroomAssignmentRelations = relations(
     classroomAssignment,
     ({ one, many }) => ({
+        organization: one(organization, {
+            fields: [classroomAssignment.organizationId],
+            references: [organization.id],
+        }),
         teacher: one(users, {
             fields: [classroomAssignment.teacherUserId],
             references: [users.id],

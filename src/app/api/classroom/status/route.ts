@@ -3,6 +3,7 @@ import { NextResponse } from "next/server"
 
 import { authOptions } from "~/server/auth"
 import { getTeacherToken } from "~/server/repositories/classroom.repository"
+import { getApprovedOrganizationForUser } from "~/server/repositories/organization.repository"
 
 import { type StatusResponse } from "../schemas"
 
@@ -19,7 +20,12 @@ export async function GET() {
 
     try {
         const token = await getTeacherToken(session.user.id)
-        const response: StatusResponse = { connected: !!token }
+        const approvedOrganization = await getApprovedOrganizationForUser(
+            session.user.id,
+        )
+        const response: StatusResponse = {
+            connected: !!token && approvedOrganization != null,
+        }
         return NextResponse.json(response)
     } catch (error) {
         console.error("Error checking classroom status:", error)
