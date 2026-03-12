@@ -20,23 +20,16 @@ export type SyncedAssignment<T extends AssignmentToSync> = T & {
 }
 
 /**
- * Syncs assignments with future due dates or draft state with Google Classroom API
- * Updates the database if state, due date, title, or description has changed
+ * Syncs provided assignments with Google Classroom API.
+ * Updates the database if state, due date, title, or description has changed.
  */
 export async function syncFutureAssignments<T extends AssignmentToSync>(
     accessToken: string,
     assignments: T[],
 ): Promise<SyncedAssignment<T>[]> {
-    const now = new Date()
-
-    // Filter to assignments that need syncing: future due dates or drafts
-    const assignmentsToSync = assignments.filter(
-        a => a.state === "DRAFT" || !a.dueDate || a.dueDate >= now,
-    )
-
     // Sync each assignment with Google Classroom
     const syncedAssignments = await Promise.all(
-        assignmentsToSync.map(async assignment => {
+        assignments.map(async assignment => {
             try {
                 const courseWork = await getCourseWork(
                     accessToken,

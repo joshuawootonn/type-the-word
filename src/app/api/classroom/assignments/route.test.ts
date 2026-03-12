@@ -31,7 +31,62 @@ vi.mock("~/server/classroom/organization-access", () => ({
 
 import { getServerSession } from "next-auth"
 
-import { POST } from "./route"
+import { filterAssignmentsForSync, POST } from "./route"
+
+describe("filterAssignmentsForSync", () => {
+    test("includes recent assignments even when published and past due", () => {
+        const now = new Date("2026-03-12T12:00:00.000Z")
+        const staleSyncedAt = new Date("2026-03-12T10:00:00.000Z")
+        const recentCreatedAt = new Date("2026-02-01T00:00:00.000Z")
+
+        const assignments = [
+            {
+                id: "a-1",
+                createdAt: recentCreatedAt,
+                lastSyncedAt: staleSyncedAt,
+            },
+        ]
+
+        const result = filterAssignmentsForSync(assignments, now)
+
+        expect(result).toEqual(assignments)
+    })
+
+    test("excludes assignments older than three months by createdAt", () => {
+        const now = new Date("2026-03-12T12:00:00.000Z")
+        const oldCreatedAt = new Date("2025-11-30T00:00:00.000Z")
+
+        const assignments = [
+            {
+                id: "a-1",
+                createdAt: oldCreatedAt,
+                lastSyncedAt: null,
+            },
+        ]
+
+        const result = filterAssignmentsForSync(assignments, now)
+
+        expect(result).toEqual([])
+    })
+
+    test("excludes assignments synced within the last hour", () => {
+        const now = new Date("2026-03-12T12:00:00.000Z")
+        const syncedRecentlyAt = new Date("2026-03-12T11:30:00.000Z")
+        const recentCreatedAt = new Date("2026-01-01T00:00:00.000Z")
+
+        const assignments = [
+            {
+                id: "a-1",
+                createdAt: recentCreatedAt,
+                lastSyncedAt: syncedRecentlyAt,
+            },
+        ]
+
+        const result = filterAssignmentsForSync(assignments, now)
+
+        expect(result).toEqual([])
+    })
+})
 
 describe("POST /api/classroom/assignments", () => {
     const mockSession = {
