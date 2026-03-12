@@ -21,10 +21,11 @@ export async function POST(request: NextRequest) {
     const body = DTOToRecordSchema.parse(rawBody)
 
     const userChangelogRepository = new UserChangelogRepository(db)
-    const userChangelog = userChangelogRepository.updateLastVisitedChangelog({
-        userId: session.user.id,
-        lastVisitedAt: body.lastVisitedAt,
-    })
+    const userChangelog =
+        await userChangelogRepository.updateLastVisitedChangelog({
+            userId: session.user.id,
+            lastVisitedAt: body.lastVisitedAt,
+        })
 
     return Response.json({ data: userChangelog }, { status: 200 })
 }
