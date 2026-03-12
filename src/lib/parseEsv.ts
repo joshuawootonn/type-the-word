@@ -226,26 +226,37 @@ export async function parseChapter(
 
     function parseInline(node: ChildNode): Inline[] {
         if (node.nodeName === "#text" && "value" in node) {
+            // Newlines inside ESV text nodes come from source HTML formatting
+            // (especially around removed footnotes), not content line breaks.
+            // Treat them like spaces so <br> remains the only newline source.
+            const textValue = node.value.replace(/\r?\n/g, " ")
             const leadingSpaces = new Array<{ type: "space" }>(
-                node.value.length - node.value.trimStart().length,
+                textValue.length - textValue.trimStart().length,
             ).fill({
                 type: "space",
             })
 
-            const wordSegments = splitLineBySpaceOrNewLine(node.value)
+            const wordSegments = splitLineBySpaceOrNewLine(textValue)
             const words =
                 wordSegments.length > 0
-                    ? wordSegments.map((word): Inline => {
-                          const letters = word.split("")
-                          const atom: Word = {
-                              type: "word",
-                              letters,
-                          }
+                    ? wordSegments
+                          .filter(
+                              segment =>
+                                  segment.length > 0 &&
+                                  segment !== " " &&
+                                  segment !== "\n",
+                          )
+                          .map((word): Inline => {
+                              const letters = word.split("")
+                              const atom: Word = {
+                                  type: "word",
+                                  letters,
+                              }
 
-                          return isAtomComplete(atom)
-                              ? atom
-                              : { ...atom, letters: [...atom.letters, " "] }
-                      })
+                              return isAtomComplete(atom)
+                                  ? atom
+                                  : { ...atom, letters: [...atom.letters, " "] }
+                          })
                     : []
 
             return [...leadingSpaces, ...words]
