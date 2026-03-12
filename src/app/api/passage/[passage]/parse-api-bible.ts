@@ -487,8 +487,9 @@ export async function parseApiBibleChapter(
                     currentTrimmedPunctuation,
                 )
 
-                // Pattern 6: standalone punctuation (e.g., Lord + ; → Lord; or report + ? → report?)
-                const isStandalonePunct = /^[;:,.?!]+$/.test(
+                // Pattern 6: standalone punctuation (e.g., Lord + ; → Lord;
+                // report + ? → report?; LORD + — → LORD—)
+                const isStandalonePunct = /^[;:,.?!\u2013\u2014-]+$/.test(
                     currentTrimmedPunctuation,
                 )
 

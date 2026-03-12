@@ -3086,3 +3086,31 @@ describe("CSB em dash formatting regressions", () => {
         expect(verse21Text).not.toContain("#")
     })
 })
+
+describe("NLT em dash typing regression", () => {
+    const nltPsalm68Html = fs.readFileSync(
+        path.join(
+            process.cwd(),
+            "src/server/api-bible/responses/nlt/psalm_68.html",
+        ),
+        "utf8",
+    )
+
+    test.concurrent("Psalm 68:4 should not emit a standalone em dash word", async () => {
+        const result = await cachedParseApiBibleChapter(nltPsalm68Html, "nlt")
+        const paragraphs = result.nodes.filter(
+            (node): node is Paragraph => node.type === "paragraph",
+        )
+
+        const verse4Words = paragraphs
+            .flatMap(paragraph =>
+                paragraph.nodes.filter(verse => verse.verse.verse === 4),
+            )
+            .flatMap(verse => verse.nodes)
+            .filter((node): node is Word => node.type === "word")
+            .map(word => word.letters.join(""))
+
+        expect(verse4Words).toContain("LORD— ")
+        expect(verse4Words).not.toContain("—")
+    })
+})
