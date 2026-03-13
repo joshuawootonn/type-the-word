@@ -7,10 +7,21 @@ import clsx from "clsx"
 import { trackEvent } from "fathom-client"
 import { useAtom } from "jotai"
 import { useSession } from "next-auth/react"
-import React, { FormEvent, KeyboardEvent, useEffect, useRef } from "react"
+import React, {
+    FormEvent,
+    KeyboardEvent,
+    useEffect,
+    useRef,
+    useState,
+} from "react"
 import { z } from "zod"
 
-import { calculateStatsForVerse } from "~/app/(app)/history/wpm"
+import {
+    calculateAccuracy,
+    calculateCorrectedAccuracy,
+    calculateStatsForVerse,
+} from "~/app/(app)/history/wpm"
+import { useOrganizationSettings } from "~/app/(classroom)/classroom/organization-settings-context"
 import {
     AssignmentHistory,
     VerseStats,
@@ -18,6 +29,7 @@ import {
 import { ChapterHistory } from "~/app/api/chapter-history/[passage]/route"
 import { AddTypedVerseBody } from "~/app/api/typing-session/[id]/route"
 import { getOS } from "~/app/global-hotkeys"
+import { AssignmentAccuracyThresholdWarningDialog } from "~/components/assignment-accuracy-threshold-warning-dialog"
 import {
     passageIdAtom,
     autofocusAtom,
@@ -225,6 +237,14 @@ export function CurrentVerse({
     const [isPassageFocused, setIsPassageFocused] =
         useAtom(isPassageFocusedAtom)
     const queryClient = useQueryClient()
+    const [accuracyModal, setAccuracyModal] = useState<{
+        title: string
+        description: string
+    } | null>(null)
+    const {
+        accuracyThreshold: correctedAccuracyThreshold,
+        regularAccuracyThreshold,
+    } = useOrganizationSettings()
 
     const addTypedVerseToSession = useMutation({
         mutationFn: (verse: AddTypedVerseBody) =>
@@ -442,6 +462,52 @@ export function CurrentVerse({
 
         if (isVerseComplete) {
             const verse = getVerse(currentVerse, passage.nodes)
+            const typingData = {
+                userActions: next,
+                userNodes: position
+                    .filter(isAtomTyped)
+                    .filter(
+                        (n): n is { type: "word"; letters: string[] } =>
+                            n.type === "word",
+                    ),
+                correctNodes: currentVerseNodes
+                    .filter(isAtomTyped)
+                    .filter(
+                        (n): n is { type: "word"; letters: string[] } =>
+                            n.type === "word",
+                    ),
+            }
+            const correctedAccuracy = calculateCorrectedAccuracy(typingData)
+            const regularAccuracy = calculateAccuracy(typingData)
+
+            if (classroomAssignmentId != null) {
+                const regularAccuracyFailed =
+                    regularAccuracy < regularAccuracyThreshold
+                const correctedAccuracyFailed =
+                    correctedAccuracy < correctedAccuracyThreshold
+
+                if (!regularAccuracyFailed && !correctedAccuracyFailed) {
+                    // continue
+                } else {
+                    // Reset the verse so students immediately retry this same verse.
+                    setPosition([])
+                    setKeystrokes([])
+
+                    if (regularAccuracyFailed) {
+                        setAccuracyModal({
+                            title: "Let us slow down and try again",
+                            description: `This verse needs at least ${regularAccuracyThreshold}% regular accuracy to count. Regular accuracy includes mistakes even if you fix them later. Type a little slower and aim for every letter.`,
+                        })
+                    } else {
+                        setAccuracyModal({
+                            title: "Close! Try this verse one more time",
+                            description: `This verse needs at least ${correctedAccuracyThreshold}% corrected accuracy to count. Corrected accuracy checks your final typed verse. Slow down and make sure each word is right.`,
+                        })
+                    }
+                    return
+                }
+            }
+
             const completedVerseCount = Object.keys(
                 history?.verses ?? {},
             ).length
@@ -472,21 +538,7 @@ export function CurrentVerse({
                     translation: verse.verse.translation,
                     typingSessionId: typingSession.id,
                     classroomAssignmentId,
-                    typingData: {
-                        userActions: next,
-                        userNodes: position
-                            .filter(isAtomTyped)
-                            .filter(
-                                (n): n is { type: "word"; letters: string[] } =>
-                                    n.type === "word",
-                            ),
-                        correctNodes: currentVerseNodes
-                            .filter(isAtomTyped)
-                            .filter(
-                                (n): n is { type: "word"; letters: string[] } =>
-                                    n.type === "word",
-                            ),
-                    },
+                    typingData,
                 })
             } else {
                 const nextVerse = getNextVerse(currentVerse, passage.nodes)
@@ -712,6 +764,13 @@ export function CurrentVerse({
                 }}
                 ref={inputRef}
                 autoFocus={true}
+            />
+            <AssignmentAccuracyThresholdWarningDialog
+                warning={accuracyModal}
+                setWarning={setAccuracyModal}
+                onTryAgain={() => {
+                    inputRef.current?.focus()
+                }}
             />
         </span>
     )

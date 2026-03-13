@@ -42,7 +42,7 @@ export function AssignmentInProgressWarningDialog({
             <DialogContent className="w-[min(95vw,36rem)]">
                 <DialogClose
                     type="button"
-                    className="svg-outline border-primary bg-secondary text-primary absolute top-0 right-0 border-2 p-1"
+                    className="svg-outline border-primary bg-secondary text-primary absolute top-0 right-0 translate-x-0.5 -translate-y-0.5 border-2 p-1"
                     aria-label="Close assignment warning"
                 >
                     <XIcon aria-hidden size={18} weight="bold" />
