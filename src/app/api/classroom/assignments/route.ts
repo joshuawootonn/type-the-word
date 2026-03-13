@@ -1,4 +1,4 @@
-import { eq, and, sql, or, gte, lt, isNull, inArray } from "drizzle-orm"
+import { eq, and, sql, or, isNull, inArray } from "drizzle-orm"
 import { getServerSession } from "next-auth"
 import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
@@ -44,6 +44,37 @@ import {
 } from "../schemas"
 
 const CLASSROOM_ASSIGNMENT_TOPIC_NAME = "Bible Typing Practice"
+const ASSIGNMENT_SYNC_MAX_AGE_MONTHS = 3
+const ASSIGNMENT_SYNC_MIN_INTERVAL_MS = 60 * 60 * 1000
+
+type SyncCandidateAssignment = {
+    createdAt: Date
+    lastSyncedAt: Date | null
+}
+
+export function filterAssignmentsForSync<T extends SyncCandidateAssignment>(
+    assignments: T[],
+    now: Date,
+): T[] {
+    const oneHourAgo = new Date(now.getTime() - ASSIGNMENT_SYNC_MIN_INTERVAL_MS)
+    const threeMonthsAgo = new Date(now)
+    threeMonthsAgo.setMonth(
+        threeMonthsAgo.getMonth() - ASSIGNMENT_SYNC_MAX_AGE_MONTHS,
+    )
+
+    return assignments.filter(assignment => {
+        const isRecentlyCreated = assignment.createdAt >= threeMonthsAgo
+        if (!isRecentlyCreated) {
+            return false
+        }
+
+        const wasSyncedRecently =
+            assignment.lastSyncedAt != null &&
+            assignment.lastSyncedAt >= oneHourAgo
+
+        return !wasSyncedRecently
+    })
+}
 
 async function getOrCreateAssignmentTopicId(
     accessToken: string,
@@ -156,12 +187,11 @@ export async function GET(request: NextRequest) {
             try {
                 const token = await getValidTeacherToken(session.user.id)
                 const now = new Date()
-                const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
 
                 // Get assignments that need syncing:
-                // - DRAFT or future due dates
-                // - AND (never synced OR last synced > 1 hour ago)
-                const assignmentsToSync = await db
+                // - Created in last 3 months
+                // - AND never synced or synced > 1 hour ago
+                const syncCandidates = await db
                     .select({
                         id: classroomAssignment.id,
                         courseId: classroomAssignment.courseId,
@@ -170,24 +200,16 @@ export async function GET(request: NextRequest) {
                         description: classroomAssignment.description,
                         dueDate: classroomAssignment.dueDate,
                         state: classroomAssignment.state,
+                        createdAt: classroomAssignment.createdAt,
+                        lastSyncedAt: classroomAssignment.lastSyncedAt,
                     })
                     .from(classroomAssignment)
-                    .where(
-                        and(
-                            teacherAssignmentsFilter,
-                            or(
-                                eq(classroomAssignment.state, "DRAFT"),
-                                gte(classroomAssignment.dueDate, now),
-                            ),
-                            or(
-                                isNull(classroomAssignment.lastSyncedAt),
-                                lt(
-                                    classroomAssignment.lastSyncedAt,
-                                    oneHourAgo,
-                                ),
-                            ),
-                        ),
-                    )
+                    .where(teacherAssignmentsFilter)
+
+                const assignmentsToSync = filterAssignmentsForSync(
+                    syncCandidates,
+                    now,
+                )
 
                 if (assignmentsToSync.length > 0) {
                     await syncFutureAssignments(
@@ -306,12 +328,11 @@ export async function GET(request: NextRequest) {
             try {
                 const token = await getValidStudentToken(session.user.id)
                 const now = new Date()
-                const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
 
                 // Get assignments that need syncing:
-                // - PUBLISHED and future due dates
-                // - AND (never synced OR last synced > 1 hour ago)
-                const assignmentsToSync = await db
+                // - Created in last 3 months
+                // - AND never synced or synced > 1 hour ago
+                const syncCandidates = await db
                     .select({
                         id: classroomAssignment.id,
                         courseId: classroomAssignment.courseId,
@@ -320,22 +341,16 @@ export async function GET(request: NextRequest) {
                         description: classroomAssignment.description,
                         dueDate: classroomAssignment.dueDate,
                         state: classroomAssignment.state,
+                        createdAt: classroomAssignment.createdAt,
+                        lastSyncedAt: classroomAssignment.lastSyncedAt,
                     })
                     .from(classroomAssignment)
-                    .where(
-                        and(
-                            eq(classroomAssignment.courseId, courseId),
-                            eq(classroomAssignment.state, "PUBLISHED"),
-                            gte(classroomAssignment.dueDate, now),
-                            or(
-                                isNull(classroomAssignment.lastSyncedAt),
-                                lt(
-                                    classroomAssignment.lastSyncedAt,
-                                    oneHourAgo,
-                                ),
-                            ),
-                        ),
-                    )
+                    .where(eq(classroomAssignment.courseId, courseId))
+
+                const assignmentsToSync = filterAssignmentsForSync(
+                    syncCandidates,
+                    now,
+                )
 
                 if (assignmentsToSync.length > 0) {
                     await syncFutureAssignments(
