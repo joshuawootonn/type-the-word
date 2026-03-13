@@ -1,9 +1,9 @@
-import { refreshAccessToken } from "~/server/clients/classroom.client"
-import { classroomTeacherToken } from "~/server/db/schema"
 import {
     getTeacherToken,
     updateTeacherTokenAccess,
-} from "~/server/repositories/classroom.repository"
+} from "~/server/classroom/classroom.repository"
+import { refreshAccessToken } from "~/server/clients/classroom.client"
+import { classroomTeacherToken } from "~/server/db/schema"
 
 type ClassroomTeacherToken = typeof classroomTeacherToken.$inferSelect
 

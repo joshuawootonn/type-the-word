@@ -1,8 +1,8 @@
-import { refreshAccessToken } from "~/server/clients/classroom.client"
 import {
     getStudentToken,
     updateStudentTokenAccess,
-} from "~/server/repositories/classroom.repository"
+} from "~/server/classroom/classroom.repository"
+import { refreshAccessToken } from "~/server/clients/classroom.client"
 
 export async function getValidStudentToken(userId: string): Promise<{
     accessToken: string

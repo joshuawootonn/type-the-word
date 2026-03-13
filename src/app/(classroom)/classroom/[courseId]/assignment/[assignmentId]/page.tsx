@@ -16,6 +16,13 @@ import { ParsedPassage } from "~/lib/parseEsv"
 import { passageSegmentSchema } from "~/lib/passageSegment"
 import { authOptions } from "~/server/auth"
 import {
+    getAssignment,
+    getTeacherToken,
+    updateTeacherTokenAccess,
+    getOrCreateSubmission,
+} from "~/server/classroom/classroom.repository"
+import { syncAssignmentIfEligible } from "~/server/classroom/classroom.service"
+import {
     canTeacherAccessAssignment,
     getTeacherTokenForAssignment,
 } from "~/server/classroom/organization-access"
@@ -27,12 +34,6 @@ import {
     getStudent,
     getStudentSubmission,
 } from "~/server/clients/classroom.client"
-import {
-    getAssignment,
-    getTeacherToken,
-    updateTeacherTokenAccess,
-    getOrCreateSubmission,
-} from "~/server/repositories/classroom.repository"
 
 interface PageProps {
     params: Promise<{ courseId: string; assignmentId: string }>
@@ -126,7 +127,7 @@ export default async function AssignmentDetailPage({
         )
     }
 
-    const assignment = await getAssignment(assignmentId)
+    let assignment = await getAssignment(assignmentId)
 
     if (!assignment) {
         return (
@@ -167,6 +168,8 @@ export default async function AssignmentDetailPage({
                 refreshed.expiresAt,
             )
         }
+
+        assignment = await syncAssignmentIfEligible(accessToken, assignment)
 
         const courses = await listCourses(accessToken)
         const course = courses.find(c => c.id === courseId)
@@ -257,6 +260,20 @@ export default async function AssignmentDetailPage({
                 title={assignment.title}
                 variant="error"
                 message="This assignment is not connected to Google Classroom."
+            />
+        )
+    }
+
+    assignment = await syncAssignmentIfEligible(teacherAccessToken, assignment)
+
+    if (assignment.state !== "PUBLISHED") {
+        return (
+            <ClassroomNotice
+                title="Assignment Not Available"
+                variant="error"
+                message="This assignment is no longer available in Google Classroom."
+                linkHref={`/classroom/${encodeURIComponent(courseId)}`}
+                linkLabel="Back to Course"
             />
         )
     }

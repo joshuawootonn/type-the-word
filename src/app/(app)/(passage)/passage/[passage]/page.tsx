@@ -15,7 +15,7 @@ import { segmentToPassageObject } from "~/lib/passageObject"
 import { passageReferenceSchema } from "~/lib/passageReference"
 import { PassageSegment, toPassageSegment } from "~/lib/passageSegment"
 import { authOptions } from "~/server/auth"
-import { getPassageAssignmentWarningMatch } from "~/server/classroom/passage-assignment-warning"
+import { getPassageAssignmentWarningMatch } from "~/server/classroom/classroom.service"
 import { db } from "~/server/db"
 import { TypedVerseRepository } from "~/server/repositories/typedVerse.repository"
 

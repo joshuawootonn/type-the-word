@@ -3,13 +3,13 @@ import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 
 import { env } from "~/env.mjs"
+import { saveTeacherToken } from "~/server/classroom/classroom.repository"
 import {
     exchangeCodeForTokens,
     listCourses,
 } from "~/server/clients/classroom.client"
 import { db } from "~/server/db"
 import { users } from "~/server/db/schema"
-import { saveTeacherToken } from "~/server/repositories/classroom.repository"
 import {
     ensureTeacherMembershipOnConnect,
     getDomainFromEmail,

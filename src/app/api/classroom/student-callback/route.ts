@@ -2,9 +2,9 @@ import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 
 import { env } from "~/env.mjs"
+import { saveStudentToken } from "~/server/classroom/classroom.repository"
 import { exchangeCodeForTokens } from "~/server/clients/classroom.client"
 import { getGoogleUserId } from "~/server/clients/google.client"
-import { saveStudentToken } from "~/server/repositories/classroom.repository"
 
 /**
  * Handles the OAuth callback from Google (student)

@@ -2,16 +2,16 @@ import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 
 import { authOptions } from "~/server/auth"
+import {
+    getTeacherToken as getTeacherClassroomToken,
+    getStudentToken,
+} from "~/server/classroom/classroom.repository"
 import { getValidStudentToken } from "~/server/classroom/student-token"
 import { getValidTeacherToken } from "~/server/classroom/teacher-token"
 import {
     listCourses,
     listStudentCourses,
 } from "~/server/clients/classroom.client"
-import {
-    getTeacherToken as getTeacherClassroomToken,
-    getStudentToken,
-} from "~/server/repositories/classroom.repository"
 import {
     getApprovedOrganizationForUser,
     syncTeacherCourseMappings,

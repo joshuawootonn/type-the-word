@@ -2,17 +2,17 @@ import { getServerSession } from "next-auth"
 import { NextRequest, NextResponse } from "next/server"
 
 import { authOptions } from "~/server/auth"
-import { canTeacherAccessAssignment } from "~/server/classroom/organization-access"
-import {
-    refreshAccessToken,
-    updateCourseWorkState,
-} from "~/server/clients/classroom.client"
 import {
     getAssignment,
     getTeacherToken,
     updateAssignmentState,
     updateTeacherTokenAccess,
-} from "~/server/repositories/classroom.repository"
+} from "~/server/classroom/classroom.repository"
+import { canTeacherAccessAssignment } from "~/server/classroom/organization-access"
+import {
+    refreshAccessToken,
+    updateCourseWorkState,
+} from "~/server/clients/classroom.client"
 
 /**
  * Publishes a draft assignment

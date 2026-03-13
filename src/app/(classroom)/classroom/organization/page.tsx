@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth"
 
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { authOptions } from "~/server/auth"
-import { getTeacherToken } from "~/server/repositories/classroom.repository"
+import { getTeacherToken } from "~/server/classroom/classroom.repository"
 
 import { ClientPage } from "./client-page"
 

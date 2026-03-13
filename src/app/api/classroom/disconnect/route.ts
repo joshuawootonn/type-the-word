@@ -3,7 +3,7 @@ import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 
 import { authOptions } from "~/server/auth"
-import { deleteTeacherToken } from "~/server/repositories/classroom.repository"
+import { deleteTeacherToken } from "~/server/classroom/classroom.repository"
 import {
     getApprovedOrganizationForUser,
     hasAnotherApprovedOrganizationAdmin,

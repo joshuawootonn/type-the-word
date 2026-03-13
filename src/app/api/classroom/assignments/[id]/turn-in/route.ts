@@ -5,6 +5,13 @@ import { NextRequest, NextResponse } from "next/server"
 import { calculateStatsForVerse } from "~/app/(app)/history/wpm"
 import { env } from "~/env.mjs"
 import { authOptions } from "~/server/auth"
+import {
+    getAssignment,
+    getOrCreateSubmission,
+    getSubmissionByStudent,
+    updateSubmissionProgress,
+    markSubmissionTurnedIn,
+} from "~/server/classroom/classroom.repository"
 import { getTeacherTokenForAssignment } from "~/server/classroom/organization-access"
 import { getValidStudentToken } from "~/server/classroom/student-token"
 import {
@@ -16,13 +23,6 @@ import {
 } from "~/server/clients/classroom.client"
 import { db } from "~/server/db"
 import { typedVerses } from "~/server/db/schema"
-import {
-    getAssignment,
-    getOrCreateSubmission,
-    getSubmissionByStudent,
-    updateSubmissionProgress,
-    markSubmissionTurnedIn,
-} from "~/server/repositories/classroom.repository"
 
 /**
  * Turns in a student assignment submission

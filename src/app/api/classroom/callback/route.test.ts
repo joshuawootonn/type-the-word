@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
+import * as classroomRepository from "~/server/classroom/classroom.repository"
 import * as classroomClient from "~/server/clients/classroom.client"
-import * as classroomRepository from "~/server/repositories/classroom.repository"
 import * as organizationRepository from "~/server/repositories/organization.repository"
 
 const cookieStoreMock = {
@@ -31,7 +31,7 @@ vi.mock("~/server/clients/classroom.client", () => ({
     listCourses: vi.fn(),
 }))
 
-vi.mock("~/server/repositories/classroom.repository", () => ({
+vi.mock("~/server/classroom/classroom.repository", () => ({
     saveTeacherToken: vi.fn(),
 }))
 

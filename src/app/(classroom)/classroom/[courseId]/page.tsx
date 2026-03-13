@@ -5,6 +5,10 @@ import { TeacherClientPage } from "~/app/(classroom)/classroom/[courseId]/teache
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Link } from "~/components/ui/link"
 import { authOptions } from "~/server/auth"
+import {
+    getTeacherToken,
+    getStudentToken,
+} from "~/server/classroom/classroom.repository"
 import { canTeacherAccessCourse } from "~/server/classroom/organization-access"
 import { getValidStudentToken } from "~/server/classroom/student-token"
 import { getValidTeacherToken } from "~/server/classroom/teacher-token"
@@ -12,10 +16,6 @@ import {
     listCourses,
     listStudentCourses,
 } from "~/server/clients/classroom.client"
-import {
-    getTeacherToken,
-    getStudentToken,
-} from "~/server/repositories/classroom.repository"
 
 interface PageProps {
     params: Promise<{ courseId: string }>

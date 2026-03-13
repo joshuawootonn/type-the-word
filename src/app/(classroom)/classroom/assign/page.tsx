@@ -5,7 +5,7 @@ import { ClassroomNotice } from "~/components/classroom-notice"
 import { Link } from "~/components/ui/link"
 import { getLastTranslation } from "~/lib/last-translation"
 import { authOptions } from "~/server/auth"
-import { getTeacherToken } from "~/server/repositories/classroom.repository"
+import { getTeacherToken } from "~/server/classroom/classroom.repository"
 
 interface PageProps {
     searchParams: Promise<{ courseId?: string }>

@@ -3,7 +3,7 @@ import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 
 import { authOptions } from "~/server/auth"
-import { deleteStudentToken } from "~/server/repositories/classroom.repository"
+import { deleteStudentToken } from "~/server/classroom/classroom.repository"
 
 import { type DisconnectResponse } from "../schemas"
 

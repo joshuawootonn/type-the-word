@@ -1,9 +1,9 @@
 import { and, eq, gte, isNotNull, SQL } from "drizzle-orm"
 
 import { calculateStatsForVerse } from "~/app/(app)/history/wpm"
+import { getAssignment } from "~/server/classroom/classroom.repository"
 import { db } from "~/server/db"
 import { typedVerses } from "~/server/db/schema"
-import { getAssignment } from "~/server/repositories/classroom.repository"
 
 import { getLatestVerseByChapter } from "./verse-location"
 

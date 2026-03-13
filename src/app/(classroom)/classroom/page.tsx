@@ -5,7 +5,7 @@ import { authOptions } from "~/server/auth"
 import {
     getStudentToken,
     getTeacherToken,
-} from "~/server/repositories/classroom.repository"
+} from "~/server/classroom/classroom.repository"
 import {
     getApprovedOrganizationForUser,
     hasPendingTeacherMembershipForUser,

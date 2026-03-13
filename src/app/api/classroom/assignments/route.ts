@@ -11,9 +11,16 @@ import {
     validatePassageRange,
 } from "~/lib/validate-passage-range"
 import { authOptions } from "~/server/auth"
+import {
+    getTeacherToken,
+    getStudentToken,
+    createAssignment,
+    updateSubmissionProgress,
+    updateTeacherTokenAccess,
+} from "~/server/classroom/classroom.repository"
+import { syncAssignmentsIfEligible } from "~/server/classroom/classroom.service"
 import { canTeacherAccessCourse } from "~/server/classroom/organization-access"
 import { getValidStudentToken } from "~/server/classroom/student-token"
-import { syncFutureAssignments } from "~/server/classroom/sync-assignments"
 import { getValidTeacherToken } from "~/server/classroom/teacher-token"
 import {
     createCourseWork,
@@ -29,13 +36,6 @@ import {
     typedVerses,
     type Book,
 } from "~/server/db/schema"
-import {
-    getTeacherToken,
-    getStudentToken,
-    createAssignment,
-    updateSubmissionProgress,
-    updateTeacherTokenAccess,
-} from "~/server/repositories/classroom.repository"
 
 import {
     type AssignmentsResponse,
@@ -44,37 +44,6 @@ import {
 } from "../schemas"
 
 const CLASSROOM_ASSIGNMENT_TOPIC_NAME = "Bible Typing Practice"
-const ASSIGNMENT_SYNC_MAX_AGE_MONTHS = 3
-const ASSIGNMENT_SYNC_MIN_INTERVAL_MS = 60 * 60 * 1000
-
-type SyncCandidateAssignment = {
-    createdAt: Date
-    lastSyncedAt: Date | null
-}
-
-export function filterAssignmentsForSync<T extends SyncCandidateAssignment>(
-    assignments: T[],
-    now: Date,
-): T[] {
-    const oneHourAgo = new Date(now.getTime() - ASSIGNMENT_SYNC_MIN_INTERVAL_MS)
-    const threeMonthsAgo = new Date(now)
-    threeMonthsAgo.setMonth(
-        threeMonthsAgo.getMonth() - ASSIGNMENT_SYNC_MAX_AGE_MONTHS,
-    )
-
-    return assignments.filter(assignment => {
-        const isRecentlyCreated = assignment.createdAt >= threeMonthsAgo
-        if (!isRecentlyCreated) {
-            return false
-        }
-
-        const wasSyncedRecently =
-            assignment.lastSyncedAt != null &&
-            assignment.lastSyncedAt >= oneHourAgo
-
-        return !wasSyncedRecently
-    })
-}
 
 async function getOrCreateAssignmentTopicId(
     accessToken: string,
@@ -186,11 +155,7 @@ export async function GET(request: NextRequest) {
             // Sync assignments that haven't been synced in the last hour
             try {
                 const token = await getValidTeacherToken(session.user.id)
-                const now = new Date()
-
-                // Get assignments that need syncing:
-                // - Created in last 3 months
-                // - AND never synced or synced > 1 hour ago
+                // Sync candidates for this teacher-course scope.
                 const syncCandidates = await db
                     .select({
                         id: classroomAssignment.id,
@@ -206,29 +171,10 @@ export async function GET(request: NextRequest) {
                     .from(classroomAssignment)
                     .where(teacherAssignmentsFilter)
 
-                const assignmentsToSync = filterAssignmentsForSync(
+                await syncAssignmentsIfEligible(
+                    token.accessToken,
                     syncCandidates,
-                    now,
                 )
-
-                if (assignmentsToSync.length > 0) {
-                    await syncFutureAssignments(
-                        token.accessToken,
-                        assignmentsToSync,
-                    )
-
-                    // Update lastSyncedAt for all synced assignments
-                    await Promise.all(
-                        assignmentsToSync.map(assignment =>
-                            db
-                                .update(classroomAssignment)
-                                .set({ lastSyncedAt: now })
-                                .where(
-                                    eq(classroomAssignment.id, assignment.id),
-                                ),
-                        ),
-                    )
-                }
 
                 // Use roster size as denominator for course completion meters.
                 const students = await listStudents(token.accessToken, courseId)
@@ -327,11 +273,7 @@ export async function GET(request: NextRequest) {
             // Sync assignments that haven't been synced in the last hour
             try {
                 const token = await getValidStudentToken(session.user.id)
-                const now = new Date()
-
-                // Get assignments that need syncing:
-                // - Created in last 3 months
-                // - AND never synced or synced > 1 hour ago
+                // Sync candidates for this student course.
                 const syncCandidates = await db
                     .select({
                         id: classroomAssignment.id,
@@ -347,29 +289,10 @@ export async function GET(request: NextRequest) {
                     .from(classroomAssignment)
                     .where(eq(classroomAssignment.courseId, courseId))
 
-                const assignmentsToSync = filterAssignmentsForSync(
+                await syncAssignmentsIfEligible(
+                    token.accessToken,
                     syncCandidates,
-                    now,
                 )
-
-                if (assignmentsToSync.length > 0) {
-                    await syncFutureAssignments(
-                        token.accessToken,
-                        assignmentsToSync,
-                    )
-
-                    // Update lastSyncedAt for all synced assignments
-                    await Promise.all(
-                        assignmentsToSync.map(assignment =>
-                            db
-                                .update(classroomAssignment)
-                                .set({ lastSyncedAt: now })
-                                .where(
-                                    eq(classroomAssignment.id, assignment.id),
-                                ),
-                        ),
-                    )
-                }
             } catch (error) {
                 console.error("Error syncing with Google Classroom:", error)
                 // Continue with request even if sync fails

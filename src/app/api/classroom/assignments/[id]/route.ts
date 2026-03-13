@@ -4,6 +4,14 @@ import { NextRequest, NextResponse } from "next/server"
 
 import { calculateStatsForVerse } from "~/app/(app)/history/wpm"
 import { authOptions } from "~/server/auth"
+import {
+    getAssignment,
+    getSubmissionsByAssignment,
+    getTeacherToken,
+    updateSubmissionProgress,
+    updateTeacherTokenAccess,
+} from "~/server/classroom/classroom.repository"
+import { syncAssignmentIfEligible } from "~/server/classroom/classroom.service"
 import { canTeacherAccessAssignment } from "~/server/classroom/organization-access"
 import {
     refreshAccessToken,
@@ -11,13 +19,6 @@ import {
 } from "~/server/clients/classroom.client"
 import { db } from "~/server/db"
 import { typedVerses } from "~/server/db/schema"
-import {
-    getAssignment,
-    getSubmissionsByAssignment,
-    getTeacherToken,
-    updateSubmissionProgress,
-    updateTeacherTokenAccess,
-} from "~/server/repositories/classroom.repository"
 
 import { type AssignmentDetail } from "../../schemas"
 
@@ -85,13 +86,21 @@ export async function GET(
             )
         }
 
+        const currentAssignment = await syncAssignmentIfEligible(
+            accessToken,
+            assignment,
+        )
+
         // Get students from Google Classroom
-        const students = await listStudents(accessToken, assignment.courseId)
+        const students = await listStudents(
+            accessToken,
+            currentAssignment.courseId,
+        )
 
         // Get submissions from our database
         const submissions = await getSubmissionsByAssignment(id)
         const assignmentTypedVerses = await db.query.typedVerses.findMany({
-            where: eq(typedVerses.classroomAssignmentId, assignment.id),
+            where: eq(typedVerses.classroomAssignmentId, currentAssignment.id),
         })
         const userVerseMap = new Map<
             string,
@@ -141,7 +150,8 @@ export async function GET(
                     completedVerses,
                     averageWpm,
                     averageAccuracy,
-                    isCompleted: completedVerses >= assignment.totalVerses,
+                    isCompleted:
+                        completedVerses >= currentAssignment.totalVerses,
                 })
             }),
         )
@@ -192,8 +202,8 @@ export async function GET(
 
         const response: AssignmentDetail = {
             assignment: {
-                ...assignment,
-                dueDate: assignment.dueDate?.toISOString() || null,
+                ...currentAssignment,
+                dueDate: currentAssignment.dueDate?.toISOString() || null,
                 submissionCount: updatedSubmissions.length,
                 completedCount: updatedSubmissions.filter(
                     s => s.isCompleted === 1,

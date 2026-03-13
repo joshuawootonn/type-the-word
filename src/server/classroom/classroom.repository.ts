@@ -207,7 +207,13 @@ export async function getAssignmentByTeacher(
 export type StudentPassageAssignmentMatch = {
     id: string
     courseId: string
+    courseWorkId: string
     title: string
+    description: string | null
+    dueDate: Date | null
+    state: "DRAFT" | "PUBLISHED" | "DELETED"
+    createdAt: Date
+    lastSyncedAt: Date | null
     translation: Translation
     book: Book
     startChapter: number
@@ -225,7 +231,13 @@ export async function getStudentPassageAssignmentMatch(data: {
         .select({
             id: classroomAssignment.id,
             courseId: classroomAssignment.courseId,
+            courseWorkId: classroomAssignment.courseWorkId,
             title: classroomAssignment.title,
+            description: classroomAssignment.description,
+            dueDate: classroomAssignment.dueDate,
+            state: classroomAssignment.state,
+            createdAt: classroomAssignment.createdAt,
+            lastSyncedAt: classroomAssignment.lastSyncedAt,
             translation: classroomAssignment.translation,
             book: classroomAssignment.book,
             startChapter: classroomAssignment.startChapter,
@@ -272,7 +284,13 @@ export async function getStudentCoursePassageAssignmentMatch(data: {
         .select({
             id: classroomAssignment.id,
             courseId: classroomAssignment.courseId,
+            courseWorkId: classroomAssignment.courseWorkId,
             title: classroomAssignment.title,
+            description: classroomAssignment.description,
+            dueDate: classroomAssignment.dueDate,
+            state: classroomAssignment.state,
+            createdAt: classroomAssignment.createdAt,
+            lastSyncedAt: classroomAssignment.lastSyncedAt,
             translation: classroomAssignment.translation,
             book: classroomAssignment.book,
             startChapter: classroomAssignment.startChapter,
@@ -428,4 +446,25 @@ export async function getSubmissionByStudent(
             eq(classroomSubmission.studentUserId, studentUserId),
         ),
     })
+}
+
+export async function updateAssignmentFromClassroomSync(data: {
+    assignmentId: string
+    title: string
+    description: string | null
+    dueDate: Date | null
+    state: "DRAFT" | "PUBLISHED" | "DELETED"
+    lastSyncedAt: Date
+}) {
+    await db
+        .update(classroomAssignment)
+        .set({
+            title: data.title,
+            description: data.description,
+            dueDate: data.dueDate,
+            state: data.state,
+            lastSyncedAt: data.lastSyncedAt,
+            updatedAt: new Date(),
+        })
+        .where(eq(classroomAssignment.id, data.assignmentId))
 }

@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 
 import { authOptions } from "~/server/auth"
-import { getTeacherToken } from "~/server/repositories/classroom.repository"
+import { getTeacherToken } from "~/server/classroom/classroom.repository"
 import { getApprovedOrganizationForUser } from "~/server/repositories/organization.repository"
 
 import { type StatusResponse } from "../schemas"

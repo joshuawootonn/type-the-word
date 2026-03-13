@@ -27,7 +27,7 @@ import {
     updateTeacherTokenAccess,
 } from "./classroom.repository"
 
-describe("ClassroomRepository - Integration Tests", () => {
+describe("ClassroomRepository", () => {
     let testTeacherId: string
     let testStudentId: string
 

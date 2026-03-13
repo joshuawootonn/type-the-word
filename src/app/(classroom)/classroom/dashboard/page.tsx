@@ -6,7 +6,7 @@ import { authOptions } from "~/server/auth"
 import {
     getTeacherToken,
     getStudentToken,
-} from "~/server/repositories/classroom.repository"
+} from "~/server/classroom/classroom.repository"
 import { getApprovedOrganizationForUser } from "~/server/repositories/organization.repository"
 
 export default async function DashboardPage() {
