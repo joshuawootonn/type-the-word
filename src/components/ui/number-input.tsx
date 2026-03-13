@@ -18,6 +18,7 @@ interface NumberInputProps {
     className?: string
     preventEnterSubmit?: boolean
     inputSize?: "default" | "compact"
+    inputClassName?: string
 }
 
 function clamp(value: number, min?: number, max?: number): number {
@@ -45,6 +46,7 @@ export function NumberInput({
     className,
     preventEnterSubmit = false,
     inputSize = "default",
+    inputClassName,
 }: NumberInputProps) {
     return (
         <NumberField.Root
@@ -68,14 +70,14 @@ export function NumberInput({
             <NumberField.ScrubArea
                 className={cn(
                     "inline-flex cursor-ew-resize select-none",
-                    inputSize === "compact" ? "mb-1 text-sm" : "mb-2",
+                    inputSize === "compact" ? "mb-1 text-sm" : "mb-2 text-sm",
                 )}
             >
                 <label htmlFor={id} className="block cursor-ew-resize">
                     {label}
                 </label>
             </NumberField.ScrubArea>
-            <div className="svg-outline group relative">
+            <div className={cn("svg-outline group relative", inputClassName)}>
                 <div className="svg-outline-override absolute -z-10 hidden group-focus-within:block" />
                 <NumberField.Group className="border-primary bg-secondary text-primary flex items-stretch border-2">
                     <NumberField.Decrement

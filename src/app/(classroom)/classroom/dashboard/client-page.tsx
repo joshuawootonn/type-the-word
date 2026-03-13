@@ -50,8 +50,9 @@ export function ClientPage({ isTeacher }: ClientPageProps) {
         <div>
             <h1>Dashboard</h1>
             {isTeacher && (
-                <div className="not-prose mb-4">
+                <div className="not-prose mb-4 flex gap-3">
                     <Link href="/classroom/organization">Organization</Link>
+                    <Link href="/classroom/dashboard/settings">Settings</Link>
                 </div>
             )}
 
