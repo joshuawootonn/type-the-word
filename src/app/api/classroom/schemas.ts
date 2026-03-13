@@ -232,3 +232,21 @@ export type OrganizationUser = z.infer<typeof organizationUserSchema>
 export type OrganizationUsersResponse = z.infer<
     typeof organizationUsersResponseSchema
 >
+
+// GET/PUT /api/classroom/organization/settings
+export const organizationSettingsSchema = z.object({
+    organizationId: z.string(),
+    accuracyThreshold: z.number().int().min(0).max(100),
+    regularAccuracyThreshold: z.number().int().min(0).max(100),
+    isOrgTeacher: z.boolean(),
+})
+
+export const updateOrganizationSettingsRequestSchema = z.object({
+    accuracyThreshold: z.number().int().min(0).max(100),
+    regularAccuracyThreshold: z.number().int().min(0).max(100),
+})
+
+export type OrganizationSettings = z.infer<typeof organizationSettingsSchema>
+export type UpdateOrganizationSettingsRequest = z.infer<
+    typeof updateOrganizationSettingsRequestSchema
+>

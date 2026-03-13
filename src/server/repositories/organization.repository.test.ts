@@ -7,6 +7,7 @@ import {
     classroomStudentToken,
     classroomTeacherToken,
     organization,
+    organizationSettings,
     organizationUser,
     users,
 } from "~/server/db/schema"
@@ -20,8 +21,12 @@ import {
     getDomainFromEmail,
     getOrganizationByDomain,
     getOrganizationById,
+    getOrganizationSettingsByOrganizationId,
+    getOrganizationSettingsByOrganizationIdOrThrow,
     getOrganizationMembership,
     getOrCreateOrganizationByDomain,
+    isUserApprovedOrganizationTeacher,
+    updateOrganizationSettings,
     isUserApprovedTeacherForCourse,
     listApprovedTeacherUserIdsForCourse,
     listOrganizationDirectoryUsers,
@@ -51,6 +56,14 @@ describe("OrganizationRepository - Integration Tests", () => {
         }
 
         if (organizationIds.length > 0) {
+            await db
+                .delete(organizationSettings)
+                .where(
+                    inArray(
+                        organizationSettings.organizationId,
+                        organizationIds,
+                    ),
+                )
             await db
                 .delete(courseTeacher)
                 .where(inArray(courseTeacher.organizationId, organizationIds))
@@ -100,6 +113,33 @@ describe("OrganizationRepository - Integration Tests", () => {
         expect(getDomainFromEmail(`Teacher@${domain.toUpperCase()}`)).toBe(
             domain,
         )
+
+        const settings = await getOrganizationSettingsByOrganizationId(org.id)
+        expect(settings?.accuracyThreshold).toBe(90)
+        expect(settings?.regularAccuracyThreshold).toBe(30)
+    })
+
+    it("updates organization settings and strict getter returns both thresholds", async () => {
+        const domain = uniqueDomain("settings")
+        const org = await getOrCreateOrganizationByDomain({
+            domain,
+            name: "Settings School",
+        })
+        organizationIds.push(org.id)
+
+        await updateOrganizationSettings({
+            organizationId: org.id,
+            accuracyThreshold: 91,
+            regularAccuracyThreshold: 42,
+        })
+
+        const strictSettings =
+            await getOrganizationSettingsByOrganizationIdOrThrow({
+                organizationId: org.id,
+            })
+
+        expect(strictSettings.accuracyThreshold).toBe(91)
+        expect(strictSettings.regularAccuracyThreshold).toBe(42)
     })
 
     it("upserts memberships and approved membership helpers", async () => {
@@ -140,6 +180,29 @@ describe("OrganizationRepository - Integration Tests", () => {
         expect(membership?.status).toBe("APPROVED")
         expect(approvedMembership?.userId).toBe(userId)
         expect(approvedOrg?.id).toBe(org.id)
+    })
+
+    it("checks approved organization teacher membership", async () => {
+        const domain = uniqueDomain("teacher-check")
+        const userId = await createUser(`teacher@${domain}`, "Teacher")
+        const org = await getOrCreateOrganizationByDomain({ domain })
+        organizationIds.push(org.id)
+
+        await upsertOrganizationMembership({
+            organizationId: org.id,
+            userId,
+            role: "TEACHER",
+            status: "APPROVED",
+            approvedByUserId: userId,
+            approvedAt: new Date(),
+        })
+
+        const result = await isUserApprovedOrganizationTeacher({
+            organizationId: org.id,
+            userId,
+        })
+
+        expect(result).toBe(true)
     })
 
     it("bootstraps first teacher as admin and second as pending", async () => {

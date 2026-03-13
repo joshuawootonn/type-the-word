@@ -197,6 +197,27 @@
             "when": 1772483846042,
             "tag": "0027_famous_speed",
             "breakpoints": true
+        },
+        {
+            "idx": 28,
+            "version": "7",
+            "when": 1773321555487,
+            "tag": "0028_narrow_virginia_dare",
+            "breakpoints": true
+        },
+        {
+            "idx": 29,
+            "version": "7",
+            "when": 1773404275168,
+            "tag": "0029_groovy_morgan_stark",
+            "breakpoints": true
+        },
+        {
+            "idx": 30,
+            "version": "7",
+            "when": 1773409160000,
+            "tag": "0030_dapper_madame_web",
+            "breakpoints": true
         }
     ]
 }

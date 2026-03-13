@@ -526,11 +526,56 @@ export const organization = pgTable(
     }),
 )
 
-export const organizationRelations = relations(organization, ({ many }) => ({
-    organizationUsers: many(organizationUser),
-    classroomAssignments: many(classroomAssignment),
-    courseTeachers: many(courseTeacher),
-}))
+export const organizationSettings = pgTable(
+    "organizationSettings",
+    {
+        organizationId: varchar("organizationId", { length: 255 }).notNull(),
+        accuracyThreshold: integer("accuracyThreshold").notNull().default(90),
+        regularAccuracyThreshold: integer("regularAccuracyThreshold")
+            .notNull()
+            .default(30),
+        createdAt: timestamp("createdAt", { mode: "date" })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+        updatedAt: timestamp("updatedAt", { mode: "date" })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+    },
+    table => ({
+        organizationIdUnique: unique().on(table.organizationId),
+        organizationIdIdx: index("organizationSettings_organizationId_idx").on(
+            table.organizationId,
+        ),
+        accuracyThresholdCheck: check(
+            "organizationSettings_accuracyThreshold_check",
+            sql`${table.accuracyThreshold} >= 0 AND ${table.accuracyThreshold} <= 100`,
+        ),
+        regularAccuracyThresholdCheck: check(
+            "organizationSettings_regularAccuracyThreshold_check",
+            sql`${table.regularAccuracyThreshold} >= 0 AND ${table.regularAccuracyThreshold} <= 100`,
+        ),
+    }),
+)
+
+export const organizationSettingsRelations = relations(
+    organizationSettings,
+    ({ one }) => ({
+        organization: one(organization, {
+            fields: [organizationSettings.organizationId],
+            references: [organization.id],
+        }),
+    }),
+)
+
+export const organizationRelations = relations(
+    organization,
+    ({ many, one }) => ({
+        organizationUsers: many(organizationUser),
+        classroomAssignments: many(classroomAssignment),
+        courseTeachers: many(courseTeacher),
+        settings: one(organizationSettings),
+    }),
+)
 
 export const organizationUser = pgTable(
     "organizationUser",

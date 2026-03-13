@@ -6,6 +6,7 @@ import {
     classroomStudentToken,
     classroomTeacherToken,
     organization,
+    organizationSettings,
     organizationUser,
     organizationRole,
     organizationUserState,
@@ -13,6 +14,7 @@ import {
 } from "~/server/db/schema"
 
 type Organization = typeof organization.$inferSelect
+type OrganizationSettings = typeof organizationSettings.$inferSelect
 type OrganizationMembership = typeof organizationUser.$inferSelect
 type OrganizationRole = (typeof organizationRole.enumValues)[number]
 type OrganizationUserState = (typeof organizationUserState.enumValues)[number]
@@ -50,6 +52,57 @@ export async function getOrganizationById(
     })
 }
 
+export async function getOrganizationSettingsByOrganizationId(
+    organizationId: string,
+): Promise<OrganizationSettings | undefined> {
+    return await db.query.organizationSettings.findFirst({
+        where: eq(organizationSettings.organizationId, organizationId),
+    })
+}
+
+export async function getOrganizationSettingsByOrganizationIdOrThrow(data: {
+    organizationId: string
+}): Promise<OrganizationSettings> {
+    const settings = await getOrganizationSettingsByOrganizationId(
+        data.organizationId,
+    )
+    if (!settings) {
+        throw new Error(
+            `Organization settings are missing for organization ${data.organizationId}`,
+        )
+    }
+
+    return settings
+}
+
+export async function updateOrganizationSettings(data: {
+    organizationId: string
+    accuracyThreshold: number
+    regularAccuracyThreshold: number
+}): Promise<OrganizationSettings> {
+    const now = new Date()
+    const [settings] = await db
+        .insert(organizationSettings)
+        .values({
+            organizationId: data.organizationId,
+            accuracyThreshold: data.accuracyThreshold,
+            regularAccuracyThreshold: data.regularAccuracyThreshold,
+            createdAt: now,
+            updatedAt: now,
+        })
+        .onConflictDoUpdate({
+            target: organizationSettings.organizationId,
+            set: {
+                accuracyThreshold: data.accuracyThreshold,
+                regularAccuracyThreshold: data.regularAccuracyThreshold,
+                updatedAt: now,
+            },
+        })
+        .returning()
+
+    return settings!
+}
+
 export async function getOrCreateOrganizationByDomain(data: {
     domain: string
     name?: string
@@ -73,6 +126,19 @@ export async function getOrCreateOrganizationByDomain(data: {
             },
         })
         .returning()
+
+    await db
+        .insert(organizationSettings)
+        .values({
+            organizationId: createdOrUpdated!.id,
+            accuracyThreshold: 90,
+            regularAccuracyThreshold: 30,
+            createdAt: now,
+            updatedAt: now,
+        })
+        .onConflictDoNothing({
+            target: organizationSettings.organizationId,
+        })
 
     return createdOrUpdated!
 }
@@ -217,6 +283,17 @@ export async function isUserOrganizationAdmin(data: {
 }): Promise<boolean> {
     const membership = await getOrganizationMembership(data)
     return membership?.status === "APPROVED" && membership.role === "ORG_ADMIN"
+}
+
+export async function isUserApprovedOrganizationTeacher(data: {
+    organizationId: string
+    userId: string
+}): Promise<boolean> {
+    const membership = await getOrganizationMembership(data)
+    return (
+        membership?.status === "APPROVED" &&
+        teacherRoles.includes(membership.role)
+    )
 }
 
 export async function approveTeacherMembership(data: {
