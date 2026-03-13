@@ -87,8 +87,6 @@ export function PassageSelector({
     const [chapterQuery, setChapterQuery] = useState("")
     const [translationQuery, setTranslationQuery] = useState("")
 
-    const timerRef = useRef<NodeJS.Timeout | null>(null)
-
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -186,12 +184,12 @@ export function PassageSelector({
         const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
         // I use `!includes` to prevent passage selector from clearing url specified verses
         if (!pathname?.includes(nextValue) && pathname !== "/") {
-            timerRef.current = setTimeout(() => {
+            const t = setTimeout(() => {
                 onSubmit({ book, chapter, translation })
             }, 3000)
 
             return () => {
-                clearTimeout(timerRef.current!)
+                clearTimeout(t)
             }
         }
     }, [book, chapter, translation, onSubmit, pathname])
