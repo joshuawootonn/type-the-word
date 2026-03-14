@@ -50,6 +50,19 @@ const ForwardedRefInput = forwardRef(function InnerForwardedRefInput(
     return <input {...props} ref={ref} />
 })
 
+function OpenTracker({
+    open,
+    onOpenChange,
+}: {
+    open: boolean
+    onOpenChange: (open: boolean) => void
+}) {
+    useEffect(() => {
+        onOpenChange(open)
+    }, [open, onOpenChange])
+    return null
+}
+
 function getValues(text: PassageReference | undefined): {
     book: Book
     chapter: string
@@ -86,6 +99,22 @@ export function PassageSelector({
     const [bookQuery, setBookQuery] = useState("")
     const [chapterQuery, setChapterQuery] = useState("")
     const [translationQuery, setTranslationQuery] = useState("")
+
+    const [translationOpen, setTranslationOpen] = useState(false)
+    const [bookOpen, setBookOpen] = useState(false)
+    const [chapterOpen, setChapterOpen] = useState(false)
+    const anyOpen = translationOpen || bookOpen || chapterOpen
+
+    const timerRef = useRef<NodeJS.Timeout | null>(null)
+
+    const navIntentRef = useRef<{
+        book: Book
+        chapter: string
+        translation: Translation
+        immediate: boolean
+    } | null>(null)
+
+    const prevAnyOpenRef = useRef(false)
 
     const router = useRouter()
     const pathname = usePathname()
@@ -181,18 +210,68 @@ export function PassageSelector({
     )
 
     useEffect(() => {
-        const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
-        // I use `!includes` to prevent passage selector from clearing url specified verses
-        if (!pathname?.includes(nextValue) && pathname !== "/") {
-            const t = setTimeout(() => {
-                onSubmit({ book, chapter, translation })
-            }, 3000)
+        const prevAnyOpen = prevAnyOpenRef.current
+        prevAnyOpenRef.current = anyOpen
 
-            return () => {
-                clearTimeout(t)
+        const justOpened = !prevAnyOpen && anyOpen
+        const justClosed = prevAnyOpen && !anyOpen
+
+        if (justOpened) {
+            clearTimeout(timerRef.current!)
+            navIntentRef.current = {
+                book,
+                chapter,
+                translation,
+                immediate: false,
+            }
+            return
+        }
+
+        if (justClosed) {
+            const intent = navIntentRef.current
+            if (intent) {
+                navIntentRef.current = null
+                const nextValue = passageReferenceSchema.parse(
+                    `${intent.book}_${intent.chapter}`,
+                )
+                if (!pathname?.includes(nextValue) && pathname !== "/") {
+                    clearTimeout(timerRef.current!)
+                    if (intent.immediate) {
+                        onSubmit(intent)
+                    } else {
+                        timerRef.current = setTimeout(
+                            () => onSubmit(intent),
+                            3000,
+                        )
+                    }
+                }
+            }
+            return
+        }
+
+        if (anyOpen) {
+            clearTimeout(timerRef.current!)
+            navIntentRef.current = {
+                book,
+                chapter,
+                translation,
+                immediate: false,
+            }
+        } else {
+            // No dropdown involved — behave as before (3-second delay).
+            const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
+            if (!pathname?.includes(nextValue) && pathname !== "/") {
+                timerRef.current = setTimeout(() => {
+                    onSubmit({ book, chapter, translation })
+                }, 3000)
+                return () => {
+                    clearTimeout(timerRef.current!)
+                }
             }
         }
-    }, [book, chapter, translation, onSubmit, pathname])
+    }, [book, translation, anyOpen, onSubmit, pathname])
+    // Note: `chapter` is intentionally excluded — chapter navigation is handled
+    // via navIntentRef set in the chapter combobox onChange.
 
     const isFirstRender = useIsFirstRender()
 
@@ -214,86 +293,94 @@ export function PassageSelector({
                         if (next !== null) setTranslation(next)
                     }}
                 >
-                    <Combobox.Input
-                        as={ForwardedRefInput}
-                        onChange={event =>
-                            setTranslationQuery(event.target.value)
-                        }
-                        onFocus={event => event.currentTarget.select()}
-                        onKeyUp={e => {
-                            if (e.key === "Enter" || e.keyCode === 13) {
-                                bookRef.current?.focus()
-                            }
-                        }}
-                        displayValue={(t: Translation) =>
-                            translations.find(tr => tr.value === t)?.label ?? t
-                        }
-                        className={
-                            "border-primary bg-secondary text-primary w-[8ch] rounded-none border-2 p-1 font-medium outline-hidden"
-                        }
-                        autoComplete="false"
-                        data-1p-ignore={true}
-                    />
-                    {isFirstRender && (
-                        <div className="text-primary absolute top-1 left-1 translate-x-0.5 translate-y-0.5 font-medium">
+                    {({ open }) => (
+                        <>
+                            <OpenTracker
+                                open={open}
+                                onOpenChange={setTranslationOpen}
+                            />
+                            <Combobox.Input
+                                as={ForwardedRefInput}
+                                onChange={event =>
+                                    setTranslationQuery(event.target.value)
+                                }
+                                onFocus={event => event.currentTarget.select()}
+                                onKeyUp={e => {
+                                    if (e.key === "Enter" || e.keyCode === 13) {
+                                        bookRef.current?.focus()
+                                    }
+                                }}
+                                displayValue={(t: Translation) =>
+                                    translations.find(tr => tr.value === t)?.label ?? t
+                                }
+                                className={
+                                    "border-primary bg-secondary text-primary w-[8ch] rounded-none border-2 p-1 font-medium outline-hidden"
+                                }
+                                autoComplete="false"
+                                data-1p-ignore={true}
+                            />
+                            {isFirstRender && (
+                                <div className="text-primary absolute top-1 left-1 translate-x-0.5 translate-y-0.5 font-medium">
                             {translations.find(t => t.value === translation)
                                 ?.label ?? translation}
-                        </div>
-                    )}
-                    <ScrollArea.Root>
-                        <ScrollArea.Viewport>
-                            <Combobox.Options
-                                className={
-                                    "border-primary bg-secondary absolute z-50 max-h-60 w-full -translate-y-0.5 overflow-auto border-2"
-                                }
-                            >
-                                {filteredTranslations.map(t => (
-                                    <Combobox.Option
-                                        key={t.value}
-                                        value={t.value}
-                                        as={Fragment}
+                                </div>
+                            )}
+                            <ScrollArea.Root>
+                                <ScrollArea.Viewport>
+                                    <Combobox.Options
+                                        className={
+                                            "border-primary bg-secondary absolute z-50 max-h-60 w-full -translate-y-0.5 overflow-auto border-2"
+                                        }
                                     >
-                                        {({ active }) => (
-                                            <div
-                                                className={clsx(
-                                                    "cursor-pointer px-2 py-1",
-                                                    active
-                                                        ? "bg-primary text-secondary"
-                                                        : "bg-secondary text-primary",
-                                                )}
-                                                onClick={() => {
-                                                    setTimeout(() =>
-                                                        bookRef.current?.focus(),
-                                                    )
-                                                }}
+                                        {filteredTranslations.map(t => (
+                                            <Combobox.Option
+                                                key={t.value}
+                                                value={t.value}
+                                                as={Fragment}
                                             >
-                                                {t.label}
-                                            </div>
-                                        )}
-                                    </Combobox.Option>
-                                ))}
-                            </Combobox.Options>
-                        </ScrollArea.Viewport>
-                        <ScrollArea.Scrollbar orientation="vertical">
-                            <ScrollArea.Thumb />
-                        </ScrollArea.Scrollbar>
-                    </ScrollArea.Root>
+                                                {({ active }) => (
+                                                    <div
+                                                        className={clsx(
+                                                            "cursor-pointer px-2 py-1",
+                                                            active
+                                                                ? "bg-primary text-secondary"
+                                                                : "bg-secondary text-primary",
+                                                        )}
+                                                        onClick={() => {
+                                                            setTimeout(() =>
+                                                                bookRef.current?.focus(),
+                                                            )
+                                                        }}
+                                                    >
+                                                        {t.label}
+                                                    </div>
+                                                )}
+                                            </Combobox.Option>
+                                        ))}
+                                    </Combobox.Options>
+                                </ScrollArea.Viewport>
+                                <ScrollArea.Scrollbar orientation="vertical">
+                                    <ScrollArea.Thumb />
+                                </ScrollArea.Scrollbar>
+                            </ScrollArea.Root>
 
-                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            aria-hidden="true"
-                            className="text-primary h-5 w-5"
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z"
-                                clipRule="evenodd"
-                            ></path>
-                        </svg>
-                    </Combobox.Button>
+                            <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    aria-hidden="true"
+                                    className="text-primary h-5 w-5"
+                                >
+                                    <path
+                                        fillRule="evenodd"
+                                        d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z"
+                                        clipRule="evenodd"
+                                    ></path>
+                                </svg>
+                            </Combobox.Button>
+                        </>
+                    )}
                 </Combobox>
                 <Combobox
                     className="relative"
@@ -303,88 +390,96 @@ export function PassageSelector({
                         if (next !== null) setBook(next)
                     }}
                 >
-                    <Combobox.Input
-                        ref={bookRef}
-                        id={PASSAGE_BOOK_INPUT_ID}
+                    {({ open }) => (
+                        <>
+                            <OpenTracker
+                                open={open}
+                                onOpenChange={setBookOpen}
+                            />
+                            <Combobox.Input
+                                ref={bookRef}
+                                id={PASSAGE_BOOK_INPUT_ID}
                         onChange={event => setBookQuery(event.target.value)}
-                        onFocus={event => {
-                            event.currentTarget.select()
-                        }}
-                        onKeyUp={e => {
-                            if (e.key === "Enter" || e.keyCode === 13) {
-                                chapterRef.current?.focus()
-                            }
-                        }}
-                        displayValue={(book: Book) =>
-                            simpleBibleMetadata[book]?.name ?? ""
-                        }
-                        className={
-                            "border-primary bg-secondary text-primary w-44 -translate-x-0.5 rounded-none border-2 p-1 font-medium outline-hidden"
-                        }
-                        autoComplete="false"
-                        data-1p-ignore={true}
-                    />
-                    {/* `ComboBox` from headlessui has to be in a client component, which is why I have to fake the SSR to prevent flickering.*/}
-                    {isFirstRender && (
-                        <div className="text-primary absolute top-1 left-1 translate-y-0.5 font-medium">
-                            {simpleBibleMetadata[book]?.name ?? ""}
-                        </div>
-                    )}
-                    <ScrollArea.Root className="bg-secondary">
-                        <ScrollArea.Viewport>
-                            <Combobox.Options
-                                className={
-                                    "border-primary bg-secondary absolute z-50 max-h-60 w-full -translate-x-0.5 -translate-y-0.5 overflow-auto border-2"
+                                onFocus={event => {
+                                    event.currentTarget.select()
+                                }}
+                                onKeyUp={e => {
+                                    if (e.key === "Enter" || e.keyCode === 13) {
+                                        chapterRef.current?.focus()
+                                    }
+                                }}
+                                displayValue={(book: Book) =>
+                                    simpleBibleMetadata[book]?.name ?? ""
                                 }
-                            >
-                                {filteredBooks.map(book => (
-                                    <Combobox.Option
-                                        key={book}
-                                        value={book}
-                                        as={Fragment}
+                                className={
+                                    "border-primary bg-secondary text-primary w-44 -translate-x-0.5 rounded-none border-2 p-1 font-medium outline-hidden"
+                                }
+                                autoComplete="false"
+                                data-1p-ignore={true}
+                            />
+                            {/* `ComboBox` from headlessui has to be in a client component, which is why I have to fake the SSR to prevent flickering.*/}
+                            {isFirstRender && (
+                                <div className="text-primary absolute top-1 left-1 translate-y-0.5 font-medium">
+                                    {simpleBibleMetadata[book]?.name ?? ""}
+                                </div>
+                            )}
+                            <ScrollArea.Root className="bg-secondary">
+                                <ScrollArea.Viewport>
+                                    <Combobox.Options
+                                        className={
+                                            "border-primary bg-secondary absolute z-50 max-h-60 w-full -translate-x-0.5 -translate-y-0.5 overflow-auto border-2"
+                                        }
                                     >
-                                        {({ active }) => (
-                                            <div
-                                                className={clsx(
-                                                    "cursor-pointer px-2 py-1",
-                                                    active
-                                                        ? "bg-primary text-secondary"
-                                                        : "bg-secondary text-primary",
-                                                )}
-                                                onClick={() => {
-                                                    setTimeout(() =>
-                                                        chapterRef.current?.focus(),
-                                                    )
-                                                }}
+                                        {filteredBooks.map(book => (
+                                            <Combobox.Option
+                                                key={book}
+                                                value={book}
+                                                as={Fragment}
                                             >
+                                                {({ active }) => (
+                                                    <div
+                                                        className={clsx(
+                                                            "cursor-pointer px-2 py-1",
+                                                            active
+                                                                ? "bg-primary text-secondary"
+                                                                : "bg-secondary text-primary",
+                                                        )}
+                                                        onClick={() => {
+                                                            setTimeout(() =>
+                                                                chapterRef.current?.focus(),
+                                                            )
+                                                        }}
+                                                    >
                                                 {simpleBibleMetadata[book]
                                                     ?.name ?? book}
-                                            </div>
-                                        )}
-                                    </Combobox.Option>
-                                ))}
-                            </Combobox.Options>
-                        </ScrollArea.Viewport>{" "}
-                        <ScrollArea.Scrollbar orientation="vertical">
-                            <ScrollArea.Thumb />
-                        </ScrollArea.Scrollbar>
-                    </ScrollArea.Root>
+                                                    </div>
+                                                )}
+                                            </Combobox.Option>
+                                        ))}
+                                    </Combobox.Options>
+                                </ScrollArea.Viewport>{" "}
+                                <ScrollArea.Scrollbar orientation="vertical">
+                                    <ScrollArea.Thumb />
+                                </ScrollArea.Scrollbar>
+                            </ScrollArea.Root>
 
-                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            aria-hidden="true"
-                            className="text-primary h-5 w-5"
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z"
-                                clipRule="evenodd"
-                            ></path>
-                        </svg>
-                    </Combobox.Button>
+                            <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    aria-hidden="true"
+                                    className="text-primary h-5 w-5"
+                                >
+                                    <path
+                                        fillRule="evenodd"
+                                        d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z"
+                                        clipRule="evenodd"
+                                    ></path>
+                                </svg>
+                            </Combobox.Button>
+                        </>
+                    )}
                 </Combobox>
                 <Combobox
                     as="div"
@@ -392,81 +487,96 @@ export function PassageSelector({
                     className="relative"
                     value={chapter}
                     onChange={next => {
-                        if (next !== null)
-                            onSubmit({ book, chapter: next, translation })
+                        if (next !== null) {
+                            navIntentRef.current = {
+                                book,
+                                chapter: next,
+                                translation,
+                                immediate: true,
+                            }
+                            setChapter(next)
+                        }
                     }}
                 >
-                    <Combobox.Input
-                        ref={chapterRef}
-                        as={ForwardedRefInput}
-                        onChange={event => setChapterQuery(event.target.value)}
-                        onFocus={event => event.currentTarget.select()}
-                        onKeyUp={event => {
-                            if (event.key === "Enter" || event.keyCode === 13) {
-                                onSubmit({ book, chapter, translation })
-                            }
-                        }}
-                        className={
-                            "border-primary bg-secondary text-primary w-16 -translate-x-1 rounded-none border-2 p-1 font-medium outline-hidden"
-                        }
-                        autoComplete="false"
-                        data-1p-ignore={true}
-                    />
-                    {/* `ComboBox` from headlessui has to be in a client component, which is why I have to fake the SSR to prevent flickering.*/}
-                    {isFirstRender && (
-                        <div className="text-primary absolute top-1 left-1 -translate-x-0.5 translate-y-0.5 font-medium">
-                            {chapter}
-                        </div>
-                    )}
-                    <ScrollArea.Root>
-                        <ScrollArea.Viewport>
-                            <Combobox.Options
+                    {({ open }) => (
+                        <>
+                            <OpenTracker
+                                open={open}
+                                onOpenChange={setChapterOpen}
+                            />
+                            <Combobox.Input
+                                ref={chapterRef}
+                                as={ForwardedRefInput}
+                                onChange={event => setChapterQuery(event.target.value)}
+                                onFocus={event => event.currentTarget.select()}
+                                onKeyUp={event => {
+                                    if (event.key === "Enter" || event.keyCode === 13) {
+                                        onSubmit({ book, chapter, translation })
+                                    }
+                                }}
                                 className={
-                                    "border-primary bg-secondary absolute z-50 max-h-60 w-full -translate-x-1 -translate-y-0.5 overflow-auto border-2"
+                                    "border-primary bg-secondary text-primary w-16 -translate-x-1 rounded-none border-2 p-1 font-medium outline-hidden"
                                 }
-                            >
-                                {filteredChapters.map((number, i) => (
-                                    <Combobox.Option
-                                        key={i}
-                                        value={number}
-                                        as={Fragment}
+                                autoComplete="false"
+                                data-1p-ignore={true}
+                            />
+                            {/* `ComboBox` from headlessui has to be in a client component, which is why I have to fake the SSR to prevent flickering.*/}
+                            {isFirstRender && (
+                                <div className="text-primary absolute top-1 left-1 -translate-x-0.5 translate-y-0.5 font-medium">
+                                    {chapter}
+                                </div>
+                            )}
+                            <ScrollArea.Root>
+                                <ScrollArea.Viewport>
+                                    <Combobox.Options
+                                        className={
+                                            "border-primary bg-secondary absolute z-50 max-h-60 w-full -translate-x-1 -translate-y-0.5 overflow-auto border-2"
+                                        }
                                     >
-                                        {({ active }) => (
-                                            <div
-                                                className={clsx(
-                                                    "cursor-pointer px-2 py-1",
-                                                    active
-                                                        ? "bg-primary text-secondary"
-                                                        : "bg-secondary text-primary",
-                                                )}
+                                        {filteredChapters.map((number, i) => (
+                                            <Combobox.Option
+                                                key={i}
+                                                value={number}
+                                                as={Fragment}
                                             >
-                                                {number}
-                                            </div>
-                                        )}
-                                    </Combobox.Option>
-                                ))}
-                            </Combobox.Options>
-                        </ScrollArea.Viewport>{" "}
-                        <ScrollArea.Scrollbar orientation="vertical">
-                            <ScrollArea.Thumb />
-                        </ScrollArea.Scrollbar>
-                    </ScrollArea.Root>
+                                                {({ active }) => (
+                                                    <div
+                                                        className={clsx(
+                                                            "cursor-pointer px-2 py-1",
+                                                            active
+                                                                ? "bg-primary text-secondary"
+                                                                : "bg-secondary text-primary",
+                                                        )}
+                                                    >
+                                                        {number}
+                                                    </div>
+                                                )}
+                                            </Combobox.Option>
+                                        ))}
+                                    </Combobox.Options>
+                                </ScrollArea.Viewport>{" "}
+                                <ScrollArea.Scrollbar orientation="vertical">
+                                    <ScrollArea.Thumb />
+                                </ScrollArea.Scrollbar>
+                            </ScrollArea.Root>
 
-                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            aria-hidden="true"
-                            className="text-primary h-5 w-5"
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z"
-                                clipRule="evenodd"
-                            ></path>
-                        </svg>
-                    </Combobox.Button>
+                            <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    aria-hidden="true"
+                                    className="text-primary h-5 w-5"
+                                >
+                                    <path
+                                        fillRule="evenodd"
+                                        d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z"
+                                        clipRule="evenodd"
+                                    ></path>
+                                </svg>
+                            </Combobox.Button>
+                        </>
+                    )}
                 </Combobox>
             </div>
         </div>
