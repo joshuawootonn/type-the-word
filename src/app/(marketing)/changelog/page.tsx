@@ -85,6 +85,10 @@ export default async function Changelog() {
             <ul>
                 <YearHeading year={2026} isFirst />
                 <li>
+                    <DateComponent date={new Date("03/15/2026")} /> - Improved
+                    the user experience of navigating via the Passage Selector.
+                </li>
+                <li>
                     <DateComponent date={new Date("03/02/2026")} /> - Fixed
                     missing NLT verses in Numbers 1:22-43, Numbers 2:12-15, and
                     Numbers 2:20-23, and formatted Numbers 1:5-15 with a
