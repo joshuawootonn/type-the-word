@@ -108,8 +108,6 @@ export function PassageSelector({
 
     const timerRef = useRef<NodeJS.Timeout | null>(null)
 
-    const immediateRef = useRef(false)
-
     const prevAnyOpenRef = useRef(false)
 
     const router = useRouter()
@@ -209,33 +207,20 @@ export function PassageSelector({
 
         const justOpened = !prevAnyOpen && anyOpen
         const justClosed = prevAnyOpen && !anyOpen
+        const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
 
         if (justOpened) {
             clearTimeout(timerRef.current!)
-            immediateRef.current = false
             return
         }
 
-        if (justClosed) {
-            const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
-            if (!pathname?.includes(nextValue) && pathname !== "/") {
-                clearTimeout(timerRef.current!)
-                immediateRef.current
-                    ? onSubmit({ book, chapter, translation })
-                    : (timerRef.current = setTimeout(
-                          () => onSubmit({ book, chapter, translation }),
-                          3000,
-                      ))
-            }
-            immediateRef.current = false
-            return
-        }
-
-        const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
         if (!pathname?.includes(nextValue) && pathname !== "/") {
+            let timerDelay = 3000
+            if (justClosed) timerDelay = 2500
+
             timerRef.current = setTimeout(
                 () => onSubmit({ book, chapter, translation }),
-                3000,
+                timerDelay,
             )
             return () => clearTimeout(timerRef.current!)
         }
@@ -461,8 +446,7 @@ export function PassageSelector({
                     value={chapter}
                     onChange={next => {
                         if (next !== null) {
-                            immediateRef.current = true
-                            setChapter(next)
+                            onSubmit({ book, chapter, translation })
                         }
                     }}
                 >
