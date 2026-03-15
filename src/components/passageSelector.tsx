@@ -231,11 +231,6 @@ export function PassageSelector({
             return
         }
 
-        if (anyOpen) {
-            clearTimeout(timerRef.current!)
-            return
-        }
-
         const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
         if (!pathname?.includes(nextValue) && pathname !== "/") {
             timerRef.current = setTimeout(
