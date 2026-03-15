@@ -15,6 +15,7 @@ import {
     Submission,
     TokenResponse,
     TurnInResponse,
+    UpdateCourseWorkStateInput,
     courseSchema,
     courseWorkSchema,
     draftGradeResponseSchema,
@@ -246,7 +247,7 @@ async function updateCourseWorkState(
     _accessToken: string,
     _courseId: string,
     courseWorkId: string,
-    state: CourseWorkState,
+    state: UpdateCourseWorkStateInput,
 ): Promise<CourseWork> {
     const existing = e2eClassroomMockStore.courseWorks.get(courseWorkId)
     if (!existing) {
@@ -259,6 +260,14 @@ async function updateCourseWorkState(
     }
     e2eClassroomMockStore.courseWorks.set(courseWorkId, updated)
     return courseWorkSchema.parse(updated)
+}
+
+async function deleteCourseWork(
+    _accessToken: string,
+    _courseId: string,
+    courseWorkId: string,
+): Promise<void> {
+    e2eClassroomMockStore.courseWorks.delete(courseWorkId)
 }
 
 async function getCourseWork(
@@ -292,6 +301,7 @@ export function createE2EMockClassroomClient(): ClassroomClient {
         turnInSubmission,
         addSubmissionLinkAttachment,
         updateCourseWorkState,
+        deleteCourseWork,
         getCourseWork,
     }
 }

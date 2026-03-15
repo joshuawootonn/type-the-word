@@ -9,7 +9,6 @@ import {
     ClassroomClient,
     Course,
     CourseWork,
-    CourseWorkState,
     CreateCourseWorkInput,
     DraftGradeResponse,
     ModifyAttachmentsResponse,
@@ -19,6 +18,7 @@ import {
     Submission,
     TokenResponse,
     TurnInResponse,
+    UpdateCourseWorkStateInput,
     courseSchema,
     courseWorkSchema,
     draftGradeResponseSchema,
@@ -364,7 +364,7 @@ async function updateCourseWorkState(
     accessToken: string,
     courseId: string,
     courseWorkId: string,
-    state: CourseWorkState,
+    state: UpdateCourseWorkStateInput,
 ): Promise<CourseWork> {
     const classroom = createClassroomClient(accessToken)
     const response = await classroom.courses.courseWork.patch({
@@ -384,6 +384,18 @@ async function updateCourseWorkState(
         maxPoints: response.data.maxPoints,
         dueDate: response.data.dueDate,
         dueTime: response.data.dueTime,
+    })
+}
+
+async function deleteCourseWork(
+    accessToken: string,
+    courseId: string,
+    courseWorkId: string,
+): Promise<void> {
+    const classroom = createClassroomClient(accessToken)
+    await classroom.courses.courseWork.delete({
+        courseId,
+        id: courseWorkId,
     })
 }
 
@@ -455,6 +467,7 @@ export function createGoogleClassroomClient(): ClassroomClient {
         turnInSubmission,
         addSubmissionLinkAttachment,
         updateCourseWorkState,
+        deleteCourseWork,
         getCourseWork,
     }
 }

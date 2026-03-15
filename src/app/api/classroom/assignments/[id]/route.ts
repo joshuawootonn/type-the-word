@@ -8,12 +8,14 @@ import {
     getAssignment,
     getSubmissionsByAssignment,
     getTeacherToken,
+    updateAssignmentState,
     updateSubmissionProgress,
     updateTeacherTokenAccess,
 } from "~/server/classroom/classroom.repository"
 import { syncAssignmentIfEligible } from "~/server/classroom/classroom.service"
 import { canTeacherAccessAssignment } from "~/server/classroom/organization-access"
 import {
+    deleteCourseWork,
     refreshAccessToken,
     listStudents,
 } from "~/server/clients/classroom.client"
@@ -227,6 +229,82 @@ export async function GET(
         console.error("Error fetching assignment details:", error)
         return NextResponse.json(
             { error: "Failed to fetch assignment details" },
+            { status: 500 },
+        )
+    }
+}
+
+/**
+ * Deletes an assignment in Google Classroom and local DB
+ * DELETE /api/classroom/assignments/[id]
+ */
+export async function DELETE(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> },
+) {
+    const session = await getServerSession(authOptions)
+
+    if (!session?.user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    try {
+        const { id } = await params
+        const assignment = await getAssignment(id)
+
+        if (!assignment) {
+            return NextResponse.json(
+                { error: "Assignment not found" },
+                { status: 404 },
+            )
+        }
+
+        const canAccess = await canTeacherAccessAssignment({
+            userId: session.user.id,
+            assignment: {
+                organizationId: assignment.organizationId,
+                courseId: assignment.courseId,
+                teacherUserId: assignment.teacherUserId,
+            },
+        })
+        if (!canAccess) {
+            return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+        }
+
+        const tokenRecord = await getTeacherToken(session.user.id)
+        if (!tokenRecord) {
+            return NextResponse.json(
+                { error: "Google Classroom not connected" },
+                { status: 403 },
+            )
+        }
+
+        let accessToken = tokenRecord.accessToken
+        const now = new Date()
+        if (tokenRecord.expiresAt <= now) {
+            const refreshed = await refreshAccessToken(tokenRecord.refreshToken)
+            accessToken = refreshed.accessToken
+
+            await updateTeacherTokenAccess(
+                session.user.id,
+                refreshed.accessToken,
+                refreshed.expiresAt,
+            )
+        }
+
+        await deleteCourseWork(
+            accessToken,
+            assignment.courseId,
+            assignment.courseWorkId,
+        )
+
+        await updateAssignmentState(id, "DELETED")
+
+        return NextResponse.json({ success: true })
+    } catch (error) {
+        console.error("Error deleting assignment:", error)
+        return NextResponse.json(
+            { error: "Failed to delete assignment" },
             { status: 500 },
         )
     }

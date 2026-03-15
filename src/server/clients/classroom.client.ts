@@ -1,4 +1,7 @@
-import type { CreateCourseWorkInput } from "~/server/clients/classroom/types"
+import type {
+    CreateCourseWorkInput,
+    UpdateCourseWorkStateInput,
+} from "~/server/clients/classroom/types"
 
 import {
     createClassroomClient,
@@ -20,6 +23,7 @@ export type {
     Submission,
     TokenResponse,
     TurnInResponse,
+    UpdateCourseWorkStateInput,
 } from "~/server/clients/classroom/types"
 
 export { createClassroomClient, createOAuth2Client }
@@ -147,13 +151,25 @@ export async function updateCourseWorkState(
     accessToken: string,
     courseId: string,
     courseWorkId: string,
-    state: "DRAFT" | "PUBLISHED" | "DELETED",
+    state: UpdateCourseWorkStateInput,
 ) {
     return getClassroomClient().updateCourseWorkState(
         accessToken,
         courseId,
         courseWorkId,
         state,
+    )
+}
+
+export async function deleteCourseWork(
+    accessToken: string,
+    courseId: string,
+    courseWorkId: string,
+) {
+    return getClassroomClient().deleteCourseWork(
+        accessToken,
+        courseId,
+        courseWorkId,
     )
 }
 

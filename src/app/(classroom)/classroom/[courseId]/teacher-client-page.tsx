@@ -1,6 +1,11 @@
 "use client"
 
-import { CheckCircle, Clock, XCircle } from "@phosphor-icons/react"
+import {
+    CheckCircle,
+    Clock,
+    DotsThreeVertical,
+    XCircle,
+} from "@phosphor-icons/react"
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query"
 import {
     type ColumnDef,
@@ -17,6 +22,15 @@ import { useCallback, useMemo, useState } from "react"
 import { type Assignment } from "~/app/api/classroom/schemas"
 import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuPortal,
+    DropdownMenuPositioner,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { Link } from "~/components/ui/link"
@@ -31,7 +45,12 @@ import {
 } from "~/components/ui/table"
 import toProperCase from "~/lib/toProperCase"
 
-import { fetchAssignments, publishAssignment } from "./actions"
+import {
+    deleteAssignment,
+    fetchAssignments,
+    publishAssignment,
+    syncAssignment,
+} from "./actions"
 
 interface TeacherClientPageProps {
     courseId: string
@@ -44,6 +63,8 @@ export function TeacherClientPage({
 }: TeacherClientPageProps) {
     const router = useRouter()
     const [publishingId, setPublishingId] = useState<string | null>(null)
+    const [syncingId, setSyncingId] = useState<string | null>(null)
+    const [deletingId, setDeletingId] = useState<string | null>(null)
     const [sorting, setSorting] = useState<SortingState>([])
     const [globalFilter, setGlobalFilter] = useState("")
     const queryClient = useQueryClient()
@@ -77,6 +98,45 @@ export function TeacherClientPage({
         },
         [courseId, queryClient],
     )
+
+    const handleSync = useCallback(
+        async (assignmentId: string) => {
+            setSyncingId(assignmentId)
+            try {
+                await syncAssignment(assignmentId)
+                await queryClient.invalidateQueries({
+                    queryKey: ["assignments", courseId],
+                })
+            } catch (_err) {
+                // Error handling
+            } finally {
+                setSyncingId(null)
+            }
+        },
+        [courseId, queryClient],
+    )
+
+    const handleDelete = useCallback(
+        async (assignmentId: string) => {
+            setDeletingId(assignmentId)
+            try {
+                await deleteAssignment(assignmentId)
+                await queryClient.invalidateQueries({
+                    queryKey: ["assignments", courseId],
+                })
+            } catch (_err) {
+                // Error handling
+            } finally {
+                setDeletingId(null)
+            }
+        },
+        [courseId, queryClient],
+    )
+
+    const handleOpenInClassroom = useCallback((assignment: Assignment) => {
+        const classroomUrl = getGoogleClassroomCourseWorkUrl(assignment)
+        window.open(classroomUrl, "_blank", "noopener,noreferrer")
+    }, [])
 
     // Extract all assignments from pages (flat list)
     const allAssignments = useMemo(
@@ -170,24 +230,138 @@ export function TeacherClientPage({
                 id: "actions",
                 header: "Actions",
                 enableSorting: false,
-                cell: ({ row }) =>
-                    row.original.state === "DRAFT" ? (
-                        <Button
-                            onClick={e => {
-                                e.preventDefault()
-                                e.stopPropagation()
-                                void handlePublish(row.original.id)
-                            }}
-                            isLoading={publishingId === row.original.id}
-                            loadingLabel=""
-                            className="inline-flex w-full min-w-0 items-center justify-center overflow-hidden text-sm whitespace-nowrap [&>div]:truncate"
-                        >
-                            Publish
-                        </Button>
-                    ) : null,
+                cell: ({ row }) => {
+                    const assignment = row.original
+                    const isDraft = assignment.state === "DRAFT"
+                    const isPublished = assignment.state === "PUBLISHED"
+                    const isPublishing = publishingId === assignment.id
+                    const isSyncing = syncingId === assignment.id
+                    const isDeleting = deletingId === assignment.id
+                    const isActionInProgress =
+                        isPublishing || isSyncing || isDeleting
+
+                    if (isActionInProgress) {
+                        return (
+                            <div className="flex h-[29.5px] items-center justify-center">
+                                <Loading
+                                    label=""
+                                    initialDots={3}
+                                    className="h-5 text-[20px] leading-none"
+                                />
+                            </div>
+                        )
+                    }
+
+                    return (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger
+                                className="svg-outline relative inline-flex w-full min-w-0 cursor-pointer items-center justify-center overflow-hidden p-1 outline-hidden"
+                                onClick={event => {
+                                    event.preventDefault()
+                                    event.stopPropagation()
+                                }}
+                                aria-label="Assignment actions"
+                            >
+                                <DotsThreeVertical
+                                    aria-hidden="true"
+                                    weight="bold"
+                                    className="h-5 w-5"
+                                />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuPortal>
+                                <DropdownMenuPositioner align="end">
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem
+                                            disabled={!isPublished}
+                                            title={
+                                                !isPublished
+                                                    ? "Only published assignments have a Classroom details page"
+                                                    : undefined
+                                            }
+                                            onClick={event => {
+                                                event.preventDefault()
+                                                event.stopPropagation()
+
+                                                if (!isPublished) {
+                                                    return
+                                                }
+
+                                                handleOpenInClassroom(
+                                                    assignment,
+                                                )
+                                            }}
+                                        >
+                                            Open in Google Classroom
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            disabled={
+                                                !isDraft || isActionInProgress
+                                            }
+                                            title={
+                                                !isDraft
+                                                    ? "Only draft assignments can be published"
+                                                    : undefined
+                                            }
+                                            onClick={event => {
+                                                event.preventDefault()
+                                                event.stopPropagation()
+
+                                                if (!isDraft) {
+                                                    return
+                                                }
+
+                                                void handlePublish(
+                                                    assignment.id,
+                                                )
+                                            }}
+                                        >
+                                            {isPublishing
+                                                ? "Publishing..."
+                                                : "Publish"}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            disabled={isActionInProgress}
+                                            onClick={event => {
+                                                event.preventDefault()
+                                                event.stopPropagation()
+                                                void handleSync(assignment.id)
+                                            }}
+                                        >
+                                            {isSyncing
+                                                ? "Syncing..."
+                                                : "Sync now"}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuSeparator className="my-0" />
+                                        <DropdownMenuItem
+                                            disabled={isActionInProgress}
+                                            className="data-highlighted:text-error text-error"
+                                            onClick={event => {
+                                                event.preventDefault()
+                                                event.stopPropagation()
+                                                void handleDelete(assignment.id)
+                                            }}
+                                        >
+                                            {isDeleting
+                                                ? "Deleting..."
+                                                : "Delete assignment"}
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenuPositioner>
+                            </DropdownMenuPortal>
+                        </DropdownMenu>
+                    )
+                },
             },
         ],
-        [handlePublish, publishingId],
+        [
+            deletingId,
+            handleDelete,
+            handleOpenInClassroom,
+            handlePublish,
+            handleSync,
+            publishingId,
+            syncingId,
+        ],
     )
     const table = useReactTable({
         data: allAssignments,
@@ -278,7 +452,12 @@ export function TeacherClientPage({
                                                         disabled={
                                                             !header.column.getCanSort()
                                                         }
-                                                        className="inline-flex w-full items-center gap-1 overflow-hidden text-left disabled:cursor-default"
+                                                        className={
+                                                            header.column.id ===
+                                                            "actions"
+                                                                ? "inline-flex w-full items-center justify-center gap-1 overflow-hidden text-center disabled:cursor-default"
+                                                                : "inline-flex w-full items-center gap-1 overflow-hidden text-left disabled:cursor-default"
+                                                        }
                                                     >
                                                         <span className="truncate">
                                                             {flexRender(
@@ -358,6 +537,18 @@ export function TeacherClientPage({
 
 function formatPassageRef(assignment: Assignment): string {
     return `${toProperCase(assignment.book.split("_").join(" "))} ${assignment.startChapter}:${assignment.startVerse}-${assignment.endChapter}:${assignment.endVerse}`
+}
+
+function getGoogleClassroomCourseWorkUrl(assignment: Assignment): string {
+    return `https://classroom.google.com/c/${toGoogleClassroomUrlId(assignment.courseId)}/a/${toGoogleClassroomUrlId(assignment.courseWorkId)}/details`
+}
+
+function toGoogleClassroomUrlId(value: string): string {
+    try {
+        return btoa(value).replace(/=+$/g, "")
+    } catch (_error) {
+        return encodeURIComponent(value)
+    }
 }
 
 function formatState(state: Assignment["state"]): string {

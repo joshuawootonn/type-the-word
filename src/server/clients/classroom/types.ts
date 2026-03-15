@@ -106,6 +106,7 @@ export type ModifyAttachmentsResponse = z.infer<
 >
 
 export type CourseWorkState = "DRAFT" | "PUBLISHED" | "DELETED"
+export type UpdateCourseWorkStateInput = "DRAFT" | "PUBLISHED"
 
 export type CreateCourseWorkInput = {
     title: string
@@ -178,8 +179,13 @@ export type ClassroomClient = {
         accessToken: string,
         courseId: string,
         courseWorkId: string,
-        state: CourseWorkState,
+        state: UpdateCourseWorkStateInput,
     ) => Promise<CourseWork>
+    deleteCourseWork: (
+        accessToken: string,
+        courseId: string,
+        courseWorkId: string,
+    ) => Promise<void>
     getCourseWork: (
         accessToken: string,
         courseId: string,

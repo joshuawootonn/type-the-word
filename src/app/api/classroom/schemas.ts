@@ -85,6 +85,23 @@ export type CreateAssignmentResponse = z.infer<
     typeof createAssignmentResponseSchema
 >
 
+export const assignmentMutationResponseSchema = z.object({
+    success: z.boolean(),
+})
+
+export type AssignmentMutationResponse = z.infer<
+    typeof assignmentMutationResponseSchema
+>
+
+export const assignmentSyncResponseSchema =
+    assignmentMutationResponseSchema.extend({
+        classroomLink: z.string().url().optional(),
+    })
+
+export type AssignmentSyncResponse = z.infer<
+    typeof assignmentSyncResponseSchema
+>
+
 // GET /api/classroom/dashboard
 export const assignmentSchema = z.object({
     id: z.string(),
