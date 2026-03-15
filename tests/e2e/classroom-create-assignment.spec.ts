@@ -41,6 +41,9 @@ test("teacher connects, creates assignment, and publishes it", async ({
         .filter({ hasText: assignmentTitle })
 
     await expect(assignmentRow).toContainText("Draft")
-    await assignmentRow.getByRole("button", { name: "Publish" }).click()
+    await assignmentRow
+        .getByRole("button", { name: "Assignment actions" })
+        .click()
+    await page.getByRole("menuitem", { name: "Publish" }).click()
     await expect(assignmentRow).toContainText("Published")
 })
