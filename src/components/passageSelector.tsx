@@ -100,6 +100,7 @@ export function PassageSelector({
     const [chapterQuery, setChapterQuery] = useState("")
     const [translationQuery, setTranslationQuery] = useState("")
 
+    // Per-combobox open state, tracked via the HeadlessUI render prop + OpenTracker
     const [translationOpen, setTranslationOpen] = useState(false)
     const [bookOpen, setBookOpen] = useState(false)
     const [chapterOpen, setChapterOpen] = useState(false)
@@ -107,12 +108,7 @@ export function PassageSelector({
 
     const timerRef = useRef<NodeJS.Timeout | null>(null)
 
-    const navIntentRef = useRef<{
-        book: Book
-        chapter: string
-        translation: Translation
-        immediate: boolean
-    } | null>(null)
+    const immediateRef = useRef(false)
 
     const prevAnyOpenRef = useRef(false)
 
@@ -194,10 +190,8 @@ export function PassageSelector({
             setTranslation(translation)
             const nextUrl = toPassageSegment(book, chapter)
 
-            // Set cookie to remember translation preference
             void updateTranslationCookie(translation)
 
-            // Always include translation param
             const params = new URLSearchParams()
             params.set("translation", translation)
             const queryString = params.toString()
@@ -218,60 +212,39 @@ export function PassageSelector({
 
         if (justOpened) {
             clearTimeout(timerRef.current!)
-            navIntentRef.current = {
-                book,
-                chapter,
-                translation,
-                immediate: false,
-            }
+            immediateRef.current = false
             return
         }
 
         if (justClosed) {
-            const intent = navIntentRef.current
-            if (intent) {
-                navIntentRef.current = null
-                const nextValue = passageReferenceSchema.parse(
-                    `${intent.book}_${intent.chapter}`,
-                )
-                if (!pathname?.includes(nextValue) && pathname !== "/") {
-                    clearTimeout(timerRef.current!)
-                    if (intent.immediate) {
-                        onSubmit(intent)
-                    } else {
-                        timerRef.current = setTimeout(
-                            () => onSubmit(intent),
-                            3000,
-                        )
-                    }
-                }
+            const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
+            if (!pathname?.includes(nextValue) && pathname !== "/") {
+                clearTimeout(timerRef.current!)
+                immediateRef.current
+                    ? onSubmit({ book, chapter, translation })
+                    : (timerRef.current = setTimeout(
+                          () => onSubmit({ book, chapter, translation }),
+                          3000,
+                      ))
             }
+            immediateRef.current = false
             return
         }
 
         if (anyOpen) {
             clearTimeout(timerRef.current!)
-            navIntentRef.current = {
-                book,
-                chapter,
-                translation,
-                immediate: false,
-            }
-        } else {
-            // No dropdown involved — behave as before (3-second delay).
-            const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
-            if (!pathname?.includes(nextValue) && pathname !== "/") {
-                timerRef.current = setTimeout(() => {
-                    onSubmit({ book, chapter, translation })
-                }, 3000)
-                return () => {
-                    clearTimeout(timerRef.current!)
-                }
-            }
+            return
         }
-    }, [book, translation, anyOpen, onSubmit, pathname])
-    // Note: `chapter` is intentionally excluded — chapter navigation is handled
-    // via navIntentRef set in the chapter combobox onChange.
+
+        const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
+        if (!pathname?.includes(nextValue) && pathname !== "/") {
+            timerRef.current = setTimeout(
+                () => onSubmit({ book, chapter, translation }),
+                3000,
+            )
+            return () => clearTimeout(timerRef.current!)
+        }
+    }, [book, chapter, translation, anyOpen, onSubmit, pathname])
 
     const isFirstRender = useIsFirstRender()
 
@@ -311,7 +284,8 @@ export function PassageSelector({
                                     }
                                 }}
                                 displayValue={(t: Translation) =>
-                                    translations.find(tr => tr.value === t)?.label ?? t
+                                    translations.find(tr => tr.value === t)
+                                        ?.label ?? t
                                 }
                                 className={
                                     "border-primary bg-secondary text-primary w-[8ch] rounded-none border-2 p-1 font-medium outline-hidden"
@@ -321,8 +295,9 @@ export function PassageSelector({
                             />
                             {isFirstRender && (
                                 <div className="text-primary absolute top-1 left-1 translate-x-0.5 translate-y-0.5 font-medium">
-                            {translations.find(t => t.value === translation)
-                                ?.label ?? translation}
+                                    {translations.find(
+                                        t => t.value === translation,
+                                    )?.label ?? translation}
                                 </div>
                             )}
                             <ScrollArea.Root>
@@ -399,7 +374,9 @@ export function PassageSelector({
                             <Combobox.Input
                                 ref={bookRef}
                                 id={PASSAGE_BOOK_INPUT_ID}
-                        onChange={event => setBookQuery(event.target.value)}
+                                onChange={event =>
+                                    setBookQuery(event.target.value)
+                                }
                                 onFocus={event => {
                                     event.currentTarget.select()
                                 }}
@@ -450,8 +427,9 @@ export function PassageSelector({
                                                             )
                                                         }}
                                                     >
-                                                {simpleBibleMetadata[book]
-                                                    ?.name ?? book}
+                                                        {simpleBibleMetadata[
+                                                            book
+                                                        ]?.name ?? book}
                                                     </div>
                                                 )}
                                             </Combobox.Option>
@@ -488,12 +466,7 @@ export function PassageSelector({
                     value={chapter}
                     onChange={next => {
                         if (next !== null) {
-                            navIntentRef.current = {
-                                book,
-                                chapter: next,
-                                translation,
-                                immediate: true,
-                            }
+                            immediateRef.current = true
                             setChapter(next)
                         }
                     }}
@@ -507,10 +480,15 @@ export function PassageSelector({
                             <Combobox.Input
                                 ref={chapterRef}
                                 as={ForwardedRefInput}
-                                onChange={event => setChapterQuery(event.target.value)}
+                                onChange={event =>
+                                    setChapterQuery(event.target.value)
+                                }
                                 onFocus={event => event.currentTarget.select()}
                                 onKeyUp={event => {
-                                    if (event.key === "Enter" || event.keyCode === 13) {
+                                    if (
+                                        event.key === "Enter" ||
+                                        event.keyCode === 13
+                                    ) {
                                         onSubmit({ book, chapter, translation })
                                     }
                                 }}
