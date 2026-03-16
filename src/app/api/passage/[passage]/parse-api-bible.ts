@@ -487,6 +487,12 @@ export async function parseApiBibleChapter(
                     currentTrimmedPunctuation,
                 )
 
+                // Pattern 5b: punctuation before closing paren/bracket
+                // (e.g., LORD + .) → LORD.) ).
+                const isPunctPlusClosingParen = /^[.!?,;:]+[)\]]+$/.test(
+                    currentTrimmedPunctuation,
+                )
+
                 // Pattern 6: standalone punctuation (e.g., Lord + ; → Lord;
                 // report + ? → report?; LORD + — → LORD—)
                 const isStandalonePunct = /^[;:,.?!\u2013\u2014-]+$/.test(
@@ -500,6 +506,7 @@ export async function parseApiBibleChapter(
                     isQuotePlusPunct ||
                     isQuotePlusParenAndPunct ||
                     isClosingParen ||
+                    isPunctPlusClosingParen ||
                     isStandalonePunct
                 ) {
                     // Remove trailing space if present, then append
