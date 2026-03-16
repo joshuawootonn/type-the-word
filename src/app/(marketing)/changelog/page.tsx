@@ -85,6 +85,20 @@ export default async function Changelog() {
             <ul>
                 <YearHeading year={2026} isFirst />
                 <li>
+                    <DateComponent date={new Date("03/16/2026")} /> - Added a
+                    new{" "}
+                    <NextLink href="/home" className="underline">
+                        /home
+                    </NextLink>{" "}
+                    page that shows your five most recent typing locations so
+                    you can quickly return to where you last typed.
+                    <br />
+                    <br />
+                    I'm going to experiment with a new memorization feature and
+                    this will be the place where your memorization passages are
+                    available.
+                </li>
+                <li>
                     <DateComponent date={new Date("03/02/2026")} /> - Fixed
                     missing NLT verses in Numbers 1:22-43, Numbers 2:12-15, and
                     Numbers 2:20-23, and formatted Numbers 1:5-15 with a
