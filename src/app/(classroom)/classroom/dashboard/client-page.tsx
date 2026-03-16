@@ -1,5 +1,6 @@
 "use client"
 
+import { DotsThree } from "@phosphor-icons/react"
 import NextLink from "next/link"
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
@@ -7,7 +8,16 @@ import { useCallback, useEffect, useState } from "react"
 import { type Course } from "~/app/api/classroom/schemas"
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Loading } from "~/components/loading"
-import { Link } from "~/components/ui/link"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuPortal,
+    DropdownMenuPositioner,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu"
+import { getGoogleClassroomHomeUrl } from "~/lib/googleClassroomUrl"
 
 import { fetchCourses } from "./actions"
 
@@ -48,13 +58,63 @@ export function ClientPage({ isTeacher }: ClientPageProps) {
 
     return (
         <div>
-            <h1>Dashboard</h1>
-            {isTeacher && (
-                <div className="not-prose mb-4 flex gap-3">
-                    <Link href="/classroom/organization">Organization</Link>
-                    <Link href="/classroom/dashboard/settings">Settings</Link>
+            <div className="mb-4 flex items-center gap-2">
+                <h1 className="my-0">Dashboard</h1>
+                <div className="not-prose">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger
+                            className="svg-outline relative inline-flex cursor-pointer items-center justify-center p-1 outline-hidden"
+                            aria-label="Dashboard actions"
+                        >
+                            <DotsThree
+                                aria-hidden="true"
+                                weight="bold"
+                                className="h-5 w-5"
+                            />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuPortal>
+                            <DropdownMenuPositioner align="end">
+                                <DropdownMenuContent>
+                                    {isTeacher && (
+                                        <>
+                                            <DropdownMenuItem
+                                                onClick={() => {
+                                                    router.push(
+                                                        "/classroom/organization",
+                                                    )
+                                                }}
+                                            >
+                                                Organization
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => {
+                                                    router.push(
+                                                        "/classroom/dashboard/settings",
+                                                    )
+                                                }}
+                                            >
+                                                Settings
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                        </>
+                                    )}
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            window.open(
+                                                getGoogleClassroomHomeUrl(),
+                                                "_blank",
+                                                "noopener,noreferrer",
+                                            )
+                                        }}
+                                    >
+                                        Go to Google Classroom
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenuPositioner>
+                        </DropdownMenuPortal>
+                    </DropdownMenu>
                 </div>
-            )}
+            </div>
 
             {isLoading ? (
                 <Loading />

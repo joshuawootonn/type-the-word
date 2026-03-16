@@ -1,4 +1,4 @@
-import { eq, and, sql, or, isNull, inArray } from "drizzle-orm"
+import { eq, and, sql, or, isNull, inArray, ne } from "drizzle-orm"
 import { getServerSession } from "next-auth"
 import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
@@ -140,6 +140,7 @@ export async function GET(request: NextRequest) {
             let enrolledStudentCount: number | null = null
             const teacherAssignmentsFilter = and(
                 eq(classroomAssignment.courseId, courseId),
+                ne(classroomAssignment.state, "DELETED"),
                 or(
                     eq(
                         classroomAssignment.organizationId,

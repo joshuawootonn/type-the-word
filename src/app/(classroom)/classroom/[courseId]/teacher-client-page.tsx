@@ -1,11 +1,6 @@
 "use client"
 
-import {
-    CheckCircle,
-    Clock,
-    DotsThreeVertical,
-    XCircle,
-} from "@phosphor-icons/react"
+import { CheckCircle, Clock, DotsThree, XCircle } from "@phosphor-icons/react"
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query"
 import {
     type ColumnDef,
@@ -21,6 +16,7 @@ import { useCallback, useMemo, useState } from "react"
 
 import { type Assignment } from "~/app/api/classroom/schemas"
 import { Loading } from "~/components/loading"
+import { LoadingTripleDot } from "~/components/loading-triple-dot"
 import { Button } from "~/components/ui/button"
 import {
     DropdownMenu,
@@ -43,6 +39,10 @@ import {
     TableHeader,
     TableRow,
 } from "~/components/ui/table"
+import {
+    getGoogleClassroomCourseUrl,
+    getGoogleClassroomCourseWorkUrl,
+} from "~/lib/googleClassroomUrl"
 import toProperCase from "~/lib/toProperCase"
 
 import {
@@ -134,7 +134,10 @@ export function TeacherClientPage({
     )
 
     const handleOpenInClassroom = useCallback((assignment: Assignment) => {
-        const classroomUrl = getGoogleClassroomCourseWorkUrl(assignment)
+        const classroomUrl = getGoogleClassroomCourseWorkUrl(
+            assignment.courseId,
+            assignment.courseWorkId,
+        )
         window.open(classroomUrl, "_blank", "noopener,noreferrer")
     }, [])
 
@@ -234,6 +237,7 @@ export function TeacherClientPage({
                     const assignment = row.original
                     const isDraft = assignment.state === "DRAFT"
                     const isPublished = assignment.state === "PUBLISHED"
+                    const isDeleted = assignment.state === "DELETED"
                     const isPublishing = publishingId === assignment.id
                     const isSyncing = syncingId === assignment.id
                     const isDeleting = deletingId === assignment.id
@@ -243,11 +247,7 @@ export function TeacherClientPage({
                     if (isActionInProgress) {
                         return (
                             <div className="flex h-[29.5px] items-center justify-center">
-                                <Loading
-                                    label=""
-                                    initialDots={3}
-                                    className="h-5 text-[20px] leading-none"
-                                />
+                                <LoadingTripleDot size={20} />
                             </div>
                         )
                     }
@@ -262,7 +262,7 @@ export function TeacherClientPage({
                                 }}
                                 aria-label="Assignment actions"
                             >
-                                <DotsThreeVertical
+                                <DotsThree
                                     aria-hidden="true"
                                     weight="bold"
                                     className="h-5 w-5"
@@ -333,11 +333,23 @@ export function TeacherClientPage({
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator className="my-0" />
                                         <DropdownMenuItem
-                                            disabled={isActionInProgress}
+                                            disabled={
+                                                isActionInProgress || isDeleted
+                                            }
+                                            title={
+                                                isDeleted
+                                                    ? "This assignment is already deleted"
+                                                    : undefined
+                                            }
                                             className="data-highlighted:text-error text-error"
                                             onClick={event => {
                                                 event.preventDefault()
                                                 event.stopPropagation()
+
+                                                if (isDeleted) {
+                                                    return
+                                                }
+
                                                 void handleDelete(assignment.id)
                                             }}
                                         >
@@ -403,7 +415,42 @@ export function TeacherClientPage({
                 </Link>
             </nav>
 
-            <h1 className="">{courseName}</h1>
+            <div className="mb-6 flex items-center gap-2">
+                <h1 className="my-0">{courseName}</h1>
+                <div className="not-prose">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger
+                            className="svg-outline relative inline-flex cursor-pointer items-center justify-center p-1 outline-hidden"
+                            aria-label="Course actions"
+                        >
+                            <DotsThree
+                                aria-hidden="true"
+                                weight="bold"
+                                className="h-5 w-5"
+                            />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuPortal>
+                            <DropdownMenuPositioner align="end">
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            window.open(
+                                                getGoogleClassroomCourseUrl(
+                                                    courseId,
+                                                ),
+                                                "_blank",
+                                                "noopener,noreferrer",
+                                            )
+                                        }}
+                                    >
+                                        Go to Google Classroom
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenuPositioner>
+                        </DropdownMenuPortal>
+                    </DropdownMenu>
+                </div>
+            </div>
 
             {isInitialLoading ? (
                 <Loading />
@@ -537,18 +584,6 @@ export function TeacherClientPage({
 
 function formatPassageRef(assignment: Assignment): string {
     return `${toProperCase(assignment.book.split("_").join(" "))} ${assignment.startChapter}:${assignment.startVerse}-${assignment.endChapter}:${assignment.endVerse}`
-}
-
-function getGoogleClassroomCourseWorkUrl(assignment: Assignment): string {
-    return `https://classroom.google.com/c/${toGoogleClassroomUrlId(assignment.courseId)}/a/${toGoogleClassroomUrlId(assignment.courseWorkId)}/details`
-}
-
-function toGoogleClassroomUrlId(value: string): string {
-    try {
-        return btoa(value).replace(/=+$/g, "")
-    } catch (_error) {
-        return encodeURIComponent(value)
-    }
 }
 
 function formatState(state: Assignment["state"]): string {

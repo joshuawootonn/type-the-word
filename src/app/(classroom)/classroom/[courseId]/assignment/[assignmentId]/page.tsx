@@ -355,6 +355,7 @@ export default async function AssignmentDetailPage({
         <StudentClientPage
             assignmentId={assignment.id}
             assignmentTitle={assignment.title}
+            courseWorkId={assignment.courseWorkId}
             referenceLabel={referenceLabel}
             translation={assignment.translation}
             passage={passage}

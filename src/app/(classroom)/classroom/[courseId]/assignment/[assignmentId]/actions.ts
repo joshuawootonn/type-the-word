@@ -1,7 +1,9 @@
 "use client"
 
 import {
+    assignmentMutationResponseSchema,
     assignmentDetailSchema,
+    assignmentSyncResponseSchema,
     errorResponseSchema,
 } from "~/app/api/classroom/schemas"
 
@@ -40,4 +42,43 @@ export async function publishAssignment(assignmentId: string) {
 
     const data = await response.json()
     return data
+}
+
+/**
+ * Manually syncs an assignment with Google Classroom
+ */
+export async function syncAssignment(assignmentId: string) {
+    const response = await fetch(
+        `/api/classroom/assignments/${assignmentId}/sync`,
+        {
+            method: "POST",
+        },
+    )
+
+    if (!response.ok) {
+        const errorData = await response.json()
+        const error = errorResponseSchema.parse(errorData)
+        throw new Error(error.error)
+    }
+
+    const data = await response.json()
+    return assignmentSyncResponseSchema.parse(data)
+}
+
+/**
+ * Deletes an assignment
+ */
+export async function deleteAssignment(assignmentId: string) {
+    const response = await fetch(`/api/classroom/assignments/${assignmentId}`, {
+        method: "DELETE",
+    })
+
+    if (!response.ok) {
+        const errorData = await response.json()
+        const error = errorResponseSchema.parse(errorData)
+        throw new Error(error.error)
+    }
+
+    const data = await response.json()
+    return assignmentMutationResponseSchema.parse(data)
 }

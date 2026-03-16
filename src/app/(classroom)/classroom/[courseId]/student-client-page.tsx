@@ -1,5 +1,6 @@
 "use client"
 
+import { DotsThree } from "@phosphor-icons/react"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import NextLink from "next/link"
 import { useMemo } from "react"
@@ -9,12 +10,21 @@ import { AssignmentStatusBadge } from "~/components/assignment-status-badge"
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuPortal,
+    DropdownMenuPositioner,
+    DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu"
 import { Link } from "~/components/ui/link"
 import { Meter } from "~/components/ui/meter"
 import {
     type StudentAssignmentDisplayStatus,
     getStudentAssignmentDisplayStatus,
 } from "~/lib/classroom-assignment-status"
+import { getGoogleClassroomCourseUrl } from "~/lib/googleClassroomUrl"
 import toProperCase from "~/lib/toProperCase"
 
 import { fetchAssignments } from "./actions"
@@ -80,7 +90,42 @@ export function StudentClientPage({
                 <span>{courseName}</span>
             </nav>
 
-            <h1>{courseName}</h1>
+            <div className="mb-6 flex items-center gap-2">
+                <h1 className="my-0">{courseName}</h1>
+                <div className="not-prose">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger
+                            className="svg-outline relative inline-flex cursor-pointer items-center justify-center p-1 outline-hidden"
+                            aria-label="Course actions"
+                        >
+                            <DotsThree
+                                aria-hidden="true"
+                                weight="bold"
+                                className="h-5 w-5"
+                            />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuPortal>
+                            <DropdownMenuPositioner align="end">
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            window.open(
+                                                getGoogleClassroomCourseUrl(
+                                                    courseId,
+                                                ),
+                                                "_blank",
+                                                "noopener,noreferrer",
+                                            )
+                                        }}
+                                    >
+                                        Go to Google Classroom
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenuPositioner>
+                        </DropdownMenuPortal>
+                    </DropdownMenu>
+                </div>
+            </div>
 
             {totalAssignments === 0 ? (
                 <p className="opacity-75">No assignments yet.</p>

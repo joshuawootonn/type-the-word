@@ -1,6 +1,6 @@
 "use client"
 
-import { CheckCircle, Clock, XCircle } from "@phosphor-icons/react"
+import { CheckCircle, Clock, DotsThree, XCircle } from "@phosphor-icons/react"
 import {
     type ColumnDef,
     flexRender,
@@ -10,12 +10,22 @@ import {
     type SortingState,
     useReactTable,
 } from "@tanstack/react-table"
+import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { type AssignmentDetail } from "~/app/api/classroom/schemas"
 import { ClassroomNotice } from "~/components/classroom-notice"
 import { Loading } from "~/components/loading"
 import { Button } from "~/components/ui/button"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuPortal,
+    DropdownMenuPositioner,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { Link } from "~/components/ui/link"
@@ -28,9 +38,15 @@ import {
     TableHeader,
     TableRow,
 } from "~/components/ui/table"
+import { getGoogleClassroomCourseWorkUrl } from "~/lib/googleClassroomUrl"
 import toProperCase from "~/lib/toProperCase"
 
-import { fetchAssignmentDetail, publishAssignment } from "./actions"
+import {
+    deleteAssignment,
+    fetchAssignmentDetail,
+    publishAssignment,
+    syncAssignment,
+} from "./actions"
 
 interface TeacherClientPageProps {
     assignmentId: string
@@ -43,11 +59,14 @@ export function TeacherClientPage({
     courseId,
     courseName,
 }: TeacherClientPageProps) {
+    const router = useRouter()
     const [data, setData] = useState<AssignmentDetail | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [isPublishing, setIsPublishing] = useState(false)
-    const [publishError, setPublishError] = useState<string | null>(null)
+    const [isSyncing, setIsSyncing] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
+    const [actionError, setActionError] = useState<string | null>(null)
     const [sorting, setSorting] = useState<SortingState>([])
     const [globalFilter, setGlobalFilter] = useState("")
 
@@ -68,18 +87,50 @@ export function TeacherClientPage({
 
     const handlePublish = async () => {
         setIsPublishing(true)
-        setPublishError(null)
+        setActionError(null)
 
         try {
             await publishAssignment(assignmentId)
             // Reload data to get updated state
             await loadData()
         } catch (err) {
-            setPublishError(
+            setActionError(
                 err instanceof Error ? err.message : "Failed to publish",
             )
         } finally {
             setIsPublishing(false)
+        }
+    }
+
+    const handleSync = async () => {
+        setIsSyncing(true)
+        setActionError(null)
+
+        try {
+            await syncAssignment(assignmentId)
+            await loadData()
+        } catch (err) {
+            setActionError(
+                err instanceof Error ? err.message : "Failed to sync",
+            )
+        } finally {
+            setIsSyncing(false)
+        }
+    }
+
+    const handleDelete = async () => {
+        setIsDeleting(true)
+        setActionError(null)
+
+        try {
+            await deleteAssignment(assignmentId)
+            router.push(`/classroom/${courseId}`)
+        } catch (err) {
+            setActionError(
+                err instanceof Error ? err.message : "Failed to delete",
+            )
+        } finally {
+            setIsDeleting(false)
         }
     }
 
@@ -226,10 +277,80 @@ export function TeacherClientPage({
                 <span>{assignment.title}</span>
             </nav>
 
-            <h1>{assignment.title}</h1>
+            <div className="mb-6 flex items-center gap-2">
+                <h1 className="my-0">{assignment.title}</h1>
+                <div className="not-prose">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger
+                            className="svg-outline relative inline-flex cursor-pointer items-center justify-center p-1 outline-hidden"
+                            aria-label="Assignment actions"
+                        >
+                            <DotsThree
+                                aria-hidden="true"
+                                weight="bold"
+                                className="h-5 w-5"
+                            />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuPortal>
+                            <DropdownMenuPositioner align="end">
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem
+                                        disabled={
+                                            assignment.state !== "DRAFT" ||
+                                            isPublishing
+                                        }
+                                        onClick={() => {
+                                            void handlePublish()
+                                        }}
+                                    >
+                                        {isPublishing
+                                            ? "Publishing..."
+                                            : "Publish Assignment"}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        disabled={isSyncing}
+                                        onClick={() => {
+                                            void handleSync()
+                                        }}
+                                    >
+                                        {isSyncing ? "Syncing..." : "Sync now"}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                        disabled={isDeleting}
+                                        className="data-highlighted:text-error text-error"
+                                        onClick={() => {
+                                            void handleDelete()
+                                        }}
+                                    >
+                                        {isDeleting
+                                            ? "Deleting..."
+                                            : "Delete assignment"}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            window.open(
+                                                getGoogleClassroomCourseWorkUrl(
+                                                    courseId,
+                                                    assignment.courseWorkId,
+                                                ),
+                                                "_blank",
+                                                "noopener,noreferrer",
+                                            )
+                                        }}
+                                    >
+                                        Go to Google Classroom
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenuPositioner>
+                        </DropdownMenuPortal>
+                    </DropdownMenu>
+                </div>
+            </div>
 
-            {/* Publish Error */}
-            {publishError && (
+            {/* Action Error */}
+            {actionError && (
                 <div className="not-prose border-error bg-secondary mb-6 flex items-start gap-3 border-2 p-4">
                     <svg
                         className="text-error mt-1 h-5 w-5 shrink-0"
@@ -242,7 +363,7 @@ export function TeacherClientPage({
                     >
                         <path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p className="text-error">{publishError}</p>
+                    <p className="text-error">{actionError}</p>
                 </div>
             )}
 

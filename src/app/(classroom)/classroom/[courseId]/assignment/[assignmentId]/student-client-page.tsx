@@ -1,12 +1,22 @@
 "use client"
 
+import { DotsThree } from "@phosphor-icons/react"
 import { useRouter } from "next/navigation"
 
 import { AssignmentHistory } from "~/app/api/assignment-history/[assignmentId]/getAssignmentHistory"
 import { CopyrightCitation } from "~/components/copyright-citation"
 import { Passage } from "~/components/passage"
 import { Button } from "~/components/ui/button"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuPortal,
+    DropdownMenuPositioner,
+    DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu"
 import { Link } from "~/components/ui/link"
+import { getGoogleClassroomCourseWorkUrl } from "~/lib/googleClassroomUrl"
 import { ParsedPassage, Translation } from "~/lib/parseEsv"
 import { TypingSession } from "~/server/repositories/typingSession.repository"
 
@@ -18,6 +28,7 @@ interface StudentClientPageProps {
     assignmentChapterHistory?: AssignmentHistory
     assignmentId: string
     assignmentTitle: string
+    courseWorkId: string
     referenceLabel: string
     translation: Translation
     passage: ParsedPassage
@@ -41,6 +52,7 @@ interface StudentClientPageProps {
 export function StudentClientPage({
     assignmentId,
     assignmentTitle,
+    courseWorkId,
     referenceLabel,
     translation,
     passage,
@@ -85,6 +97,44 @@ export function StudentClientPage({
                 <span className="mx-2 opacity-50">/</span>
                 <span>{assignmentTitle}</span>
             </nav>
+
+            <div className="mb-6 flex items-center gap-2">
+                <h1 className="my-0">{assignmentTitle}</h1>
+                <div className="not-prose">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger
+                            className="svg-outline relative inline-flex cursor-pointer items-center justify-center p-1 outline-hidden"
+                            aria-label="Assignment actions"
+                        >
+                            <DotsThree
+                                aria-hidden="true"
+                                weight="bold"
+                                className="h-5 w-5"
+                            />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuPortal>
+                            <DropdownMenuPositioner align="end">
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            window.open(
+                                                getGoogleClassroomCourseWorkUrl(
+                                                    courseId,
+                                                    courseWorkId,
+                                                ),
+                                                "_blank",
+                                                "noopener,noreferrer",
+                                            )
+                                        }}
+                                    >
+                                        Go to Google Classroom
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenuPositioner>
+                        </DropdownMenuPortal>
+                    </DropdownMenu>
+                </div>
+            </div>
 
             <div className="space-y-8">
                 <Passage
