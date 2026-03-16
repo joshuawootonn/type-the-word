@@ -85,6 +85,11 @@ export default async function Changelog() {
             <ul>
                 <YearHeading year={2026} isFirst />
                 <li>
+                    <DateComponent date={new Date("03/16/2026")} /> - Fixed NLT
+                    Leviticus 23:38 so the closing punctuation in{" "}
+                    <code>LORD.)</code> is now typeable.
+                </li>
+                <li>
                     <DateComponent date={new Date("03/16/2026")} /> - Added a
                     new{" "}
                     <NextLink href="/home" className="underline">
