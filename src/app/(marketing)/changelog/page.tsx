@@ -99,6 +99,20 @@ export default async function Changelog() {
                     available.
                 </li>
                 <li>
+                    <DateComponent date={new Date("03/12/2026")} /> - Fixed
+                    passage formatting issues that blocked typing:
+                    <ul>
+                        <li>
+                            Fixed NLT Psalm 68:4 so the dash formatting no
+                            longer creates an untypeable break.
+                        </li>
+                        <li>
+                            Fixed ESV James 1 so newline/space artifacts no
+                            longer render as extra typeable content.
+                        </li>
+                    </ul>
+                </li>
+                <li>
                     <DateComponent date={new Date("03/02/2026")} /> - Fixed
                     missing NLT verses in Numbers 1:22-43, Numbers 2:12-15, and
                     Numbers 2:20-23, and formatted Numbers 1:5-15 with a
