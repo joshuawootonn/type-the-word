@@ -17,6 +17,7 @@ COMPOSE_PROJECT_NAME="type_the_word"
 POSTGRES_DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:1200/type_the_word'
 NEXTAUTH_SECRET=""
 NEXTAUTH_URL="http://localhost:1199"
+AUTH_COOKIE_SUFFIX="1199"
 GOOGLE_CLIENT_SECRET=""
 GOOGLE_CLIENT_ID=""
 CROSSWAY_SECRET=""
@@ -35,6 +36,12 @@ NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
 This will allow you to load [Psalm 23](http://localhost:1199/passage/psalm_23) and [Gensis 1](http://localhost:1199/passage/genesis_1).
 
 If you run multiple local copies of this repo, give each one a unique `APP_PORT` / `POSTGRES_PORT` / `POSTGRES_TEST_PORT` triplet and keep the URLs + database URL aligned to that triplet. A useful pattern is to offset each extra instance by `+10` (for example: `1209/1210/1211`, then `1219/1220/1221`) to keep buffer space for other services.
+
+Set a unique `AUTH_COOKIE_SUFFIX` for each clone so sign-in/sign-out in one local instance does not invalidate the others. Example suffixes that match the port pattern:
+
+- clone on `1199`: `AUTH_COOKIE_SUFFIX="1199"`
+- clone on `1209`: `AUTH_COOKIE_SUFFIX="1209"`
+- clone on `1219`: `AUTH_COOKIE_SUFFIX="1219"`
 
 You can also set a unique `COMPOSE_PROJECT_NAME` per clone/worktree so Docker container, network, and volume names do not overlap.
 

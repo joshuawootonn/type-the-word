@@ -34,6 +34,26 @@ declare module "next-auth/jwt" {
     }
 }
 
+function getCookieNameBase(): string {
+    const suffix = env.AUTH_COOKIE_SUFFIX?.trim()
+    if (!suffix) {
+        return "next-auth"
+    }
+
+    // Cookie names may only use a restricted character set.
+    const sanitizedSuffix = suffix.replace(/[^A-Za-z0-9_-]/g, "-")
+    if (!sanitizedSuffix) {
+        return "next-auth"
+    }
+
+    return `next-auth-${sanitizedSuffix}`
+}
+
+const useSecureCookies = new URL(env.DEPLOYED_URL).protocol === "https:"
+const secureCookiePrefix = useSecureCookies ? "__Secure-" : ""
+const hostCookiePrefix = useSecureCookies ? "__Host-" : ""
+const cookieNameBase = getCookieNameBase()
+
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
  *
@@ -107,6 +127,64 @@ export const authOptions: NextAuthOptions = {
     adapter: DrizzleAdapter(db),
     session: {
         strategy: "jwt",
+    },
+    // Isolate auth cookies per local clone to avoid cross-port session collisions.
+    cookies: {
+        sessionToken: {
+            name: `${secureCookiePrefix}${cookieNameBase}.session-token`,
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: useSecureCookies,
+            },
+        },
+        callbackUrl: {
+            name: `${secureCookiePrefix}${cookieNameBase}.callback-url`,
+            options: {
+                sameSite: "lax",
+                path: "/",
+                secure: useSecureCookies,
+            },
+        },
+        csrfToken: {
+            name: `${hostCookiePrefix}${cookieNameBase}.csrf-token`,
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: useSecureCookies,
+            },
+        },
+        pkceCodeVerifier: {
+            name: `${secureCookiePrefix}${cookieNameBase}.pkce.code_verifier`,
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: useSecureCookies,
+                maxAge: 900,
+            },
+        },
+        state: {
+            name: `${secureCookiePrefix}${cookieNameBase}.state`,
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: useSecureCookies,
+                maxAge: 900,
+            },
+        },
+        nonce: {
+            name: `${secureCookiePrefix}${cookieNameBase}.nonce`,
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: useSecureCookies,
+            },
+        },
     },
     providers: [
         CredentialsProvider({
