@@ -97,4 +97,49 @@ export class TypedVerseRepository {
             orderBy: [desc(schema.typedVerses.createdAt)],
         })
     }
+
+    async getRecentTypingLocations({
+        userId,
+        limit,
+    }: {
+        userId: string
+        limit: number
+    }): Promise<TypedVerse[]> {
+        const recentPerLocation = this.db
+            .selectDistinctOn(
+                [
+                    schema.typedVerses.book,
+                    schema.typedVerses.chapter,
+                    schema.typedVerses.translation,
+                ],
+                {
+                    id: schema.typedVerses.id,
+                    userId: schema.typedVerses.userId,
+                    typingSessionId: schema.typedVerses.typingSessionId,
+                    classroomAssignmentId:
+                        schema.typedVerses.classroomAssignmentId,
+                    translation: schema.typedVerses.translation,
+                    book: schema.typedVerses.book,
+                    chapter: schema.typedVerses.chapter,
+                    verse: schema.typedVerses.verse,
+                    createdAt: schema.typedVerses.createdAt,
+                    typingData: schema.typedVerses.typingData,
+                },
+            )
+            .from(schema.typedVerses)
+            .where(eq(schema.typedVerses.userId, userId))
+            .orderBy(
+                schema.typedVerses.book,
+                schema.typedVerses.chapter,
+                schema.typedVerses.translation,
+                desc(schema.typedVerses.createdAt),
+            )
+            .as("recentPerLocation")
+
+        return await this.db
+            .select()
+            .from(recentPerLocation)
+            .orderBy(desc(recentPerLocation.createdAt))
+            .limit(limit)
+    }
 }
