@@ -13,7 +13,11 @@ import { fetchPassage } from "~/lib/api"
 import { Translation } from "~/lib/parseEsv"
 import { segmentToPassageObject } from "~/lib/passageObject"
 import { passageReferenceSchema } from "~/lib/passageReference"
-import { PassageSegment, toPassageSegment } from "~/lib/passageSegment"
+import {
+    PassageSegment,
+    safeDecodePassageSegment,
+    toPassageSegment,
+} from "~/lib/passageSegment"
 import { authOptions } from "~/server/auth"
 import { getPassageAssignmentWarningMatch } from "~/server/classroom/classroom.service"
 import { db } from "~/server/db"
@@ -47,7 +51,8 @@ export async function generateMetadata({
     params: Promise<{ passage?: PassageSegment }>
     searchParams: Promise<{ translation?: string }>
 }): Promise<Metadata> {
-    const passage = (await params).passage
+    const rawPassage = (await params).passage
+    const passage = safeDecodePassageSegment(rawPassage)
     const { translation: translationParam } = await searchParams
     const translation = parseTranslation(translationParam)
     const a = passageReferenceSchema.parse(passage)

@@ -10,3 +10,17 @@ export type PassageSegment = z.infer<typeof passageSegmentSchema>
 export function toPassageSegment(book: string, chapter: string | number) {
     return passageSegmentSchema.parse(`${book}_${chapter}`)
 }
+
+export function safeDecodePassageSegment(
+    value: string | null | undefined,
+): string | undefined {
+    if (value == null) {
+        return undefined
+    }
+
+    try {
+        return decodeURIComponent(value)
+    } catch (_error) {
+        return value
+    }
+}

@@ -1,5 +1,8 @@
 import { env } from "~/env.mjs"
-import { passageSegmentSchema } from "~/lib/passageSegment"
+import {
+    passageSegmentSchema,
+    safeDecodePassageSegment,
+} from "~/lib/passageSegment"
 
 export const runtime = "edge"
 
@@ -10,7 +13,8 @@ export default async function Image({
 }: {
     params: Promise<{ passage: string }>
 }) {
-    const { passage } = await params
+    const { passage: rawPassage } = await params
+    const passage = safeDecodePassageSegment(rawPassage)
     const search = new URLSearchParams()
     if (passage) {
         search.set("passage", passageSegmentSchema.parse(passage))
