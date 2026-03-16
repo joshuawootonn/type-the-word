@@ -80,7 +80,7 @@ const DropdownMenuSeparator = forwardRef<
 >(({ className, ...props }, ref) => (
     <DropdownMenuPrimitive.Separator
         ref={ref}
-        className={mergeClassName("border-primary my-1 border-t-2", className)}
+        className={mergeClassName("border-primary border-t-2", className)}
         {...props}
     />
 ))
