@@ -19,15 +19,16 @@ import { z } from "zod"
 import { useIsFirstRender } from "~/lib/hooks/useIsFirstRender"
 import { Translation } from "~/lib/parseEsv"
 import { stringToPassageObject } from "~/lib/passageObject"
-import {
-    PassageReference,
-    passageReferenceSchema,
-} from "~/lib/passageReference"
+import { PassageReference } from "~/lib/passageReference"
 import { toPassageSegment } from "~/lib/passageSegment"
 import { allTranslations, validTranslations } from "~/lib/translations"
 import { Book, bookSchema } from "~/lib/types/book"
 
 import metadata from "../lib/simple-bible-metadata.json"
+import {
+    shouldSchedulePassageAutoSync,
+    toPassageSelectorTargetKey,
+} from "./passageSelector-auto-sync"
 
 export const PASSAGE_BOOK_INPUT_ID = "passage-book-input"
 
@@ -90,6 +91,7 @@ export function PassageSelector({
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
+    const lastSubmittedTargetRef = useRef<string | null>(null)
 
     const bookRef = useRef<HTMLInputElement>(null)
     const chapterRef = useRef<HTMLInputElement>(null)
@@ -163,6 +165,11 @@ export function PassageSelector({
             setBook(book)
             setChapter(chapter)
             setTranslation(translation)
+            lastSubmittedTargetRef.current = toPassageSelectorTargetKey(
+                book,
+                chapter,
+                translation,
+            )
             const nextUrl = toPassageSegment(book, chapter)
 
             // Set cookie to remember translation preference
@@ -181,9 +188,15 @@ export function PassageSelector({
     )
 
     useEffect(() => {
-        const nextValue = passageReferenceSchema.parse(`${book}_${chapter}`)
-        // I use `!includes` to prevent passage selector from clearing url specified verses
-        if (!pathname?.includes(nextValue) && pathname !== "/") {
+        if (
+            shouldSchedulePassageAutoSync({
+                pathname,
+                book,
+                chapter,
+                translation,
+                lastSubmittedTargetKey: lastSubmittedTargetRef.current,
+            })
+        ) {
             const t = setTimeout(() => {
                 onSubmit({ book, chapter, translation })
             }, 3000)
