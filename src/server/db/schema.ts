@@ -486,22 +486,36 @@ export const userDailyActivityRelations = relations(
     }),
 )
 
-export const passageResponse = pgTable("passageResponse", {
-    id: varchar("id", { length: 255 })
-        .notNull()
-        .$default(() => crypto.randomUUID())
-        .primaryKey(),
-    book: passageResponseBook("book").notNull(),
-    chapter: integer("chapter").notNull(),
-    translation: passageResponseTranslation("translation").notNull(),
-    response: json("response").notNull(),
-    createdAt: timestamp("createdAt", { mode: "date" })
-        .notNull()
-        .$default(() => sql`CURRENT_TIMESTAMP(3)`),
-    updatedAt: timestamp("updatedAt", { mode: "date" })
-        .notNull()
-        .$default(() => sql`CURRENT_TIMESTAMP(3)`),
-})
+export const passageResponse = pgTable(
+    "passageResponse",
+    {
+        id: varchar("id", { length: 255 })
+            .notNull()
+            .$default(() => crypto.randomUUID())
+            .primaryKey(),
+        book: passageResponseBook("book").notNull(),
+        chapter: integer("chapter").notNull(),
+        firstVerse: integer("firstVerse").notNull().default(0),
+        lastVerse: integer("lastVerse").notNull().default(0),
+        translation: passageResponseTranslation("translation").notNull(),
+        response: json("response").notNull(),
+        createdAt: timestamp("createdAt", { mode: "date" })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+        updatedAt: timestamp("updatedAt", { mode: "date" })
+            .notNull()
+            .$default(() => sql`CURRENT_TIMESTAMP(3)`),
+    },
+    table => ({
+        cacheKeyUnique: unique("passageResponse_cache_key_unique").on(
+            table.translation,
+            table.book,
+            table.chapter,
+            table.firstVerse,
+            table.lastVerse,
+        ),
+    }),
+)
 
 // Google Classroom Integration
 

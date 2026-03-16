@@ -1,5 +1,3 @@
-import { isAfter, isBefore, subDays } from "date-fns"
-import { and, eq, sql } from "drizzle-orm"
 import fs from "fs"
 import path from "path"
 import { z } from "zod"
@@ -14,7 +12,9 @@ import {
     toPassageSegment,
 } from "~/lib/passageSegment"
 import { db } from "~/server/db"
-import { passageResponse } from "~/server/db/schema"
+import { Translation as DbTranslation } from "~/server/db/schema"
+import { toPassageResponseCacheKey } from "~/server/passage-response/cache-key"
+import { PassageResponseRepository } from "~/server/passage-response/passageResponse.repository"
 
 import { createApiBibleURL } from "./create-api-bible-url"
 import { createESVURL } from "./create-esv-url"
@@ -59,6 +59,7 @@ const translationSchema = z
     .default("esv")
 
 export const dynamic = "force-dynamic" // defaults to auto
+const passageResponseRepository = new PassageResponseRepository(db)
 
 function getErrorMessage(error: unknown) {
     if (error instanceof Error) return error.message
@@ -102,6 +103,7 @@ async function fetchESVPassage(
     reference: PassageSegment,
 ) {
     const includesVerses = passageData.lastVerse != null
+    const cacheKey = toPassageResponseCacheKey(passageData, "esv")
 
     // Check for local cached files (ESV only)
     if (
@@ -138,37 +140,14 @@ async function fetchESVPassage(
         }
     }
 
-    // Only optimize whole chapter fetches
-    if (passageData.chapter != null && includesVerses) {
+    const existingPassageResponse =
+        await passageResponseRepository.findFreshByKey(cacheKey)
+
+    console.log("existingPassageResponse", existingPassageResponse)
+
+    if (existingPassageResponse != null) {
         console.log(
-            "Passage route cache MISS: reference isn't entire chapter",
-            { reference },
-        )
-        const response = await fetch(createESVURL(passageData), {
-            headers: {
-                Authorization: `Token ${env.CROSSWAY_SECRET}`,
-            },
-        })
-        const data: unknown = await response.json()
-        const parsedData = esvPassageSchema.parse(data)
-
-        return { data: await parseChapter(parsedData.passages.at(0) ?? "") }
-    }
-
-    const existingPassageResponse = await db.query.passageResponse.findFirst({
-        where: and(
-            eq(passageResponse.chapter, passageData.chapter),
-            eq(passageResponse.book, passageData.book),
-            eq(passageResponse.translation, "esv"),
-        ),
-    })
-
-    if (
-        existingPassageResponse != null &&
-        isAfter(existingPassageResponse.updatedAt, subDays(new Date(), 31))
-    ) {
-        console.log(
-            "Passage route cache HIT: reference is entire chapter and less than a month old",
+            "Passage route cache HIT: reference is less than a month old",
             {
                 reference,
             },
@@ -187,36 +166,11 @@ async function fetchESVPassage(
 
     const data: unknown = await response.json()
     const parsedData = esvPassageSchema.parse(data)
-    if (existingPassageResponse == null) {
-        console.log(
-            "Passage route cache MISS: reference is entire chapter but entry doesn't exist",
-            {
-                reference,
-            },
-        )
-        await db.insert(passageResponse).values({
-            response: data,
-            book: passageData.book,
-            chapter: passageData.chapter,
-            translation: "esv",
-        })
-    } else if (
-        isBefore(existingPassageResponse.updatedAt, subDays(new Date(), 31))
-    ) {
-        console.log(
-            "Passage route cache MISS: reference is entire chapter but entry is expired",
-            {
-                reference,
-            },
-        )
-        await db
-            .update(passageResponse)
-            .set({
-                response: data,
-                updatedAt: sql`CURRENT_TIMESTAMP(3)`,
-            })
-            .where(eq(passageResponse.id, existingPassageResponse.id))
-    }
+    await passageResponseRepository.upsertByKey({
+        key: cacheKey,
+        response: data,
+    })
+
     return { data: await parseChapter(parsedData.passages.at(0) ?? "") }
 }
 
@@ -225,48 +179,17 @@ async function fetchApiBiblePassage(
     reference: PassageSegment,
     translation: Exclude<Translation, "esv">,
 ) {
-    const includesVerses = passageData.lastVerse != null
+    const cacheKey = toPassageResponseCacheKey(
+        passageData,
+        translation as DbTranslation,
+    )
 
-    // Only optimize whole chapter fetches for caching
-    if (passageData.chapter != null && includesVerses) {
+    const existingPassageResponse =
+        await passageResponseRepository.findFreshByKey(cacheKey)
+
+    if (existingPassageResponse != null) {
         console.log(
-            `${translation.toUpperCase()} Passage route cache MISS: reference isn't entire chapter`,
-            { reference },
-        )
-        const response = await fetch(
-            createApiBibleURL(passageData, translation),
-            {
-                headers: {
-                    "api-key": env.API_BIBLE_API_KEY,
-                },
-            },
-        )
-        const data: unknown = await response.json()
-        const parsedData = apiBiblePassageSchema.parse(data)
-
-        return {
-            data: await parseApiBibleChapter(
-                parsedData.data.content,
-                translation,
-                parsedData.data.copyright,
-            ),
-        }
-    }
-
-    const existingPassageResponse = await db.query.passageResponse.findFirst({
-        where: and(
-            eq(passageResponse.chapter, passageData.chapter),
-            eq(passageResponse.book, passageData.book),
-            eq(passageResponse.translation, translation),
-        ),
-    })
-
-    if (
-        existingPassageResponse != null &&
-        isAfter(existingPassageResponse.updatedAt, subDays(new Date(), 31))
-    ) {
-        console.log(
-            `${translation.toUpperCase()} Passage route cache HIT: reference is entire chapter and less than a month old`,
+            `${translation.toUpperCase()} Passage route cache HIT: reference is less than a month old`,
             { reference },
         )
         const parsedData = apiBiblePassageSchema.parse(
@@ -289,32 +212,10 @@ async function fetchApiBiblePassage(
 
     const data: unknown = await response.json()
     const parsedData = apiBiblePassageSchema.parse(data)
-    if (existingPassageResponse == null) {
-        console.log(
-            `${translation.toUpperCase()} Passage route cache MISS: reference is entire chapter but entry doesn't exist`,
-            { reference },
-        )
-        await db.insert(passageResponse).values({
-            response: data,
-            book: passageData.book,
-            chapter: passageData.chapter,
-            translation: translation,
-        })
-    } else if (
-        isBefore(existingPassageResponse.updatedAt, subDays(new Date(), 31))
-    ) {
-        console.log(
-            `${translation.toUpperCase()} Passage route cache MISS: reference is entire chapter but entry is expired`,
-            { reference },
-        )
-        await db
-            .update(passageResponse)
-            .set({
-                response: data,
-                updatedAt: sql`CURRENT_TIMESTAMP(3)`,
-            })
-            .where(eq(passageResponse.id, existingPassageResponse.id))
-    }
+    await passageResponseRepository.upsertByKey({
+        key: cacheKey,
+        response: data,
+    })
     return {
         data: await parseApiBibleChapter(
             parsedData.data.content,

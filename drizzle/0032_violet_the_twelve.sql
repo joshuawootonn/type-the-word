@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS "passageResponse_cache_lookup_idx" ON "passageResponse" USING btree ("translation","book","chapter","firstVerse","lastVerse");
